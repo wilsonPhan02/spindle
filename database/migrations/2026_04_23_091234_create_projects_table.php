@@ -15,11 +15,11 @@ return new class extends Migration
             $table->uuid('project_id')->primary();
             $table->foreignUuid('user_id')->references('user_id')->on('users')->cascadeOnDelete();
             $table->foreignUuid('template_id')->references('template_id')->on('templates')->cascadeOnDelete();
-            $table->string('title', 255);
+            $table->foreignUuid('section_id')->references('section_id')->on('sections')->cascadeOnDelete();
+            $table->string('title');
             $table->text('description')->nullable();
             $table->boolean('is_pinned')->default(false);
-            $table->boolean('is_archived')->useCurrent();
-            $table->timestamp('last_edited')->useCurrent();
+            $table->timestamp('archived_at')->nullable();
             $table->timestamps();
         });
     }
