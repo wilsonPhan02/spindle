@@ -11,11 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('structure_sections', function (Blueprint $table) {
-            $table->uuid('section_id')->primary();
-            $table->foreignUuid('template_id')->references('template_id')->on('templates')->cascadeOnDelete();
-            $table->string('title', 255);
-            $table->text('goal')->nullable();
+        Schema::create('user_preferences', function (Blueprint $table) {
+            $table->uuid('id')->primary();
+            $table->foreignUuid('user_id')->references('user_id')->on('users')->cascadeOnDelete();
+            $table->enum('theme', ['light', 'dark'])->default('light');
             $table->timestamps();
         });
     }
@@ -25,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('structure_sections');
+        Schema::dropIfExists('user_preferences');
     }
 };

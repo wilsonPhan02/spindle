@@ -11,11 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('user_preferences', function (Blueprint $table) {
-            $table->uuid('id')->primary;
-            $table->foreignUuid('user_id')->references('user_id')->on('users')->cascadeOnDelete();
-            $table->string('theme', 20)->default('light');
-            $table->boolean('auto_save_enabled')->default(true);
+        Schema::create('notes', function (Blueprint $table) {
+            $table->uuid('note_id')->primary();
+            $table->foreignUuid('project')->references('project_id')->on('projects')->cascadeOnDelete();
+            $table->string('title');
+            $table->longText('body')->nullable();
             $table->timestamps();
         });
     }
@@ -25,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('user_preferences');
+        Schema::dropIfExists('notes');
     }
 };
