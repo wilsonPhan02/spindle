@@ -14,10 +14,8 @@ return new class extends Migration
         Schema::create('profiles', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->foreignUuid('user_id')->references('user_id')->on('users')->cascadeOnDelete();
-            $table->string('full_name', 255);
-            $table->text('bio')->nullable();
-            $table->text('social_links')->nullable();
-            $table->string('avatar_url', 255)->nullable();
+            $table->string('username')->unique();
+            $table->string('avatar_url')->nullable();
             $table->timestamps();
         });
     }

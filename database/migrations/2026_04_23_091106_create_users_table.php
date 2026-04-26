@@ -13,9 +13,8 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->uuid('user_id')->primary();
-            $table->string('email', 255)->unique();
-            $table->string('password', 255);
-            $table->boolean('is_verified')->default(false);
+            $table->string('email')->unique();
+            $table->string('password');
             $table->timestamps();
         });
     }

@@ -11,11 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('templates', function (Blueprint $table) {
-            $table->uuid('template_id')->primary();
-            $table->string('name', 255);
-            $table->text('description')->nullable();
-            $table->boolean('is_custom')->default(false);
+        Schema::create('structure_sections', function (Blueprint $table) {
+            $table->uuid('structure_section_id')->primary();
+            $table->foreignUuid('template_id')->references('template_id')->on('templates')->cascadeOnDelete();
+            $table->string('title');
+            $table->text('goal')->nullable();
             $table->timestamps();
         });
     }
@@ -25,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('templates');
+        Schema::dropIfExists('structure_sections');
     }
 };

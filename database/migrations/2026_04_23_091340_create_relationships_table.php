@@ -15,7 +15,7 @@ return new class extends Migration
             $table->uuid('relationship_id')->primary();
             $table->foreignUuid('from_id')->references('character_id')->on('characters')->cascadeOnDelete();
             $table->foreignUuid('to_id')->references('character_id')->on('characters')->cascadeOnDelete();
-            $table->string('type', 255);
+            $table->string('type');
             $table->text('context')->nullable();
             $table->timestamps();
         });

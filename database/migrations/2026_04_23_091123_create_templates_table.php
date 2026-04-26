@@ -11,12 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('characters', function (Blueprint $table) {
-            $table->uuid('character_id')->primary();
-            $table->foreignUuid('project_id')->references('project_id')->on('projects')->cascadeOnDelete();
-            $table->string('name', 255);
+        Schema::create('templates', function (Blueprint $table) {
+            $table->uuid('template_id')->primary();
+            $table->string('name');
             $table->text('description')->nullable();
-            $table->string('image_path', 255)->nullable();
+            $table->boolean('is_custom')->default(false);
             $table->timestamps();
         });
     }
@@ -26,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('characters');
+        Schema::dropIfExists('templates');
     }
 };
