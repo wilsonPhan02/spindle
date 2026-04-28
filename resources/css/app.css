@@ -1,8 +1,237 @@
 @import 'tailwindcss';
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:wght@400;700&family=Montserrat:wght@400;500;600;700;800&display=swap');
 
 @source '../views';
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 
 @theme {
+    /* --- Font Families --- */
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-merriweather: 'Merriweather', serif;
+    --font-montserrat: 'Montserrat', sans-serif;
+    --font-inter: 'Inter', sans-serif;
+    
+    /* Neutrals Colors */
+    --color-text-60: rgb(104 101 99);
+    --color-text-70: rgb(82 77 73);
+    --color-text-80: rgb(55 50 46);
+    --color-text-90: rgb(35 29 24);
+    --color-text-100: rgb(35 29 24);   
+    
+    /* Sub Text */     
+    --color-subtext-60: rgb(229 229 229);
+    --color-subtext-70: rgb(217 217 217);
+    --color-subtext-80: rgb(199 199 199);
+    --color-subtext-90: rgb(152 152 152);
+    --color-subtext-100: rgb(116 116 116);
+    
+    /* Interactive */
+    --color-interactive-100: rgb(53 117 255);
+    --color-interactive-opacity: rgb(101 150 255);
+    
+    /* Success */
+    --color-success-100: rgb(0 192 89);
+    
+    /* Warning */
+    --color-warning-100: rgb(255 190 0); 
+    
+    /* Danger */
+    --color-danger-100: rgb(255 59 47);
+
+    /* --- Background Colors --- */
+    
+    /* Background */
+    --color-bg-main: rgb(246 246 244);
+    --color-bg-border: rgb(239 239 233);
+    
+    /* Card */
+    --color-card-bg: rgb(255 254 251);
+    --color-card-hover: rgb(247 245 241);
+    --color-card-border: rgb(226 224 213);
+
+    /* --- Brand Colors --- */
+    --color-brand-200: rgb(201 190 181);
+    --color-brand-150: rgb(225 215 206);
+    --color-brand-100: rgb(233 225 218);
+    --color-brand-50: rgb(242 239 236);
+    --color-brand-10: rgb(247 245 244); 
+
+    /* --- Secondary --- */
+    --color-secondary-200: rgb(129 100 77); 
+    --color-secondary-150: rgb(154 125 102); 
+    --color-secondary-100: rgb(177 160 134); 
+    --color-secondary-50: rgb(198 179 149); 
+    --color-secondary-10: rgb(217 197 164); 
+}
+
+/* --- Text Styles Library (Composite Properties) --- */
+@layer components {
+
+    /* ==============================
+       WEB STYLES
+       ============================== */
+    
+    .text-web-title {
+        font-family: var(--font-merriweather);
+        font-weight: 400; /* Regular */
+        font-size: 4rem; /* 64px */
+        line-height: 5rem; /* 80px */
+        letter-spacing: 0;
+    }
+
+    .text-web-heading-1 {
+        font-family: var(--font-merriweather);
+        font-weight: 700; /* Bold */
+        font-size: 2.25rem; /* 36px */
+        line-height: 3.25rem; /* 52px */
+        letter-spacing: 0;
+    }
+
+    .text-web-heading-2 {
+        font-family: var(--font-merriweather);
+        font-weight: 400; /* Regular */
+        font-size: 1.75rem; /* 28px */
+        line-height: 2.375rem; /* 38px */
+        letter-spacing: 0;
+    }
+
+    .text-web-subheading-1 {
+        font-family: var(--font-montserrat);
+        font-weight: 600; /* SemiBold */
+        font-size: 1.25rem; /* 20px */
+        line-height: 1.75rem; /* 28px */
+        letter-spacing: 0;
+    }
+
+    .text-web-body-large {
+        font-family: var(--font-montserrat);
+        font-weight: 600; /* SemiBold */
+        font-size: 1.125rem; /* 18px */
+        line-height: 1.75rem; /* 28px */
+        letter-spacing: 0;
+    }
+
+    .text-web-body-small {
+        font-family: var(--font-montserrat);
+        font-weight: 400; /* Regular */
+        font-size: 1rem; /* 16px */
+        line-height: 1.5rem; /* 24px */
+        letter-spacing: 0;
+    }
+
+    .text-web-button {
+        font-family: var(--font-montserrat);
+        font-weight: 600; /* SemiBold */
+        font-size: 1rem; /* 16px */
+        line-height: 1.25rem; /* 20px */
+        letter-spacing: 0;
+    }
+
+    /* ==============================
+       WEB APP STYLES
+       ============================== */
+
+    .text-app-title-1 {
+        font-family: var(--font-merriweather);
+        font-weight: 400; /* Regular */
+        font-size: 2.25rem; /* 36px */
+        line-height: 2.875rem; /* 46px */
+        letter-spacing: 0;
+    }
+
+    .text-app-title-2 {
+        font-family: var(--font-montserrat);
+        font-weight: 700; /* Bold */
+        font-size: 2.25rem; /* 36px */
+        line-height: 2.625rem; /* 42px */
+        letter-spacing: 0;
+    }
+
+    .text-app-heading-1 {
+        font-family: var(--font-montserrat);
+        font-weight: 600; /* SemiBold */
+        font-size: 1.5rem; /* 24px */
+        line-height: 2rem; /* 32px */
+        letter-spacing: 0;
+    }
+
+    .text-app-heading-2 {
+        font-family: var(--font-montserrat);
+        font-weight: 600; /* SemiBold */
+        font-size: 1.25rem; /* 20px */
+        line-height: 1.5rem; /* 24px */
+        letter-spacing: 0;
+    }
+
+    .text-app-subheading-1 {
+        font-family: var(--font-inter);
+        font-weight: 600; /* SemiBold */
+        font-size: 1.25rem; /* 20px */
+        line-height: 1.5rem; /* 24px */
+        letter-spacing: 0;
+    }
+
+    .text-app-subheading-2 {
+        font-family: var(--font-inter);
+        font-weight: 600; /* SemiBold */
+        font-size: 1rem; /* 16px */
+        line-height: 1.375rem; /* 22px */
+        letter-spacing: 0;
+    }
+
+    .text-app-body-large {
+        font-family: var(--font-inter);
+        font-weight: 500; /* Medium */
+        font-size: 1rem; /* 16px */
+        line-height: 1.375rem; /* 22px */
+        letter-spacing: 0;
+    }
+
+    .text-app-body-medium {
+        font-family: var(--font-inter);
+        font-weight: 500; /* Medium */
+        font-size: 0.875rem; /* 14px */
+        line-height: 1.25rem; /* 20px */
+        letter-spacing: 0;
+    }
+
+    .text-app-body-small {
+        font-family: var(--font-inter);
+        font-weight: 500; /* Medium */
+        font-size: 0.75rem; /* 12px */
+        line-height: 1rem; /* 16px */
+        letter-spacing: 0;
+    }
+
+    .text-app-subtitle-1 {
+        font-family: var(--font-montserrat);
+        font-weight: 500; /* Medium */
+        font-size: 1.125rem; /* 18px */
+        line-height: 1.5rem; /* 24px */
+        letter-spacing: 0;
+    }
+
+    .text-app-feature {
+        font-family: var(--font-montserrat);
+        font-weight: 600; /* SemiBold */
+        font-size: 0.875rem; /* 14px */
+        line-height: 1.125rem; /* 18px */
+        letter-spacing: 0;
+    }
+
+    .text-app-subfeature {
+        font-family: var(--font-montserrat);
+        font-weight: 500; /* Medium */
+        font-size: 1rem; /* 16px */
+        line-height: 1.375rem; /* 22px */
+        letter-spacing: 0;
+    }
+
+    .text-app-desc-feature {
+        font-family: var(--font-montserrat);
+        font-weight: 500; /* Medium */
+        font-size: 0.75rem; /* 12px */
+        line-height: 1rem; /* 16px */
+        letter-spacing: 0;
+    }
 }
