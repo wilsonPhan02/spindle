@@ -40,79 +40,79 @@ new #[Layout('layouts.guest')] class extends Component
 };
 ?>
 
-<div class="flex flex-col items-center justify-center min-h-screen bg-[#F2EFEC]">
+<div class="flex flex-col items-center justify-center min-h-screen bg-brand-50">
     
-    <div class="mb-5 text-4xl font-bold tracking-tight text-[#37322E]">
-        <x-logo class="h-10 w-auto text-[#37322E]" />
+    <div class="mb-5 text-4xl font-bold font-merriweather tracking-tight text-text-80">
+        <x-logo class="h-10 w-auto text-text-80" />
     </div>
 
-    <div class="w-full max-w-md p-6 bg-[#FFFEFB] border border-transparent rounded-xl shadow-md">
+    <div class="w-full max-w-md p-6 bg-card-bg border border-transparent rounded-xl shadow-md">
         
-        <h1 class="mb-5 text-2xl font-serif text-center text-[#37322E]">Sign Up</h1>
+        <h1 class="mb-5 text-2xl font-merriweather text-center text-text-80">Sign Up</h1>
 
         <form wire:submit="register" class="space-y-3">
             
             <div>
-                <label class="block mb-1 text-sm font-medium text-[#37322E]">Email</label>
+                <label class="block mb-1 text-app-body-medium text-text-80">Email</label>
                 <input type="email" wire:model="email" placeholder="Enter your email" 
-                    class="w-full px-4 py-2 bg-white border border-[#DCDCDC] rounded-md focus:ring-2 focus:ring-[#765137] outline-none transition-all placeholder-[#989898] text-sm text-[#37322E]">
-                @error('email') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
+                    class="w-full px-4 py-2 bg-white border border-subtext-70 rounded-md focus:ring-2 focus:ring-secondary-200 outline-none transition-all placeholder-subtext-90 text-app-body-medium text-text-80">
+                @error('email') <span class="text-app-body-small text-danger-100 mt-1 block">{{ $message }}</span> @enderror
             </div>
 
             <div x-data="{ show: false }">
-                <label class="block mb-1 text-sm font-medium text-[#37322E]">Password</label>
+                <label class="block mb-1 text-app-body-medium text-text-80">Password</label>
                 <div class="relative">
                     <input :type="show ? 'text' : 'password'" wire:model="password" placeholder="Enter your password" 
-                        class="w-full px-4 py-2 pr-10 bg-white border border-[#DCDCDC] rounded-md focus:ring-2 focus:ring-[#765137] outline-none transition-all placeholder-[#989898] text-sm text-[#37322E]">
-                    <button type="button" @click="show = !show" class="absolute inset-y-0 right-0 flex items-center pr-3 text-[#989898] hover:text-[#37322E] focus:outline-none transition-colors">
+                        class="w-full px-4 py-2 pr-10 bg-white border border-subtext-70 rounded-md focus:ring-2 focus:ring-secondary-200 outline-none transition-all placeholder-subtext-90 text-app-body-medium text-text-80">
+                    <button type="button" @click="show = !show" class="absolute inset-y-0 right-0 flex items-center pr-3 text-subtext-90 hover:text-text-80 focus:outline-none transition-colors">
                         <svg x-show="!show" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7a9.978 9.978 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.542 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" /></svg>
                         <svg x-show="show" style="display: none;" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
                     </button>
                 </div>
-                @error('password') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
+                @error('password') <span class="text-app-body-small text-danger-100 mt-1 block">{{ $message }}</span> @enderror
             </div>
 
             <div x-data="{ showConfirm: false }">
-                <label class="block mb-1 text-sm font-medium text-[#37322E]">Confirm Password</label>
+                <label class="block mb-1 text-app-body-medium text-text-80">Confirm Password</label>
                 <div class="relative">
                     <input :type="showConfirm ? 'text' : 'password'" wire:model="password_confirmation" placeholder="Re-enter your password" 
-                        class="w-full px-4 py-2 pr-10 bg-white border border-[#DCDCDC] rounded-md focus:ring-2 focus:ring-[#765137] outline-none transition-all placeholder-[#989898] text-sm text-[#37322E]">
-                    <button type="button" @click="showConfirm = !showConfirm" class="absolute inset-y-0 right-0 flex items-center pr-3 text-[#989898] hover:text-[#37322E] focus:outline-none transition-colors">
+                        class="w-full px-4 py-2 pr-10 bg-white border border-subtext-70 rounded-md focus:ring-2 focus:ring-secondary-200 outline-none transition-all placeholder-subtext-90 text-app-body-medium text-text-80">
+                    <button type="button" @click="showConfirm = !showConfirm" class="absolute inset-y-0 right-0 flex items-center pr-3 text-subtext-90 hover:text-text-80 focus:outline-none transition-colors">
                         <svg x-show="!showConfirm" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7a9.978 9.978 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.542 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" /></svg>
                         <svg x-show="showConfirm" style="display: none;" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
                     </button>
                 </div>
-                @error('password_confirmation') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
+                @error('password_confirmation') <span class="text-app-body-small text-danger-100 mt-1 block">{{ $message }}</span> @enderror
             </div>
 
             <div class="flex items-start pt-1">
                 <div class="flex items-center h-5">
                     <input type="checkbox" wire:model="terms" id="terms" 
-                        class="w-4 h-4 bg-white border-transparent rounded text-[#765137] focus:ring-[#765137] focus:ring-offset-[#FFFEFB]">
+                        class="w-4 h-4 bg-white border-transparent rounded text-secondary-200 focus:ring-secondary-200 focus:ring-offset-card-bg">
                 </div>
-                <div class="ml-2 text-sm">
-                    <label for="terms" class="text-[#37322E]">
-                        I have read and agree to the <a href="#" class="text-blue-600 hover:underline">terms and conditions</a>
+                <div class="ml-2">
+                    <label for="terms" class="text-app-body-medium text-text-80">
+                        I have read and agree to the <a href="#" class="text-interactive-100 hover:underline">terms and conditions</a>
                     </label>
                 </div>
             </div>
-            @error('terms') <span class="text-xs text-red-500 block">{{ $message }}</span> @enderror
+            @error('terms') <span class="text-app-body-small text-danger-100 block">{{ $message }}</span> @enderror
 
             <button type="submit" 
-                class="w-full py-2.5 mt-2 text-sm font-medium text-[#F6F6F4] transition-colors bg-[#765137] rounded-md hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#765137] focus:ring-offset-[#FFFEFB]">
+                class="w-full py-2.5 mt-2 text-app-feature text-bg-main transition-colors bg-secondary-200 rounded-md hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary-200 focus:ring-offset-card-bg">
                 Sign Up
             </button>
             
         </form>
 
         <div class="flex items-center my-4">
-            <div class="flex-grow border-t border-gray-300"></div>
-            <span class="px-3 text-xs text-[#989898] bg-[#FFFEFB]">Or</span>
-            <div class="flex-grow border-t border-gray-300"></div>
+            <div class="flex-grow border-t border-subtext-70"></div>
+            <span class="px-3 text-app-body-small text-subtext-90 bg-card-bg">Or</span>
+            <div class="flex-grow border-t border-subtext-70"></div>
         </div>
 
         <button type="button" 
-            class="flex items-center justify-center w-full py-2.5 mb-4 text-sm font-medium text-[#37322E] transition-colors bg-white border border-[#DCDCDC] rounded-md hover:bg-gray-50">
+            class="flex items-center justify-center w-full py-2.5 mb-4 text-app-feature text-text-80 transition-colors bg-white border border-subtext-70 rounded-md hover:bg-card-hover">
             <svg class="w-5 h-5 mr-2" viewBox="0 0 24 24">
                 <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
                 <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
@@ -122,9 +122,9 @@ new #[Layout('layouts.guest')] class extends Component
             Sign in with Google
         </button>
 
-        <p class="text-sm text-center text-[#37322E]">
+        <p class="text-app-body-medium text-center text-text-80">
             Already have an account? 
-            <a href="{{ route('login') }}" class="text-blue-600 hover:underline">Log in</a>
+            <a href="{{ route('login') }}" class="text-interactive-100 hover:underline">Log in</a>
         </p>
     </div>
 </div>
