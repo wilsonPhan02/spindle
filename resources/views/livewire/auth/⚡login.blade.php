@@ -24,17 +24,20 @@ new #[Layout('layouts.guest')] class extends Component
 
         $this->addError('email', 'The provided credentials do not match our records.');
     }
-
 };
 ?>
 
-<div class="flex flex-col items-center justify-center min-h-screen bg-brand-50">
+<div class="relative flex flex-col items-center justify-center min-h-screen bg-brand-50 overflow-hidden">
     
-    <div class="mb-5 text-4xl font-bold font-merriweather tracking-tight text-text-80">
+    <div class="absolute inset-0 z-0 pointer-events-none">
+        @include('components/auth-bg') 
+    </div>
+
+    <div class="relative z-10 mb-5 text-4xl font-bold font-merriweather tracking-tight text-text-80">
         <x-logo class="h-10 w-auto text-text-80" />
     </div>
 
-    <div class="w-full max-w-md p-6 bg-card-bg border border-transparent rounded-xl shadow-md">
+    <div class="relative z-10 w-full max-w-md p-6 bg-card-bg border border-transparent rounded-xl shadow-md">
         
         <h1 class="mb-5 text-2xl font-merriweather text-center text-text-80">Sign In</h1>
 
@@ -47,7 +50,7 @@ new #[Layout('layouts.guest')] class extends Component
                 @error('email') <span class="text-app-body-small text-danger-100 mt-1 block">{{ $message }}</span> @enderror
             </div>
 
-            <div x-data="{ show: false }">
+            <div class="mb-5" x-data="{ show: false }">
                 <label class="block mb-1 text-app-body-medium text-text-80">Password</label>
                 <div class="relative">
                     <input :type="show ? 'text' : 'password'" wire:model="password" placeholder="Enter your password" 
@@ -69,8 +72,8 @@ new #[Layout('layouts.guest')] class extends Component
             <div class="flex items-center justify-between pt-1">
                 <div class="flex items-center">
                     <input type="checkbox" wire:model="remember" id="remember" 
-                        class="w-4 h-4 bg-white border-transparent rounded text-secondary-200 focus:ring-secondary-200 focus:ring-offset-card-bg">
-                    <label for="remember" class="ml-2 text-app-body-medium text-text-80">Remember me</label>
+                        class="w-4 h-4 flex-shrink-0 mt-0.5 bg-white border-transparent rounded text-secondary-200 focus:ring-secondary-200 focus:ring-offset-card-bg">
+                    <label for="remember" class="ml-2 text-app-body-medium text-text-80 cursor-pointer">Remember me</label>
                 </div>
                 <a href="#" class="text-app-body-medium text-interactive-100 hover:underline">Forgot Password?</a>
             </div>
