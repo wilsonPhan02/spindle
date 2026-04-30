@@ -27,7 +27,5 @@ Route::middleware('guest')->group(function () {
 Route::middleware('auth')->group(function () {
     
     // Rute dummy Dashboard setelah sukses register/login
-    Route::get('/dashboard', function () {
-        return 'Berhasil! Selamat datang di Dashboard Spindle.';
-    })->name('dashboard');
+Volt::route('/dashboard', 'dashboard.index')->name('dashboard');
 });

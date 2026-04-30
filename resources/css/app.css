@@ -235,3 +235,20 @@
         letter-spacing: 0;
     }
 }
+
+@layer utilities {
+    /* Mengubah tampilan scrollbar khusus buat class custom-scrollbar */
+    .custom-scrollbar::-webkit-scrollbar {
+        width: 4px; /* Scrollbar tipis elegan */
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        background-color: var(--color-brand-200); /* Warna coklat muda */
+        border-radius: 10px;
+    }
+    .custom-scrollbar:hover::-webkit-scrollbar-thumb {
+        background-color: var(--color-secondary-100); /* Lebih gelap pas dihover */
+    }
+}
