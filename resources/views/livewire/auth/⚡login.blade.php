@@ -27,18 +27,14 @@ new #[Layout('layouts.guest')] class extends Component
 };
 ?>
 
-<div class="relative flex flex-col items-center justify-center min-h-screen bg-brand-50 overflow-hidden">
+<div class="relative flex flex-col items-center justify-center min-h-screen w-full">
     
     <div class="absolute inset-0 z-0 pointer-events-none">
         @include('components/auth-bg') 
     </div>
 
-    <div class="relative z-10 mb-5 text-4xl font-bold font-merriweather tracking-tight text-text-80">
-        <x-logo class="h-10 w-auto text-text-80" />
-    </div>
+    <div class="relative z-10 flex flex-col items-center justify-center w-full px-4">
 
-    <div class="relative z-10 w-full max-w-md p-6 bg-card-bg border border-transparent rounded-xl shadow-md">
-        
         <h1 class="mb-5 text-2xl font-merriweather text-center text-text-80">Sign In</h1>
 
         <form wire:submit="login" class="space-y-3">
