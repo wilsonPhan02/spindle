@@ -40,14 +40,12 @@ new #[Layout('layouts.guest')] class extends Component
 };
 ?>
 
-<div class="relative flex flex-col items-center justify-center min-h-screen bg-brand-50 w-full max-w-[100vw] overflow-x-hidden">
+<div class="relative flex flex-col items-center justify-center min-h-screen w-full">
     
-    <!-- BACKGROUND LAYER (Z-0) -->
     <div class="absolute inset-0 z-0 pointer-events-none">
         @include('components/auth-bg') 
     </div>
 
-    <!-- FOREGROUND LAYER (Z-10) - Form & Konten Utama -->
     <div class="relative z-10 flex flex-col items-center justify-center w-full px-4">
         
         <div class="mb-5 text-4xl font-bold font-merriweather tracking-tight text-text-80">
