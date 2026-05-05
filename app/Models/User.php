@@ -29,6 +29,11 @@ class User extends Authenticatable
         'remember_token',
     ];
 
+    // function untuk relasi one-to-one dengan Profile
+    public function profile() {
+        return $this->hasOne(Profile::class, 'user_id', 'user_id');
+    }
+
     // typecast ke tipe data tertentu
     protected function casts(): array
     {
