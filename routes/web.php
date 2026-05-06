@@ -27,5 +27,7 @@ Route::middleware('guest')->group(function () {
 Route::middleware('auth')->group(function () {
     
     // Rute dummy Dashboard setelah sukses register/login
-Volt::route('/dashboard', 'dashboard.index')->name('dashboard');
+    Volt::route('/dashboard', 'dashboard.index')->name('dashboard');
+    // Rute untuk ke Settings Page
+    Volt::route('/settings', 'settings.index')->name('settings');
 });
