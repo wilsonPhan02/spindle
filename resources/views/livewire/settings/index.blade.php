@@ -30,7 +30,7 @@ new #[Layout('layouts.app')] class extends Component {
             <hr class="w-full border-subtext-80">
         </div>
 
-        <div class="flex items-center gap-10 pl-4">
+        <div class="flex items-center gap-15 pl-8">
             <!-- Avatar -->
             <div class="w-32 h-32 rounded-full bg-secondary-5 border border-secondary-20 flex items-center justify-center overflow-hidden flex-shrink-0 relative shadow-sm">
                 @if($profile && $profile->avatar_url)
@@ -41,8 +41,8 @@ new #[Layout('layouts.app')] class extends Component {
             </div>
 
             <!-- Profile Data Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-y-8 gap-x-12 w-full pt-2">
-                <x-settings-items variant="info" label="Your Preferred Name" :value="$profile->name" ></x->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-y-8 gap-x-12 w-full pt-2 justify-between">
+                <x-settings-items variant="info" label="Your Preferred Name" :value="$profile->username" ></x->
                 <x-settings-items variant="info" label="Occupation" :value="$profile->occupation ?? 'None'" ></x->
                 <x-settings-items variant="info" label="Gender" :value="$profile->gender ?? 'None'" ></x->
                 <x-settings-items variant="info" label="Email" :value="$profile->email ?? 'None'" ></x->
@@ -82,18 +82,24 @@ new #[Layout('layouts.app')] class extends Component {
             </x-settings-items>
 
             <!-- Logout -->
-            <x-settings-items variant="menu" label="Logout" wire:click="logout">
+            <x-settings-items variant="menu" label="Logout" @click="$dispatch('open-logout-dialog')">
                 <x-slot:icon>
                     <svg class="w-5 h-5 text-subtext-90" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
                 </x-slot:icon>
             </x-settings-items>
 
             <!-- Delete Account -->
-            <x-settings-items variant="menu" label="Delete Account" wire:click="openDeleteAccount">
+            <x-settings-items variant="menu" label="Delete Account" danger="true" wire:click="openDeleteAccount">
                 <x-slot:icon>
                     <svg class="w-5 h-5 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                 </x-slot:icon>
             </x-settings-items>
         </div>
     </section>
+
+    {{-- import popup / dialog --}}
+    <livewire:settings.logout-dialog />
+
 </div>
+
+
