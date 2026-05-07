@@ -43,7 +43,7 @@
             {{-- Background ganti warna kalau isOn = true --}}
             <div 
                 class="w-11 h-6 rounded-full relative shadow-inner transition-colors duration-300"
-                :class="isOn ? 'bg-blue-600' : 'bg-gray-200'"
+                :class="isOn ? 'bg-secondary-250' : 'bg-gray-200'"
             >
                 {{-- Lingkaran putih geser ke kanan kalau isOn = true --}}
                 <div 

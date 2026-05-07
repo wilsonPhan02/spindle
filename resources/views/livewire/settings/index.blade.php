@@ -42,10 +42,10 @@ new #[Layout('layouts.app')] class extends Component {
 
             <!-- Profile Data Grid -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-y-8 gap-x-12 w-full pt-2 justify-between">
-                <x-settings-items variant="info" label="Your Preferred Name" :value="$profile->username" ></x->
+                <x-settings-items variant="info" label="Your Preferred Name" :value="$profile->username ?? 'Sailor Shift'" ></x->
                 <x-settings-items variant="info" label="Occupation" :value="$profile->occupation ?? 'None'" ></x->
                 <x-settings-items variant="info" label="Gender" :value="$profile->gender ?? 'None'" ></x->
-                <x-settings-items variant="info" label="Email" :value="$profile->email ?? 'None'" ></x->
+                <x-settings-items variant="info" label="Email" :value="$user->email ?? 'None'" ></x->
                 <x-settings-items variant="info" label="Birth Date" :value="$profile->birthdate ?? 'dd-mm-yyyy'" ></x->
             </div>
         </div>
@@ -89,7 +89,7 @@ new #[Layout('layouts.app')] class extends Component {
             </x-settings-items>
 
             <!-- Delete Account -->
-            <x-settings-items variant="menu" label="Delete Account" danger="true" wire:click="openDeleteAccount">
+            <x-settings-items variant="menu" label="Delete Account" danger="true" @click="$dispatch('open-delete-dialog')">
                 <x-slot:icon>
                     <svg class="w-5 h-5 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                 </x-slot:icon>
@@ -99,6 +99,7 @@ new #[Layout('layouts.app')] class extends Component {
 
     {{-- import popup / dialog --}}
     <livewire:settings.logout-dialog />
+    <livewire:settings.delete-dialog />
 
 </div>
 
