@@ -39,13 +39,10 @@
         </div>
 
         @if($variant === 'toggle')
-            <!-- Bentuk Saklar Toggle (Bisa Diklik) -->
-            {{-- Background ganti warna kalau isOn = true --}}
             <div 
                 class="w-11 h-6 rounded-full relative shadow-inner transition-colors duration-300"
-                :class="isOn ? 'bg-secondary-250' : 'bg-gray-200'"
+                :class="isOn ? 'bg-secondary-300' : 'bg-gray-200'"
             >
-                {{-- Lingkaran putih geser ke kanan kalau isOn = true --}}
                 <div 
                     class="w-5 h-5 bg-white rounded-full shadow absolute top-0.5 left-0.5 transition-transform duration-300"
                     :class="isOn ? 'translate-x-5' : 'translate-x-0'"

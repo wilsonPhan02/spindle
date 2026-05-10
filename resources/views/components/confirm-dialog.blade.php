@@ -53,14 +53,14 @@
             <!-- Tombol Batal -->
             <button 
                 @click="show = false" 
-                class="flex-1 py-3 px-4 rounded-lg bg-brand-100 text-text-80 text-app-feature hover:bg-brand-150 transition-colors"
+                class="flex-1 py-3 px-4 rounded-lg bg-brand-100 text-text-80 text-web-body-small font-semibold hover:bg-brand-150 transition-colors"
             >
                 {{ $cancelText }}
             </button>
             <!-- Tombol Aksi Utama (Livewire) -->
             <button 
                 wire:click="{{ $submitAction }}" 
-                class="flex-1 py-3 px-4 rounded-lg text-subtext-60 transition-colors text-app-feature {{ $btnColor }}"
+                class="flex-1 py-3 px-4 rounded-lg text-subtext-60 transition-colors text-web-body-small font-semibold {{ $btnColor }}"
             >
                 {{ $confirmText }}
             </button>
