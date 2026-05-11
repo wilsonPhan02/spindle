@@ -86,25 +86,9 @@ new class extends Component {
                     model="new_password_confirmation" 
                 />
 
-                <div class="flex flex-col gap-5">
-                    <p class="text-web-body-small text-text-80 mt-4">Are you sure want to change your password?</p>
-
-                    <div class="flex gap-4">
-                        <button 
-                            type="button" 
-                            @click="show = false"
-                            class="flex-1 py-4 bg-brand-100 text-text-80 text-web-body-small font-semibold rounded-xl hover:bg-brand-150 transition-colors"
-                        >
-                            No, leave it
-                        </button>
-                        <button 
-                            type="submit"
-                            class="flex-1 py-4 bg-secondary-300 text-subtext-60 text-web-body-small font-semibold rounded-xl hover:bg-[#634735] transition-colors shadow-lg"
-                        >
-                            Yes, change it!
-                        </button>
-                    </div>
-                </div>
+                <x-dialog-footer 
+                    message="Are you sure want to change your password?" 
+                />
             </form>
         </div>
     </div>

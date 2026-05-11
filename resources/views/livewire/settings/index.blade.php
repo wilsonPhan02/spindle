@@ -1,14 +1,26 @@
 <?php
 
 use Livewire\Volt\Component;
+use Livewire\Attributes\On;
 
 new #[Layout('layouts.app')] class extends Component {
     public $user;
     public $profile;
 
     public function mount(){
-        $this->user = Auth::user();
+        $this->loadData();
+    }
+    
+    public function loadData()
+    {
+        $this->user = Auth::user()->fresh();
         $this->profile = $this->user->profile;
+    }
+
+    #[On('profile-updated')]
+    public function refreshSettings()
+    {
+        $this->loadData();
     }
 
 }; ?>
@@ -32,13 +44,10 @@ new #[Layout('layouts.app')] class extends Component {
 
         <div class="flex items-center gap-15 pl-8">
             <!-- Avatar -->
-            <div class="w-32 h-32 rounded-full bg-secondary-5 border border-secondary-20 flex items-center justify-center overflow-hidden flex-shrink-0 relative shadow-sm">
-                @if($profile && $profile->avatar_url)
-                    <img src="{{ $profile->avatar_url }}" alt="Avatar" class="w-full h-full object-cover">
-                @else
-                    <x-icons.default-profile class="w-18 h-18 text-secondary-250" />
-                @endif
-            </div>
+            <x-avatar 
+                size="w-35 h-35"
+                :imageUrl="auth()->user()->profile->avatar_url ? Storage::url(auth()->user()->profile->avatar_url) : null"
+            />
 
             <!-- Profile Data Grid -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-y-8 gap-x-12 w-full pt-2 justify-between">
@@ -68,7 +77,7 @@ new #[Layout('layouts.app')] class extends Component {
             </x-settings-items>
 
             <!-- Edit Profile -->
-            <x-settings-items variant="menu" label="Edit Profile">
+            <x-settings-items variant="menu" label="Edit Profile" @click="$dispatch('open-edit-profile')">
                 <x-slot:icon>
                     <svg class="w-5 h-5 text-subtext-90" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
                 </x-slot:icon>
@@ -101,6 +110,7 @@ new #[Layout('layouts.app')] class extends Component {
     <livewire:settings.logout-dialog />
     <livewire:settings.delete-dialog />
     <livewire:settings.change-password />
+    <livewire:settings.edit-profile />
 
 </div>
 

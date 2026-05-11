@@ -254,4 +254,6 @@
     .custom-scrollbar:hover::-webkit-scrollbar-thumb {
         background-color: var(--color-secondary-100); /* Lebih gelap pas dihover */
     }
+
+    
 }
