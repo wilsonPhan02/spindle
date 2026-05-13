@@ -237,7 +237,67 @@
         line-height: 1rem; /* 16px */
         letter-spacing: 0;
     }
+
+    /* ==============================
+       FLATPICKR CUSTOM
+       ============================== */
+    .flatpickr-calendar.static {
+        @apply bg-brand-10 border border-secondary-50 rounded-xl shadow-lg !important;
+        @apply right-0 left-auto mt-1 !important;
+        transform: scale(0.9) !important;
+        transform-origin: top right !important;
+        font-family: var(--font-montserrat) !important;
+    }
+
+    .flatpickr-current-month {
+        @apply flex items-center h-8 p-0 !important;
+    }
+
+    .flatpickr-monthDropdown-months {
+        @apply text-[13px] font-medium text-secondary-200 bg-brand-10 rounded-md px-1 !important;
+        @apply hover:bg-brand-100 transition-colors cursor-pointer !important;
+        height: 24px !important;
+    }
+
+    .flatpickr-monthDropdown-month {
+        @apply bg-brand-10 text-secondary-200 !important;
+    }
+
+    span.flatpickr-weekday {
+        @apply text-secondary-250 font-medium !important;
+    }
+
+    .flatpickr-day {
+        @apply rounded-lg transition-colors !important;
+    }
+
+    .flatpickr-day:hover,
+    .flatpickr-day.prevMonthDay:hover,
+    .flatpickr-day.nextMonthDay:hover,
+    .flatpickr-day.today:hover,
+    .flatpickr-day:focus {
+        @apply bg-brand-100 text-secondary-200 border-transparent !important;
+    }
+
+    .flatpickr-day.today {
+        @apply border-secondary-100 text-secondary-250 !important;
+    }
+
+    .flatpickr-day.selected {
+        @apply bg-secondary-200 border-secondary-200 text-brand-10 !important;
+    }
+
+    .flatpickr-prev-month svg,
+    .flatpickr-next-month svg {
+        @apply fill-secondary-200 transition-colors !important;
+    }
+
+    .flatpickr-prev-month:hover svg,
+    .flatpickr-next-month:hover svg {
+        @apply fill-secondary-250 !important;
+    }
 }
+
 
 @layer utilities {
     /* Mengubah tampilan scrollbar khusus buat class custom-scrollbar */
@@ -257,3 +317,4 @@
 
     
 }
+
