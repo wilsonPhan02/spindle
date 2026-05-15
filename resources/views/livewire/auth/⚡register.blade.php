@@ -33,6 +33,15 @@ new #[Layout('layouts.guest')] #[Title('Sign Up - Spindle')] class extends Compo
             'password' => Hash::make($this->password),
         ]);
 
+        // code sementara agar kolom username nya tidak null
+        $firstname = explode('@', $this->email)[0];
+        $defaultUsername = $firstname . rand(1000, 9999);
+
+        // menambahkan data pada tabel profile setelah user berhasil dibuat
+        $user->profile()->create([
+            'username' => $defaultUsername
+        ]);
+
         // 3. Login & Redirect
         Auth::login($user);
 

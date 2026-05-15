@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Concerns\HasUuids; // Wajib import ini
+use Illuminate\Auth\Notifications\ResetPassword;
+use Illuminate\Notifications\Messages\MailMessage;
 
 class User extends Authenticatable
 {
@@ -29,11 +31,32 @@ class User extends Authenticatable
         'remember_token',
     ];
 
+    // function untuk relasi one-to-one dengan Profile
+    public function profile() {
+        return $this->hasOne(Profile::class, 'user_id', 'user_id');
+    }
+
     // typecast ke tipe data tertentu
     protected function casts(): array
     {
         return [
             'password' => 'hashed', // biar password otomatis dihash pas disimpan
         ];
+    }
+
+    public function sendPasswordResetNotification($token)
+    {
+        $url = url(route('password.reset', [
+            'token' => $token,
+            'email' => $this->getEmailForPasswordReset(),
+        ], false));
+
+        ResetPassword::toMailUsing(function ($notifiable, $token) use ($url) {
+            return (new MailMessage)
+                ->subject('Rewrite Your Story - Reset Password')
+                ->view('emails.forgot-password', ['url' => $url]);
+        });
+
+        $this->notify(new ResetPassword($token));
     }
 }

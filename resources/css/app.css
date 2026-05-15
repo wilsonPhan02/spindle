@@ -37,7 +37,6 @@
     
     /* Danger */
     --color-danger-100: rgb(255 59 47);
-
     /* --- Background Colors --- */
     
     /* Background */
@@ -57,11 +56,15 @@
     --color-brand-10: rgb(247 245 244); 
 
     /* --- Secondary --- */
+    --color-secondary-300: rgb(118 81 55);
+    --color-secondary-250: rgb(138 97 68);
     --color-secondary-200: rgb(129 100 77); 
     --color-secondary-150: rgb(154 125 102); 
     --color-secondary-100: rgb(177 160 134); 
     --color-secondary-50: rgb(198 179 149); 
+    --color-secondary-20: rgb(212 198 188); 
     --color-secondary-10: rgb(217 197 164); 
+    --color-secondary-5: rgb(244 236 229)
 }
 
 /* --- Text Styles Library (Composite Properties) --- */
@@ -234,7 +237,65 @@
         line-height: 1rem; /* 16px */
         letter-spacing: 0;
     }
+
+    /* ==============================
+       FLATPICKR CUSTOM
+       ============================== */
+    .flatpickr-calendar.static {
+        @apply !bg-brand-10 !border !border-secondary-50 !rounded-xl !shadow-lg;
+        @apply !right-0 !left-auto !mt-1;
+        
+        transform: scale(0.9) !important;
+        transform-origin: top right !important;
+        font-family: var(--font-montserrat) !important;
+    }
+
+    .flatpickr-current-month {
+        @apply !flex !items-center !h-8 !p-0;
+    }
+
+    .flatpickr-monthDropdown-months {
+        @apply !text-[17px] !font-medium !text-secondary-200 !bg-brand-10 !rounded-md !px-1;
+        @apply hover:!bg-brand-100 !transition-colors !cursor-pointer; 
+        height: 24px !important;
+    }
+
+    span.flatpickr-weekday {
+        @apply !text-secondary-250 !font-medium;
+    }
+
+    .flatpickr-day {
+        @apply !rounded-lg !transition-colors;
+    }
+
+    .flatpickr-day:hover,
+    .flatpickr-day.prevMonthDay:hover,
+    .flatpickr-day.nextMonthDay:hover,
+    .flatpickr-day.today:hover,
+    .flatpickr-day:focus {
+        @apply !bg-brand-100 !text-secondary-200 !border-transparent;
+    }
+
+    .flatpickr-day.today {
+        @apply !border-secondary-100 !text-secondary-250;
+    }
+
+    .flatpickr-day.selected {
+        /* Tadi kurang 'text-' di sini */
+        @apply !bg-secondary-200 !border-secondary-200 !text-brand-10;
+    }
+
+    .flatpickr-prev-month svg,
+    .flatpickr-next-month svg {
+        @apply !fill-secondary-200 !transition-colors;
+    }
+
+    .flatpickr-prev-month:hover svg,
+    .flatpickr-next-month:hover svg {
+        @apply !fill-secondary-250;
+    }
 }
+
 
 @layer utilities {
     /* Mengubah tampilan scrollbar khusus buat class custom-scrollbar */
@@ -251,4 +312,7 @@
     .custom-scrollbar:hover::-webkit-scrollbar-thumb {
         background-color: var(--color-secondary-100); /* Lebih gelap pas dihover */
     }
+
+    
 }
+

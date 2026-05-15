@@ -81,6 +81,18 @@ new #[Layout('layouts.guest')] #[Title('Sign In - Spindle')] class extends Compo
                     <a href="#" class="text-app-body-medium text-interactive-100 hover:underline">Forgot Password?</a>
                 </div>
 
+                {{-- <a href="#" class="text-app-body-medium text-interactive-100 hover:underline">Forgot Password?</a> --}}
+
+                <div class="text-right -mt-1">
+                    <button 
+                        type="button"
+                        @click="show = false; $dispatch('open-forgot-password')" 
+                        class="text-app-body-medium text-interactive-100 hover:underline italic"
+                    >
+                        Forgot Password?
+                    </button>
+                </div>
+
                 <button type="submit" 
                     class="w-full py-2.5 mt-2 text-app-feature text-bg-main transition-colors bg-secondary-200 rounded-md hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary-200 focus:ring-offset-card-bg">
                     Sign In
@@ -113,4 +125,6 @@ new #[Layout('layouts.guest')] #[Title('Sign In - Spindle')] class extends Compo
         </div>
 
     </div>
+
+    <livewire:auth.forgot-password />
 </div>

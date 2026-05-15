@@ -12,9 +12,16 @@
 
     <div class="p-6">
         <div class="flex items-center space-x-3">
-            <div class="w-12 h-12 rounded-full bg-secondary-100 flex items-center justify-center overflow-hidden">
+            {{-- <div class="w-12 h-12 rounded-full bg-secondary-100 flex items-center justify-center overflow-hidden">
                 <x-icons.default-profile class="w-6 h-6 text-secondary-200" />
+            </div> --}}
+            <div>
+                <x-avatar 
+                    size="w-12 h-12"
+                    :imageUrl="auth()->user()->profile->avatar_url ? Storage::url(auth()->user()->profile->avatar_url) : null"
+                />
             </div>
+
             <div class="flex flex-col truncate">
                 <span class="text-app-subheading-2 text-text-80 truncate">{{ Auth::user()->name ?? 'Guest' }}</span>
                 <span class="text-app-body-small text-subtext-90 truncate">{{ Auth::user()->email ?? 'guest@spindle.com' }}</span>
@@ -65,7 +72,7 @@
                     Archive
                 </a>
                 
-                <a href="#" class="flex items-center px-3 py-2 -mx-3 rounded-lg text-app-body-medium text-text-80 hover:bg-brand-150 hover:text-text-100 transition-colors group">
+                <a href="settings" class="flex items-center px-3 py-2 -mx-3 rounded-lg text-app-body-medium text-text-80 hover:bg-brand-150 hover:text-text-100 transition-colors group">
                     <x-icons.setting class="w-5 h-5 mr-3 text-text-80 group-hover:text-text-100 transition-colors" />
                     Settings
                 </a>
