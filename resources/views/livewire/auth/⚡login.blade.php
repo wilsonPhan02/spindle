@@ -71,7 +71,17 @@ new #[Layout('layouts.guest')] class extends Component
                         class="w-4 h-4 flex-shrink-0 mt-0.5 bg-white border-transparent rounded text-secondary-200 focus:ring-secondary-200 focus:ring-offset-card-bg">
                     <label for="remember" class="ml-2 text-app-body-medium text-text-80 cursor-pointer">Remember me</label>
                 </div>
-                <a href="#" class="text-app-body-medium text-interactive-100 hover:underline">Forgot Password?</a>
+                {{-- <a href="#" class="text-app-body-medium text-interactive-100 hover:underline">Forgot Password?</a> --}}
+
+                <div class="text-right -mt-1">
+                    <button 
+                        type="button"
+                        @click="show = false; $dispatch('open-forgot-password')" 
+                        class="text-app-body-medium text-interactive-100 hover:underline italic"
+                    >
+                        Forgot Password?
+                    </button>
+                </div>
             </div>
 
             <button type="submit" 
@@ -103,4 +113,6 @@ new #[Layout('layouts.guest')] class extends Component
             <a href="{{ route('register') }}" class="text-interactive-100 hover:underline">Sign up</a>
         </p>
     </div>
+
+    <livewire:auth.forgot-password />
 </div>

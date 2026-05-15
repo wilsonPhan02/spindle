@@ -19,26 +19,23 @@
             }
         @endif
     }" 
-    {{-- LISTENER BARU DI SINI --}}
+
     @profile-updated.window="photoPreview = $event.detail.avatarUrl; isRemoved = false"
     @open-edit-profile.window="if(@json($editable)) { photoPreview = null; isRemoved = false; if($refs.photo) $refs.photo.value = null }"
     class="flex flex-col items-center shrink-0"
 >
     <div 
-        {{-- Hapus flex dan items-center di sini, cukup biarkan relative --}}
         class="{{ $size }} rounded-full bg-brand-100 border-2 border-brand-200 overflow-hidden relative group transition-all shrink-0"
         :class="{ 'cursor-pointer hover:border-secondary-200': @json($editable) }"
         @if($editable) @click="$refs.photo.click()" @endif
     >
         {{-- Tampilan FOTO --}}
         <template x-if="photoPreview || ('{{ $imageUrl }}' && !isRemoved)">
-            {{-- Gunakan absolute inset-0 agar gambar menempel sempurna ke pinggir lingkaran --}}
             <img :src="photoPreview || '{{ $imageUrl }}'" class="absolute inset-0 w-full h-full object-cover object-center z-10">
         </template>
 
         {{-- Tampilan PLACEHOLDER --}}
         <template x-if="!photoPreview && (!'{{ $imageUrl }}' || isRemoved)">
-            {{-- Gunakan absolute inset-0 juga di sini --}}
             <div class="absolute inset-0 flex items-center justify-center bg-brand-100 z-0">
                 <x-icons.default-avatar
                     primaryColor="#D9C5A4"

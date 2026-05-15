@@ -69,7 +69,13 @@ new class extends Component {
                 />
                 
                 <div class="text-right -mt-4">
-                    <a href="#" class="text-app-desc-feature text-interactive-100 hover:underline italic">Forgot Password?</a>
+                    <button 
+                        type="button"
+                        @click="show = false; $dispatch('open-forgot-password')" 
+                        class="text-app-desc-feature text-interactive-100 hover:underline italic focus:outline-none"
+                    >
+                        Forgot Password?
+                    </button>
                 </div>
 
                 <x-form-input 

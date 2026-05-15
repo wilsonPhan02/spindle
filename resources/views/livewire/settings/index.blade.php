@@ -110,6 +110,7 @@ new #[Layout('layouts.app')] class extends Component {
     <livewire:settings.logout-dialog />
     <livewire:settings.delete-dialog />
     <livewire:settings.change-password />
+    <livewire:auth.forgot-password />
     <livewire:settings.edit-profile wire:key="modal-edit-{{ auth()->user()->profile->avatar_url }}"/>
 
 </div>
