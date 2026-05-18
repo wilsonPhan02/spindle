@@ -1,10 +1,10 @@
-<aside 
+<aside
     @mouseleave="isHovered = false"
     class="fixed inset-y-0 left-0 z-50 w-72 bg-brand-100 border-r border-brand-150 transition-transform duration-300 ease-in-out flex flex-col shadow-sm"
     :class="(isPinned || isHovered) ? 'translate-x-0' : '-translate-x-full'"
 >
-    <button 
-        @click="isPinned = false; isHovered = false" 
+    <button
+        @click="isPinned = false; isHovered = false"
         class="absolute right-0 top-1/2 translate-x-1/2 -translate-y-1/2 w-8 h-16 bg-brand-100 border border-brand-150 rounded-full flex items-center justify-start pl-1.5 text-text-80 hover:bg-brand-150 transition-colors z-50 shadow-sm focus:outline-none"
     >
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
@@ -12,19 +12,21 @@
 
     <div class="p-6">
         <div class="flex items-center space-x-3">
-            {{-- <div class="w-12 h-12 rounded-full bg-secondary-100 flex items-center justify-center overflow-hidden">
-                <x-icons.default-profile class="w-6 h-6 text-secondary-200" />
-            </div> --}}
+            {{-- Bagian Avatar ini UTUH sesuai kodingan asli lu, tidak disentuh --}}
             <div>
-                <x-avatar 
+                <x-avatar
                     size="w-12 h-12"
-                    :imageUrl="auth()->user()->profile->avatar_url ? Storage::url(auth()->user()->profile->avatar_url) : null"
-                />
+                    :imageUrl="auth()->user()->profile?->avatar_url ? Storage::url(auth()->user()->profile->avatar_url) : null"                />
             </div>
 
             <div class="flex flex-col truncate">
-                <span class="text-app-subheading-2 text-text-80 truncate">{{ Auth::user()->name ?? 'Guest' }}</span>
-                <span class="text-app-body-small text-subtext-90 truncate">{{ Auth::user()->email ?? 'guest@spindle.com' }}</span>
+                <span class="text-app-subheading-2 text-text-80 truncate" :title="currentUsername" x-text="currentUsername">
+                {{ Auth::user()->profile?->username ?? explode('@', Auth::user()->email)[0] }}
+                </span>
+
+                <span class="text-app-body-small text-subtext-90 truncate" title="{{ Auth::user()->email }}">
+                {{ Auth::user()->email }}
+                </span>
             </div>
         </div>
     </div>
@@ -37,7 +39,7 @@
     </div>
 
     <div class="flex-1 overflow-y-auto px-6 space-y-6 pb-6 custom-scrollbar">
-        
+
         <div x-data="{ open: true }">
             <button @click="open = !open" class="flex items-center justify-between w-full text-app-feature text-text-70 mb-2 focus:outline-none hover:text-text-80 transition-colors">
                 <span>Pinned</span>
@@ -71,7 +73,7 @@
                     <x-icons.archive class="w-5 h-5 mr-3 text-text-80 group-hover:text-text-100 transition-colors" />
                     Archive
                 </a>
-                
+
                 <a href="settings" class="flex items-center px-3 py-2 -mx-3 rounded-lg text-app-body-medium text-text-80 hover:bg-brand-150 hover:text-text-100 transition-colors group">
                     <x-icons.setting class="w-5 h-5 mr-3 text-text-80 group-hover:text-text-100 transition-colors" />
                     Settings
