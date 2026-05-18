@@ -60,6 +60,9 @@ class User extends Authenticatable
         $this->notify(new ResetPassword($token));
     }
 
+    public function sections() {
+        return $this->hasMany(Section::class, 'user_id', 'user_id');
+    }
 
     protected static function booted()
     {
