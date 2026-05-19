@@ -14,9 +14,15 @@ return new class extends Migration
         Schema::create('projects', function (Blueprint $table) {
             $table->uuid('project_id')->primary();
             $table->foreignUuid('user_id')->references('user_id')->on('users')->cascadeOnDelete();
-            $table->foreignUuid('template_id')->references('template_id')->on('templates')->cascadeOnDelete();
+
+            // Tambahkan ->nullable() di sini agar user bisa bikin project kosong tanpa template dulu
+            $table->foreignUuid('template_id')->nullable()->references('template_id')->on('templates')->cascadeOnDelete();
+
             $table->foreignUuid('section_id')->references('section_id')->on('sections')->cascadeOnDelete();
-            $table->string('title');
+
+            // Tambahkan default value
+            $table->string('title')->default('Untitled Project');
+
             $table->text('description')->nullable();
             $table->boolean('is_pinned')->default(false);
             $table->timestamp('archived_at')->nullable();
