@@ -21,16 +21,18 @@ Volt::route('/reset-password/{token}', 'auth.reset-password')->name('password.re
 
 // AREA GUEST: Hanya bisa diakses oleh orang yang BELUM LOGIN
 Route::middleware('guest')->group(function () {
-    
+
     Volt::route('/register', 'auth.register')->name('register');
     Volt::route('/login', 'auth.login')->name('login');
 });
 
 // AREA AUTH: Hanya bisa diakses oleh orang yang SUDAH LOGIN
 Route::middleware('auth')->group(function () {
-    
-    // Rute dummy Dashboard setelah sukses register/login
+
+    // Rute Dashboard setelah sukses register/login
     Volt::route('/dashboard', 'dashboard.index')->name('dashboard');
     // Rute untuk ke Settings Page
     Volt::route('/settings', 'settings.index')->name('settings');
+    // Rute untuk ke detail project
+    Volt::route('/projects/{project}', 'projects.show')->name('projects.show');
 });

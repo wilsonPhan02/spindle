@@ -27,4 +27,10 @@ class Section extends Model
     {
         return $this->belongsTo(User::class, 'user_id', 'user_id');
     }
+
+    // Tambahkan di dalam class Section
+    public function projects()
+    {
+        return $this->hasMany(Project::class, 'section_id', 'section_id');
+    }
 }
