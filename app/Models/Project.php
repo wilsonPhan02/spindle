@@ -15,7 +15,8 @@ class Project extends Model
 
     protected $fillable = [
         'project_id', 'user_id', 'template_id', 'section_id',
-        'title', 'description', 'is_pinned', 'archived_at'
+        'title', 'description', 'is_pinned', 'archived_at', 'synopsis',
+        'cover_image_path',
     ];
 
     public function section()
@@ -26,5 +27,9 @@ class Project extends Model
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id', 'user_id');
+    }
+    
+    public function categories() {
+        return $this->hasMany(ProjectCategory::class, 'project_id', 'project_id');
     }
 }
