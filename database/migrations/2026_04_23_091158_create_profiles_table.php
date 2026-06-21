@@ -6,23 +6,21 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('profiles', function (Blueprint $table) {
-            $table->uuid('id')->primary();
+            $table->uuid('profile_id')->primary();
             $table->foreignUuid('user_id')->references('user_id')->on('users')->cascadeOnDelete();
             $table->string('username')->unique();
             $table->string('avatar_url')->nullable();
+            $table->string('occupation')->nullable();
+            $table->enum('gender', ['male', 'female'])->nullable();
+            $table->date('birthdate')->nullable();
+            $table->enum('theme', ['light', 'dark'])->default('light');
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('profiles');

@@ -6,33 +6,22 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('projects', function (Blueprint $table) {
             $table->uuid('project_id')->primary();
             $table->foreignUuid('user_id')->references('user_id')->on('users')->cascadeOnDelete();
-
-            // Tambahkan ->nullable() di sini agar user bisa bikin project kosong tanpa template dulu
-            $table->foreignUuid('template_id')->nullable()->references('template_id')->on('templates')->cascadeOnDelete();
-
+            $table->foreignUuid('template_id')->nullable()->references('template_id')->on('templates')->nullOnDelete();
             $table->foreignUuid('section_id')->references('section_id')->on('sections')->cascadeOnDelete();
-
-            // Tambahkan default value
             $table->string('title')->default('Untitled Project');
-
-            $table->text('description')->nullable();
+            $table->text('synopsis')->nullable();
+            $table->string('cover_image_path')->nullable();
             $table->boolean('is_pinned')->default(false);
             $table->timestamp('archived_at')->nullable();
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('projects');
