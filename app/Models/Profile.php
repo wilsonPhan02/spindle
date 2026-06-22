@@ -9,6 +9,10 @@ class Profile extends Model
 {
     use HasUuids;
 
+    protected $primaryKey = 'profile_id';
+    public $incrementing = false;
+    protected $keyType = 'string';
+
     protected $fillable = [
         'user_id',
         'username',

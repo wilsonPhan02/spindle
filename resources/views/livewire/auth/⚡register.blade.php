@@ -27,19 +27,10 @@ new #[Layout('layouts.guest')] #[Title('Sign Up - Spindle')] class extends Compo
             'password_confirmation.same' => 'The password confirmation does not match.'
         ]);
 
-        // 2. Simpan User
+        // 2. Simpan User (profile dibuat otomatis via User::booted())
         $user = User::create([
             'email' => $this->email,
-            'password' => Hash::make($this->password),
-        ]);
-
-        // code sementara agar kolom username nya tidak null
-        $firstname = explode('@', $this->email)[0];
-        $defaultUsername = $firstname . rand(1000, 9999);
-
-        // menambahkan data pada tabel profile setelah user berhasil dibuat
-        $user->profile()->create([
-            'username' => $defaultUsername
+            'password' => $this->password,
         ]);
 
         // 3. Login & Redirect
@@ -53,7 +44,7 @@ new #[Layout('layouts.guest')] #[Title('Sign Up - Spindle')] class extends Compo
 <div class="relative flex flex-col items-center justify-center min-h-screen w-full">
     
     <div class="absolute inset-0 z-0 pointer-events-none">
-        @include('components/auth-bg') 
+        @include('components.auth-bg') 
     </div>
 
     <div class="relative z-10 flex flex-col items-center justify-center w-full px-4">
