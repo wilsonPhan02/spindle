@@ -1,12 +1,13 @@
 <?php
 
 use Livewire\Volt\Component;
+use Illuminate\Support\Facades\Auth;
 
 new class extends Component {
     public function deleteAccount(){
         $user = Auth::user();
         if ($user) {
-            $user->forceDelete();
+            $user->delete();
         }
         Auth::logout();
         session()->invalidate();

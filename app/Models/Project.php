@@ -14,9 +14,9 @@ class Project extends Model
     protected $keyType = 'string';
 
     protected $fillable = [
-        'project_id', 'user_id', 'template_id', 'section_id',
-        'title', 'description', 'is_pinned', 'archived_at', 'synopsis',
-        'cover_image_path',
+        'user_id', 'template_id', 'section_id',
+        'title', 'synopsis', 'cover_image_path',
+        'is_pinned', 'archived_at',
     ];
 
     public function section()
