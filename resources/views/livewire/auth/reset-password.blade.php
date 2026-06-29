@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Password;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Auth\Events\PasswordReset;
 use Livewire\Volt\Component;
@@ -44,7 +43,7 @@ new #[Layout('layouts.guest')] class extends Component {
 
                 if ($user) {
                     $user->forceFill([
-                        'password' => Hash::make($password)
+                        'password' => $password
                     ]);
 
                     $user->setRememberToken(Str::random(60));
