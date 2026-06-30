@@ -281,9 +281,9 @@ new #[Layout('layouts.app')] class extends Component {
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                 @foreach([
-                    ['title' => 'Structure', 'icon' => 'no-structure', 'desc' => 'You Didn\'t Have Any Chapters!', 'btn' => 'View Structure'],
-                    ['title' => 'Character', 'icon' => 'no-character', 'desc' => 'You Didn\'t Have Any Characters!', 'btn' => 'View Character'],
-                    ['title' => 'Notes', 'icon' => 'no-notes', 'desc' => 'You Didn\'t Have Any Notes!', 'btn' => 'View Notes']
+                    ['title' => 'Structure', 'icon' => 'no-structure', 'desc' => 'You Didn\'t Have Any Chapters!', 'btn' => 'View Structure', 'route' => null],
+                    ['title' => 'Character', 'icon' => 'no-character', 'desc' => 'You Didn\'t Have Any Characters!', 'btn' => 'View Character', 'route' => null],
+                    ['title' => 'Notes', 'icon' => 'no-notes', 'desc' => 'You Didn\'t Have Any Notes!', 'btn' => 'View Notes', 'route' => 'projects.notes']
                 ] as $workspace)
 
                 <div class="bg-[#EAE1D5] rounded-xl p-8 flex flex-col justify-between h-[360px] shadow-sm border border-brand-100 hover:shadow-md transition-shadow">
@@ -297,9 +297,15 @@ new #[Layout('layouts.app')] class extends Component {
                         <p class="text-sm font-semibold text-text-80">{{ $workspace['desc'] }}</p>
                     </div>
 
-                    <button class="w-full py-3 mt-4 border border-[#D5C6A9] bg-transparent rounded-lg text-[14px] font-bold text-[#4A4A4A] hover:bg-[#DFD5C5] transition-colors">
-                        {{ $workspace['btn'] }}
-                    </button>
+                    @if($workspace['route'])
+                        <a href="{{ route($workspace['route'], ['project' => $project->project_id]) }}" wire:navigate class="w-full py-3 mt-4 border border-[#D5C6A9] bg-transparent rounded-lg text-[14px] font-bold text-[#4A4A4A] hover:bg-[#DFD5C5] transition-colors text-center">
+                            {{ $workspace['btn'] }}
+                        </a>
+                    @else
+                        <button class="w-full py-3 mt-4 border border-[#D5C6A9] bg-transparent rounded-lg text-[14px] font-bold text-[#4A4A4A] hover:bg-[#DFD5C5] transition-colors">
+                            {{ $workspace['btn'] }}
+                        </button>
+                    @endif
                 </div>
                 @endforeach
             </div>
