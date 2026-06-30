@@ -281,9 +281,9 @@ new #[Layout('layouts.app')] class extends Component {
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                 @foreach([
-                    ['title' => 'Structure', 'icon' => 'no-structure', 'desc' => 'You Didn\'t Have Any Chapters!', 'btn' => 'View Structure'],
-                    ['title' => 'Character', 'icon' => 'no-character', 'desc' => 'You Didn\'t Have Any Characters!', 'btn' => 'View Character'],
-                    ['title' => 'Notes', 'icon' => 'no-notes', 'desc' => 'You Didn\'t Have Any Notes!', 'btn' => 'View Notes']
+                    ['title' => 'Structure', 'icon' => 'no-structure', 'desc' => 'You Didn\'t Have Any Chapters!', 'btn' => 'View Structure', 'url' => route('projects.structure', $project->project_id)],
+                    ['title' => 'Character', 'icon' => 'no-character', 'desc' => 'You Didn\'t Have Any Characters!', 'btn' => 'View Character', 'url' => '#'],
+                    ['title' => 'Notes', 'icon' => 'no-notes', 'desc' => 'You Didn\'t Have Any Notes!', 'btn' => 'View Notes', 'url'=> '#']
                 ] as $workspace)
 
                 <div class="bg-[#EAE1D5] rounded-xl p-8 flex flex-col justify-between h-[360px] shadow-sm border border-brand-100 hover:shadow-md transition-shadow">
@@ -297,9 +297,9 @@ new #[Layout('layouts.app')] class extends Component {
                         <p class="text-sm font-semibold text-text-80">{{ $workspace['desc'] }}</p>
                     </div>
 
-                    <button class="w-full py-3 mt-4 border border-[#D5C6A9] bg-transparent rounded-lg text-[14px] font-bold text-[#4A4A4A] hover:bg-[#DFD5C5] transition-colors">
+                    <a href="{{ $workspace['url'] }}" wire:navigate class="w-full py-3 mt-4 text-center border border-[#D5C6A9] bg-transparent rounded-lg text-[14px] font-bold text-[#4A4A4A] hover:bg-[#DFD5C5] transition-colors">
                         {{ $workspace['btn'] }}
-                    </button>
+                    </a>
                 </div>
                 @endforeach
             </div>

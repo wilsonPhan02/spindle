@@ -32,4 +32,14 @@ class Project extends Model
     public function categories() {
         return $this->hasMany(ProjectCategory::class, 'project_id', 'project_id');
     }
+
+    public function template() 
+    {
+        return $this->belongsTo(Template::class, 'template_id', 'template_id');
+    }
+
+    public function chapterCards() 
+    {
+        return $this->hasMany(ChapterCard::class, 'project_id', 'project_id');
+    }
 }

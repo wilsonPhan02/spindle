@@ -35,4 +35,6 @@ Route::middleware('auth')->group(function () {
     Volt::route('/settings', 'settings.index')->name('settings');
     // Rute untuk ke detail project
     Volt::route('/projects/{project}', 'projects.show')->name('projects.show');
+    //Rute untuk ke 
+    Volt::route('/projects/{project}/structure', 'projects.structure')->name('projects.structure');
 });

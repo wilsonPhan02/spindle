@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('structure_sections', function (Blueprint $table) {
             $table->uuid('structure_section_id')->primary();
             $table->foreignUuid('template_id')->references('template_id')->on('templates')->cascadeOnDelete();
+            $table->integer('order_index');
             $table->string('title');
             $table->text('goal')->nullable();
             $table->timestamps();
