@@ -740,7 +740,7 @@ new #[Layout('layouts.app')] class extends Component {
 
         {{-- Breadcrumb --}}
         <header class="flex justify-between items-center mb-8">
-            <div class="flex items-center gap-3 text-[14px] text-[#7A7A7A]">
+            <div class="flex items-center gap-3 text-[18px] text-[#7A7A7A]">
                 <a href="{{ route('dashboard') }}" wire:navigate class="hover:text-[#8C7558] transition-colors">Dashboard</a>
                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                 <a href="{{ route('projects.show', $project) }}" wire:navigate class="hover:text-[#8C7558] transition-colors truncate max-w-[160px]">{{ $project->title }}</a>
