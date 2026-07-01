@@ -73,6 +73,11 @@ new #[Layout('layouts.app')] class extends Component {
         $this->project->update(['cover_image_path' => null]);
         $this->project->refresh();
     }
+
+    public function archiveProject() {
+        $this->project->update(['archived_at' => now()]);
+        $this->redirect(route('dashboard'), navigate: true);
+    }
 }; ?>
 
 <div>
@@ -168,7 +173,10 @@ new #[Layout('layouts.app')] class extends Component {
                     </div>
 
                     <div class="flex items-center gap-3 shrink-0">
-                        <button class="flex items-center gap-2 border border-[#D5C6A9] bg-transparent px-3 py-1.5 rounded-lg text-[13px] font-medium text-[#4A4A4A] hover:bg-[#EAE1D5] transition-colors">
+                        <button
+                            wire:click="archiveProject"
+                            wire:confirm="Are you sure you want to archive this project? You can restore it from the Archive page."
+                            class="flex items-center gap-2 border border-[#D5C6A9] bg-transparent px-3 py-1.5 rounded-lg text-[13px] font-medium text-[#4A4A4A] hover:bg-[#EAE1D5] transition-colors">
                             <x-icons.archive class="w-4 h-4" /> Move To Archive
                         </button>
                         <button class="text-[#8C7558] hover:text-[#5E4C38] transition-colors">
