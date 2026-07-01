@@ -304,7 +304,6 @@ new #[Layout('layouts.app')] class extends Component {
             return !!this.collapsed[id];
         },
 
-        // PERBAIKAN: Fungsi Menu Global dipusatkan di sini
         openMenu(id, title, isLeaf, triggerEl) {
             this.openMenuId = id;
             this.menuNoteId = id;
@@ -337,7 +336,7 @@ new #[Layout('layouts.app')] class extends Component {
         },
 
         // ========================
-        // DRAG & DROP
+        // DRAG & DROP (TABS)
         // ========================
         draggedId: null,
         dragOverId: null,
@@ -371,7 +370,140 @@ new #[Layout('layouts.app')] class extends Component {
         },
 
         // ========================
-        // EDITOR TOOLBAR
+        // EDITOR BLOCK DRAG & DROP
+        // ========================
+        blockDragHandle: { show: false, top: 0, left: 0, block: null },
+        dragIndicator: { show: false, top: 0 },
+        isDraggingBlock: false,
+        draggedBlock: null,
+        dropTargetBlock: null,
+        dropPosition: null,
+
+        onEditorMouseMove(e) {
+            if (this.isDraggingBlock) return;
+            const editor = document.getElementById('note-editor');
+            if (!editor) return;
+            const editorRect = editor.getBoundingClientRect();
+
+            let block = null;
+            const elements = document.elementsFromPoint(e.clientX, e.clientY);
+
+            for (let el of elements) {
+                if (el.parentElement === editor) {
+                    block = el;
+                    break;
+                }
+            }
+
+            if (!block) {
+                const children = Array.from(editor.children);
+                for (let child of children) {
+                    const rect = child.getBoundingClientRect();
+                    if (e.clientY >= rect.top && e.clientY <= rect.bottom) {
+                        block = child;
+                        break;
+                    }
+                }
+            }
+
+            if (block) {
+                const rect = block.getBoundingClientRect();
+                this.blockDragHandle.show = true;
+                this.blockDragHandle.left = 10;
+
+                // Menempatkan titik 6 pas di tengah secara vertikal pada blok tersebut
+                let topPos = rect.top - editorRect.top + editor.scrollTop + (rect.height / 2) - 12;
+
+                this.blockDragHandle.top = topPos;
+                this.blockDragHandle.block = block;
+            }
+        },
+
+        onBlockDragStart(e) {
+            if (!this.blockDragHandle.block) {
+                e.preventDefault();
+                return;
+            }
+            this.isDraggingBlock = true;
+            this.draggedBlock = this.blockDragHandle.block;
+
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/html', this.draggedBlock.outerHTML);
+            e.dataTransfer.setDragImage(this.draggedBlock, 0, 0);
+
+            setTimeout(() => {
+                this.draggedBlock.style.opacity = '0.3';
+            }, 0);
+        },
+
+        onBlockDragEnd(e) {
+            this.isDraggingBlock = false;
+            this.dragIndicator.show = false;
+            if (this.draggedBlock) {
+                this.draggedBlock.style.opacity = '1';
+                this.draggedBlock = null;
+            }
+        },
+
+        onEditorDragOver(e) {
+            if (!this.isDraggingBlock || !this.draggedBlock) return;
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+
+            const editor = document.getElementById('note-editor');
+            const children = Array.from(editor.children);
+
+            let targetBlock = null;
+            let minDistance = Infinity;
+
+            children.forEach(child => {
+                if (child === this.draggedBlock) return;
+                const rect = child.getBoundingClientRect();
+                const center = rect.top + rect.height / 2;
+                const distance = Math.abs(e.clientY - center);
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    targetBlock = child;
+                }
+            });
+
+            if (targetBlock) {
+                this.dropTargetBlock = targetBlock;
+                const rect = targetBlock.getBoundingClientRect();
+                const editorRect = editor.getBoundingClientRect();
+
+                const isAbove = e.clientY < (rect.top + rect.height / 2);
+                this.dropPosition = isAbove ? 'before' : 'after';
+
+                this.dragIndicator.show = true;
+                let indTop = isAbove ? rect.top : rect.bottom;
+                this.dragIndicator.top = indTop - editorRect.top + editor.scrollTop;
+            }
+        },
+
+        onEditorDrop(e) {
+            if (!this.isDraggingBlock || !this.draggedBlock || !this.dropTargetBlock) return;
+            e.preventDefault();
+
+            const editor = document.getElementById('note-editor');
+
+            if (this.dropPosition === 'before') {
+                editor.insertBefore(this.draggedBlock, this.dropTargetBlock);
+            } else {
+                editor.insertBefore(this.draggedBlock, this.dropTargetBlock.nextSibling);
+            }
+
+            this.scheduleSave();
+
+            this.isDraggingBlock = false;
+            this.dragIndicator.show = false;
+            this.draggedBlock.style.opacity = '1';
+            this.draggedBlock = null;
+            this.dropTargetBlock = null;
+        },
+
+        // ========================
+        // EDITOR TOOLBAR & FORMATTING
         // ========================
         formatValue: 'p',
         formatLabel: 'Normal Text',
@@ -386,6 +518,35 @@ new #[Layout('layouts.app')] class extends Component {
         textColors: ['#2c2c2c', '#8c7558', '#b23a3a', '#2563eb', '#15803d', '#9333ea', '#ea580c'],
         highlightColors: ['#ffeaa7', '#ffd1dc', '#c7f0db', '#cde7ff', '#e8d9ff', '#ffe0b3', 'transparent'],
         savedRange: null,
+        activeDropdown: null,
+        hoverArea: null,
+        hoverCloseTimeout: null,
+
+        onToolbarAreaEnter(id) {
+            this.hoverArea = id;
+            if (this.hoverCloseTimeout) {
+                clearTimeout(this.hoverCloseTimeout);
+                this.hoverCloseTimeout = null;
+            }
+        },
+
+        onToolbarAreaLeave(id) {
+            this.hoverArea = id;
+            if (this.hoverCloseTimeout) clearTimeout(this.hoverCloseTimeout);
+            this.hoverCloseTimeout = setTimeout(() => {
+                if (this.hoverArea === id) this.activeDropdown = null;
+                this.hoverCloseTimeout = null;
+            }, 120);
+        },
+
+        closeDropdowns() {
+            this.activeDropdown = null;
+        },
+
+        adjustOverlayPosition(pos, width = 180, height = 220) {
+            pos.left = Math.min(Math.max(pos.left, 12), Math.max(window.innerWidth - width - 12, 12));
+            pos.top = Math.min(Math.max(pos.top, 12), Math.max(window.innerHeight - height - 12, 12));
+        },
 
         isDraggingToolbar: false,
         startX: 0,
@@ -437,20 +598,93 @@ new #[Layout('layouts.app')] class extends Component {
             if (document.activeElement !== editorEl) {
                 this.restoreSelection();
             }
+
+            // PERBAIKAN: Tangani ALIGNMENT secara eksplisit untuk keseluruhan blok
+            if (['justifyLeft', 'justifyCenter', 'justifyRight', 'justifyFull'].includes(cmd)) {
+                const sel = window.getSelection();
+                if (sel && sel.anchorNode) {
+                    let node = sel.anchorNode;
+                    if (node.nodeType === 3) node = node.parentElement;
+                    const block = node.closest('p, h1, h2, h3, blockquote, li');
+
+                    if (block && editorEl.contains(block)) {
+                        const aligns = {
+                            justifyLeft: 'left',
+                            justifyCenter: 'center',
+                            justifyRight: 'right',
+                            justifyFull: 'justify'
+                        };
+                        block.style.textAlign = aligns[cmd];
+                        this.refreshToolbarState();
+                        this.scheduleSave();
+                        return; // Berhenti agar tidak dipisah oleh execCommand native
+                    }
+                }
+            }
+
             document.execCommand(cmd, false, val);
             this.refreshToolbarState();
             this.scheduleSave();
         },
+
         setFormat(tag, label) {
             const editorEl = document.getElementById('note-editor');
             if (document.activeElement !== editorEl) {
                 this.restoreSelection();
             }
-            document.execCommand('formatBlock', false, tag === 'p' ? 'p' : tag);
+
+            // PERBAIKAN: Tangani FORMAT HEADING secara presisi dan terapkan ke seluruh isi blok
+            const sel = window.getSelection();
+            if (sel && sel.anchorNode) {
+                let node = sel.anchorNode;
+                if (node.nodeType === 3) node = node.parentElement;
+                let block = node.closest('p, h1, h2, h3, blockquote');
+
+                if (block && editorEl.contains(block)) {
+                    // Simpan rentang
+                    const range = sel.getRangeAt(0);
+                    const startOffset = range.startOffset;
+                    const endOffset = range.endOffset;
+                    const startNode = range.startContainer;
+                    const endNode = range.endContainer;
+
+                    // Ganti elemen
+                    const newBlock = document.createElement(tag === 'p' ? 'p' : tag);
+                    if (block.style.textAlign) newBlock.style.textAlign = block.style.textAlign; // Pertahankan Alignment
+
+                    while (block.firstChild) {
+                        newBlock.appendChild(block.firstChild);
+                    }
+
+                    block.parentNode.replaceChild(newBlock, block);
+
+                    // Pulihkan seleksi
+                    try {
+                        const newRange = document.createRange();
+                        newRange.setStart(startNode, startOffset);
+                        newRange.setEnd(endNode, endOffset);
+                        sel.removeAllRanges();
+                        sel.addRange(newRange);
+                    } catch (e) {
+                        const fallbackRange = document.createRange();
+                        fallbackRange.selectNodeContents(newBlock);
+                        fallbackRange.collapse(false);
+                        sel.removeAllRanges();
+                        sel.addRange(fallbackRange);
+                    }
+                } else {
+                    document.execCommand('formatBlock', false, tag === 'p' ? 'p' : tag);
+                }
+            } else {
+                document.execCommand('formatBlock', false, tag === 'p' ? 'p' : tag);
+            }
+
             this.formatValue = tag;
-            this.formatLabel = label;
+            if (label) this.formatLabel = label;
             this.scheduleSave();
+            this.refreshToolbarState();
         },
+
         refreshToolbarState() {
             try {
                 this.activeStates.bold = document.queryCommandState('bold');
@@ -459,21 +693,27 @@ new #[Layout('layouts.app')] class extends Component {
                 this.activeStates.strikeThrough = document.queryCommandState('strikeThrough');
                 this.activeStates.insertUnorderedList = document.queryCommandState('insertUnorderedList');
                 this.activeStates.insertOrderedList = document.queryCommandState('insertOrderedList');
-                this.activeStates.justifyLeft = document.queryCommandState('justifyLeft');
-                this.activeStates.justifyCenter = document.queryCommandState('justifyCenter');
-                this.activeStates.justifyRight = document.queryCommandState('justifyRight');
-                this.activeStates.justifyFull = document.queryCommandState('justifyFull');
 
                 const sel = window.getSelection();
                 if (sel && sel.anchorNode) {
                     let node = sel.anchorNode;
                     if (node.nodeType === 3) node = node.parentElement;
-                    const block = node ? node.closest('h1, h2, h3, blockquote, p') : null;
+                    const block = node ? node.closest('h1, h2, h3, blockquote, p, li, div') : null;
                     if (block) {
                         const tag = block.tagName.toLowerCase();
                         const map = { p: 'Normal Text', h1: 'Heading 1', h2: 'Heading 2', h3: 'Heading 3', blockquote: 'Quote' };
-                        this.formatValue = tag;
-                        this.formatLabel = map[tag] || 'Normal Text';
+                        if (map[tag]) {
+                            this.formatValue = tag;
+                            this.formatLabel = map[tag];
+                        }
+
+                        // Override status Toolbar UI dari ComputedStyle
+                        const style = window.getComputedStyle(block);
+                        const align = style.textAlign;
+                        this.activeStates.justifyLeft = align === 'left' || align === 'start';
+                        this.activeStates.justifyCenter = align === 'center';
+                        this.activeStates.justifyRight = align === 'right' || align === 'end';
+                        this.activeStates.justifyFull = align === 'justify';
                     }
                 }
             } catch (e) { /* ignore */ }
@@ -546,7 +786,11 @@ new #[Layout('layouts.app')] class extends Component {
 
                     document.execCommand('delete', false, null);
 
-                    if (pattern.cmd) document.execCommand(pattern.cmd, false, pattern.val);
+                    if (pattern.cmd === 'formatBlock') {
+                        this.setFormat(pattern.val, null);
+                    } else if (pattern.cmd) {
+                        document.execCommand(pattern.cmd, false, pattern.val);
+                    }
                     if (pattern.callback) pattern.callback();
 
                     this.refreshToolbarState();
@@ -591,12 +835,79 @@ new #[Layout('layouts.app')] class extends Component {
             if (!editorEl || editorEl.dataset.boundListeners === '1') return;
             editorEl.dataset.boundListeners = '1';
 
-            editorEl.innerHTML = (window.__initialEditorBody ?? '') || '';
+            document.execCommand('defaultParagraphSeparator', false, 'p');
+
+            let initialBody = (window.__initialEditorBody ?? '') || '';
+            if (initialBody.trim() === '') {
+                initialBody = '<p><br></p>';
+            }
+            editorEl.innerHTML = initialBody;
             this.updateCharCount();
 
             editorEl.addEventListener('input', () => this.scheduleSave());
 
             editorEl.addEventListener('keydown', (e) => {
+                if (e.altKey && (e.key === 'ArrowUp' || e.key === 'ArrowDown')) {
+                    e.preventDefault();
+                    const sel = window.getSelection();
+                    if (!sel || sel.rangeCount === 0) return;
+
+                    let node = sel.anchorNode;
+                    if (node.nodeType === 3) node = node.parentElement;
+
+                    let block = node.closest('p, h1, h2, h3, blockquote, li, div');
+                    if (!block || !editorEl.contains(block) || block === editorEl) return;
+
+                    if (e.key === 'ArrowUp') {
+                        const prev = block.previousElementSibling;
+                        if (prev) {
+                            block.parentNode.insertBefore(block, prev);
+                            this.scheduleSave();
+                        }
+                    } else if (e.key === 'ArrowDown') {
+                        const next = block.nextElementSibling;
+                        if (next) {
+                            block.parentNode.insertBefore(block, next.nextSibling);
+                            this.scheduleSave();
+                        }
+                    }
+                    return;
+                }
+
+                if (e.key === 'Backspace') {
+                    try {
+                        const sel = window.getSelection();
+                        if (sel && sel.rangeCount > 0 && sel.isCollapsed) {
+                            const node = sel.anchorNode;
+                            const offset = sel.anchorOffset;
+                            if (node && node.nodeType === 3 && offset === 0) {
+                                const li = node.parentElement ? node.parentElement.closest('li') : null;
+                                if (li) {
+                                    const list = li.parentElement;
+                                    if (list && list.firstElementChild === li) {
+                                        e.preventDefault();
+                                        const inner = li.innerHTML || '';
+                                        const p = document.createElement('p');
+                                        p.innerHTML = inner.trim() === '' ? '<br>' : inner;
+                                        list.parentNode.insertBefore(p, list);
+                                        list.removeChild(li);
+                                        if (!list.querySelector('li')) {
+                                            list.parentNode.removeChild(list);
+                                        }
+                                        const newRange = document.createRange();
+                                        newRange.setStart(p, 0);
+                                        newRange.collapse(true);
+                                        sel.removeAllRanges();
+                                        sel.addRange(newRange);
+                                        this.refreshToolbarState();
+                                        this.scheduleSave();
+                                        return;
+                                    }
+                                }
+                            }
+                        }
+                    } catch (err) {}
+                }
                 if (e.key === 'Tab') {
                     e.preventDefault();
 
@@ -617,7 +928,15 @@ new #[Layout('layouts.app')] class extends Component {
                     }
                     this.scheduleSave();
                 }
-                else if (e.key === 'Enter' && !e.shiftKey) {
+                else if (e.key === 'Enter') {
+                    // PERBAIKAN: Tangani Shift+Enter dengan API murni (<br>)
+                    if (e.shiftKey) {
+                        e.preventDefault();
+                        document.execCommand('insertLineBreak');
+                        this.scheduleSave();
+                        return;
+                    }
+
                     setTimeout(() => {
                         const sel = window.getSelection();
                         if (sel && sel.anchorNode) {
@@ -626,6 +945,8 @@ new #[Layout('layouts.app')] class extends Component {
                             const block = node ? node.closest('h1, h2, h3, blockquote') : null;
 
                             if (block) {
+                                document.execCommand('formatBlock', false, 'p');
+                            } else if (!node.closest('h1, h2, h3, blockquote, p, li')) {
                                 document.execCommand('formatBlock', false, 'p');
                             }
                         }
@@ -674,7 +995,9 @@ new #[Layout('layouts.app')] class extends Component {
         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background-color: #B69F78; }
 
         #note-editor:focus { outline: none; }
-        #note-editor p { margin-bottom: 0.75em; }
+
+        /* Baris paragraf dibuat lebih renggang satu sama lain (biar beda pemisah) */
+        #note-editor p { margin-bottom: 1em; }
 
         #note-editor h1 { font-size: 2em; font-weight: normal; margin-bottom: 0.5em; }
         #note-editor h2 { font-size: 1.5em; font-weight: normal; margin-bottom: 0.5em; }
@@ -821,14 +1144,15 @@ new #[Layout('layouts.app')] class extends Component {
                             >
 
                                 {{-- Format dropdown --}}
-                                <div class="relative shrink-0" x-data="{ open: false, pos: { top: 0, left: 0 } }">
+                                <div class="relative shrink-0" x-data="{ pos: { top: 0, left: 0 } }" @mouseenter="onToolbarAreaEnter('format')" @mouseleave="onToolbarAreaLeave('format')">
                                     <button
                                         type="button"
                                         @mousedown.prevent="saveSelection()"
                                         @click.stop="
                                             const r = $event.currentTarget.getBoundingClientRect();
-                                            pos = { top: r.bottom + window.scrollY + 4, left: r.left + window.scrollX };
-                                            open = !open;
+                                            pos = { top: r.bottom + window.scrollY + 8, left: r.left + window.scrollX };
+                                            activeDropdown = activeDropdown === 'format' ? null : 'format';
+                                            if (activeDropdown === 'format') $root.adjustOverlayPosition(pos, 180, 220);
                                         "
                                         class="h-7 px-2.5 flex items-center gap-1.5 text-[12px] text-[#4A4A4A] bg-white border border-[#E0D5C5] rounded-md outline-none cursor-pointer hover:border-[#B69F78] transition-colors"
                                         style="min-width: 118px;"
@@ -839,21 +1163,23 @@ new #[Layout('layouts.app')] class extends Component {
                                     </button>
                                     <template x-teleport="body">
                                         <div
-                                            x-show="open"
+                                            x-show="activeDropdown === 'format'"
+                                            @mouseenter="onToolbarAreaEnter('format')"
+                                            @mouseleave="onToolbarAreaLeave('format')"
                                             x-cloak
                                             x-transition:enter="transition ease-out duration-100"
                                             x-transition:enter-start="opacity-0 scale-95"
                                             x-transition:enter-end="opacity-100 scale-100"
-                                            @click.outside="open = false"
+                                            @click.outside="activeDropdown = null"
                                             x-bind:style="`position: fixed; top: ${pos.top}px; left: ${pos.left}px; z-index: 9999;`"
                                             class="w-40 bg-white border border-[#E0D5C5] rounded-lg shadow-lg py-1"
                                             style="display: none;"
                                         >
-                                            <button type="button" @mousedown.prevent="saveSelection()" @click="setFormat('p', 'Normal Text'); open = false" class="format-option w-full text-left px-3 py-1.5 text-[13px] text-[#2C2C2C] hover:bg-[#F0E8DC]" x-bind:class="formatValue === 'p' ? 'bg-[#EAE1D5] font-semibold' : ''" title="Normal Text">Normal Text</button>
-                                            <button type="button" @mousedown.prevent="saveSelection()" @click="setFormat('h1', 'Heading 1'); open = false" class="format-option w-full text-left px-3 py-1.5 text-[18px] font-bold text-[#2C2C2C] hover:bg-[#F0E8DC]" x-bind:class="formatValue === 'h1' ? 'bg-[#EAE1D5]' : ''" title="Heading 1 (# + Space)">Heading 1</button>
-                                            <button type="button" @mousedown.prevent="saveSelection()" @click="setFormat('h2', 'Heading 2'); open = false" class="format-option w-full text-left px-3 py-1.5 text-[15px] font-bold text-[#2C2C2C] hover:bg-[#F0E8DC]" x-bind:class="formatValue === 'h2' ? 'bg-[#EAE1D5]' : ''" title="Heading 2 (## + Space)">Heading 2</button>
-                                            <button type="button" @mousedown.prevent="saveSelection()" @click="setFormat('h3', 'Heading 3'); open = false" class="format-option w-full text-left px-3 py-1.5 text-[13.5px] font-bold text-[#2C2C2C] hover:bg-[#F0E8DC]" x-bind:class="formatValue === 'h3' ? 'bg-[#EAE1D5]' : ''" title="Heading 3 (### + Space)">Heading 3</button>
-                                            <button type="button" @mousedown.prevent="saveSelection()" @click="setFormat('blockquote', 'Quote'); open = false" class="format-option w-full text-left px-3 py-1.5 text-[13px] italic text-[#6B6B6B] hover:bg-[#F0E8DC]" x-bind:class="formatValue === 'blockquote' ? 'bg-[#EAE1D5]' : ''" title="Quote (> + Space)">Quote</button>
+                                            <button type="button" @mousedown.prevent="saveSelection()" @click="setFormat('p', 'Normal Text'); activeDropdown = null" class="format-option w-full text-left px-3 py-1.5 text-[13px] text-[#2C2C2C] hover:bg-[#F0E8DC]" x-bind:class="formatValue === 'p' ? 'bg-[#EAE1D5] font-semibold' : ''" title="Normal Text">Normal Text</button>
+                                            <button type="button" @mousedown.prevent="saveSelection()" @click="setFormat('h1', 'Heading 1'); activeDropdown = null" class="format-option w-full text-left px-3 py-1.5 text-[18px] font-bold text-[#2C2C2C] hover:bg-[#F0E8DC]" x-bind:class="formatValue === 'h1' ? 'bg-[#EAE1D5]' : ''" title="Heading 1 (# + Space)">Heading 1</button>
+                                            <button type="button" @mousedown.prevent="saveSelection()" @click="setFormat('h2', 'Heading 2'); activeDropdown = null" class="format-option w-full text-left px-3 py-1.5 text-[15px] font-bold text-[#2C2C2C] hover:bg-[#F0E8DC]" x-bind:class="formatValue === 'h2' ? 'bg-[#EAE1D5]' : ''" title="Heading 2 (## + Space)">Heading 2</button>
+                                            <button type="button" @mousedown.prevent="saveSelection()" @click="setFormat('h3', 'Heading 3'); activeDropdown = null" class="format-option w-full text-left px-3 py-1.5 text-[13.5px] font-bold text-[#2C2C2C] hover:bg-[#F0E8DC]" x-bind:class="formatValue === 'h3' ? 'bg-[#EAE1D5]' : ''" title="Heading 3 (### + Space)">Heading 3</button>
+                                            <button type="button" @mousedown.prevent="saveSelection()" @click="setFormat('blockquote', 'Quote'); activeDropdown = null" class="format-option w-full text-left px-3 py-1.5 text-[13px] italic text-[#6B6B6B] hover:bg-[#F0E8DC]" x-bind:class="formatValue === 'blockquote' ? 'bg-[#EAE1D5]' : ''" title="Quote (> + Space)">Quote</button>
                                         </div>
                                     </template>
                                 </div>
@@ -900,14 +1226,19 @@ new #[Layout('layouts.app')] class extends Component {
                                 <div class="toolbar-divider"></div>
 
                                 {{-- Text Color with Custom Color Picker --}}
-                                <div class="relative" x-data="{ open: false, pos: { top: 0, left: 0 } }">
+                                <div class="relative" x-data="{ pos: { top: 0, left: 0 } }" @mouseenter="onToolbarAreaEnter('textColor')" @mouseleave="onToolbarAreaLeave('textColor')">
                                     <button
                                         type="button"
                                         @mousedown.prevent="saveSelection()"
                                         @click.stop="
                                             const r = $event.currentTarget.getBoundingClientRect();
-                                            pos = { top: r.bottom + window.scrollY + 4, left: r.left + window.scrollX };
-                                            open = !open;
+                                            const overlayW = 190;
+                                            const sb = document.querySelector('aside');
+                                            const sbOpen = sb && sb.getBoundingClientRect().right > 0;
+                                            const left = sbOpen ? (r.right + window.scrollX - overlayW) : (r.left + window.scrollX);
+                                            pos = { top: r.bottom + window.scrollY + 8, left: left };
+                                            activeDropdown = activeDropdown === 'textColor' ? null : 'textColor';
+                                            if (activeDropdown === 'textColor') $root.adjustOverlayPosition(pos, overlayW, 220);
                                         "
                                         class="toolbar-btn" title="Text Color"
                                     >
@@ -916,8 +1247,8 @@ new #[Layout('layouts.app')] class extends Component {
                                     </button>
                                     <template x-teleport="body">
                                         <div
-                                            x-show="open" x-cloak x-transition
-                                            @click.outside="open = false"
+                                            x-show="activeDropdown === 'textColor'" x-cloak x-transition @mouseenter="onToolbarAreaEnter('textColor')" @mouseleave="onToolbarAreaLeave('textColor')"
+                                            @click.outside="activeDropdown = null"
                                             x-bind:style="`position: fixed; top: ${pos.top}px; left: ${pos.left}px; z-index: 9999;`"
                                             class="p-2.5 bg-white border border-[#E0D5C5] rounded-lg shadow-lg flex flex-col"
                                             style="display: none; width: 172px;"
@@ -925,7 +1256,7 @@ new #[Layout('layouts.app')] class extends Component {
                                             <span class="text-[10px] font-semibold text-[#9A8E80] uppercase tracking-wider mb-2 block">Theme Colors</span>
                                             <div class="grid grid-cols-7 gap-1.5 mb-2.5">
                                                 <template x-for="c in textColors" :key="c">
-                                                    <button type="button" @mousedown.prevent="saveSelection()" @click="exec('foreColor', c); currentTextColor = c; open = false" class="w-5 h-5 rounded-full border border-[#E0D5C5] hover:scale-110 transition-transform" x-bind:style="`background:${c}`" :title="c"></button>
+                                                    <button type="button" @mousedown.prevent="saveSelection()" @click="exec('foreColor', c); currentTextColor = c; activeDropdown = null" class="w-5 h-5 rounded-full border border-[#E0D5C5] hover:scale-110 transition-transform" x-bind:style="`background:${c}`" :title="c"></button>
                                                 </template>
                                             </div>
 
@@ -937,7 +1268,7 @@ new #[Layout('layouts.app')] class extends Component {
                                                     <input type="color"
                                                            :value="currentTextColor"
                                                            @click.stop="saveSelection()"
-                                                           @change="currentTextColor = $event.target.value; exec('foreColor', $event.target.value); open = false;"
+                                                           @change="currentTextColor = $event.target.value; exec('foreColor', $event.target.value); activeDropdown = null;"
                                                            class="absolute opacity-0 w-full h-full cursor-pointer z-10"
                                                            style="transform: scale(2);"
                                                     >
@@ -949,14 +1280,19 @@ new #[Layout('layouts.app')] class extends Component {
                                 </div>
 
                                 {{-- Highlight Color with Custom Color Picker --}}
-                                <div class="relative" x-data="{ open: false, pos: { top: 0, left: 0 } }">
+                                <div class="relative" x-data="{ pos: { top: 0, left: 0 } }" @mouseenter="onToolbarAreaEnter('highlightColor')" @mouseleave="onToolbarAreaLeave('highlightColor')">
                                     <button
                                         type="button"
                                         @mousedown.prevent="saveSelection()"
                                         @click.stop="
                                             const r = $event.currentTarget.getBoundingClientRect();
-                                            pos = { top: r.bottom + window.scrollY + 4, left: r.left + window.scrollX };
-                                            open = !open;
+                                            const overlayW = 190;
+                                            const sb = document.querySelector('aside');
+                                            const sbOpen = sb && sb.getBoundingClientRect().right > 0;
+                                            const left = sbOpen ? (r.right + window.scrollX - overlayW) : (r.left + window.scrollX);
+                                            pos = { top: r.bottom + window.scrollY + 8, left: left };
+                                            activeDropdown = activeDropdown === 'highlightColor' ? null : 'highlightColor';
+                                            if (activeDropdown === 'highlightColor') $root.adjustOverlayPosition(pos, overlayW, 220);
                                         "
                                         class="toolbar-btn" title="Highlight (==text==)"
                                     >
@@ -965,8 +1301,8 @@ new #[Layout('layouts.app')] class extends Component {
                                     </button>
                                     <template x-teleport="body">
                                         <div
-                                            x-show="open" x-cloak x-transition
-                                            @click.outside="open = false"
+                                            x-show="activeDropdown === 'highlightColor'" x-cloak x-transition @mouseenter="onToolbarAreaEnter('highlightColor')" @mouseleave="onToolbarAreaLeave('highlightColor')"
+                                            @click.outside="activeDropdown = null"
                                             x-bind:style="`position: fixed; top: ${pos.top}px; left: ${pos.left}px; z-index: 9999;`"
                                             class="p-2.5 bg-white border border-[#E0D5C5] rounded-lg shadow-lg flex flex-col"
                                             style="display: none; width: 172px;"
@@ -974,7 +1310,7 @@ new #[Layout('layouts.app')] class extends Component {
                                             <span class="text-[10px] font-semibold text-[#9A8E80] uppercase tracking-wider mb-2 block">Theme Colors</span>
                                             <div class="grid grid-cols-7 gap-1.5 mb-2.5">
                                                 <template x-for="c in highlightColors" :key="c">
-                                                    <button type="button" @mousedown.prevent="saveSelection()" @click="exec('hiliteColor', c === 'transparent' ? 'transparent' : c); currentHighlightColor = c; open = false" class="w-5 h-5 rounded-full border border-[#E0D5C5] hover:scale-110 transition-transform flex items-center justify-center" x-bind:style="`background:${c}`" :title="c === 'transparent' ? 'No Highlight' : c">
+                                                    <button type="button" @mousedown.prevent="saveSelection()" @click="exec('hiliteColor', c === 'transparent' ? 'transparent' : c); currentHighlightColor = c; activeDropdown = null" class="w-5 h-5 rounded-full border border-[#E0D5C5] hover:scale-110 transition-transform flex items-center justify-center" x-bind:style="`background:${c}`" :title="c === 'transparent' ? 'No Highlight' : c">
                                                         <template x-if="c === 'transparent'">
                                                             <svg class="w-3 h-3 text-[#E64C4C]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                                                         </template>
@@ -990,7 +1326,7 @@ new #[Layout('layouts.app')] class extends Component {
                                                     <input type="color"
                                                            :value="currentHighlightColor === 'transparent' ? '#ffffff' : currentHighlightColor"
                                                            @click.stop="saveSelection()"
-                                                           @change="currentHighlightColor = $event.target.value; exec('hiliteColor', $event.target.value); open = false;"
+                                                           @change="currentHighlightColor = $event.target.value; exec('hiliteColor', $event.target.value); activeDropdown = null;"
                                                            class="absolute opacity-0 w-full h-full cursor-pointer z-10"
                                                            style="transform: scale(2);"
                                                     >
@@ -1018,15 +1354,51 @@ new #[Layout('layouts.app')] class extends Component {
                             </div>
 
                             {{-- Editor --}}
-                            <div class="flex-1 relative overflow-hidden" wire:ignore wire:key="editor-{{ $activeNote->note_id }}">
+                            <div class="flex-1 relative overflow-hidden flex flex-col"
+                                 wire:ignore
+                                 wire:key="editor-{{ $activeNote->note_id }}"
+                                 @mousemove="onEditorMouseMove($event)"
+                                 @mouseleave="blockDragHandle.show = false"
+                                 @dragover.prevent="onEditorDragOver($event)"
+                                 @drop.prevent="onEditorDrop($event)"
+                            >
+                                {{-- PERBAIKAN: Mengubah line-height menjadi leading-[1.5] agar rapat --}}
                                 <div
                                     id="note-editor"
                                     contenteditable="true"
-                                    class="w-full h-full p-8 text-[15px] text-[#2C2C2C] leading-[1.8] font-['Georgia',serif] overflow-y-auto custom-scrollbar"
+                                    class="w-full h-full p-8 text-[15px] text-[#2C2C2C] leading-[1.5] font-['Georgia',serif] overflow-y-auto custom-scrollbar"
                                     style="min-height: 400px; max-height: calc(100vh - 280px);"
                                     data-note-id="{{ $activeNote->note_id }}"
                                     x-init='window.__initialEditorBody = {!! json_encode($activeNote->body ?? '', JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}; initEditorElement();'
                                 ></div>
+
+                                {{-- Floating Block Drag Handle --}}
+                                <div x-show="blockDragHandle.show"
+                                     class="absolute flex items-center justify-center cursor-grab text-[#B0A090] hover:text-[#5E4C38] transition-colors"
+                                     :style="`top: ${blockDragHandle.top}px; left: ${blockDragHandle.left}px; width: 24px; height: 24px; z-index: 50;`"
+                                     draggable="true"
+                                     @dragstart="onBlockDragStart($event)"
+                                     @dragend="onBlockDragEnd($event)"
+                                     @mouseenter="blockDragHandle.show = true"
+                                     title="Drag to move block"
+                                >
+                                    {{-- PERBAIKAN: Bentuk ikon Grip titik 6 diubah dengan sempurna --}}
+                                    <svg viewBox="0 0 24 24" fill="currentColor" class="w-[16px] h-[16px]">
+                                        <circle cx="8" cy="6" r="1.5"></circle>
+                                        <circle cx="14" cy="6" r="1.5"></circle>
+                                        <circle cx="8" cy="12" r="1.5"></circle>
+                                        <circle cx="14" cy="12" r="1.5"></circle>
+                                        <circle cx="8" cy="18" r="1.5"></circle>
+                                        <circle cx="14" cy="18" r="1.5"></circle>
+                                    </svg>
+                                </div>
+
+                                {{-- Drag Indicator Line --}}
+                                <div x-show="dragIndicator.show"
+                                     class="absolute left-8 right-8 h-0.5 bg-[#8C7558] pointer-events-none z-50 rounded-full shadow-sm"
+                                     :style="`top: ${dragIndicator.top}px;`"
+                                ></div>
+
                                 <div class="absolute bottom-3 right-4 pointer-events-none">
                                     <span id="char-counter" class="text-[11px] text-[#A08866]"></span>
                                 </div>
@@ -1043,7 +1415,7 @@ new #[Layout('layouts.app')] class extends Component {
             @endif
 
             {{-- ============================================================
-                 PERBAIKAN: GLOBAL CONTEXT MENU UNTUK TABS
+                 GLOBAL CONTEXT MENU UNTUK TABS
             ============================================================ --}}
             <template x-teleport="body">
                 <div
