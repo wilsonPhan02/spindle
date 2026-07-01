@@ -33,4 +33,11 @@ class Section extends Model
     {
         return $this->hasMany(Project::class, 'section_id', 'section_id');
     }
+
+    protected function casts(): array
+    {
+        return [
+            'archived_at' => 'datetime',
+        ];
+    }
 }

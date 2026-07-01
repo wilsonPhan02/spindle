@@ -37,4 +37,6 @@ Route::middleware('auth')->group(function () {
     Volt::route('/projects/{project}', 'projects.show')->name('projects.show');
     // Rute untuk halaman notes project
     Volt::route('/projects/{project}/notes', 'projects.notes')->name('projects.notes');
+    // Rute untuk halaman archive
+    Volt::route('/archive', 'archive.index')->name('archive');
 });
