@@ -14,13 +14,29 @@ new #[Layout('layouts.app')] class extends Component {
     public function mount(Project $project): void
     {
         $this->project = $project;
-        $first = Note::where('project_id', $project->project_id)
-                     ->whereNull('parent_note_id')
-                     ->orderBy('sort_order')
-                     ->first();
-        if ($first) {
-            $this->activeNoteId = $first->note_id;
-            $this->editorBody   = $first->body ?? '';
+
+        // Jika ada note yang diminta lewat query string (?note=xxx), misalnya dari
+        // klik salah satu item di card "Notes" pada halaman project, buka note itu
+        // secara langsung. Jika tidak ada / tidak valid, fallback ke note pertama.
+        $requestedNoteId = request()->query('note');
+        $selected = null;
+
+        if ($requestedNoteId) {
+            $selected = Note::where('note_id', $requestedNoteId)
+                            ->where('project_id', $project->project_id)
+                            ->first();
+        }
+
+        if (!$selected) {
+            $selected = Note::where('project_id', $project->project_id)
+                         ->whereNull('parent_note_id')
+                         ->orderBy('sort_order')
+                         ->first();
+        }
+
+        if ($selected) {
+            $this->activeNoteId = $selected->note_id;
+            $this->editorBody   = $selected->body ?? '';
         }
     }
 
@@ -830,14 +846,17 @@ new #[Layout('layouts.app')] class extends Component {
             }
         },
 
-        initEditorElement() {
+            initEditorElement() {
             const editorEl = document.getElementById('note-editor');
             if (!editorEl || editorEl.dataset.boundListeners === '1') return;
             editorEl.dataset.boundListeners = '1';
 
             document.execCommand('defaultParagraphSeparator', false, 'p');
 
-            let initialBody = (window.__initialEditorBody ?? '') || '';
+            // PERBAIKAN: Ambil body langsung dari engine Livewire ($wire).
+            // Ini 100% aman dari masalah tanda kutip (quotes).
+            let initialBody = $wire.editorBody || '';
+
             if (initialBody.trim() === '') {
                 initialBody = '<p><br></p>';
             }
@@ -1369,7 +1388,7 @@ new #[Layout('layouts.app')] class extends Component {
                                     class="w-full h-full p-8 text-[15px] text-[#2C2C2C] leading-[1.5] font-['Georgia',serif] overflow-y-auto custom-scrollbar"
                                     style="min-height: 400px; max-height: calc(100vh - 280px);"
                                     data-note-id="{{ $activeNote->note_id }}"
-                                    x-init='window.__initialEditorBody = {!! json_encode($activeNote->body ?? '', JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}; initEditorElement();'
+                                    x-init="initEditorElement()"
                                 ></div>
 
                                 {{-- Floating Block Drag Handle --}}
