@@ -297,7 +297,119 @@
 }
 
 
+/* ==============================
+   LANDING PAGE — SUBTLE ANIMATIONS
+   ============================== */
 @layer utilities {
+
+    /* Scroll reveal: elemen mulai turun + transparan, naik halus saat masuk viewport */
+    .reveal {
+        opacity: 0;
+        transform: translateY(28px);
+        transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1),
+                    transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+        will-change: opacity, transform;
+    }
+    .reveal.in-view {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    /* Varian arah & delay bertingkat */
+    .reveal-left  { transform: translateX(-32px); }
+    .reveal-right { transform: translateX(32px); }
+    .reveal-left.in-view, .reveal-right.in-view { transform: translateX(0); }
+    .reveal-d1 { transition-delay: 0.12s; }
+    .reveal-d2 { transition-delay: 0.24s; }
+    .reveal-d3 { transition-delay: 0.36s; }
+
+    /* Float lembut naik-turun (untuk ilustrasi) */
+    @keyframes float-soft {
+        0%, 100% { transform: translateY(0); }
+        50%      { transform: translateY(-14px); }
+    }
+    .animate-float      { animation: float-soft 6s ease-in-out infinite; }
+    .animate-float-slow { animation: float-soft 9s ease-in-out infinite; }
+
+    /* Putaran sangat lambat untuk spiral galaksi */
+    @keyframes spin-slow { to { transform: rotate(360deg); } }
+    .animate-spin-slow { animation: spin-slow 90s linear infinite; }
+
+    /* Kelap-kelip bintang */
+    @keyframes twinkle {
+        0%, 100% { opacity: 0.2; }
+        50%      { opacity: 1; }
+    }
+    .animate-twinkle { animation: twinkle 3.5s ease-in-out infinite; }
+
+    /* Awan menyapu perlahan menyeberangi langit hero (geser horizontal jelas) */
+    @keyframes cloud-drift   { from { transform: translateX(-60px); } to { transform: translateX(80px); } }
+    @keyframes cloud-drift-2 { from { transform: translateX(70px); }  to { transform: translateX(-90px); } }
+    .animate-cloud   { animation: cloud-drift   38s ease-in-out infinite alternate; }
+    .animate-cloud-2 { animation: cloud-drift-2 48s ease-in-out infinite alternate; }
+
+    /* Ayunan lembut (syal / figur hero) — organik seperti tertiup angin */
+    @keyframes sway {
+        0%, 100% { transform: rotate(-0.5deg); }
+        30%      { transform: rotate(0.6deg); }
+        55%      { transform: rotate(-0.2deg); }
+        75%      { transform: rotate(0.4deg); }
+    }
+    .animate-sway { animation: sway 9s ease-in-out infinite; transform-origin: 55% bottom; }
+
+    /* Kabut tipis menyapu di atas gunung */
+    @keyframes mist {
+        0%   { transform: translateX(-5%); opacity: 0.35; }
+        50%  { opacity: 0.7; }
+        100% { transform: translateX(7%); opacity: 0.35; }
+    }
+    .animate-mist { animation: mist 28s ease-in-out infinite alternate; }
+
+    /* Partikel benang/debu naik perlahan dari figur */
+    @keyframes mote-rise {
+        0%   { transform: translateY(0) translateX(0) scale(1); opacity: 0; }
+        12%  { opacity: 0.85; }
+        88%  { opacity: 0.6; }
+        100% { transform: translateY(-140px) translateX(18px) scale(0.6); opacity: 0; }
+    }
+    .animate-mote { animation: mote-rise linear infinite; }
+
+    /* Untaian benang berkibar (dipakai bersama SMIL pada path) */
+    @keyframes thread-flutter {
+        0%, 100% { transform: translateY(0) skewX(0deg); }
+        50%      { transform: translateY(-3px) skewX(3deg); }
+    }
+    .animate-thread { animation: thread-flutter 4.5s ease-in-out infinite; transform-origin: left center; }
+
+    /* Navbar: transparan di atas hero, jadi solid setelah scroll */
+    #site-nav {
+        transition: background-color 0.4s ease, box-shadow 0.4s ease, backdrop-filter 0.4s ease;
+    }
+    #site-nav.nav-scrolled {
+        background-color: rgba(246, 246, 244, 0.85);
+        backdrop-filter: blur(10px);
+        box-shadow: 0 1px 0 rgba(129, 100, 77, 0.12);
+    }
+
+    /* Garis bawah underline tumbuh saat hover nav */
+    .nav-link { position: relative; }
+    .nav-link::after {
+        content: "";
+        position: absolute;
+        left: 0; bottom: -4px;
+        width: 100%; height: 1.5px;
+        background: currentColor;
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform 0.35s ease;
+    }
+    .nav-link:hover::after { transform: scaleX(1); }
+
+    /* Hormati preferensi reduce-motion */
+    @media (prefers-reduced-motion: reduce) {
+        .reveal { opacity: 1 !important; transform: none !important; transition: none !important; }
+        .animate-float, .animate-float-slow, .animate-spin-slow, .animate-twinkle { animation: none !important; }
+    }
+
     /* Mengubah tampilan scrollbar khusus buat class custom-scrollbar */
     .custom-scrollbar::-webkit-scrollbar {
         width: 4px; /* Scrollbar tipis elegan */
