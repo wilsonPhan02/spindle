@@ -10,7 +10,7 @@ new #[Layout('layouts.app')] class extends Component {
     public function mount(){
         $this->loadData();
     }
-    
+
     public function loadData()
     {
         $this->user = Auth::user()->fresh();
@@ -28,13 +28,11 @@ new #[Layout('layouts.app')] class extends Component {
 <div class="p-10 w-full max-w-8xl mx-auto">
     <!-- Header -->
     <header class="flex justify-between items-center mb-12">
-        <a href="{{ route('dashboard') ?? '#' }}" class="flex items-center gap-3 text-web-subheading-1 text-text-80 hover:text-secondary-100 transition-colors">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
-            Settings
+        <a href="{{ route('dashboard') ?? '#' }}" wire:navigate class="flex items-center gap-3 text-[18px] text-[#7A7A7A] hover:text-[#8C7558] transition-colors">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+            <span class="text-[#2C2C2C] font-semibold">Settings</span>
         </a>
-        <x-logo class="h-10 w-auto text-text-80" />
     </header>
-
     <!-- Profile Section-->
     <section class="mb-14 w-full max-w-4xl mx-auto">
         <div class="items-center gap-4 mb-8">
@@ -44,7 +42,7 @@ new #[Layout('layouts.app')] class extends Component {
 
         <div class="flex items-center gap-15 pl-8">
             <!-- Avatar -->
-            <x-avatar 
+            <x-avatar
                 size="w-35 h-35"
                 :imageUrl="auth()->user()->profile->avatar_url ? Storage::url(auth()->user()->profile->avatar_url) : null"
             />
