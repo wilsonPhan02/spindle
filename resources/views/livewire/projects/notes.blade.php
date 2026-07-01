@@ -2,14 +2,18 @@
 
 use Livewire\Volt\Component;
 use Livewire\Attributes\Layout;
+use Livewire\WithFileUploads;
 use App\Models\Note;
 use App\Models\Project;
+use Illuminate\Support\Facades\Storage;
 
 new #[Layout('layouts.app')] class extends Component {
+    use WithFileUploads;
 
     public Project $project;
     public ?string $activeNoteId = null;
     public string $editorBody = '';
+    public $uploadFile;
 
     public function mount(Project $project): void
     {
@@ -185,6 +189,16 @@ new #[Layout('layouts.app')] class extends Component {
         $this->saveCurrentBody();
     }
 
+    public function saveUploadedFile()
+    {
+        if ($this->uploadFile) {
+            $path = $this->uploadFile->store('notes_attachments', 'public');
+            $this->uploadFile = null;
+            return asset('storage/' . $path);
+        }
+        return null;
+    }
+
     public function moveNote(string $draggedId, ?string $targetId, string $position): void
     {
         $dragged = Note::where('note_id', $draggedId)
@@ -326,9 +340,18 @@ new #[Layout('layouts.app')] class extends Component {
             this.menuNoteTitle = title;
             this.menuNoteIsLeaf = isLeaf;
             const rect = triggerEl.getBoundingClientRect();
+            
+            let top = rect.bottom;
+            let left = rect.right - 176;
+            
+            // Adjust if menu would get cut off at the bottom
+            if (top + 170 > window.innerHeight) {
+                top = rect.top - 165; 
+            }
+            
             this.menuPos = {
-                top:   rect.top + window.scrollY,
-                left:  rect.right + window.scrollX - 176
+                top: top,
+                left: left
             };
         },
         closeMenu() {
@@ -428,7 +451,7 @@ new #[Layout('layouts.app')] class extends Component {
                 this.blockDragHandle.left = 10;
 
                 // Menempatkan titik 6 pas di tengah secara vertikal pada blok tersebut
-                let topPos = rect.top - editorRect.top + editor.scrollTop + (rect.height / 2) - 12;
+                let topPos = rect.top - editorRect.top + (rect.height / 2) - 12;
 
                 this.blockDragHandle.top = topPos;
                 this.blockDragHandle.block = block;
@@ -493,11 +516,24 @@ new #[Layout('layouts.app')] class extends Component {
 
                 this.dragIndicator.show = true;
                 let indTop = isAbove ? rect.top : rect.bottom;
-                this.dragIndicator.top = indTop - editorRect.top + editor.scrollTop;
+                this.dragIndicator.top = indTop - editorRect.top;
             }
         },
 
         onEditorDrop(e) {
+            if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                const file = e.dataTransfer.files[0];
+                if (file.type.startsWith('image/')) {
+                    e.preventDefault();
+                    $wire.upload('uploadFile', file, (uploadedFilename) => {
+                        $wire.saveUploadedFile().then(url => {
+                            if (url) this.insertImageBlock(url);
+                        });
+                    });
+                    return;
+                }
+            }
+
             if (!this.isDraggingBlock || !this.draggedBlock || !this.dropTargetBlock) return;
             e.preventDefault();
 
@@ -525,7 +561,7 @@ new #[Layout('layouts.app')] class extends Component {
         formatLabel: 'Normal Text',
         activeStates: {
             bold: false, italic: false, underline: false, strikeThrough: false,
-            insertUnorderedList: false, insertOrderedList: false,
+            insertUnorderedList: false, insertOrderedList: false, todo: false,
             justifyLeft: true, justifyCenter: false, justifyRight: false, justifyFull: false,
         },
 
@@ -709,6 +745,7 @@ new #[Layout('layouts.app')] class extends Component {
                 this.activeStates.strikeThrough = document.queryCommandState('strikeThrough');
                 this.activeStates.insertUnorderedList = document.queryCommandState('insertUnorderedList');
                 this.activeStates.insertOrderedList = document.queryCommandState('insertOrderedList');
+                this.activeStates.todo = false;
 
                 const sel = window.getSelection();
                 if (sel && sel.anchorNode) {
@@ -716,6 +753,11 @@ new #[Layout('layouts.app')] class extends Component {
                     if (node.nodeType === 3) node = node.parentElement;
                     const block = node ? node.closest('h1, h2, h3, blockquote, p, li, div') : null;
                     if (block) {
+                        if (block.tagName.toLowerCase() === 'li' && block.classList.contains('todo-item')) {
+                            this.activeStates.todo = true;
+                            this.activeStates.insertUnorderedList = false;
+                        }
+
                         const tag = block.tagName.toLowerCase();
                         const map = { p: 'Normal Text', h1: 'Heading 1', h2: 'Heading 2', h3: 'Heading 3', blockquote: 'Quote' };
                         if (map[tag]) {
@@ -758,6 +800,7 @@ new #[Layout('layouts.app')] class extends Component {
             }
         },
 
+
         handleMarkdownShortcuts() {
             const sel = window.getSelection();
             if (!sel || sel.rangeCount === 0) return;
@@ -773,22 +816,14 @@ new #[Layout('layouts.app')] class extends Component {
                 { regex: /^#\s$/, cmd: 'formatBlock', val: 'h1' },
                 { regex: /^##\s$/, cmd: 'formatBlock', val: 'h2' },
                 { regex: /^###\s$/, cmd: 'formatBlock', val: 'h3' },
-                { regex: /^>\s$/, cmd: 'formatBlock', val: 'blockquote' },
+                { regex: /^\{\}\s$/, cmd: 'formatBlock', val: 'blockquote' },
                 { regex: /^-\s$/, cmd: 'insertUnorderedList' },
                 { regex: /^\*\s$/, cmd: 'insertUnorderedList' },
                 { regex: /^\+\s$/, cmd: 'insertUnorderedList' },
                 { regex: /^1\.\s$/, cmd: 'insertOrderedList' },
-                { regex: /^a\.\s$/, cmd: 'insertOrderedList', callback: () => {
-                    setTimeout(() => {
-                        const currNode = window.getSelection().anchorNode;
-                        const targetElem = currNode && currNode.nodeType === 3 ? currNode.parentElement : currNode;
-                        const ol = targetElem ? targetElem.closest('ol') : null;
-                        if (ol) {
-                            ol.setAttribute('type', 'a');
-                            ol.style.listStyleType = 'lower-alpha';
-                        }
-                    }, 10);
-                }},
+                { regex: /^a\.\s$/, cmd: 'insertOrderedList', callback: () => { setTimeout(() => { const currNode = window.getSelection().anchorNode; const targetElem = currNode && currNode.nodeType === 3 ? currNode.parentElement : currNode; const ol = targetElem ? targetElem.closest('ol') : null; if (ol) { ol.setAttribute('type', 'a'); ol.style.listStyleType = 'lower-alpha'; } }, 10); }},
+                { regex: /^\[\]\s$/, cmd: 'custom', callback: () => window.insertTodoBlock() },
+                { regex: /^\[x\]\s$/i, cmd: 'custom', callback: () => { window.insertTodoBlock(); setTimeout(() => { const cb = window.getSelection().anchorNode.parentElement.closest('.todo-item').querySelector('.todo-cb'); if(cb){ cb.checked = true; cb.setAttribute('checked', 'checked'); const txt = cb.nextElementSibling; if(txt){ txt.style.textDecoration='line-through'; txt.style.color='#9A8E80'; } } }, 30); } },
                 { regex: /^---\s$/, cmd: 'insertHorizontalRule' }
             ];
 
@@ -804,7 +839,7 @@ new #[Layout('layouts.app')] class extends Component {
 
                     if (pattern.cmd === 'formatBlock') {
                         this.setFormat(pattern.val, null);
-                    } else if (pattern.cmd) {
+                    } else if (pattern.cmd && pattern.cmd !== 'custom') {
                         document.execCommand(pattern.cmd, false, pattern.val);
                     }
                     if (pattern.callback) pattern.callback();
@@ -863,6 +898,73 @@ new #[Layout('layouts.app')] class extends Component {
             editorEl.innerHTML = initialBody;
             this.updateCharCount();
 
+            editorEl.addEventListener('scroll', () => {
+                if (this.blockDragHandle.show && this.blockDragHandle.block) {
+                    const rect = this.blockDragHandle.block.getBoundingClientRect();
+                    const editorRect = editorEl.getBoundingClientRect();
+                    if (rect.bottom < editorRect.top || rect.top > editorRect.bottom) {
+                        this.blockDragHandle.show = false;
+                    } else {
+                        let topPos = rect.top - editorRect.top + (rect.height / 2) - 12;
+                        this.blockDragHandle.top = topPos;
+                    }
+                }
+            });
+
+            editorEl.addEventListener('change', (e) => {
+                if (e.target && e.target.type === 'checkbox' && e.target.classList.contains('todo-cb')) {
+                    const span = e.target.nextElementSibling;
+                    if (e.target.checked) {
+                        e.target.setAttribute('checked', 'checked');
+                        if (span && span.classList.contains('todo-text')) {
+                            span.style.textDecoration = 'line-through';
+                            span.style.color = '#9A8E80';
+                        }
+                    } else {
+                        e.target.removeAttribute('checked');
+                        if (span && span.classList.contains('todo-text')) {
+                            span.style.textDecoration = 'none';
+                            span.style.color = 'inherit';
+                        }
+                    }
+                    this.scheduleSave();
+                }
+            });
+
+            editorEl.addEventListener('toggle', (e) => {
+                if (e.target && e.target.tagName === 'DETAILS' && e.target.classList.contains('toggle-block')) {
+                    if (e.target.open) {
+                        e.target.setAttribute('open', 'open');
+                    } else {
+                        e.target.removeAttribute('open');
+                    }
+                    this.scheduleSave();
+                }
+            }, true);
+
+            editorEl.addEventListener('paste', (e) => {
+                const items = (e.clipboardData || window.clipboardData).items;
+                for (let i = 0; i < items.length; i++) {
+                    if (items[i].kind === 'file' && items[i].type.startsWith('image/')) {
+                        e.preventDefault();
+                        const blob = items[i].getAsFile();
+                        const tempUrl = URL.createObjectURL(blob);
+                        const imgId = 'img-' + Date.now();
+                        window.insertImageBlockVanilla(tempUrl, imgId);
+                        $wire.upload('uploadFile', blob, (uploadedFilename) => {
+                            $wire.saveUploadedFile().then(url => {
+                                if (url) {
+                                    const img = document.getElementById(imgId);
+                                    if (img) img.src = url;
+                                    document.getElementById('note-editor').dispatchEvent(new Event('input'));
+                                }
+                            });
+                        });
+                        return;
+                    }
+                }
+            });
+
             editorEl.addEventListener('input', () => this.scheduleSave());
 
             editorEl.addEventListener('keydown', (e) => {
@@ -893,23 +995,75 @@ new #[Layout('layouts.app')] class extends Component {
                     return;
                 }
 
+                if (e.key === 'Enter') {
+                    const sel = window.getSelection();
+                    if (!sel || sel.rangeCount === 0) return;
+                    let node = sel.anchorNode;
+                    if (node.nodeType === 3) node = node.parentElement;
+                    const todoLi = node ? node.closest('li.todo-item') : null;
+                    if (todoLi) {
+                        e.preventDefault();
+                        const newLi = document.createElement('li');
+                        newLi.className = 'todo-item';
+                        newLi.style.cssText = todoLi.style.cssText;
+                        newLi.innerHTML = '<input type=&quot;checkbox&quot; class=&quot;todo-cb&quot; contenteditable=&quot;false&quot; style=&quot;position: absolute; left: 4px; top: 3px; accent-color: #8C7558; cursor: pointer; width: 16px; height: 16px;&quot;><span class=&quot;todo-text&quot;>\u200B</span>';
+                        todoLi.parentNode.insertBefore(newLi, todoLi.nextSibling);
+                        const range = document.createRange();
+                        range.setStart(newLi.querySelector('.todo-text'), 1);
+                        range.collapse(true);
+                        sel.removeAllRanges();
+                        sel.addRange(range);
+                        this.scheduleSave();
+                        return;
+                    }
+                }
+
                 if (e.key === 'Backspace') {
                     try {
                         const sel = window.getSelection();
                         if (sel && sel.rangeCount > 0 && sel.isCollapsed) {
                             const node = sel.anchorNode;
                             const offset = sel.anchorOffset;
-                            if (node && node.nodeType === 3 && offset === 0) {
-                                const li = node.parentElement ? node.parentElement.closest('li') : null;
-                                if (li) {
-                                    const list = li.parentElement;
-                                    if (list && list.firstElementChild === li) {
+                            
+                            const targetLi = node.nodeType === 3 ? node.parentElement.closest('li') : (node.closest ? node.closest('li') : null);
+                            
+                            if (targetLi) {
+                                const tempRange = document.createRange();
+                                tempRange.setStart(targetLi, 0);
+                                tempRange.setEnd(node, offset);
+                                const textBefore = tempRange.toString().replace(/\u200B/g, '');
+                                
+                                if (textBefore.length === 0) {
+                                    const list = targetLi.parentElement;
+                                    const isTodo = targetLi.classList.contains('todo-item');
+                                    
+                                    if (isTodo && list && targetLi === list.lastElementChild) {
                                         e.preventDefault();
-                                        const inner = li.innerHTML || '';
+                                        const span = targetLi.querySelector('.todo-text');
+                                        const inner = span ? span.innerHTML.replace(/\u200B/g, '') : '';
+                                        const p = document.createElement('p');
+                                        p.innerHTML = inner.trim() === '' ? '<br>' : inner;
+                                        
+                                        list.parentNode.insertBefore(p, list.nextSibling);
+                                        list.removeChild(targetLi);
+                                        if (!list.querySelector('li')) list.parentNode.removeChild(list);
+                                        
+                                        const newRange = document.createRange();
+                                        newRange.setStart(p, 0);
+                                        newRange.collapse(true);
+                                        sel.removeAllRanges();
+                                        sel.addRange(newRange);
+                                        
+                                        this.refreshToolbarState();
+                                        this.scheduleSave();
+                                        return;
+                                    } else if (list && list.firstElementChild === targetLi && !isTodo) {
+                                        e.preventDefault();
+                                        const inner = targetLi.innerHTML || '';
                                         const p = document.createElement('p');
                                         p.innerHTML = inner.trim() === '' ? '<br>' : inner;
                                         list.parentNode.insertBefore(p, list);
-                                        list.removeChild(li);
+                                        list.removeChild(targetLi);
                                         if (!list.querySelector('li')) {
                                             list.parentNode.removeChild(list);
                                         }
@@ -937,7 +1091,30 @@ new #[Layout('layouts.app')] class extends Component {
 
                     if (parentLi) {
                         if (e.shiftKey) {
-                            document.execCommand('outdent', false, null);
+                            const isTodo = parentLi.classList.contains('todo-item');
+                            const list = parentLi.parentElement;
+                            if (isTodo && list && parentLi === list.lastElementChild) {
+                                const span = parentLi.querySelector('.todo-text');
+                                const inner = span ? span.innerHTML.replace(/\u200B/g, '') : '';
+                                const p = document.createElement('p');
+                                p.innerHTML = inner.trim() === '' ? '<br>' : inner;
+                                
+                                list.parentNode.insertBefore(p, list.nextSibling);
+                                list.removeChild(parentLi);
+                                if (!list.querySelector('li')) list.parentNode.removeChild(list);
+                                
+                                const newRange = document.createRange();
+                                newRange.setStart(p, 0);
+                                newRange.collapse(true);
+                                sel.removeAllRanges();
+                                sel.addRange(newRange);
+                                
+                                this.refreshToolbarState();
+                                this.scheduleSave();
+                                return;
+                            } else {
+                                document.execCommand('outdent', false, null);
+                            }
                         } else {
                             document.execCommand('indent', false, null);
                         }
@@ -961,6 +1138,21 @@ new #[Layout('layouts.app')] class extends Component {
                         if (sel && sel.anchorNode) {
                             let node = sel.anchorNode;
                             if (node.nodeType === 3) node = node.parentElement;
+
+                            const todoLi = node ? node.closest('li.todo-item') : null;
+                            if (todoLi) {
+                                const cb = todoLi.querySelector('.todo-cb');
+                                if (cb) {
+                                    cb.checked = false;
+                                    cb.removeAttribute('checked');
+                                }
+                                const textSpan = todoLi.querySelector('.todo-text');
+                                if (textSpan) {
+                                    textSpan.style.textDecoration = 'none';
+                                    textSpan.style.color = 'inherit';
+                                }
+                            }
+
                             const block = node ? node.closest('h1, h2, h3, blockquote') : null;
 
                             if (block) {
@@ -1095,10 +1287,10 @@ new #[Layout('layouts.app')] class extends Component {
         <h2 class="text-[28px] font-merriweather text-[#2C2C2C] mb-6">Project Notes</h2>
 
         {{-- Main Container --}}
-        <div class="border border-[#E8DED2] rounded-xl shadow-sm overflow-hidden" style="min-height: 500px;">
+        <div class="border border-[#E8DED2] rounded-xl shadow-sm overflow-hidden flex flex-col" style="height: calc(100vh - 200px); min-height: 500px;">
 
             @if($rootNotes->isEmpty())
-                <div class="flex" style="min-height: 500px;">
+                <div class="flex flex-1 min-h-0">
                     <div class="w-[220px] shrink-0 border-r border-[#E8DED2] flex flex-col bg-[#FAF7F3]">
                         <div class="flex items-center justify-between px-4 py-3 border-b border-[#E8DED2]">
                             <span class="text-[11px] font-semibold text-[#9A8E80] uppercase tracking-widest">Document Tabs</span>
@@ -1114,7 +1306,7 @@ new #[Layout('layouts.app')] class extends Component {
                     </div>
                 </div>
             @else
-                <div class="flex h-full" style="min-height: 500px;">
+                <div class="flex flex-1 min-h-0">
 
                     {{-- LEFT PANEL --}}
                     <div id="tab-panel" class="w-[220px] shrink-0 border-r border-[#E8DED2] flex flex-col bg-[#FAF7F3] relative">
@@ -1198,7 +1390,7 @@ new #[Layout('layouts.app')] class extends Component {
                                             <button type="button" @mousedown.prevent="saveSelection()" @click="setFormat('h1', 'Heading 1'); activeDropdown = null" class="format-option w-full text-left px-3 py-1.5 text-[18px] font-bold text-[#2C2C2C] hover:bg-[#F0E8DC]" x-bind:class="formatValue === 'h1' ? 'bg-[#EAE1D5]' : ''" title="Heading 1 (# + Space)">Heading 1</button>
                                             <button type="button" @mousedown.prevent="saveSelection()" @click="setFormat('h2', 'Heading 2'); activeDropdown = null" class="format-option w-full text-left px-3 py-1.5 text-[15px] font-bold text-[#2C2C2C] hover:bg-[#F0E8DC]" x-bind:class="formatValue === 'h2' ? 'bg-[#EAE1D5]' : ''" title="Heading 2 (## + Space)">Heading 2</button>
                                             <button type="button" @mousedown.prevent="saveSelection()" @click="setFormat('h3', 'Heading 3'); activeDropdown = null" class="format-option w-full text-left px-3 py-1.5 text-[13.5px] font-bold text-[#2C2C2C] hover:bg-[#F0E8DC]" x-bind:class="formatValue === 'h3' ? 'bg-[#EAE1D5]' : ''" title="Heading 3 (### + Space)">Heading 3</button>
-                                            <button type="button" @mousedown.prevent="saveSelection()" @click="setFormat('blockquote', 'Quote'); activeDropdown = null" class="format-option w-full text-left px-3 py-1.5 text-[13px] italic text-[#6B6B6B] hover:bg-[#F0E8DC]" x-bind:class="formatValue === 'blockquote' ? 'bg-[#EAE1D5]' : ''" title="Quote (> + Space)">Quote</button>
+                                            <button type="button" @mousedown.prevent="saveSelection()" @click="setFormat('blockquote', 'Quote'); activeDropdown = null" class="format-option w-full text-left px-3 py-1.5 text-[13px] italic text-[#6B6B6B] hover:bg-[#F0E8DC]" x-bind:class="formatValue === 'blockquote' ? 'bg-[#EAE1D5]' : ''" title="Quote ({} + Space)">Quote</button>
                                         </div>
                                     </template>
                                 </div>
@@ -1225,6 +1417,9 @@ new #[Layout('layouts.app')] class extends Component {
                                 </button>
                                 <button type="button" @mousedown.prevent="saveSelection()" @click="exec('insertOrderedList')" class="toolbar-btn" x-bind:class="activeStates.insertOrderedList ? 'is-active' : ''" title="Numbered List (1. or a. and Space)">
                                     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M2 17h2v.5H3v1h1v.5H2v1h3v-4H2v1zm1-9h1V4H2v1h1v3zm-1 3h1.8L2 13.1v.9h3v-1H3.2L5 10.9V10H2v1zm5-6v2h14V5H7zm0 14h14v-2H7v2zm0-6h14v-2H7v2z"/></svg>
+                                </button>
+                                <button type="button" @mousedown.prevent="saveSelection()" @click="restoreSelection(); insertTodoBlock()" class="toolbar-btn" x-bind:class="activeStates.todo ? 'is-active' : ''" title="To-Do List ([] + Space)">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
                                 </button>
 
                                 <div class="toolbar-divider"></div>
@@ -1370,23 +1565,23 @@ new #[Layout('layouts.app')] class extends Component {
                                 <button type="button" @mousedown.prevent="saveSelection()" @click="exec('insertHorizontalRule')" class="toolbar-btn" title="Horizontal Rule (--- + Space)">
                                     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19 13H5v-2h14v2z"/></svg>
                                 </button>
+
                             </div>
 
                             {{-- Editor --}}
                             <div class="flex-1 relative overflow-hidden flex flex-col"
                                  wire:ignore
                                  wire:key="editor-{{ $activeNote->note_id }}"
-                                 @mousemove="onEditorMouseMove($event)"
+                                 @mousemove.throttle.50ms="onEditorMouseMove($event)"
                                  @mouseleave="blockDragHandle.show = false"
-                                 @dragover.prevent="onEditorDragOver($event)"
+                                 @dragover.prevent.throttle.50ms="onEditorDragOver($event)"
                                  @drop.prevent="onEditorDrop($event)"
                             >
                                 {{-- PERBAIKAN: Mengubah line-height menjadi leading-[1.5] agar rapat --}}
                                 <div
                                     id="note-editor"
                                     contenteditable="true"
-                                    class="w-full h-full p-8 text-[15px] text-[#2C2C2C] leading-[1.5] font-['Georgia',serif] overflow-y-auto custom-scrollbar"
-                                    style="min-height: 400px; max-height: calc(100vh - 280px);"
+                                    class="w-full h-full flex-1 p-8 text-[15px] text-[#2C2C2C] leading-[1.5] font-['Georgia',serif] overflow-y-auto custom-scrollbar"
                                     data-note-id="{{ $activeNote->note_id }}"
                                     x-init="initEditorElement()"
                                 ></div>
@@ -1508,3 +1703,40 @@ new #[Layout('layouts.app')] class extends Component {
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // ============================================================
+    // VANILLA JS BLOCK FUNCTIONS (outside x-data to avoid quote issues)
+    // ============================================================
+
+    // -- Helper: get editor & trigger save --
+    function getEditor() { return document.getElementById('note-editor'); }
+    function triggerSave() {
+        const ed = getEditor();
+        if (ed) ed.dispatchEvent(new Event('input'));
+    }
+
+    // -- INSERT TO-DO BLOCK --
+    window.insertTodoBlock = function() {
+        const html = '<ul class="todo-list" style="list-style-type: none; padding-left: 0.2em;"><li class="todo-item" style="position: relative; padding-left: 28px; margin-bottom: 0.5em;"><input type="checkbox" class="todo-cb" contenteditable="false" style="position: absolute; left: 4px; top: 3px; accent-color: #8C7558; cursor: pointer; width: 16px; height: 16px;"><span class="todo-text">\u200B</span></li></ul>';
+        document.execCommand('insertHTML', false, html);
+        setTimeout(function() {
+            const sel = window.getSelection();
+            if (sel && sel.anchorNode) {
+                const span = sel.anchorNode.nodeType === 3 ? sel.anchorNode.parentElement : sel.anchorNode;
+                const todoText = span ? (span.closest('.todo-text') || span.querySelector('.todo-text')) : null;
+                if (todoText) {
+                    const range = document.createRange();
+                    range.selectNodeContents(todoText);
+                    range.collapse(false);
+                    sel.removeAllRanges();
+                    sel.addRange(range);
+                }
+            }
+        }, 20);
+        triggerSave();
+    };
+
+});
+</script>
