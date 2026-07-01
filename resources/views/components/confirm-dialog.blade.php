@@ -11,9 +11,9 @@
 ])
 
 <div 
-    x-data="{ show: false }" 
+    x-data="{ show: false, itemId: null }" 
     @keydown.escape.window="show = false"
-    x-on:{{ $eventName }}.window="show = true"
+    x-on:{{ $eventName }}.window="show = true; itemId = $event.detail?.id || null"
     x-show="show" 
     style="display: none;"
     class="fixed inset-0 z-50 flex items-center justify-center bg-text-80/75 backdrop-blur-[1.5px]"
@@ -53,7 +53,12 @@
                 {{ $cancelText }}
             </button>
             <button 
-                wire:click="{{ $submitAction }}" 
+                @click="
+                    itemId 
+                        ? $wire.call('{{ $submitAction }}', itemId) 
+                        : $wire.call('{{ $submitAction }}'); 
+                    show = false;
+                "
                 class="flex-1 py-3 px-4 rounded-lg text-subtext-60 transition-colors text-web-body-small font-semibold {{ $btnColor }}"
             >
                 {{ $confirmText }}

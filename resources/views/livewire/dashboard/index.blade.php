@@ -57,9 +57,7 @@ new class extends Component {
 <div class="p-10 max-w-7xl mx-auto">
 
     <header class="flex justify-between items-center mb-8">
-        <div class="flex items-center gap-3 text-[18px] text-[#7A7A7A]">
-            <span class="text-[#2C2C2C] font-semibold">Dashboard</span>
-        </div>
+        <span class="text-app-heading-2 text-text-100 font-semibold">Dashboard</span>
         <x-logo class="h-8 w-auto text-text-100" />
     </header>
 

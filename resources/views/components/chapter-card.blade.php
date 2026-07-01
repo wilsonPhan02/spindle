@@ -2,53 +2,72 @@
 
 <div class="flex flex-col w-full group cursor-pointer">
     
-    <div class="text-[13px] text-text-60 font-medium mb-1.5 ml-1 group-hover:text-secondary-200 transition-colors">
-        Chapter {{ $chapter->order_index }}
+    <div class="flex justify-between items-end mb-1.5 px-1">
+        
+        <div class="text-app-desc-feature text-text-60 group-hover:text-secondary-200 transition-colors">
+            Chapter {{ $chapter->order_index }}
+        </div>
+        
+        <button 
+            @click.stop="$dispatch('open-delete-dialog', { id: '{{ $chapter->chapter_card_id }}' })"
+            class="text-text-60 hover:text-danger-100 hover:bg-danger-100/10 p-1 rounded transition-all opacity-0 group-hover:opacity-100 focus:outline-none"
+            title="Delete Chapter"
+        >
+            <x-icons.delete-default size="w-4 h-4" color="currentColor"/>            
+        </button>
+        
     </div>
     
-    <div class="bg-white border border-[#E8E1D5] rounded-xl shadow-sm flex flex-col flex-1 overflow-hidden transition-all group-hover:border-secondary-200 group-hover:shadow-md min-h-[260px]">
+    <div class="bg-card-bg border border-card-border rounded-lg shadow-md flex flex-col flex-1 overflow-hidden transition-all group-hover:border-secondary-200 group-hover:shadow-lg group-hover:bg-card-hover min-h-[260px]">
         
         <div class="p-5 flex-1 flex flex-col">
             
-            <div class="flex justify-between items-baseline border-b-2 border-[#F0EBE1] pb-2 mb-3">
-                <h3 class="text-app-heading-2 text-text-90 font-semibold truncate pr-4">
+            <div class="flex justify-between items-baseline border-b-1 border-card-border pb-2 mb-3">
+                <h3 class="text-app-body-large truncate pr-4">
                     {{ $chapter->title }}
                 </h3>
             </div>
             
-            <p class="text-[14px] text-text-80 line-clamp-4 leading-relaxed font-medium">
+            <p class="text-app-body-small text-text-90 line-clamp-6">
                 {{ $chapter->summary ?? 'No Description About This Chapter!' }}
             </p>
         </div>
 
-        <div class="bg-[#EFECE5] px-5 py-4 flex flex-col gap-4 border-t border-[#E8E1D5]">
+        <div class="bg-brand-100 px-5 py-4 flex flex-col gap-2 group-hover:bg-brand-150">
             
-            <div class="flex">
-                <span class="text-[11px] text-text-60 font-medium bg-white border border-[#DCD6CC] px-2 py-1 rounded shadow-sm">
-                    No Tag Here
-                </span>
+            <div class="flex items-center gap-2 overflow-hidden">
+                @if($chapter->tags->isNotEmpty())
+                    @foreach($chapter->tags->take(2) as $tag)
+                        <span class="text-app-desc-feature text-secondary-100 bg-brand-100 border border-brand-200 px-2 py-0.5 rounded truncate max-w-[80px]">
+                            {{ $tag->name }}
+                        </span>
+                    @endforeach
+
+                    @if($chapter->tags->count() > 2)
+                        <span class="text-app-desc-feature text-secondary-100 px-1">
+                            +{{ $chapter->tags->count() - 2 }} more
+                        </span>
+                    @endif
+                @else
+                    <span class="text-app-desc-feature text-secondary-100 bg-card-hover border border-dashed border-brand-200 px-2 py-0.5 rounded italic">
+                        No tag here
+                    </span>
+                @endif
             </div>
 
             <div class="flex justify-between items-center">
                 
-                <span class="text-[13px] text-text-70 font-semibold">
+                <span class="text-app-body-small text-text-60">
                     {{ $chapter->manuscript ? number_format($chapter->manuscript->count()) : 0 }} Draft(s)
                 </span>
                 
                 <span @class([
-                    'text-[11px] px-2.5 py-1.5 rounded-md flex items-center gap-1.5 font-bold tracking-wide shadow-sm',
-                    'bg-[#F8D664] text-[#5A4114]' => $chapter->status === 'In Progress',
-                    'bg-[#CEEAD6] text-[#0D532A]' => $chapter->status === 'Completed',
-                    'bg-[#D2E3FC] text-[#174EA6]' => $chapter->status === 'Draft',
-                    'bg-[#F1F3F4] text-[#5F6368]' => !in_array($chapter->status, ['In Progress', 'Completed', 'Draft'])
+                    'text-app-desc-feature text-text-80 px-2.5 py-1.5 rounded-md flex items-center gap-1.5 shadow-sm',
+                    'bg-warning-100/70' => $chapter->status === 'In Progress',
+                    'bg-success-100/70' => $chapter->status === 'Completed',
+                    'bg-text-100' => !in_array($chapter->status, ['In Progress', 'Completed'])
                 ])>
-                    @if($chapter->status === 'In Progress')
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                    @elseif($chapter->status === 'Completed')
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
-                    @else
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-                    @endif
+                    <x-icons.chapter-status :status="$chapter->status" />
                     {{ $chapter->status ?? 'In Progress' }}
                 </span>
             </div>

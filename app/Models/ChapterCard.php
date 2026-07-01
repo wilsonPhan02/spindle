@@ -31,4 +31,9 @@ class ChapterCard extends Model
     {
         return $this->hasMany(Manuscript::class, 'chapter_card_id', 'chapter_card_id');
     }
+
+    public function tags()
+    {
+        return $this->belongsToMany(Tag::class, 'chapter_tag', 'chapter_card_id', 'tag_id');
+    }
 }
