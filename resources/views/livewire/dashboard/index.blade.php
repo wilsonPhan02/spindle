@@ -163,10 +163,9 @@ new class extends Component {
 
                         @foreach($section->projects as $project)
                             <a href="{{ route('projects.show', $project->project_id) }}" wire:navigate class="w-44 shrink-0 group cursor-pointer block">
-                                <div class="w-full aspect-[1/1.6] relative mb-3 transition-transform duration-300 ease-out group-hover:scale-[1.03] group-hover:-translate-y-1.5">
+                                <div class="w-full aspect-[1/1.6] relative mb-3 transition-transform duration-300 ease-out group-hover:-translate-y-2">
                                     @if($project->cover_image_path)
                                         <img src="{{ Storage::url($project->cover_image_path) }}" class="absolute inset-y-0 left-0 right-3 w-[calc(100%-12px)] h-full object-cover rounded-l-sm rounded-r-md shadow-md z-20 border-r border-black/10 transition-shadow duration-300 group-hover:shadow-xl" />
-                                        <div class="absolute inset-y-0 left-0 w-4 bg-gradient-to-r from-black/60 via-black/10 to-transparent z-20 pointer-events-none mix-blend-multiply rounded-l-sm"></div>
                                         <div class="absolute top-2 bottom-2 right-1.5 w-3 bg-gradient-to-r from-[#E8E3D9] to-[#D5C6A9] border-y border-r border-[#C4B7A3] rounded-r-[2px] z-10 shadow-inner"></div>
                                         <div class="absolute inset-y-0 right-0 w-6 bg-[#8C7558] rounded-r-md z-0 shadow-sm border-l border-black/20 transition-shadow duration-300 group-hover:shadow-lg"></div>
                                     @else

@@ -27,7 +27,4 @@
             </svg>
         </div>
     </div>
-    
-    <!-- Spine shadow overlay to make it look like a real book -->
-    <div class="absolute inset-y-0 left-0 w-8 bg-gradient-to-r from-black/40 via-black/5 to-transparent z-10 pointer-events-none mix-blend-multiply"></div>
 </div>
