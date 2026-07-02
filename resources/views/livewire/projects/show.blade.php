@@ -23,12 +23,21 @@ new #[Layout('layouts.app')] class extends Component {
     // Daftar 10 notes yang terakhir diedit, untuk ditampilkan di card Notes
     public $recentNotes = [];
 
+    // Daftar karakter untuk ditampilkan di card Character
+    public $recentCharacters = [];
+
     public function mount(Project $project) {
         $this->project = $project;
         $this->title = $project->title;
         $this->synopsis = $project->synopsis ?? '';
 
         $this->recentNotes = Note::where('project_id', $project->project_id)
+            ->orderByDesc('updated_at')
+            ->limit(10)
+            ->get();
+
+        $this->recentCharacters = $project->characters()
+            ->with('hashtags')
             ->orderByDesc('updated_at')
             ->limit(10)
             ->get();
@@ -467,6 +476,35 @@ new #[Layout('layouts.app')] class extends Component {
                                         <p class="text-[12px] text-[#5A5A5A] leading-[1.6] mt-1" style="display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">
                                             {{ Str::limit($cleanBody, 120) ?: 'No content yet' }}
                                         </p>
+                                    </div>
+                                </a>
+                            @endforeach
+                        </div>
+                    @elseif($workspace['title'] === 'Character' && $recentCharacters->isNotEmpty())
+                        <div class="flex-1 flex flex-col gap-3 overflow-y-auto pr-1.5 custom-scrollbar -mx-1.5 px-1.5">
+                            @foreach($recentCharacters as $character)
+                                <a
+                                    href="{{ route('projects.character.show', ['project' => $project->project_id, 'character' => $character->character_id]) }}"
+                                    wire:navigate
+                                    class="flex items-center gap-3 bg-[#F5EFE9] border border-[#D5C6A9] p-3 rounded-lg group cursor-pointer hover:bg-[#F0E8DC] hover:border-[#B69F78] hover:shadow-sm transition-all duration-200"
+                                >
+                                    <div class="w-14 h-14 shrink-0 rounded-lg bg-[#EAE1D5] overflow-hidden flex items-center justify-center">
+                                        @if($character->image_path)
+                                            <img src="{{ Storage::url($character->image_path) }}" class="w-full h-full object-cover">
+                                        @else
+                                            <x-icons.default-avatar class="w-full h-full text-[#A08866]" />
+                                        @endif
+                                    </div>
+                                    <div class="min-w-0 flex-1">
+                                        <p class="text-[14px] font-bold text-[#2C2C2C] truncate group-hover:text-[#8C7558] transition-colors">{{ $character->full_name }}</p>
+                                        @if($character->hashtags->isNotEmpty())
+                                            <div class="flex items-center gap-1 mt-1.5 flex-wrap">
+                                                <span class="text-[11px] text-[#7A7A7A] shrink-0">Tags :</span>
+                                                @foreach($character->hashtags->take(4) as $tag)
+                                                    <span class="px-2 py-0.5 rounded-full bg-[#EAE1D5] text-[11px] text-[#4A4A4A]">{{ $tag->name }}</span>
+                                                @endforeach
+                                            </div>
+                                        @endif
                                     </div>
                                 </a>
                             @endforeach

@@ -230,7 +230,17 @@ new class extends Component {
 
         <h2 class="text-app-title-1 text-text-100">Character Details</h2>
 
-        <div class="flex flex-col gap-6 max-h-[28rem] overflow-y-auto pr-1">
+        <div class="flex flex-col gap-6 max-h-[28rem] overflow-y-auto pr-2 
+                    [&::-webkit-scrollbar]:w-1.5 
+                    [&::-webkit-scrollbar-track]:bg-transparent 
+                    [&::-webkit-scrollbar-thumb]:bg-[var(--color-brand-50)] 
+                    [&::-webkit-scrollbar-thumb]:rounded-full 
+                    [&::-webkit-scrollbar-thumb:hover]:bg-[var(--color-brand-100)] 
+                    [&::-webkit-scrollbar-button]:w-0 
+                    [&::-webkit-scrollbar-button]:h-0
+                    [&::-webkit-scrollbar-button]:!hidden
+                    [scrollbar-width:thin] 
+                    [scrollbar-color:#D5C6A9_transparent]">
             <template x-for="group in detailGroups" :key="group.id">
                 <div class="flex flex-col gap-3 text-left">
                     <div class="flex items-center gap-2 min-w-0">
