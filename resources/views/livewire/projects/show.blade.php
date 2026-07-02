@@ -1,9 +1,12 @@
 <?php
+
 use Livewire\Volt\Component;
 use App\Models\Project;
+use App\Models\Note;
 use Livewire\Attributes\Layout;
 use Livewire\WithFileUploads;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 new #[Layout('layouts.app')] class extends Component {
     use WithFileUploads;
@@ -17,10 +20,18 @@ new #[Layout('layouts.app')] class extends Component {
     public $newCategoryName = '';
     public $cover_image;
 
+    // Daftar 10 notes yang terakhir diedit, untuk ditampilkan di card Notes
+    public $recentNotes = [];
+
     public function mount(Project $project) {
         $this->project = $project;
         $this->title = $project->title;
         $this->synopsis = $project->synopsis ?? '';
+
+        $this->recentNotes = Note::where('project_id', $project->project_id)
+            ->orderByDesc('updated_at')
+            ->limit(10)
+            ->get();
     }
 
     public function saveTitle() {
@@ -72,6 +83,11 @@ new #[Layout('layouts.app')] class extends Component {
         }
         $this->project->update(['cover_image_path' => null]);
         $this->project->refresh();
+    }
+
+    public function archiveProject() {
+        $this->project->update(['archived_at' => now()]);
+        $this->redirect(route('dashboard'), navigate: true);
     }
 }; ?>
 
@@ -168,7 +184,10 @@ new #[Layout('layouts.app')] class extends Component {
                     </div>
 
                     <div class="flex items-center gap-3 shrink-0">
-                        <button class="flex items-center gap-2 border border-[#D5C6A9] bg-transparent px-3 py-1.5 rounded-lg text-[13px] font-medium text-[#4A4A4A] hover:bg-[#EAE1D5] transition-colors">
+                        <button
+                            wire:click="archiveProject"
+                            wire:confirm="Are you sure you want to archive this project? You can restore it from the Archive page."
+                            class="flex items-center gap-2 border border-[#D5C6A9] bg-transparent px-3 py-1.5 rounded-lg text-[13px] font-medium text-[#4A4A4A] hover:bg-[#EAE1D5] transition-colors">
                             <x-icons.archive class="w-4 h-4" /> Move To Archive
                         </button>
                         <button class="text-[#8C7558] hover:text-[#5E4C38] transition-colors">
@@ -218,14 +237,14 @@ new #[Layout('layouts.app')] class extends Component {
                     localSyn: @entangle('synopsis'),
                     checkOverflow() {
                         if(this.$refs.synText) {
-                            // Cek apakah konten melebihi batas 150px
                             this.isOverflowing = this.$refs.synText.scrollHeight > 150;
                         }
                     }
                 }"
                 x-init="$watch('localSyn', () => $nextTick(() => checkOverflow())); setTimeout(() => checkOverflow(), 200)"
                 @resize.window="checkOverflow()"
-                class="w-full"> <div @mouseover="hoverSyn = true" @mouseleave="hoverSyn = false" class="flex items-center gap-3 mb-1">
+                class="w-full">
+                    <div @mouseover="hoverSyn = true" @mouseleave="hoverSyn = false" class="flex items-center gap-3 mb-1">
                         <span class="text-[16px] font-bold text-[#2C2C2C]">Synopsis</span>
                         <button x-show="hoverSyn && !editingSyn" @click="editingSyn = true; setTimeout(() => $refs.synInput.focus(), 50)" class="text-[#A08866] hover:text-secondary-200 transition-colors">
                             <x-icons.rename class="w-4 h-4" />
@@ -279,30 +298,68 @@ new #[Layout('layouts.app')] class extends Component {
                 <div class="flex-1 h-px bg-[#D5C6A9]"></div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 @foreach([
                     ['title' => 'Structure', 'icon' => 'no-structure', 'desc' => 'You Didn\'t Have Any Chapters!', 'btn' => 'View Structure', 'route' => 'projects.structure'],
                     ['title' => 'Character', 'icon' => 'no-character', 'desc' => 'You Didn\'t Have Any Characters!', 'btn' => 'View Character', 'route' => null],
                     ['title' => 'Notes', 'icon' => 'no-notes', 'desc' => 'You Didn\'t Have Any Notes!', 'btn' => 'View Notes', 'route' => 'projects.notes']
                 ] as $workspace)
 
-                <div class="bg-[#EAE1D5] rounded-xl p-8 flex flex-col justify-between h-[360px] shadow-sm border border-brand-100 hover:shadow-md transition-shadow">
-                    <h3 class="text-xl font-bold text-text-100 mb-4">{{ $workspace['title'] }}</h3>
+                <div class="bg-[#EAE1D5] rounded-xl px-5 py-7 flex flex-col justify-between h-[360px] shadow-sm border border-brand-100 hover:shadow-md transition-shadow">
+                    <h3 class="text-xl font-bold text-text-100 mb-4 px-1">{{ $workspace['title'] }}</h3>
 
-                    <div class="flex-1 flex flex-col items-center justify-center gap-6 opacity-60">
-                        @php $iconPath = 'icons.'.$workspace['icon']; @endphp
-                        <div class="w-32 h-32 text-text-80">
-                            <x-dynamic-component :component="$iconPath" class="w-full h-full" />
+                    @if($workspace['title'] === 'Notes' && $recentNotes->isNotEmpty())
+                        <div class="flex-1 flex flex-col gap-3 overflow-y-auto pr-1.5 custom-scrollbar -mx-1.5 px-1.5">
+                            @foreach($recentNotes as $note)
+                                <a
+                                    href="{{ route('projects.notes', ['project' => $project->project_id, 'note' => $note->note_id]) }}"
+                                    wire:navigate
+                                    class="flex items-start gap-3 bg-[#F5EFE9] border border-[#D5C6A9] p-3 rounded-lg group cursor-pointer hover:bg-[#F0E8DC] hover:border-[#B69F78] hover:shadow-sm transition-all duration-200"
+                                >
+                                    <div class="w-8 h-8 shrink-0 bg-[#EAE1D5] rounded-md flex items-center justify-center group-hover:bg-[#DFD5C5] transition-colors">
+                                        <svg class="w-4 h-4 text-[#8C7558]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 3.5h7.5L19 8v12.5a1 1 0 01-1 1H7a1 1 0 01-1-1V4.5a1 1 0 011-1z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 3.5V8h5" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6M9 16.5h6" />
+                                        </svg>
+                                    </div>
+                                    <div class="min-w-0 flex-1">
+                                        <p class="text-[14px] font-bold text-[#2C2C2C] truncate group-hover:text-[#8C7558] transition-colors">{{ $note->title }}</p>
+
+                                        @php
+                                            // 1. Ubah tag block/pemisah (p, br, li, h1-h3, div) menjadi spasi agar kata tidak menempel
+                                            $cleanBody = preg_replace('/<(p|br|h\d|li|div)[^>]*>/i', ' ', $note->body ?? '');
+
+                                            // 2. Hapus semua tag HTML yang tersisa
+                                            $cleanBody = strip_tags($cleanBody);
+
+                                            // 3. Bersihkan spasi ganda yang berlebihan akibat proses sebelumnya
+                                            $cleanBody = trim(preg_replace('/\s+/', ' ', $cleanBody));
+                                        @endphp
+
+                                        <p class="text-[12px] text-[#5A5A5A] leading-[1.6] mt-1" style="display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">
+                                            {{ Str::limit($cleanBody, 120) ?: 'No content yet' }}
+                                        </p>
+                                    </div>
+                                </a>
+                            @endforeach
                         </div>
-                        <p class="text-sm font-semibold text-text-80">{{ $workspace['desc'] }}</p>
-                    </div>
+                    @else
+                        <div class="flex-1 flex flex-col items-center justify-center gap-6 opacity-60">
+                            @php $iconPath = 'icons.'.$workspace['icon']; @endphp
+                            <div class="w-32 h-32 text-text-80">
+                                <x-dynamic-component :component="$iconPath" class="w-full h-full" />
+                            </div>
+                            <p class="text-sm font-semibold text-text-80">{{ $workspace['desc'] }}</p>
+                        </div>
+                    @endif
 
                     @if($workspace['route'])
-                        <a href="{{ route($workspace['route'], ['project' => $project->project_id]) }}" wire:navigate class="w-full py-3 mt-4 border border-[#D5C6A9] bg-transparent rounded-lg text-[14px] font-bold text-[#4A4A4A] hover:bg-[#DFD5C5] transition-colors text-center">
+                        <a href="{{ route($workspace['route'], ['project' => $project->project_id]) }}" wire:navigate class="w-full py-3 mt-4 mx-1 border border-[#D5C6A9] bg-transparent rounded-lg text-[14px] font-bold text-[#4A4A4A] hover:bg-[#DFD5C5] transition-colors text-center block" style="width: calc(100% - 8px);">
                             {{ $workspace['btn'] }}
                         </a>
                     @else
-                        <button class="w-full py-3 mt-4 border border-[#D5C6A9] bg-transparent rounded-lg text-[14px] font-bold text-[#4A4A4A] hover:bg-[#DFD5C5] transition-colors">
+                        <button class="w-full py-3 mt-4 mx-1 border border-[#D5C6A9] bg-transparent rounded-lg text-[14px] font-bold text-[#4A4A4A] hover:bg-[#DFD5C5] transition-colors" style="width: calc(100% - 8px);">
                             {{ $workspace['btn'] }}
                         </button>
                     @endif

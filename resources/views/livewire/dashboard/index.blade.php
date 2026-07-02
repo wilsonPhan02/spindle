@@ -12,9 +12,11 @@ new class extends Component {
 
     public function loadSections() {
         // Load section beserta project-nya, diurutkan project terbaru di atas
+        // Hanya load section yang belum di-archive
         $this->sections = auth()->user()->sections()
+            ->whereNull('archived_at')
             ->with(['projects' => function ($query) {
-                $query->orderBy('created_at', 'desc');
+                $query->whereNull('archived_at')->orderBy('created_at', 'desc');
             }])
             ->orderBy('created_at')
             ->get();
@@ -49,6 +51,14 @@ new class extends Component {
                 'user_id' => auth()->id(),
                 'title' => 'Untitled Project'
             ]);
+            $this->loadSections();
+        }
+    }
+
+    public function archiveSection($sectionId) {
+        $section = auth()->user()->sections()->find($sectionId);
+        if ($section) {
+            $section->update(['archived_at' => now()]);
             $this->loadSections();
         }
     }
@@ -137,7 +147,7 @@ new class extends Component {
                                 <button @click="editing = true; menuOpen = false; setTimeout(() => $refs.nameInput.focus(), 50)" class="w-full text-left px-4 py-2 text-app-body-medium text-text-80 hover:bg-brand-10 flex items-center gap-3">
                                     <x-icons.rename class="w-4 h-4" /> Rename
                                 </button>
-                                <button class="w-full text-left px-4 py-2 text-app-body-medium text-text-80 hover:bg-brand-10 flex items-center gap-3">
+                                <button wire:click="archiveSection('{{ $section->section_id }}')" wire:confirm="Are you sure you want to archive this section? You can restore it from the Archive page." @click="menuOpen = false" class="w-full text-left px-4 py-2 text-app-body-medium text-text-80 hover:bg-brand-10 flex items-center gap-3">
                                     <x-icons.archive class="w-4 h-4" /> Archive
                                 </button>
                             </div>

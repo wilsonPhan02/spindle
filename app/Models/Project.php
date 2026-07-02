@@ -42,4 +42,11 @@ class Project extends Model
     {
         return $this->hasMany(ChapterCard::class, 'project_id', 'project_id');
     }
+
+    protected function casts(): array
+    {
+        return [
+            'archived_at' => 'datetime',
+        ];
+    }
 }
