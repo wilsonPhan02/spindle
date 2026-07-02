@@ -46,9 +46,10 @@ new #[Layout('layouts.app')] class extends Component {
     public function addCategory() {
         if (trim($this->newCategoryName) !== '') {
             $this->project->categories()->create([
-                'name' => trim($this->newCategoryName)
+                'name' => strtolower(substr(trim($this->newCategoryName), 0, 20))
             ]);
             $this->newCategoryName = '';
+            $this->project->touch();
             $this->project->load('categories');
         }
     }
@@ -56,13 +57,15 @@ new #[Layout('layouts.app')] class extends Component {
     public function renameCategory($id, $newName) {
         $category = $this->project->categories()->find($id);
         if ($category && trim($newName) !== '') {
-            $category->update(['name' => trim($newName)]);
+            $category->update(['name' => strtolower(substr(trim($newName), 0, 20))]);
+            $this->project->touch();
         }
         $this->project->load('categories');
     }
 
     public function deleteCategory($id) {
         $this->project->categories()->find($id)?->delete();
+        $this->project->touch();
         $this->project->load('categories');
     }
 
@@ -115,15 +118,19 @@ new #[Layout('layouts.app')] class extends Component {
                 x-data="{ hoverCover: false }"
                 @mouseover="hoverCover = true"
                 @mouseleave="hoverCover = false"
-                class="relative w-full lg:w-[320px] xl:w-[360px] shrink-0 aspect-[1/1.45] z-10"
+                class="relative w-full lg:w-[320px] xl:w-[360px] shrink-0 aspect-[1/1.6] z-10"
             >
                 @if($project->cover_image_path)
-                    <img src="{{ Storage::url($project->cover_image_path) }}" class="absolute inset-y-0 left-0 right-3 w-[calc(100%-12px)] h-full object-cover rounded-l-md rounded-r-xl shadow-md z-20" />
-                    <div class="absolute inset-y-0 left-0 w-8 bg-gradient-to-r from-black/50 via-black/10 to-transparent z-20 pointer-events-none mix-blend-multiply rounded-l-md"></div>
-                    <div class="absolute top-[2%] bottom-[2%] right-1.5 w-3 bg-[#E8E3D9] border-y border-r border-[#C4B7A3] rounded-r-md z-10"></div>
-                    <div class="absolute inset-y-0 right-0 w-3 bg-[#8C7558] rounded-r-md z-0 shadow-lg"></div>
+                    <!-- Image / Front Cover -->
+                    <img src="{{ Storage::url($project->cover_image_path) }}" class="absolute inset-y-0 left-0 right-4 w-[calc(100%-16px)] h-full object-cover rounded-l-md rounded-r-xl shadow-md z-20 border-r border-black/10" />
+                    <!-- Book pages on the right -->
+                    <div class="absolute top-3.5 bottom-3.5 right-2 w-4 bg-gradient-to-r from-[#E8E3D9] to-[#D5C6A9] border-y border-r border-[#C4B7A3] rounded-r-sm z-10 shadow-inner"></div>
+                    <!-- Back cover sticking out -->
+                    <div class="absolute inset-y-0 right-0 w-8 bg-[#8C7558] rounded-r-xl z-0 shadow-xl border-l border-black/20"></div>
                 @else
-                    <x-default-project class="absolute inset-0 w-full h-full text-[#B69F78]" preserveAspectRatio="none" />
+                    <x-default-project class="absolute inset-y-0 left-0 right-4 w-[calc(100%-16px)] h-full text-[#B69F78] rounded-l-md rounded-r-xl shadow-md z-20 border-r border-black/10" />
+                    <div class="absolute top-3.5 bottom-3.5 right-2 w-4 bg-gradient-to-r from-[#E8E3D9] to-[#D5C6A9] border-y border-r border-[#C4B7A3] rounded-r-sm z-10 shadow-inner"></div>
+                    <div class="absolute inset-y-0 right-0 w-8 bg-[#8C7558] rounded-r-xl z-0 shadow-xl border-l border-black/20"></div>
                 @endif
 
                 <div x-show="hoverCover" x-transition class="absolute bottom-5 left-5 z-30 flex gap-2">
@@ -141,14 +148,15 @@ new #[Layout('layouts.app')] class extends Component {
                     @endif
                 </div>
 
-                <div wire:loading wire:target="cover_image" class="absolute inset-y-0 left-0 right-3 w-[calc(100%-12px)] bg-[#F5EFE9]/60 backdrop-blur-sm z-40 flex items-center justify-center rounded-l-md rounded-r-xl">
+                <div wire:loading.flex wire:target="cover_image" class="absolute inset-y-0 left-0 right-4 w-[calc(100%-16px)] bg-[#F5EFE9]/70 backdrop-blur-md z-40 items-center justify-center rounded-l-md rounded-r-lg transition-all">
                     <svg class="animate-spin h-8 w-8 text-secondary-200" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
                 </div>
             </div>
 
-            <div class="flex-1 min-w-0 bg-[#F5EFE9] border border-[#E8E1D5] p-10 pb-16 rounded-xl shadow-sm relative flex flex-col">
+            <div class="flex-1 min-w-0 relative">
+                <div class="static lg:absolute inset-0 bg-[#F5EFE9] border border-[#E8E1D5] p-10 pb-16 rounded-xl shadow-sm flex flex-col">
 
-                <div class="flex justify-between items-start mb-8">
+                <div class="flex justify-between items-start mb-4">
                     <div class="flex-1 min-w-0 mr-4">
                         <x-icons.sidebar-book class="w-8 h-8 text-[#A08866] mb-3" />
 
@@ -180,54 +188,100 @@ new #[Layout('layouts.app')] class extends Component {
                                 class="{{ $dtlTitleSize }} font-merriweather font-medium text-[#2C2C2C] bg-transparent border-b-2 border-[#D5C6A9] outline-none w-full focus:border-[#A08866] focus:ring-0 px-0 py-1"
                             />
                         </div>
-                        <p class="text-[15px] text-[#7A7A7A] mt-2">from <span class="font-semibold text-[#4A4A4A]">Sailor's Version Series</span></p>
+                        <p class="text-[15px] text-[#7A7A7A] mt-2 truncate">from <span class="font-semibold text-[#4A4A4A]" title="{{ $project->section->title ?? 'Uncategorized' }}">{{ \Illuminate\Support\Str::limit($project->section->title ?? 'Uncategorized', 30) }}</span></p>
                     </div>
 
                     <div class="flex items-center gap-3 shrink-0">
-                        <button
-                            wire:click="archiveProject"
-                            wire:confirm="Are you sure you want to archive this project? You can restore it from the Archive page."
-                            class="flex items-center gap-2 border border-[#D5C6A9] bg-transparent px-3 py-1.5 rounded-lg text-[13px] font-medium text-[#4A4A4A] hover:bg-[#EAE1D5] transition-colors">
-                            <x-icons.archive class="w-4 h-4" /> Move To Archive
-                        </button>
                         <button class="text-[#8C7558] hover:text-[#5E4C38] transition-colors">
                             <x-icons.bookmark class="w-5 h-5" />
                         </button>
                     </div>
                 </div>
 
-                <div x-data="{ addingCat: false }" class="mb-6">
-                    <div class="flex items-center gap-2 mb-3">
-                        <x-icons.category class="w-4 h-4 text-[#8C7558]" />
-                        <span class="text-[11px] font-bold text-[#4A4A4A] uppercase tracking-[0.15em]">Categories</span>
+                <div x-data="{
+                    addingCat: false,
+                    addCount: 0,
+                    isDown: false,
+                    startX: 0,
+                    scrollLeft: 0,
+                    startDrag(e) {
+                        this.isDown = true;
+                        this.startX = e.pageX - this.$refs.scrollContainer.offsetLeft;
+                        this.scrollLeft = this.$refs.scrollContainer.scrollLeft;
+                    },
+                    endDrag() {
+                        this.isDown = false;
+                    },
+                    doDrag(e) {
+                        if (!this.isDown) return;
+                        e.preventDefault();
+                        const x = e.pageX - this.$refs.scrollContainer.offsetLeft;
+                        const walk = (x - this.startX) * 1.5;
+                        this.$refs.scrollContainer.scrollLeft = this.scrollLeft - walk;
+                    }
+                }" class="mb-0 w-full max-w-full">
+                    <div class="flex items-center gap-3 mb-1.5">
+                        <div class="flex items-center gap-2">
+                            <x-icons.category class="w-4 h-4 text-[#8C7558]" />
+                            <span class="text-[11px] font-bold text-[#4A4A4A] uppercase tracking-[0.15em]">Categories</span>
+                        </div>
+                        <button x-show="!addingCat" @click="addingCat = true; addCount = 0; setTimeout(() => $refs.catInput.focus(), 50)" class="text-[#8C7558] hover:text-[#A08866] transition-colors p-1 -ml-1">
+                            <x-icons.add class="w-4 h-4" />
+                        </button>
                     </div>
 
-                    <div class="flex flex-wrap gap-2 items-center">
+                    <div 
+                        x-ref="scrollContainer"
+                        @mousedown="startDrag"
+                        @mouseleave="endDrag"
+                        @mouseup="endDrag"
+                        @mousemove="doDrag"
+                        @wheel.prevent="if (Math.abs($event.deltaY) > 0) { $el.scrollLeft += $event.deltaY; }"
+                        class="flex gap-2 items-center overflow-x-auto pb-5 cursor-grab active:cursor-grabbing scroll-smooth [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-[#A08866] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-button]:hidden [scrollbar-width:thin] [scrollbar-color:#A08866_transparent]"
+                    >
+                        <div x-show="addingCat" class="flex items-center gap-1 bg-[#EAE1D5] pl-2 pr-1 py-1 rounded-md border border-[#D5C6A9] relative shrink-0">
+                                <input type="text" maxlength="20" @input="addCount = $event.target.value.length" x-model="$wire.newCategoryName" x-ref="catInput" @keyup.enter="addingCat = false; $wire.addCategory()" @blur="if(addingCat) { addingCat = false; $wire.set('newCategoryName', ''); }" @keydown.escape="addingCat = false; $wire.set('newCategoryName', '');" placeholder="Category..." class="w-28 text-[13px] bg-transparent border-b border-[#D5C6A9] outline-none px-1 py-0 text-[#2C2C2C] focus:border-[#A08866]"/>
+                                <button @mousedown.prevent="addingCat = false; $wire.addCategory()" class="text-[#A08866] hover:text-secondary-200 transition-colors shrink-0">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                                </button>
+                            <span class="absolute -bottom-3.5 right-1 text-[9px] text-subtext-90 font-medium" x-text="addCount + '/20'"></span>
+                        </div>
+
+                        @if($project->categories->count() == 0)
+                            <div x-show="!addingCat" class="px-3 py-1 rounded-md bg-[#EAE1D5]/50 border border-dashed border-[#D5C6A9] text-[12px] text-[#A08866]/80 font-medium flex items-center justify-center shrink-0 italic">
+                                Add your project category here
+                            </div>
+                        @endif
+
                         @foreach($project->categories as $category)
-                            <div x-data="{ editingCat: false, hoverCat: false }" @mouseover="hoverCat = true" @mouseleave="hoverCat = false" class="relative group">
-                                <div x-show="!editingCat" class="px-3 py-1.5 rounded-md bg-[#EAE1D5] text-[13px] text-[#4A4A4A] font-medium flex gap-2 items-center border border-transparent group-hover:border-[#D5C6A9] transition-colors">
-                                    <span @dblclick="editingCat = true; setTimeout(() => $refs.editCat{{ $category->category_id }}.focus(), 50)" class="cursor-pointer select-none">
+                            <div x-data="{ editingCat: false, hoverCat: false, count: {{ strlen($category->name) }} }" 
+                                 @mouseenter="hoverCat = true" 
+                                 @mouseleave="hoverCat = false"
+                                 class="relative group shrink-0">
+                                
+                                <div x-show="!editingCat" @dblclick="editingCat = true; $nextTick(() => $refs.editCatInput.focus())" title="{{ $category->name }}" class="cursor-pointer px-3 py-1.5 rounded-md bg-[#EAE1D5] text-[13px] text-[#4A4A4A] font-medium flex gap-1.5 items-center border border-transparent group-hover:border-[#D5C6A9] transition-colors">
+                                    <span class="select-none truncate max-w-[130px] block">
                                         {{ $category->name }}
                                     </span>
-                                    <button wire:click="deleteCategory('{{ $category->category_id }}')" x-show="hoverCat" class="text-[#A08866] hover:text-[#E64C4C] transition-colors">
+                                    
+                                    <button wire:click.stop="deleteCategory('{{ $category->category_id }}')" x-show="hoverCat" class="text-[#A08866] hover:text-[#E64C4C] transition-colors shrink-0 flex items-center justify-center">
                                         <x-icons.delete class="w-3.5 h-3.5" />
                                     </button>
                                 </div>
-                                <input x-show="editingCat" x-ref="editCat{{ $category->category_id }}" value="{{ $category->name }}" @keyup.enter="editingCat = false; $wire.renameCategory('{{ $category->category_id }}', $el.value)" @blur="editingCat = false; $wire.renameCategory('{{ $category->category_id }}', $el.value)" class="w-24 text-[13px] text-[#2C2C2C] bg-transparent border-b-2 border-[#D5C6A9] outline-none px-1 py-0.5 focus:border-[#A08866]" />
+
+                                <div x-show="editingCat" class="flex items-center gap-1 bg-[#EAE1D5] pl-2 pr-1 py-1 rounded-md border border-[#D5C6A9] relative">
+                                        <input x-ref="editCatInput" value="{{ $category->name }}" maxlength="20" @input="count = $event.target.value.length" @keyup.enter="$el.blur()" @blur="editingCat = false; $wire.renameCategory('{{ $category->category_id }}', $el.value)" @keydown.escape="editingCat = false; $refs.editCatInput.value = '{{ addslashes($category->name) }}'; count = {{ strlen($category->name) }}" class="w-24 text-[13px] bg-transparent border-b border-[#D5C6A9] outline-none px-1 py-0 text-[#2C2C2C] focus:border-[#A08866]" />
+                                        <button @mousedown.prevent="$refs.editCatInput.blur()" class="text-[#A08866] hover:text-secondary-200 transition-colors shrink-0">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                                        </button>
+                                    <span class="absolute -bottom-3.5 right-1 text-[9px] text-subtext-90 font-medium" x-text="count + '/20'"></span>
+                                </div>
                             </div>
                         @endforeach
-
-                        <button x-show="!addingCat" @click="addingCat = true; setTimeout(() => $refs.catInput.focus(), 50)" class="px-2 py-1.5 rounded-md border border-[#D5C6A9] text-[#8C7558] hover:bg-[#EAE1D5] flex items-center justify-center transition-colors bg-transparent">
-                            <x-icons.add class="w-4 h-4" />
-                        </button>
-
-                        <div x-show="addingCat" class="flex items-center gap-2">
-                            <input type="text" x-model="$wire.newCategoryName" x-ref="catInput" @keyup.enter="addingCat = false; $wire.addCategory()" @click.outside="addingCat = false; $wire.newCategoryName = ''" placeholder="Category..." class="w-28 text-[13px] bg-transparent border-b-2 border-[#D5C6A9] outline-none px-1 py-0.5 text-[#2C2C2C] focus:border-[#A08866]"/>
-                        </div>
                     </div>
                 </div>
 
-                <div class="h-px bg-[#D5C6A9]/60 w-full mb-6"></div>
+                <div class="h-px bg-[#D5C6A9]/60 w-full mb-4"></div>
 
                 <div x-data="{
                     editingSyn: false,
@@ -237,42 +291,47 @@ new #[Layout('layouts.app')] class extends Component {
                     localSyn: @entangle('synopsis'),
                     checkOverflow() {
                         if(this.$refs.synText) {
-                            this.isOverflowing = this.$refs.synText.scrollHeight > 150;
+                            this.isOverflowing = this.$refs.synText.scrollHeight > 140 && this.localSyn.trim() !== '';
                         }
+                    },
+                    init() {
+                        setInterval(() => this.checkOverflow(), 1000);
+                        this.$watch('localSyn', () => this.$nextTick(() => this.checkOverflow()));
+                        setTimeout(() => this.checkOverflow(), 200);
                     }
                 }"
-                x-init="$watch('localSyn', () => $nextTick(() => checkOverflow())); setTimeout(() => checkOverflow(), 200)"
                 @resize.window="checkOverflow()"
-                class="w-full">
-                    <div @mouseover="hoverSyn = true" @mouseleave="hoverSyn = false" class="flex items-center gap-3 mb-1">
+                class="w-full lg:flex-1 lg:min-h-0 flex flex-col">
+                    <div @mouseover="hoverSyn = true" @mouseleave="hoverSyn = false" class="flex items-center gap-3 mb-1 shrink-0">
                         <span class="text-[16px] font-bold text-[#2C2C2C]">Synopsis</span>
                         <button x-show="hoverSyn && !editingSyn" @click="editingSyn = true; setTimeout(() => $refs.synInput.focus(), 50)" class="text-[#A08866] hover:text-secondary-200 transition-colors">
                             <x-icons.rename class="w-4 h-4" />
                         </button>
                     </div>
 
-                    <div x-show="!editingSyn" class="relative group w-full">
-                        <div
-                            x-ref="synText"
-                            @dblclick="editingSyn = true; setTimeout(() => $refs.synInput.focus(), 50)"
-                            class="text-[15px] text-[#4A4A4A] leading-[1.7] whitespace-pre-wrap select-none cursor-pointer w-full transition-all duration-300"
-                            :class="showMore ? 'max-h-[300px] overflow-y-auto pr-3 custom-scrollbar' : 'max-h-[150px] overflow-hidden'"
-                        >
-                            <div x-show="localSyn.trim() !== ''" x-text="localSyn"></div>
-                            <div x-show="localSyn.trim() === ''" class="text-[#A08866]/60 italic font-medium">Write your synopsis here!</div>
+                    <div x-show="!editingSyn" class="lg:flex-1 lg:min-h-0 flex flex-col relative pb-16">
+                        <div class="relative group w-full lg:flex-1 lg:min-h-0 shrink flex flex-col">
+                            <div
+                                x-ref="synText"
+                                @dblclick="editingSyn = true; setTimeout(() => $refs.synInput.focus(), 50)"
+                                class="text-[15px] text-[#4A4A4A] leading-[1.6] select-none cursor-pointer w-full shrink min-h-0"
+                                :class="showMore ? 'lg:overflow-y-auto pr-3 custom-scrollbar lg:flex-1' : 'max-h-[140px] overflow-hidden'"
+                            >
+                                <div x-show="localSyn.trim() !== ''" class="whitespace-pre-wrap" x-text="localSyn.trim()"></div>
+                                <div x-show="localSyn.trim() === ''" class="text-[#A08866]/60 italic font-medium">Write your synopsis here!</div>
+                            </div>
+                            <div x-show="isOverflowing && !showMore" class="absolute bottom-0 left-0 w-full h-16 bg-gradient-to-t from-[#F5EFE9] via-[#F5EFE9]/90 to-transparent pointer-events-none"></div>
                         </div>
 
-                        <div x-show="isOverflowing && !showMore" class="absolute bottom-0 left-0 w-full h-16 bg-gradient-to-t from-[#F5EFE9] via-[#F5EFE9]/90 to-transparent pointer-events-none"></div>
-                    </div>
-
-                    <div x-show="isOverflowing && !editingSyn" class="mt-2 w-full flex justify-center">
-                        <button
-                            @click="showMore = !showMore; if(!showMore) $nextTick(() => checkOverflow())"
-                            class="text-[13px] font-bold text-[#2C2C2C] hover:text-secondary-200 flex items-center gap-1 z-10 px-4 py-1 rounded-full"
-                        >
-                            <svg class="w-4 h-4 transition-transform" :class="showMore ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
-                            <span x-text="showMore ? 'Show Less' : 'Show More'"></span>
-                        </button>
+                        <div x-show="isOverflowing && localSyn.trim() !== '' && !editingSyn" class="absolute bottom-6 left-0 w-full flex justify-center">
+                            <button
+                                @click="showMore = !showMore; if(!showMore) { $nextTick(() => checkOverflow()); $refs.synText.scrollTop = 0; }"
+                                class="text-[13px] font-bold text-[#2C2C2C] hover:text-secondary-200 flex items-center gap-1 z-10 px-4 py-1 rounded-full bg-[#EAE1D5]/50 hover:bg-[#EAE1D5] transition-colors"
+                            >
+                                <svg class="w-4 h-4 transition-transform" :class="showMore ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+                                <span x-text="showMore ? 'Show Less' : 'Show More'"></span>
+                            </button>
+                        </div>
                     </div>
 
                     <textarea
@@ -282,13 +341,64 @@ new #[Layout('layouts.app')] class extends Component {
                         @click.outside="if(editingSyn) { $wire.saveSynopsis(); editingSyn = false; }"
                         @keydown.ctrl.enter="$wire.saveSynopsis(); editingSyn = false"
                         @keydown.escape="editingSyn = false; localSyn = `{{ addslashes($project->synopsis ?? '') }}`"
-                        class="w-full mt-2 min-h-[150px] text-[15px] text-[#2C2C2C] leading-[1.7] bg-transparent border-2 border-[#D5C6A9] rounded-md outline-none resize-none p-4 focus:border-[#A08866] transition-colors custom-scrollbar"
+                        class="w-full mt-2 lg:flex-1 lg:min-h-0 min-h-[150px] text-[15px] text-[#2C2C2C] leading-[1.7] bg-transparent border-2 border-[#D5C6A9] rounded-md outline-none resize-none p-4 focus:border-[#A08866] transition-colors custom-scrollbar"
                     ></textarea>
                 </div>
 
-                <div class="absolute bottom-8 right-10 text-[12px] font-medium text-[#7A7A7A]">
-                    Last Edited {{ $project->updated_at->diffForHumans() }}
+                <div class="absolute bottom-8 left-10 right-10 flex justify-between items-center">
+                    <button
+                        wire:click="archiveProject"
+                        wire:confirm="Are you sure you want to archive this project? You can restore it from the Archive page."
+                        class="flex items-center gap-1.5 px-2 py-1 -ml-2 rounded-md text-[11px] font-medium text-[#A08866] hover:text-[#E64C4C] hover:bg-[#E64C4C]/10 transition-colors opacity-70 hover:opacity-100">
+                        <x-icons.archive class="w-3.5 h-3.5" /> Move To Archive
+                    </button>
+                    <div
+                        x-data="{
+                            diffSeconds: 0,
+                            clientStartTime: 0,
+                            diffText: '{{ $project->updated_at->diffForHumans() }}',
+                            lastRenderTime: null,
+                            init() {
+                                this.updateTime();
+                                setInterval(() => this.updateTime(), 1000);
+                            },
+                            updateTime() {
+                                if (this.$refs.renderTime) {
+                                    const newRenderTime = parseFloat(this.$refs.renderTime.innerText);
+                                    if (this.lastRenderTime !== newRenderTime) {
+                                        this.diffSeconds = Math.abs(parseInt(this.$refs.serverDiff.innerText)) || 0;
+                                        this.lastRenderTime = newRenderTime;
+                                        this.clientStartTime = Math.floor(Date.now() / 1000);
+                                    }
+                                }
+                                
+                                const now = Math.floor(Date.now() / 1000);
+                                const elapsedSinceRender = now - this.clientStartTime;
+                                const totalDiff = this.diffSeconds + Math.max(0, elapsedSinceRender);
+                                
+                                if (totalDiff < 60) {
+                                    this.diffText = 'just now';
+                                } else if (totalDiff < 120) {
+                                    this.diffText = '1 minute ago';
+                                } else if (totalDiff < 3600) {
+                                    this.diffText = Math.floor(totalDiff / 60) + ' minutes ago';
+                                } else if (totalDiff < 7200) {
+                                    this.diffText = '1 hour ago';
+                                } else if (totalDiff < 86400) {
+                                    this.diffText = Math.floor(totalDiff / 3600) + ' hours ago';
+                                } else {
+                                    this.diffText = '{{ $project->updated_at->diffForHumans() }}';
+                                }
+                            }
+                        }"
+                        class="text-[12px] font-medium text-[#7A7A7A]"
+                    >
+                        <span x-ref="serverDiff" class="hidden">{{ abs(now()->timestamp - $project->updated_at->timestamp) }}</span>
+                        <span x-ref="renderTime" class="hidden">{{ microtime(true) }}</span>
+                        Last Edited <span x-text="diffText"></span>
+                    </div>
                 </div>
+            </div>
             </div>
         </div>
 
