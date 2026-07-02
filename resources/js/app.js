@@ -1,4 +1,6 @@
-import Alpine from 'alpinejs';
+// import Alpine from 'alpinejs';
+import { Livewire, Alpine } from '../../vendor/livewire/livewire/dist/livewire.esm';
+import './whiteboard';
 
 // ---- Komponen carousel (From Writers To Writers) ----
 Alpine.data('carousel', () => ({
@@ -20,7 +22,7 @@ Alpine.data('carousel', () => ({
 }));
 
 window.Alpine = Alpine;
-Alpine.start();
+Livewire.start();
 
 // ---- Scroll-reveal halus untuk landing page ----
 function initReveal() {
