@@ -46,7 +46,7 @@ new #[Layout('layouts.app')] class extends Component {
     public function addCategory() {
         if (trim($this->newCategoryName) !== '') {
             $this->project->categories()->create([
-                'name' => trim($this->newCategoryName)
+                'name' => strtolower(substr(trim($this->newCategoryName), 0, 20))
             ]);
             $this->newCategoryName = '';
             $this->project->load('categories');
@@ -56,7 +56,7 @@ new #[Layout('layouts.app')] class extends Component {
     public function renameCategory($id, $newName) {
         $category = $this->project->categories()->find($id);
         if ($category && trim($newName) !== '') {
-            $category->update(['name' => trim($newName)]);
+            $category->update(['name' => strtolower(substr(trim($newName), 0, 20))]);
         }
         $this->project->load('categories');
     }
@@ -118,12 +118,18 @@ new #[Layout('layouts.app')] class extends Component {
                 class="relative w-full lg:w-[320px] xl:w-[360px] shrink-0 aspect-[1/1.45] z-10"
             >
                 @if($project->cover_image_path)
-                    <img src="{{ Storage::url($project->cover_image_path) }}" class="absolute inset-y-0 left-0 right-3 w-[calc(100%-12px)] h-full object-cover rounded-l-md rounded-r-xl shadow-md z-20" />
-                    <div class="absolute inset-y-0 left-0 w-8 bg-gradient-to-r from-black/50 via-black/10 to-transparent z-20 pointer-events-none mix-blend-multiply rounded-l-md"></div>
-                    <div class="absolute top-[2%] bottom-[2%] right-1.5 w-3 bg-[#E8E3D9] border-y border-r border-[#C4B7A3] rounded-r-md z-10"></div>
-                    <div class="absolute inset-y-0 right-0 w-3 bg-[#8C7558] rounded-r-md z-0 shadow-lg"></div>
+                    <!-- Image / Front Cover -->
+                    <img src="{{ Storage::url($project->cover_image_path) }}" class="absolute inset-y-0 left-0 right-4 w-[calc(100%-16px)] h-full object-cover rounded-l-md rounded-r-lg shadow-md z-20 border-r border-black/10" />
+                    <!-- Spine shadow for 3D effect -->
+                    <div class="absolute inset-y-0 left-0 w-8 bg-gradient-to-r from-black/60 via-black/10 to-transparent z-20 pointer-events-none mix-blend-multiply rounded-l-md"></div>
+                    <!-- Book pages on the right -->
+                    <div class="absolute top-[1.5%] bottom-[1.5%] right-2 w-4 bg-gradient-to-r from-[#E8E3D9] to-[#D5C6A9] border-y border-r border-[#C4B7A3] rounded-r-md z-10 shadow-inner"></div>
+                    <!-- Back cover sticking out -->
+                    <div class="absolute inset-y-0 right-0 w-4 bg-[#8C7558] rounded-r-lg z-0 shadow-xl border-l border-black/20"></div>
                 @else
-                    <x-default-project class="absolute inset-0 w-full h-full text-[#B69F78]" preserveAspectRatio="none" />
+                    <x-default-project class="absolute inset-y-0 left-0 right-4 w-[calc(100%-16px)] h-full text-[#B69F78] rounded-l-md rounded-r-lg" preserveAspectRatio="none" />
+                    <div class="absolute top-[1.5%] bottom-[1.5%] right-2 w-4 bg-gradient-to-r from-[#E8E3D9] to-[#D5C6A9] border-y border-r border-[#C4B7A3] rounded-r-md z-10 shadow-inner"></div>
+                    <div class="absolute inset-y-0 right-0 w-4 bg-[#8C7558] rounded-r-lg z-0 shadow-xl border-l border-black/20"></div>
                 @endif
 
                 <div x-show="hoverCover" x-transition class="absolute bottom-5 left-5 z-30 flex gap-2">
@@ -141,7 +147,7 @@ new #[Layout('layouts.app')] class extends Component {
                     @endif
                 </div>
 
-                <div wire:loading wire:target="cover_image" class="absolute inset-y-0 left-0 right-3 w-[calc(100%-12px)] bg-[#F5EFE9]/60 backdrop-blur-sm z-40 flex items-center justify-center rounded-l-md rounded-r-xl">
+                <div wire:loading.flex wire:target="cover_image" class="absolute inset-y-0 left-0 right-4 w-[calc(100%-16px)] bg-[#F5EFE9]/70 backdrop-blur-md z-40 items-center justify-center rounded-l-md rounded-r-lg transition-all">
                     <svg class="animate-spin h-8 w-8 text-secondary-200" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
                 </div>
             </div>
@@ -180,16 +186,10 @@ new #[Layout('layouts.app')] class extends Component {
                                 class="{{ $dtlTitleSize }} font-merriweather font-medium text-[#2C2C2C] bg-transparent border-b-2 border-[#D5C6A9] outline-none w-full focus:border-[#A08866] focus:ring-0 px-0 py-1"
                             />
                         </div>
-                        <p class="text-[15px] text-[#7A7A7A] mt-2">from <span class="font-semibold text-[#4A4A4A]">Sailor's Version Series</span></p>
+                        <p class="text-[15px] text-[#7A7A7A] mt-2">from <span class="font-semibold text-[#4A4A4A]">{{ $project->section->title ?? 'Uncategorized' }}</span></p>
                     </div>
 
                     <div class="flex items-center gap-3 shrink-0">
-                        <button
-                            wire:click="archiveProject"
-                            wire:confirm="Are you sure you want to archive this project? You can restore it from the Archive page."
-                            class="flex items-center gap-2 border border-[#D5C6A9] bg-transparent px-3 py-1.5 rounded-lg text-[13px] font-medium text-[#4A4A4A] hover:bg-[#EAE1D5] transition-colors">
-                            <x-icons.archive class="w-4 h-4" /> Move To Archive
-                        </button>
                         <button class="text-[#8C7558] hover:text-[#5E4C38] transition-colors">
                             <x-icons.bookmark class="w-5 h-5" />
                         </button>
@@ -204,16 +204,19 @@ new #[Layout('layouts.app')] class extends Component {
 
                     <div class="flex flex-wrap gap-2 items-center">
                         @foreach($project->categories as $category)
-                            <div x-data="{ editingCat: false, hoverCat: false }" @mouseover="hoverCat = true" @mouseleave="hoverCat = false" class="relative group">
-                                <div x-show="!editingCat" class="px-3 py-1.5 rounded-md bg-[#EAE1D5] text-[13px] text-[#4A4A4A] font-medium flex gap-2 items-center border border-transparent group-hover:border-[#D5C6A9] transition-colors">
-                                    <span @dblclick="editingCat = true; setTimeout(() => $refs.editCat{{ $category->category_id }}.focus(), 50)" class="cursor-pointer select-none">
+                            <div x-data="{ editingCat: false, hoverCat: false, count: {{ strlen($category->name) }} }" @mouseover="hoverCat = true" @mouseleave="hoverCat = false" class="relative group">
+                                <div x-show="!editingCat" title="{{ $category->name }}" class="px-3 py-1.5 rounded-md bg-[#EAE1D5] text-[13px] text-[#4A4A4A] font-medium flex gap-2 items-center border border-transparent group-hover:border-[#D5C6A9] transition-colors max-w-[150px]">
+                                    <span @dblclick="editingCat = true; setTimeout(() => $refs.editCat{{ $category->category_id }}.focus(), 50)" class="cursor-pointer select-none truncate block w-full">
                                         {{ $category->name }}
                                     </span>
-                                    <button wire:click="deleteCategory('{{ $category->category_id }}')" x-show="hoverCat" class="text-[#A08866] hover:text-[#E64C4C] transition-colors">
+                                    <button wire:click="deleteCategory('{{ $category->category_id }}')" x-show="hoverCat" class="text-[#A08866] hover:text-[#E64C4C] transition-colors shrink-0">
                                         <x-icons.delete class="w-3.5 h-3.5" />
                                     </button>
                                 </div>
-                                <input x-show="editingCat" x-ref="editCat{{ $category->category_id }}" value="{{ $category->name }}" @keyup.enter="editingCat = false; $wire.renameCategory('{{ $category->category_id }}', $el.value)" @blur="editingCat = false; $wire.renameCategory('{{ $category->category_id }}', $el.value)" class="w-24 text-[13px] text-[#2C2C2C] bg-transparent border-b-2 border-[#D5C6A9] outline-none px-1 py-0.5 focus:border-[#A08866]" />
+                                <div x-show="editingCat" class="flex flex-col gap-1 bg-[#EAE1D5] px-2 py-1.5 rounded-md absolute top-0 left-0 z-10 shadow-sm border border-[#D5C6A9]">
+                                    <input x-ref="editCat{{ $category->category_id }}" value="{{ $category->name }}" maxlength="20" @input="count = $event.target.value.length" @keyup.enter="editingCat = false; $wire.renameCategory('{{ $category->category_id }}', $el.value)" @blur="editingCat = false; $wire.renameCategory('{{ $category->category_id }}', $el.value)" class="w-24 text-[13px] text-[#2C2C2C] bg-transparent border-b-2 border-[#D5C6A9] outline-none px-1 py-0.5 focus:border-[#A08866]" />
+                                    <span class="text-[10px] text-subtext-90 text-right pr-1" x-text="count + '/20'"></span>
+                                </div>
                             </div>
                         @endforeach
 
@@ -221,8 +224,9 @@ new #[Layout('layouts.app')] class extends Component {
                             <x-icons.add class="w-4 h-4" />
                         </button>
 
-                        <div x-show="addingCat" class="flex items-center gap-2">
-                            <input type="text" x-model="$wire.newCategoryName" x-ref="catInput" @keyup.enter="addingCat = false; $wire.addCategory()" @click.outside="addingCat = false; $wire.newCategoryName = ''" placeholder="Category..." class="w-28 text-[13px] bg-transparent border-b-2 border-[#D5C6A9] outline-none px-1 py-0.5 text-[#2C2C2C] focus:border-[#A08866]"/>
+                        <div x-show="addingCat" x-data="{ count: $wire.newCategoryName.length }" class="flex flex-col gap-1 bg-[#EAE1D5] px-2 py-1.5 rounded-md border border-[#D5C6A9]">
+                            <input type="text" maxlength="20" @input="count = $event.target.value.length" x-model="$wire.newCategoryName" x-ref="catInput" @keyup.enter="addingCat = false; count = 0; $wire.addCategory()" @click.outside="addingCat = false; $wire.newCategoryName = ''; count = 0;" placeholder="Category..." class="w-28 text-[13px] bg-transparent border-b-2 border-[#D5C6A9] outline-none px-1 py-0.5 text-[#2C2C2C] focus:border-[#A08866]"/>
+                            <span class="text-[10px] text-subtext-90 text-right pr-1" x-text="count + '/20'"></span>
                         </div>
                     </div>
                 </div>
@@ -237,13 +241,13 @@ new #[Layout('layouts.app')] class extends Component {
                     localSyn: @entangle('synopsis'),
                     checkOverflow() {
                         if(this.$refs.synText) {
-                            this.isOverflowing = this.$refs.synText.scrollHeight > 150;
+                            this.isOverflowing = this.$refs.synText.scrollHeight > 150 && this.localSyn.trim() !== '';
                         }
                     }
                 }"
                 x-init="$watch('localSyn', () => $nextTick(() => checkOverflow())); setTimeout(() => checkOverflow(), 200)"
                 @resize.window="checkOverflow()"
-                class="w-full">
+                class="w-full mb-10">
                     <div @mouseover="hoverSyn = true" @mouseleave="hoverSyn = false" class="flex items-center gap-3 mb-1">
                         <span class="text-[16px] font-bold text-[#2C2C2C]">Synopsis</span>
                         <button x-show="hoverSyn && !editingSyn" @click="editingSyn = true; setTimeout(() => $refs.synInput.focus(), 50)" class="text-[#A08866] hover:text-secondary-200 transition-colors">
@@ -262,13 +266,13 @@ new #[Layout('layouts.app')] class extends Component {
                             <div x-show="localSyn.trim() === ''" class="text-[#A08866]/60 italic font-medium">Write your synopsis here!</div>
                         </div>
 
-                        <div x-show="isOverflowing && !showMore" class="absolute bottom-0 left-0 w-full h-16 bg-gradient-to-t from-[#F5EFE9] via-[#F5EFE9]/90 to-transparent pointer-events-none"></div>
+                        <div x-show="isOverflowing && !showMore" class="absolute bottom-0 left-0 w-full h-16 bg-gradient-to-t from-[#F5EFE9] via-[#F5EFE9]/90 to-transparent pointer-events-none backdrop-blur-[1px]"></div>
                     </div>
 
-                    <div x-show="isOverflowing && !editingSyn" class="mt-2 w-full flex justify-center">
+                    <div x-show="isOverflowing && localSyn.trim() !== '' && !editingSyn" class="mt-2 w-full flex justify-center">
                         <button
                             @click="showMore = !showMore; if(!showMore) $nextTick(() => checkOverflow())"
-                            class="text-[13px] font-bold text-[#2C2C2C] hover:text-secondary-200 flex items-center gap-1 z-10 px-4 py-1 rounded-full"
+                            class="text-[13px] font-bold text-[#2C2C2C] hover:text-secondary-200 flex items-center gap-1 z-10 px-4 py-1 rounded-full bg-[#EAE1D5]/50 hover:bg-[#EAE1D5] transition-colors"
                         >
                             <svg class="w-4 h-4 transition-transform" :class="showMore ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
                             <span x-text="showMore ? 'Show Less' : 'Show More'"></span>
@@ -286,8 +290,16 @@ new #[Layout('layouts.app')] class extends Component {
                     ></textarea>
                 </div>
 
-                <div class="absolute bottom-8 right-10 text-[12px] font-medium text-[#7A7A7A]">
-                    Last Edited {{ $project->updated_at->diffForHumans() }}
+                <div class="absolute bottom-8 right-10 flex flex-col items-end gap-2">
+                        <div class="text-[12px] font-medium text-[#7A7A7A]">
+                            Last Edited {{ $project->updated_at->diffForHumans() }}
+                        </div>
+                        <button
+                            wire:click="archiveProject"
+                            wire:confirm="Are you sure you want to archive this project? You can restore it from the Archive page."
+                            class="flex items-center gap-1.5 px-2 py-1 rounded-md text-[11px] font-medium text-[#A08866] hover:text-[#E64C4C] hover:bg-[#E64C4C]/10 transition-colors opacity-70 hover:opacity-100">
+                            <x-icons.archive class="w-3.5 h-3.5" /> Move To Archive
+                        </button>
                 </div>
             </div>
         </div>
