@@ -1,5 +1,28 @@
-// Scroll-reveal halus untuk landing page.
-// Setiap elemen ber-class `.reveal` akan mendapat `.in-view` saat masuk viewport.
+import Alpine from 'alpinejs';
+
+// ---- Komponen carousel (From Writers To Writers) ----
+Alpine.data('carousel', () => ({
+    active: 0,
+    slides: 0,
+    init() {
+        this.slides = this.$refs.track.children.length;
+        this.$refs.track.addEventListener('scroll', () => {
+            const w = this.$refs.track.children[0]?.offsetWidth || 1;
+            this.active = Math.round(this.$refs.track.scrollLeft / (w + 24));
+        }, { passive: true });
+    },
+    goTo(i) {
+        const child = this.$refs.track.children[i];
+        if (child) this.$refs.track.scrollTo({ left: child.offsetLeft - 16, behavior: 'smooth' });
+    },
+    next() { this.goTo(Math.min(this.active + 1, this.slides - 1)); },
+    prev() { this.goTo(Math.max(this.active - 1, 0)); },
+}));
+
+window.Alpine = Alpine;
+Alpine.start();
+
+// ---- Scroll-reveal halus untuk landing page ----
 function initReveal() {
     const els = document.querySelectorAll('.reveal');
     if (!els.length) return;
@@ -24,19 +47,6 @@ function initReveal() {
     els.forEach((el) => io.observe(el));
 }
 
-// Navbar berubah solid setelah scroll sedikit melewati hero.
-function initNavbar() {
-    const nav = document.getElementById('site-nav');
-    if (!nav) return;
-    const onScroll = () => {
-        if (window.scrollY > 40) nav.classList.add('nav-scrolled');
-        else nav.classList.remove('nav-scrolled');
-    };
-    onScroll();
-    window.addEventListener('scroll', onScroll, { passive: true });
-}
-
 document.addEventListener('DOMContentLoaded', () => {
     initReveal();
-    initNavbar();
 });

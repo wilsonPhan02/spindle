@@ -1,5 +1,5 @@
-@import 'tailwindcss';
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:wght@400;700&family=Montserrat:wght@400;500;600;700;800&display=swap');
+@import 'tailwindcss';
 
 @source '../views';
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
@@ -10,39 +10,39 @@
     --font-merriweather: 'Merriweather', serif;
     --font-montserrat: 'Montserrat', sans-serif;
     --font-inter: 'Inter', sans-serif;
-    
+
     /* Neutrals Colors */
     --color-text-60: rgb(104 101 99);
     --color-text-70: rgb(82 77 73);
     --color-text-80: rgb(55 50 46);
     --color-text-90: rgb(35 29 24);
-    --color-text-100: rgb(35 29 24);   
-    
-    /* Sub Text */     
+    --color-text-100: rgb(35 29 24);
+
+    /* Sub Text */
     --color-subtext-60: rgb(229 229 229);
     --color-subtext-70: rgb(217 217 217);
     --color-subtext-80: rgb(199 199 199);
     --color-subtext-90: rgb(152 152 152);
     --color-subtext-100: rgb(116 116 116);
-    
+
     /* Interactive */
     --color-interactive-100: rgb(53 117 255);
     --color-interactive-opacity: rgb(101 150 255);
-    
+
     /* Success */
     --color-success-100: rgb(0 192 89);
-    
+
     /* Warning */
-    --color-warning-100: rgb(255 190 0); 
-    
+    --color-warning-100: rgb(255 190 0);
+
     /* Danger */
     --color-danger-100: rgb(255 59 47);
     /* --- Background Colors --- */
-    
+
     /* Background */
     --color-bg-main: rgb(246 246 244);
     --color-bg-border: rgb(239 239 233);
-    
+
     /* Card */
     --color-card-bg: rgb(255 254 251);
     --color-card-hover: rgb(247 245 241);
@@ -53,17 +53,17 @@
     --color-brand-150: rgb(225 215 206);
     --color-brand-100: rgb(233 225 218);
     --color-brand-50: rgb(242 239 236);
-    --color-brand-10: rgb(247 245 244); 
+    --color-brand-10: rgb(247 245 244);
 
     /* --- Secondary --- */
     --color-secondary-300: rgb(118 81 55);
     --color-secondary-250: rgb(138 97 68);
-    --color-secondary-200: rgb(129 100 77); 
-    --color-secondary-150: rgb(154 125 102); 
-    --color-secondary-100: rgb(177 160 134); 
-    --color-secondary-50: rgb(198 179 149); 
-    --color-secondary-20: rgb(212 198 188); 
-    --color-secondary-10: rgb(217 197 164); 
+    --color-secondary-200: rgb(129 100 77);
+    --color-secondary-150: rgb(154 125 102);
+    --color-secondary-100: rgb(177 160 134);
+    --color-secondary-50: rgb(198 179 149);
+    --color-secondary-20: rgb(212 198 188);
+    --color-secondary-10: rgb(217 197 164);
     --color-secondary-5: rgb(244 236 229)
 }
 
@@ -73,7 +73,7 @@
     /* ==============================
        WEB STYLES
        ============================== */
-    
+
     .text-web-title {
         font-family: var(--font-merriweather);
         font-weight: 400; /* Regular */
@@ -244,7 +244,7 @@
     .flatpickr-calendar.static {
         @apply !bg-brand-10 !border !border-secondary-50 !rounded-xl !shadow-lg;
         @apply !right-0 !left-auto !mt-1;
-        
+
         transform: scale(0.9) !important;
         transform-origin: top right !important;
         font-family: var(--font-montserrat) !important;
@@ -256,7 +256,7 @@
 
     .flatpickr-monthDropdown-months {
         @apply !text-[17px] !font-medium !text-secondary-200 !bg-brand-10 !rounded-md !px-1;
-        @apply hover:!bg-brand-100 !transition-colors !cursor-pointer; 
+        @apply hover:!bg-brand-100 !transition-colors !cursor-pointer;
         height: 24px !important;
     }
 
@@ -336,16 +336,16 @@
 
     /* Kelap-kelip bintang */
     @keyframes twinkle {
-        0%, 100% { opacity: 0.2; }
+        0%, 100% { opacity: 0.05; }
         50%      { opacity: 1; }
     }
-    .animate-twinkle { animation: twinkle 3.5s ease-in-out infinite; }
+    .animate-twinkle { animation: twinkle 1.8s ease-in-out infinite; }
 
-    /* Awan menyapu perlahan menyeberangi langit hero (geser horizontal jelas) */
-    @keyframes cloud-drift   { from { transform: translateX(-60px); } to { transform: translateX(80px); } }
-    @keyframes cloud-drift-2 { from { transform: translateX(70px); }  to { transform: translateX(-90px); } }
-    .animate-cloud   { animation: cloud-drift   38s ease-in-out infinite alternate; }
-    .animate-cloud-2 { animation: cloud-drift-2 48s ease-in-out infinite alternate; }
+    /* Awan menyapu perlahan di langit hero */
+    @keyframes cloud-drift   { from { transform: translateX(-6%); } to { transform: translateX(7%); } }
+    @keyframes cloud-drift-2 { from { transform: translateX(8%); }  to { transform: translateX(-9%); } }
+    .animate-cloud   { animation: cloud-drift   12s ease-in-out infinite alternate; }
+    .animate-cloud-2 { animation: cloud-drift-2 16s ease-in-out infinite alternate; }
 
     /* Ayunan lembut (syal / figur hero) — organik seperti tertiup angin */
     @keyframes sway {
@@ -425,6 +425,8 @@
         background-color: var(--color-secondary-100); /* Lebih gelap pas dihover */
     }
 
-    
+
 }
 
+@keyframes windBlow { 0% { transform: translateX(-100%); opacity: 0; } 50% { opacity: 1; } 100% { transform: translateX(300%); opacity: 0; } } .animate-wind-blow { animation: windBlow linear infinite; }
+@keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
