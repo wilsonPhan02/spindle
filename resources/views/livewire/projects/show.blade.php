@@ -322,7 +322,7 @@ new #[Layout('layouts.app')] class extends Component {
                                 <div x-show="localSyn.trim() !== ''" class="whitespace-pre-wrap" x-text="localSyn.trim()"></div>
                                 <div x-show="localSyn.trim() === ''" class="text-[#A08866]/60 italic font-medium">Write your synopsis here!</div>
                             </div>
-                            <div x-show="isOverflowing && !showMore" class="absolute bottom-0 left-0 w-full h-12 bg-gradient-to-t from-[#F5EFE9] via-[#F5EFE9]/90 to-transparent pointer-events-none backdrop-blur-[1px]"></div>
+                            <div x-show="isOverflowing && !showMore" class="absolute bottom-0 left-0 w-full h-12 bg-gradient-to-t from-[#F5EFE9] via-[#F5EFE9]/90 to-transparent pointer-events-none"></div>
                         </div>
 
                         <div x-show="isOverflowing && localSyn.trim() !== '' && !editingSyn" class="absolute bottom-6 left-0 w-full flex justify-center">
