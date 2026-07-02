@@ -163,11 +163,17 @@ new class extends Component {
 
                         @foreach($section->projects as $project)
                             <a href="{{ route('projects.show', $project->project_id) }}" wire:navigate class="w-44 shrink-0 group cursor-pointer block">
-                                <div class="w-full aspect-[2/3] bg-[#B69F78] rounded-r-xl rounded-l-sm border-l-[6px] border-[#705D42] shadow-md relative mb-3 group-hover:shadow-lg transition-all group-hover:-translate-y-1">
-                                    <div class="absolute inset-1 border border-[#D5C6A9] opacity-40 rounded-r-lg pointer-events-none"></div>
-                                    <div class="absolute top-1.5 left-1.5 w-4 h-4 border-t border-l border-[#E2D6C0] opacity-60"></div>
-                                    <div class="absolute bottom-1.5 right-1.5 w-4 h-4 border-b border-r border-[#E2D6C0] opacity-60"></div>
-                                    <div class="absolute right-0 top-0 bottom-0 w-1.5 bg-white opacity-40 rounded-r-xl"></div>
+                                <div class="w-full aspect-[1/1.6] relative mb-3 transition-transform duration-300 ease-out group-hover:scale-[1.03] group-hover:-translate-y-1.5">
+                                    @if($project->cover_image_path)
+                                        <img src="{{ Storage::url($project->cover_image_path) }}" class="absolute inset-y-0 left-0 right-3 w-[calc(100%-12px)] h-full object-cover rounded-l-sm rounded-r-md shadow-md z-20 border-r border-black/10 transition-shadow duration-300 group-hover:shadow-xl" />
+                                        <div class="absolute inset-y-0 left-0 w-4 bg-gradient-to-r from-black/60 via-black/10 to-transparent z-20 pointer-events-none mix-blend-multiply rounded-l-sm"></div>
+                                        <div class="absolute top-2 bottom-2 right-1.5 w-3 bg-gradient-to-r from-[#E8E3D9] to-[#D5C6A9] border-y border-r border-[#C4B7A3] rounded-r-[2px] z-10 shadow-inner"></div>
+                                        <div class="absolute inset-y-0 right-0 w-6 bg-[#8C7558] rounded-r-md z-0 shadow-sm border-l border-black/20 transition-shadow duration-300 group-hover:shadow-lg"></div>
+                                    @else
+                                        <x-default-project class="absolute inset-y-0 left-0 right-3 w-[calc(100%-12px)] h-full text-[#B69F78] rounded-l-sm rounded-r-md shadow-md z-20 border-r border-black/10 transition-shadow duration-300 group-hover:shadow-xl" />
+                                        <div class="absolute top-2 bottom-2 right-1.5 w-3 bg-gradient-to-r from-[#E8E3D9] to-[#D5C6A9] border-y border-r border-[#C4B7A3] rounded-r-[2px] z-10 shadow-inner"></div>
+                                        <div class="absolute inset-y-0 right-0 w-6 bg-[#8C7558] rounded-r-md z-0 shadow-sm border-l border-black/20 transition-shadow duration-300 group-hover:shadow-lg"></div>
+                                    @endif
                                 </div>
 
                                 <div class="flex items-center gap-2 mb-1">
