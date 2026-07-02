@@ -120,21 +120,24 @@ new class extends Component {
                             <h2
                                 x-show="!editing"
                                 @dblclick="editing = true; setTimeout(() => $refs.nameInput.focus(), 50)"
-                                class="text-2xl font-merriweather text-text-100 cursor-pointer select-none hover:text-secondary-200 transition-colors"
-                                title="Double click to rename"
+                                class="text-2xl font-merriweather text-text-100 cursor-pointer select-none hover:text-secondary-200 transition-colors truncate"
+                                title="{{ $section->title }}"
                             >
-                                {{ $section->title }}
+                                {{ \Illuminate\Support\Str::limit($section->title, 30) }}
                             </h2>
 
-                            <input
-                                x-show="editing"
-                                x-model="newName"
-                                x-ref="nameInput"
-                                @keydown.enter="$wire.renameSection('{{ $section->section_id }}', newName); editing = false"
-                                @keydown.escape="editing = false; newName = '{{ $section->title }}'"
-                                @click.away="$wire.renameSection('{{ $section->section_id }}', newName); editing = false"
-                                class="text-2xl font-merriweather text-text-100 bg-transparent border-b border-secondary-200 outline-none w-1/2 focus:ring-0 px-0 py-0"
-                            >
+                            <div x-show="editing" class="flex items-center gap-3 w-1/2">
+                                <input
+                                    x-model="newName"
+                                    x-ref="nameInput"
+                                    maxlength="50"
+                                    @keydown.enter="$wire.renameSection('{{ $section->section_id }}', newName); editing = false"
+                                    @keydown.escape="editing = false; newName = '{{ $section->title }}'"
+                                    @click.away="$wire.renameSection('{{ $section->section_id }}', newName); editing = false"
+                                    class="text-2xl font-merriweather text-text-100 bg-transparent border-b border-secondary-200 outline-none w-full focus:ring-0 px-0 py-0"
+                                >
+                                <span class="text-[12px] text-text-80 font-medium whitespace-nowrap shrink-0" x-text="newName.length + '/50'"></span>
+                            </div>
                         </div>
 
                         <div class="relative shrink-0">
