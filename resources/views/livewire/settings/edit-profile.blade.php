@@ -40,8 +40,8 @@ new class extends Component {
 
     public function updateProfile(){
         $this->validate([
-            'username' => 'required|string|max:255',
-            'occupation' => 'nullable|string',
+            'username' => 'required|string|max:60',
+            'occupation' => 'nullable|string|max:60',
             'birth_date' => 'nullable|date',
             'gender' => 'nullable|in:male,female',
             'new_photo' => 'nullable|image|max:1024',
@@ -105,7 +105,7 @@ new class extends Component {
 
                     <x-form-input label="What is your new preferred name?" 
                         placeholder="Enter your preferred name" 
-                        model="username" />
+                        model="username" maxlength="60" />
                 </div>
 
                 <div class="hidden md:block absolute left-1/2 top-0 bottom-0 w-[0.5px] bg-brand-200"></div>
@@ -114,7 +114,7 @@ new class extends Component {
                 <div class="flex flex-col justify-between h-full gap-4">
                     <x-form-input label="Occupation" 
                         placeholder="Enter your occupation" 
-                        model="occupation" />
+                        model="occupation" maxlength="60" />
                     
                     <x-form-input label="Birth Date" type="date" model="birth_date" placeholder="Select your birth date">
                         <x-slot:icon>
