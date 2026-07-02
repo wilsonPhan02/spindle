@@ -8,7 +8,7 @@
 @if($variant === 'info')
     <!-- Untuk Data Profile -->
     <div class="min-w-0" title="{{ $value ?? 'None' }}">
-        <div class="text-web-body-small text-text-80 mb-1">{{ $label }}</div>
+        <div class="text-web-body-small text-text-80 mb-1 truncate">{{ $label }}</div>
         <div class="text-web-body-small text-subtext-90 truncate">{{ $value ?? 'None' }}</div>
     </div>
 @else
