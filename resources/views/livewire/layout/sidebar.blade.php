@@ -112,21 +112,25 @@ new class extends Component {
                     </div>
 
                     {{-- View All: show all with vertical scroll --}}
-                    <div x-show="viewAll" x-cloak class="max-h-[280px] overflow-y-auto overflow-x-hidden custom-scrollbar space-y-1">
-                        @foreach($pinnedProjects as $pProject)
-                            <div class="group flex items-center justify-between px-2 py-1.5 -mx-2 rounded-lg hover:bg-brand-150 transition-colors">
-                                <a href="{{ route('projects.show', $pProject->project_id) }}" wire:navigate class="flex items-center gap-2 flex-1 min-w-0">
-                                    <x-icons.sidebar-book class="w-4 h-4 text-text-70 shrink-0" />
-                                    <span class="text-[13px] font-medium text-text-80 truncate group-hover:text-text-100 transition-colors">{{ $pProject->title }}</span>
-                                </a>
-                                <button wire:click="unpin('{{ $pProject->project_id }}')" class="opacity-0 group-hover:opacity-100 text-subtext-70 hover:text-[#8C7558] transition-all p-1 shrink-0" title="Unpin Project">
-                                    <x-icons.bookmark-slash class="w-3.5 h-3.5" />
-                                </button>
-                            </div>
-                        @endforeach
-                        <button @click="viewAll = false" class="w-full text-center text-[11px] font-semibold text-[#8C7558] hover:text-[#5E4C38] py-1.5 transition-colors">
-                            Show less
-                        </button>
+                    <div x-show="viewAll" x-cloak class="relative">
+                        <div class="max-h-[250px] overflow-y-auto overflow-x-hidden custom-scrollbar space-y-1 pb-8">
+                            @foreach($pinnedProjects as $pProject)
+                                <div class="group flex items-center justify-between px-2 py-1.5 -mx-2 rounded-lg hover:bg-brand-150 transition-colors">
+                                    <a href="{{ route('projects.show', $pProject->project_id) }}" wire:navigate class="flex items-center gap-2 flex-1 min-w-0">
+                                        <x-icons.sidebar-book class="w-4 h-4 text-text-70 shrink-0" />
+                                        <span class="text-[13px] font-medium text-text-80 truncate group-hover:text-text-100 transition-colors">{{ $pProject->title }}</span>
+                                    </a>
+                                    <button wire:click="unpin('{{ $pProject->project_id }}')" class="opacity-0 group-hover:opacity-100 text-subtext-70 hover:text-[#8C7558] transition-all p-1 shrink-0" title="Unpin Project">
+                                        <x-icons.bookmark-slash class="w-3.5 h-3.5" />
+                                    </button>
+                                </div>
+                            @endforeach
+                        </div>
+                        <div class="sticky bottom-0 left-0 right-0 bg-gradient-to-t from-brand-100 via-brand-100 to-transparent pt-4 -mt-8">
+                            <button @click="viewAll = false" class="w-full text-center text-[11px] font-semibold text-[#8C7558] hover:text-[#5E4C38] py-1 transition-colors">
+                                Show less
+                            </button>
+                        </div>
                     </div>
                 @else
                     <div class="flex flex-col items-center justify-center py-4 text-center opacity-60">
