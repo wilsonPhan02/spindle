@@ -253,8 +253,10 @@ new #[Layout('layouts.app')] class extends Component {
 
 <div x-data="{ confirmingDelete: false }" class="p-6 lg:p-10 max-w-6xl mx-auto">
     <header class="flex justify-between items-center mb-10">
-        <div class="flex items-center gap-3 text-app-heading-2 text-text-80">
+        <div class="flex items-center gap-3 text-app-subtitle-1 text-text-80">
             <a href="{{ route('dashboard') }}" wire:navigate class="hover:text-secondary-200 transition-colors">Dashboard</a>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+            <a href="{{ route('projects.show', $project) }}" wire:navigate class="hover:text-secondary-200 transition-colors truncate">{{ $project->title }}</a>
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
             <a href="{{ route('projects.characters', $project) }}" wire:navigate class="hover:text-secondary-200 transition-colors">Characters</a>
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
@@ -263,7 +265,7 @@ new #[Layout('layouts.app')] class extends Component {
         <x-logo class="h-8 w-auto text-text-100" />
     </header>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-2 items-start">
 
         {{-- KOLOM KIRI: nama, backstory, dan detail group/field --}}
         <div class="lg:col-span-2 bg-brand-10 border border-brand-150 rounded-2xl p-8 flex flex-col gap-6 h-full">

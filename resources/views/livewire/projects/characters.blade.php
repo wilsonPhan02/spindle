@@ -123,8 +123,8 @@ new #[Layout('layouts.app')] class extends Component {
 
 }; ?>
 
-<div class="h-screen flex flex-col overflow-hidden">
-    <div class="pt-6 lg:pt-10 pb-4">
+<div class="px-6 pt-6 lg:px-10 lg:pt-10 max-w-7xl mx-auto h-screen flex flex-col overflow-hidden">
+    <div class="mb-4">
         <header class="flex justify-between items-center mb-10">
             <div class="flex items-center gap-3 text-app-subtitle-1 text-text-80">
                 <a href="{{ route('dashboard') }}" wire:navigate class="hover:text-secondary-200 transition-colors">Dashboard</a>
@@ -160,13 +160,13 @@ new #[Layout('layouts.app')] class extends Component {
             )"
             x-on:livewire:navigated.window="centerBoard()"
             x-on:character-created.window="characters.push($event.detail.character)"
-            @wheel.prevent="onWheel($event)"
-            @mousedown="startPan($event)"
-            @mousemove="onPan($event); onDragChar($event)"
+            @wheel.prevent="if (characters.length > 0) onWheel($event)"
+            @mousedown="if (characters.length > 0) startPan($event)"
+            @mousemove="if (characters.length > 0) { onPan($event); onDragChar($event); }"
             @mouseup="stopPan(); stopDragChar()"
             @mouseleave="stopPan(); stopDragChar()"
             :style="`background-image: radial-gradient(circle, #C9BBA3 ${1.5 * zoom}px, transparent ${1.5 * zoom}px); background-size: ${22 * zoom}px ${22 * zoom}px; background-position: ${panX}px ${panY}px;`"
-            :class="isAnyPopupOpen() ? 'cursor-auto' : (panning ? 'cursor-grabbing' : 'cursor-grab')"
+            :class="characters.length === 0 ? 'cursor-default' : (isAnyPopupOpen() ? 'cursor-auto' : (panning ? 'cursor-grabbing' : 'cursor-grab'))"
             class="relative w-full h-full rounded-xl border border-brand-200 bg-[#F5EFE9] overflow-hidden"
             wire:ignore
         >
@@ -235,6 +235,21 @@ new #[Layout('layouts.app')] class extends Component {
                         x-text="rel.name"
                     ></span>
                 </template>
+            </div>
+
+            {{-- Empty state: tampil saat belum ada karakter --}}
+            <div
+                x-show="characters.length === 0"
+                style="display: none;"
+                class="absolute inset-0 z-10 flex flex-col items-center justify-center gap-4 pointer-events-none"
+            >
+                <div class="w-40 h-40">
+                    <x-icons.no-character class="w-full h-full" />
+                </div>
+                <div class="text-center">
+                    <p class="text-app-heading-2 text-secondary-150">No characters yet</p>
+                    <p class="text-app-feature text-medium text-secondary-100 mt-1">Click the <span class="font-bold">+</span> button below to add your first character</p>
+                </div>
             </div>
 
             {{-- Notifikasi mengambang: pilih karakter tujuan relasi --}}
