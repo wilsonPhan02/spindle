@@ -1,3 +1,5 @@
+import './whiteboard';
+
 // ---- Komponen carousel (From Writers To Writers) ----
 document.addEventListener('alpine:init', () => {
     Alpine.data('carousel', () => ({
