@@ -221,8 +221,8 @@ new #[Layout('layouts.app')] class extends Component {
 
                                 <div x-show="editingCat" class="flex flex-col gap-1 bg-[#EAE1D5] px-2 py-1.5 rounded-md absolute top-0 left-0 z-30 shadow-sm border border-[#D5C6A9]">
                                     <div class="flex items-center gap-1">
-                                        <input x-ref="editCat{{ $category->category_id }}" value="{{ $category->name }}" maxlength="20" @input="count = $event.target.value.length" @keyup.enter="editingCat = false; $wire.renameCategory('{{ $category->category_id }}', $el.value)" @blur="editingCat = false; $wire.renameCategory('{{ $category->category_id }}', $el.value)" class="w-24 text-[13px] text-[#2C2C2C] bg-transparent border-b-2 border-[#D5C6A9] outline-none px-1 py-0.5 focus:border-[#A08866]" />
-                                        <button @mousedown.prevent="editingCat = false; $wire.renameCategory('{{ $category->category_id }}', $refs.editCat{{ $category->category_id }}.value)" class="text-[#A08866] hover:text-secondary-200 transition-colors">
+                                        <input x-ref="editCat{{ $category->category_id }}" value="{{ $category->name }}" maxlength="20" @input="count = $event.target.value.length" @keyup.enter="$el.blur()" @blur="editingCat = false; $wire.renameCategory('{{ $category->category_id }}', $el.value)" class="w-24 text-[13px] text-[#2C2C2C] bg-transparent border-b-2 border-[#D5C6A9] outline-none px-1 py-0.5 focus:border-[#A08866]" />
+                                        <button @mousedown.prevent="$refs.editCat{{ $category->category_id }}.blur()" class="text-[#A08866] hover:text-secondary-200 transition-colors">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
                                         </button>
                                     </div>
@@ -231,14 +231,14 @@ new #[Layout('layouts.app')] class extends Component {
                             </div>
                         @endforeach
 
-                        <button x-show="!addingCat" @click="addingCat = true; setTimeout(() => $refs.catInput.focus(), 50)" class="px-2 py-1.5 rounded-md border border-[#D5C6A9] text-[#8C7558] hover:bg-[#EAE1D5] flex items-center justify-center transition-colors bg-transparent">
+                        <button x-show="!addingCat" @click="addingCat = true; $wire.newCategoryName = ''; count = 0; setTimeout(() => $refs.catInput.focus(), 50)" class="px-2 py-1.5 rounded-md border border-[#D5C6A9] text-[#8C7558] hover:bg-[#EAE1D5] flex items-center justify-center transition-colors bg-transparent">
                             <x-icons.add class="w-4 h-4" />
                         </button>
 
                         <div x-show="addingCat" x-data="{ count: $wire.newCategoryName.length }" class="flex flex-col gap-1 bg-[#EAE1D5] px-2 py-1.5 rounded-md border border-[#D5C6A9]">
                             <div class="flex items-center gap-1">
-                                <input type="text" maxlength="20" @input="count = $event.target.value.length" x-model="$wire.newCategoryName" x-ref="catInput" @keyup.enter="addingCat = false; count = 0; $wire.addCategory()" @blur="addingCat = false; $wire.newCategoryName = ''; count = 0;" placeholder="Category..." class="w-28 text-[13px] bg-transparent border-b-2 border-[#D5C6A9] outline-none px-1 py-0.5 text-[#2C2C2C] focus:border-[#A08866]"/>
-                                <button @mousedown.prevent="addingCat = false; count = 0; $wire.addCategory()" class="text-[#A08866] hover:text-secondary-200 transition-colors">
+                                <input type="text" maxlength="20" @input="count = $event.target.value.length" x-model="$wire.newCategoryName" x-ref="catInput" @keyup.enter="addingCat = false; $wire.addCategory()" @blur="addingCat = false" placeholder="Category..." class="w-28 text-[13px] bg-transparent border-b-2 border-[#D5C6A9] outline-none px-1 py-0.5 text-[#2C2C2C] focus:border-[#A08866]"/>
+                                <button @mousedown.prevent="addingCat = false; $wire.addCategory()" class="text-[#A08866] hover:text-secondary-200 transition-colors">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
                                 </button>
                             </div>
