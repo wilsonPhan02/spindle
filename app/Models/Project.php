@@ -33,7 +33,6 @@ class Project extends Model
         return $this->hasMany(ProjectCategory::class, 'project_id', 'project_id');
     }
 
-<<<<<<< HEAD
     public function characters() {
         return $this->hasMany(Character::class, 'project_id', 'project_id');
     }
@@ -106,12 +105,4 @@ class Project extends Model
             }
         }
     }
-=======
-    protected function casts(): array
-    {
-        return [
-            'archived_at' => 'datetime',
-        ];
-    }
->>>>>>> f00383dd9da91d4f5aa9f414ecf868155467613f
 }

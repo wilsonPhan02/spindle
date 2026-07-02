@@ -411,7 +411,7 @@ new #[Layout('layouts.app')] class extends Component {
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 @foreach([
                     ['title' => 'Structure', 'icon' => 'no-structure', 'desc' => 'You Didn\'t Have Any Chapters!', 'btn' => 'View Structure', 'route' => null],
-                    ['title' => 'Character', 'icon' => 'no-character', 'desc' => 'You Didn\'t Have Any Characters!', 'btn' => 'View Character', 'route' => null],
+                    ['title' => 'Character', 'icon' => 'no-character', 'desc' => 'You Didn\'t Have Any Characters!', 'btn' => 'View Character', 'route' => 'projects.characters'],
                     ['title' => 'Notes', 'icon' => 'no-notes', 'desc' => 'You Didn\'t Have Any Notes!', 'btn' => 'View Notes', 'route' => 'projects.notes']
                 ] as $workspace)
 

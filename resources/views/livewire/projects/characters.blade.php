@@ -123,10 +123,10 @@ new #[Layout('layouts.app')] class extends Component {
 
 }; ?>
 
-<div>
-    <div class="p-6 lg:p-10 max-w-7xl mx-auto">
+<div class="h-full flex flex-col overflow-hidden">
+    <div class="pt-6 lg:pt-10 pb-4">
         <header class="flex justify-between items-center mb-10">
-            <div class="flex items-center gap-3 text-app-heading-2 text-text-80">
+            <div class="flex items-center gap-3 text-app-subtitle-1 text-text-80">
                 <a href="{{ route('dashboard') }}" wire:navigate class="hover:text-secondary-200 transition-colors">Dashboard</a>
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                 <a href="{{ route('projects.show', $project) }}" wire:navigate class="hover:text-secondary-200 transition-colors truncate">{{ $project->title }}</a>
@@ -136,7 +136,7 @@ new #[Layout('layouts.app')] class extends Component {
             <x-logo class="h-8 w-auto text-text-100" />
         </header>
 
-        <div class="flex justify-between items-center mb-4">
+        <div class="flex justify-between items-center">
             <h1 class="text-app-title-1 text-text-100">Characters Sheet</h1>
 
             <button
@@ -147,7 +147,9 @@ new #[Layout('layouts.app')] class extends Component {
                 <x-icons.rename class="w-4 h-4 stroke-2 group-hover:text-[var(--color-secondary-200)] transition-colors" />
             </button>
         </div>
+    </div>
 
+    <div class="flex-1 min-h-0 pb-6 lg:pb-10">
         {{-- WHITEBOARD --}}
         <div
             x-data="whiteboard(
@@ -165,7 +167,7 @@ new #[Layout('layouts.app')] class extends Component {
             @mouseleave="stopPan(); stopDragChar()"
             :style="`background-image: radial-gradient(circle, #C9BBA3 ${1.5 * zoom}px, transparent ${1.5 * zoom}px); background-size: ${22 * zoom}px ${22 * zoom}px; background-position: ${panX}px ${panY}px;`"
             :class="isAnyPopupOpen() ? 'cursor-auto' : (panning ? 'cursor-grabbing' : 'cursor-grab')"
-            class="relative w-full h-[620px] rounded-xl border border-[#D5C6A9] bg-[#F5EFE9] overflow-hidden"
+            class="relative w-full h-full rounded-xl border border-brand-200 bg-[#F5EFE9] overflow-hidden"
             wire:ignore
         >
             <div x-ref="canvas" class="absolute inset-0 origin-top-left" :style="`transform: translate(${panX}px, ${panY}px) scale(${zoom}); width: 2400px; height: 1800px;`">
@@ -202,7 +204,7 @@ new #[Layout('layouts.app')] class extends Component {
                             <button
                                 x-show="hoverSelf && !addingRelation"
                                 @click.stop="startAddRelation(char.id)"
-                                class="absolute -top-9 left-1/2 -translate-x-1/2 whitespace-nowrap px-2.5 py-1 rounded-full bg-brand-150 border border-[#D5C6A9] text-[11px] font-semibold text-[#4A4A4A] hover:bg-brand-200 transition-colors shadow-sm"
+                                class="absolute -top-9 left-1/2 -translate-x-1/2 whitespace-nowrap p-2 rounded-full bg-brand-150 border border-brand-100 text-app-desc-feature font-semibold text-text-80 hover:bg-brand-200 transition-colors shadow-sm"
                             >
                                 + Add Relation
                             </button>
@@ -219,7 +221,7 @@ new #[Layout('layouts.app')] class extends Component {
                                 <x-icons.default-avatar x-show="!char.imagePath" class="w-full h-full" />
                             </div>
                         </div>
-                        <span class="text-[13px] font-semibold text-text-100" x-text="char.name"></span>
+                        <span class="text-app-feature text-text-80 border border-brand-100 bg-brand-100 px-2 py-1 rounded" x-text="char.name"></span>
                     </div>
                 </template>
 
@@ -227,7 +229,7 @@ new #[Layout('layouts.app')] class extends Component {
                      tapi z-index-nya di bawah semua karakter supaya karakter selalu tampil di atas label --}}
                 <template x-for="rel in relationships" :key="'label-' + rel.id">
                     <span
-                        class="absolute z-[15] cursor-pointer whitespace-nowrap text-[12px] font-bold px-1.5 py-0.5 rounded"
+                        class="absolute z-[15] text-app-desc-feature font-semibold cursor-pointer whitespace-nowrap px-2 py-1 rounded"
                         :style="`left: ${relationLine(rel).midX}px; top: ${relationLine(rel).midY}px; transform: translate(-50%, -50%) rotate(${relationLine(rel).labelAngle}rad); color: ${rel.textColor}; background-color: ${rel.bgColor};`"
                         @click="openEditRelation(rel)"
                         x-text="rel.name"
@@ -241,9 +243,9 @@ new #[Layout('layouts.app')] class extends Component {
                 style="display: none;"
                 class="absolute top-4 inset-x-0 z-40 flex justify-center"
             >
-                <div class="flex items-center gap-3 bg-white border border-[#D5C6A9] rounded-full shadow-md px-4 py-2">
-                    <span class="text-[13px] font-semibold text-[#4A4A4A]">Choose one character</span>
-                    <button @click="cancelAddRelation()" class="text-[12px] font-bold text-secondary-200 hover:text-secondary-300 transition-colors px-2 py-1 rounded-full hover:bg-brand-100">Cancel</button>
+                <div class="flex items-center gap-3 bg-bg-main border border-secondary-100 rounded-full shadow-sm px-5 py-2">
+                    <span class="text-app-feature text-text-80">Choose one character</span>
+                    <button @click="cancelAddRelation()" class="text-app-feature text-danger-100 transition-colors px-4 py-1 rounded-full hover:bg-danger-100/10">Cancel</button>
                 </div>
             </div>
 
@@ -251,11 +253,11 @@ new #[Layout('layouts.app')] class extends Component {
 
             {{-- Kontrol Zoom --}}
             <div class="absolute bottom-5 left-5 z-30 flex flex-col bg-white border border-[#D5C6A9] rounded-lg shadow-sm overflow-hidden">
-                <button @click="zoomIn()" class="w-9 h-9 flex items-center justify-center text-[#4A4A4A] hover:bg-[#EAE1D5] transition-colors border-b border-[#D5C6A9]">
+                <button @click="zoomIn()" class="w-9 h-9 flex items-center justify-center text-text-80 hover:bg-bg-main transition-colors border-b border-secondary-100">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
                 </button>
-                <span class="text-[11px] text-center text-[#7A7A7A] py-1" x-text="Math.round(zoom * 100) + '%'"></span>
-                <button @click="zoomOut()" class="w-9 h-9 flex items-center justify-center text-[#4A4A4A] hover:bg-[#EAE1D5] transition-colors border-t border-[#D5C6A9]">
+                <span class="text-app-desc-feature text-center text-text-80 py-2" x-text="Math.round(zoom * 100) + '%'"></span>
+                <button @click="zoomOut()" class="w-9 h-9 flex items-center justify-center text-text-80 hover:bg-bg-main transition-colors border-t border-secondary-100">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 12h-15"/></svg>
                 </button>
             </div>
@@ -265,7 +267,7 @@ new #[Layout('layouts.app')] class extends Component {
                 <span
                     x-show="hoverAdd"
                     x-transition
-                    class="absolute -top-9 right-0 whitespace-nowrap px-2.5 py-1 rounded-full bg-brand-150 border border-[#D5C6A9] text-[11px] font-semibold text-[#4A4A4A] shadow-sm"
+                    class="absolute -top-11 right-0 whitespace-nowrap p-2 rounded-full bg-brand-150 border border-brand-200 text-app-desc-feature font-semibold text-text-80 shadow-sm"
                 >
                     Add New Character
                 </span>
@@ -273,7 +275,7 @@ new #[Layout('layouts.app')] class extends Component {
                     @mouseenter="hoverAdd = true"
                     @mouseleave="hoverAdd = false"
                     wire:click="addCharacter"
-                    class="w-12 h-12 rounded-full bg-brand-150 border border-[#D5C6A9] text-[#4A4A4A] flex items-center justify-center hover:bg-brand-200 transition-colors shadow-sm"
+                    class="w-12 h-12 rounded-full bg-brand-150 border border-secondary-100 text-text-80 flex items-center justify-center hover:bg-brand-200 transition-colors shadow-sm"
                 >
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3"><path stroke-linecap="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
                 </button>
