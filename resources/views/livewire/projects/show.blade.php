@@ -92,6 +92,19 @@ new #[Layout('layouts.app')] class extends Component {
         $this->project->update(['archived_at' => now()]);
         $this->redirect(route('dashboard'), navigate: true);
     }
+
+    public function togglePin() {
+        if (!$this->project->is_pinned) {
+            $pinnedCount = auth()->user()->projects()->where('is_pinned', true)->count();
+            if ($pinnedCount >= 10) {
+                $this->dispatch('limit-reached'); // We'll listen to this via Alpine
+                return;
+            }
+        }
+        $this->project->is_pinned = !$this->project->is_pinned;
+        $this->project->save();
+        $this->dispatch('project-pinned-updated');
+    }
 }; ?>
 
 <div>
@@ -191,9 +204,13 @@ new #[Layout('layouts.app')] class extends Component {
                         <p class="text-[15px] text-[#7A7A7A] mt-2 truncate">from <span class="font-semibold text-[#4A4A4A]" title="{{ $project->section->title ?? 'Uncategorized' }}">{{ \Illuminate\Support\Str::limit($project->section->title ?? 'Uncategorized', 30) }}</span></p>
                     </div>
 
-                    <div class="flex items-center gap-3 shrink-0">
-                        <button class="text-[#8C7558] hover:text-[#5E4C38] transition-colors">
-                            <x-icons.bookmark class="w-5 h-5" />
+                    <div class="flex items-center gap-3 shrink-0" @limit-reached.window="alert('Pinned projects have reached the maximum limit (10). You cannot pin more projects.')">
+                        <button wire:click="togglePin" class="text-[#8C7558] hover:text-[#5E4C38] transition-colors focus:outline-none" title="{{ $project->is_pinned ? 'Unpin Project' : 'Pin Project' }}">
+                            @if($project->is_pinned)
+                                <x-icons.bookmark-solid class="w-5 h-5" />
+                            @else
+                                <x-icons.bookmark class="w-5 h-5" />
+                            @endif
                         </button>
                     </div>
                 </div>

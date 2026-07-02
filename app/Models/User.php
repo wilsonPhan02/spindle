@@ -64,6 +64,10 @@ class User extends Authenticatable
         return $this->hasMany(Section::class, 'user_id', 'user_id');
     }
 
+    public function projects() {
+        return $this->hasMany(Project::class, 'user_id', 'user_id');
+    }
+
     protected static function booted()
     {
         static::created(function ($user) {
