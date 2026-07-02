@@ -205,18 +205,20 @@ new #[Layout('layouts.app')] class extends Component {
                     <div class="flex flex-wrap gap-2 items-center">
                         @foreach($project->categories as $category)
                             <div x-data="{ editingCat: false, count: {{ strlen($category->name) }} }" class="relative group">
-                                <div x-show="!editingCat" title="{{ $category->name }}" class="relative px-3 py-1.5 rounded-md bg-[#EAE1D5] text-[13px] text-[#4A4A4A] font-medium flex items-center border border-transparent group-hover:border-[#D5C6A9] transition-colors max-w-[150px] overflow-hidden">
-                                    <span @dblclick="editingCat = true; setTimeout(() => $refs.editCat{{ $category->category_id }}.focus(), 50)" class="cursor-pointer select-none truncate block w-full transition-opacity group-hover:opacity-30">
+                                <!-- Background that expands visually without shifting flex layout -->
+                                <div x-show="!editingCat" class="absolute inset-0 bg-[#EAE1D5] rounded-md transition-all duration-200 group-hover:-right-8 border border-transparent group-hover:border-[#D5C6A9] z-0"></div>
+
+                                <!-- Content container determines the DOM width -->
+                                <div x-show="!editingCat" title="{{ $category->name }}" class="relative z-10 px-3 py-1.5 text-[13px] text-[#4A4A4A] font-medium flex items-center max-w-[150px]">
+                                    <span @dblclick="editingCat = true; setTimeout(() => $refs.editCat{{ $category->category_id }}.focus(), 50)" class="cursor-pointer select-none truncate block w-full">
                                         {{ $category->name }}
                                     </span>
                                     
-                                    <div class="absolute right-0 top-0 bottom-0 px-2.5 bg-gradient-to-l from-[#EAE1D5] via-[#EAE1D5] to-transparent flex items-center justify-end opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-opacity duration-200">
-                                        <button wire:click="deleteCategory('{{ $category->category_id }}')" class="text-[#A08866] hover:text-[#E64C4C] transition-colors shrink-0 bg-[#EAE1D5] rounded-full p-0.5">
-                                            <x-icons.delete class="w-3.5 h-3.5" />
-                                        </button>
-                                    </div>
+                                    <button wire:click="deleteCategory('{{ $category->category_id }}')" class="absolute -right-6 top-1/2 -translate-y-1/2 text-[#A08866] hover:text-[#E64C4C] opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-opacity duration-200 flex items-center justify-center w-5 h-5 z-20">
+                                        <x-icons.delete class="w-3.5 h-3.5" />
+                                    </button>
                                 </div>
-                                <div x-show="editingCat" class="flex flex-col gap-1 bg-[#EAE1D5] px-2 py-1.5 rounded-md absolute top-0 left-0 z-10 shadow-sm border border-[#D5C6A9]">
+                                <div x-show="editingCat" class="flex flex-col gap-1 bg-[#EAE1D5] px-2 py-1.5 rounded-md absolute top-0 left-0 z-30 shadow-sm border border-[#D5C6A9]">
                                     <input x-ref="editCat{{ $category->category_id }}" value="{{ $category->name }}" maxlength="20" @input="count = $event.target.value.length" @keyup.enter="editingCat = false; $wire.renameCategory('{{ $category->category_id }}', $el.value)" @blur="editingCat = false; $wire.renameCategory('{{ $category->category_id }}', $el.value)" class="w-24 text-[13px] text-[#2C2C2C] bg-transparent border-b-2 border-[#D5C6A9] outline-none px-1 py-0.5 focus:border-[#A08866]" />
                                     <span class="text-[10px] text-subtext-90 text-right pr-1" x-text="count + '/20'"></span>
                                 </div>
