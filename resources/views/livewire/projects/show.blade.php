@@ -248,7 +248,7 @@ new #[Layout('layouts.app')] class extends Component {
                 x-init="$watch('localSyn', () => $nextTick(() => checkOverflow())); setTimeout(() => checkOverflow(), 200)"
                 @resize.window="checkOverflow()"
                 class="w-full mb-10">
-                    <div @mouseover="hoverSyn = true" @mouseleave="hoverSyn = false" class="flex items-center gap-3 mb-1">
+                    <div @mouseover="hoverSyn = true" @mouseleave="hoverSyn = false" class="flex items-center gap-3">
                         <span class="text-[16px] font-bold text-[#2C2C2C]">Synopsis</span>
                         <button x-show="hoverSyn && !editingSyn" @click="editingSyn = true; setTimeout(() => $refs.synInput.focus(), 50)" class="text-[#A08866] hover:text-secondary-200 transition-colors">
                             <x-icons.rename class="w-4 h-4" />
@@ -259,10 +259,10 @@ new #[Layout('layouts.app')] class extends Component {
                         <div
                             x-ref="synText"
                             @dblclick="editingSyn = true; setTimeout(() => $refs.synInput.focus(), 50)"
-                            class="text-[15px] text-[#4A4A4A] leading-[1.7] whitespace-pre-wrap select-none cursor-pointer w-full transition-all duration-300"
+                            class="text-[15px] text-[#4A4A4A] leading-[1.6] select-none cursor-pointer w-full transition-all duration-300"
                             :class="showMore ? 'max-h-[300px] overflow-y-auto pr-3 custom-scrollbar' : 'max-h-[150px] overflow-hidden'"
                         >
-                            <div x-show="localSyn.trim() !== ''" x-text="localSyn"></div>
+                            <div x-show="localSyn.trim() !== ''" class="whitespace-pre-wrap" x-text="localSyn.trim()"></div>
                             <div x-show="localSyn.trim() === ''" class="text-[#A08866]/60 italic font-medium">Write your synopsis here!</div>
                         </div>
 
