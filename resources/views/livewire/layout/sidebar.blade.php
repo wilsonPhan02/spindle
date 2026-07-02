@@ -84,14 +84,35 @@ new class extends Component {
 
     <div class="flex-1 overflow-y-auto px-6 space-y-6 pb-6 custom-scrollbar">
 
-        <div x-data="{ open: true }">
+        <div x-data="{ open: true, viewAll: false }">
             <button @click="open = !open" class="flex items-center justify-between w-full text-app-feature text-text-70 mb-2 focus:outline-none hover:text-text-80 transition-colors">
                 <span>Pinned <span class="text-[10px] ml-1 opacity-70">{{ count($pinnedProjects) }}/10</span></span>
                 <svg :class="open ? 'rotate-180' : ''" class="w-4 h-4 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
             </button>
             <div x-show="open" x-collapse>
                 @if(count($pinnedProjects) > 0)
-                    <div class="max-h-[160px] overflow-y-auto custom-scrollbar space-y-1 pr-1 -mr-1">
+                    {{-- Default: show first 5 only, no scroll --}}
+                    <div x-show="!viewAll" class="space-y-1">
+                        @foreach($pinnedProjects->take(5) as $pProject)
+                            <div class="group flex items-center justify-between px-2 py-1.5 -mx-2 rounded-lg hover:bg-brand-150 transition-colors">
+                                <a href="{{ route('projects.show', $pProject->project_id) }}" wire:navigate class="flex items-center gap-2 flex-1 min-w-0">
+                                    <x-icons.sidebar-book class="w-4 h-4 text-text-70 shrink-0" />
+                                    <span class="text-[13px] font-medium text-text-80 truncate group-hover:text-text-100 transition-colors">{{ $pProject->title }}</span>
+                                </a>
+                                <button wire:click="unpin('{{ $pProject->project_id }}')" class="opacity-0 group-hover:opacity-100 text-subtext-70 hover:text-[#8C7558] transition-all p-1 shrink-0" title="Unpin Project">
+                                    <x-icons.bookmark-slash class="w-3.5 h-3.5" />
+                                </button>
+                            </div>
+                        @endforeach
+                        @if(count($pinnedProjects) > 5)
+                            <button @click="viewAll = true" class="w-full text-center text-[11px] font-semibold text-[#8C7558] hover:text-[#5E4C38] py-1.5 transition-colors">
+                                View all ({{ count($pinnedProjects) }})
+                            </button>
+                        @endif
+                    </div>
+
+                    {{-- View All: show all with vertical scroll --}}
+                    <div x-show="viewAll" x-cloak class="max-h-[280px] overflow-y-auto overflow-x-hidden custom-scrollbar space-y-1">
                         @foreach($pinnedProjects as $pProject)
                             <div class="group flex items-center justify-between px-2 py-1.5 -mx-2 rounded-lg hover:bg-brand-150 transition-colors">
                                 <a href="{{ route('projects.show', $pProject->project_id) }}" wire:navigate class="flex items-center gap-2 flex-1 min-w-0">
@@ -103,6 +124,9 @@ new class extends Component {
                                 </button>
                             </div>
                         @endforeach
+                        <button @click="viewAll = false" class="w-full text-center text-[11px] font-semibold text-[#8C7558] hover:text-[#5E4C38] py-1.5 transition-colors">
+                            Show less
+                        </button>
                     </div>
                 @else
                     <div class="flex flex-col items-center justify-center py-4 text-center opacity-60">
