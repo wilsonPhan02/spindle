@@ -50,7 +50,7 @@
                     <li><a href="#tools"   class="nav-link hover:text-secondary-200 transition-colors">Guides</a></li>
                     <li><a href="#writers" class="nav-link hover:text-secondary-200 transition-colors">Advantages</a></li>
                 </ul>
-                <a href="{{ route('register') }}"
+                <a href="{{ route('dashboard') }}"
                    class="inline-flex items-center rounded-full bg-secondary-150 px-9 py-3.5 text-web-body-small font-merriweather text-brand-10
                           transition-all duration-300 hover:bg-secondary-200 hover:-translate-y-0.5 hover:shadow-md">
                     Join Us Now
@@ -120,7 +120,7 @@
                     <br>worth telling, spinning countless narrative
                     <br> threads into one cohesive universe.
                 </p>
-                <a href="{{ route('register') }}"
+                <a href="{{ route('dashboard') }}"
                    class="mt-8 inline-flex items-center rounded-[7px] bg-secondary-150 px-10 py-3.5 font-merriweather text-[16px] text-brand-10
                           shadow-md transition-all duration-700 hover:bg-secondary-200 hover:-translate-y-1 hover:shadow-lg">
                     Get Started
@@ -331,7 +331,7 @@
                 <h2 class="text-web-title text-text-80">
                     Are You Ready To <span class="font-merriweather italic text-secondary-200">Spin A Yarn?</span>
                 </h2>
-                <a href="{{ route('register') }}"
+                <a href="{{ route('dashboard') }}"
                    class="mt-6 inline-flex items-center rounded-[7px] bg-secondary-150 px-10 py-3.5 font-merriweather text-[16px] text-brand-10
                           shadow-md transition-all duration-700 hover:bg-secondary-200 hover:-translate-y-1 hover:shadow-lg">
                     Join Us Now
