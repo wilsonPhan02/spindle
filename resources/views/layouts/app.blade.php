@@ -28,9 +28,7 @@
         currentAvatarUrl = $event.detail.avatarUrl;
     "
 >
-
-    <x-sidebar />
-
+    <livewire:layout.sidebar />
     <div
         x-show="!isPinned"
         @mouseenter="isHovered = true"

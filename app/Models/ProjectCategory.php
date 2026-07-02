@@ -11,6 +11,7 @@ class ProjectCategory extends Model
     protected $primaryKey = 'category_id';
     public $incrementing = false;
     protected $keyType = 'string';
+    protected $touches = ['project'];
 
     protected $fillable = ['project_id', 'name'];
 
