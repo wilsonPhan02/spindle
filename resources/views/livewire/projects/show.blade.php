@@ -209,7 +209,7 @@ new #[Layout('layouts.app')] class extends Component {
                                  @mouseleave="hoverCat = false"
                                  class="relative group">
                                 
-                                <div x-show="!editingCat" @dblclick="editingCat = true; setTimeout(() => $refs.editCatInput.focus(), 50)" title="{{ $category->name }}" class="cursor-pointer px-3 py-1.5 rounded-md bg-[#EAE1D5] text-[13px] text-[#4A4A4A] font-medium flex gap-1.5 items-center border border-transparent group-hover:border-[#D5C6A9] transition-colors">
+                                <div x-show="!editingCat" @dblclick="editingCat = true; $nextTick(() => $refs.editCatInput.focus())" title="{{ $category->name }}" class="cursor-pointer px-3 py-1.5 rounded-md bg-[#EAE1D5] text-[13px] text-[#4A4A4A] font-medium flex gap-1.5 items-center border border-transparent group-hover:border-[#D5C6A9] transition-colors">
                                     <span class="select-none truncate max-w-[130px] block">
                                         {{ $category->name }}
                                     </span>
@@ -219,7 +219,7 @@ new #[Layout('layouts.app')] class extends Component {
                                     </button>
                                 </div>
 
-                                <div x-show="editingCat" class="flex flex-col gap-1 bg-[#EAE1D5] px-2 py-1.5 rounded-md absolute top-0 left-0 z-30 shadow-sm border border-[#D5C6A9]">
+                                <div x-show="editingCat" class="flex flex-col gap-1 bg-[#EAE1D5] px-2 py-1.5 rounded-md border border-[#D5C6A9]">
                                     <div class="flex items-center gap-1">
                                         <input x-ref="editCatInput" value="{{ $category->name }}" maxlength="20" @input="count = $event.target.value.length" @keyup.enter="$el.blur()" @blur="editingCat = false; $wire.renameCategory('{{ $category->category_id }}', $el.value)" class="w-24 text-[13px] text-[#2C2C2C] bg-transparent border-b-2 border-[#D5C6A9] outline-none px-1 py-0.5 focus:border-[#A08866]" />
                                         <button @mousedown.prevent="$refs.editCatInput.blur()" class="text-[#A08866] hover:text-secondary-200 transition-colors">
@@ -231,7 +231,7 @@ new #[Layout('layouts.app')] class extends Component {
                             </div>
                         @endforeach
 
-                        <button x-show="!addingCat" @click="addingCat = true; setTimeout(() => $refs.catInput.focus(), 50)" class="px-2 py-1.5 rounded-md border border-[#D5C6A9] text-[#8C7558] hover:bg-[#EAE1D5] flex items-center justify-center transition-colors bg-transparent">
+                        <button x-show="!addingCat" @click="addingCat = true; $nextTick(() => $refs.catInput.focus())" class="px-2 py-1.5 rounded-md border border-[#D5C6A9] text-[#8C7558] hover:bg-[#EAE1D5] flex items-center justify-center transition-colors bg-transparent">
                             <x-icons.add class="w-4 h-4" />
                         </button>
 
