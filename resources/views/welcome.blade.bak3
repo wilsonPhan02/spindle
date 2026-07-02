@@ -151,9 +151,9 @@
         </section>
 
         
-        <section class="relative min-h-screen flex flex-col justify-center overflow-hidden bg-[#2a1f17] py-20">
+        <section class="relative overflow-hidden bg-[#2a1f17] pb-28 pt-8">
             @include('partials.starfield')
-            <div class="relative z-10 mx-auto w-full max-w-[1240px] px-6 lg:px-[52px] text-center mt-6 lg:mt-8">
+            <div class="relative z-10 mx-auto max-w-[1240px] px-6 lg:px-[52px] text-center">
                 <p class="reveal font-montserrat text-[18px] text-brand-200">However, every Writer faces the same monster</p>
                 <h2 class="reveal reveal-d1 mt-2 font-merriweather text-[44px] font-bold italic text-brand-10">“The Great Tangle”</h2>
 
@@ -169,7 +169,7 @@
     
     <section id="about" class="relative min-h-screen flex flex-col justify-center overflow-hidden bg-[#2a1f17] py-20">
         @include('partials.starfield')
-        <div class="relative z-10 mx-auto grid max-w-[1240px] grid-cols-1 items-center gap-12 px-6 lg:px-[52px] lg:grid-cols-2 mt-12 lg:mt-24">
+        <div class="relative z-10 mx-auto grid max-w-[1240px] grid-cols-1 items-center gap-12 px-6 lg:px-[52px] lg:grid-cols-2">
             
             
             <div class="reveal reveal-left relative order-2 h-[500px] w-full lg:order-1">
@@ -196,7 +196,7 @@
 
     
     <section id="writers" class="relative min-h-screen flex flex-col justify-center overflow-hidden bg-brand-50 py-20">
-        <div class="mx-auto max-w-[1240px] px-6 lg:px-[52px] text-center -mt-4">
+        <div class="mx-auto max-w-[1240px] px-6 lg:px-[52px] text-center mt-12">
             <p class="reveal font-montserrat text-[18px] font-semibold text-secondary-200">OUR MISSION</p>
             <h2 class="mt-1 text-web-title text-text-80">
                 From Writers To <span class="font-merriweather italic text-secondary-200">Writers</span>
@@ -240,7 +240,7 @@
 
     
     <section id="tools" class="relative min-h-screen flex flex-col justify-center overflow-hidden bg-brand-50 pt-24 pb-8">
-        <div class="mx-auto max-w-[1240px] px-6 lg:px-[52px] -mt-16">
+        <div class="mx-auto max-w-[1240px] px-6 lg:px-[52px]">
             <p class="reveal font-montserrat text-[18px] font-semibold text-secondary-200">WHY CHOOSE US</p>
             <h2 class="reveal reveal-d1 mt-1 max-w-[599px] text-web-title text-text-80">We Provide A Tools For Writing</h2>
 
@@ -281,7 +281,7 @@
 
                   <div class="reveal reveal-right order-1 space-y-3 lg:order-2 w-full lg:max-w-[480px]">
                       <template x-for="(it, i) in items" :key="i">
-                          <button type="button" x-on:click="sel = i" x-on:mouseenter="sel = i"
+                          <button type="button" x-on:click="sel = i"
                                   class="block w-full rounded-[6px] border-2 px-7 text-left transition-all duration-[800ms] ease-[cubic-bezier(0.4,0,0.2,1)]"
                                   :class="sel === i ? 'border-secondary-200 bg-brand-150 pt-5 pb-5' : 'border-brand-200 py-4 hover:border-secondary-150 hover:bg-brand-10'">
                               <span class="font-merriweather text-[20px] italic transition-colors duration-[800ms]"
@@ -325,9 +325,9 @@
         </div>
     </section>
 
-    <section class="relative overflow-hidden bg-brand-50 pt-16 pb-0">
+    <section class="relative overflow-hidden bg-brand-50 pt-10 pb-0">
         <div class="reveal reveal-d1 relative mx-auto max-w-[1240px] px-6 lg:px-[52px]">
-            <div class="relative overflow-hidden rounded-[28px] bg-brand-100 px-6 pt-20 mb-16 text-center shadow-lg">
+            <div class="relative overflow-hidden rounded-[28px] bg-brand-100 px-6 pt-10 mb-16 text-center shadow-lg">
                 <h2 class="text-web-title text-text-80">
                     Are You Ready To <span class="font-merriweather italic text-secondary-200">Spin A Yarn?</span>
                 </h2>
@@ -782,69 +782,5 @@
         });
     </script>
 
-    <script>
-        // True Scroll-Jacking (Section-by-Section)
-        document.addEventListener('DOMContentLoaded', () => {
-            const sections = Array.from(document.querySelectorAll('header#hero, section, footer'));
-            let isAnimating = false;
-            
-            window.addEventListener('wheel', (e) => {
-                // Prevent default native scroll
-                e.preventDefault();
-                
-                if (isAnimating) return;
-                
-                let currentIdx = -1;
-                let minDistance = Infinity;
-                
-                // Find which section we are currently focusing on
-                sections.forEach((sec, idx) => {
-                    const rect = sec.getBoundingClientRect();
-                    const distance = Math.abs(rect.top);
-                    if (distance < minDistance) {
-                        minDistance = distance;
-                        currentIdx = idx;
-                    }
-                });
-                
-                let nextIdx = currentIdx;
-                
-                // Determine direction
-                // e.deltaY > 0 means scrolling down
-                if (e.deltaY > 20 || e.deltaY < -20) {
-                    if (e.deltaY > 0) {
-                        nextIdx = Math.min(sections.length - 1, currentIdx + 1);
-                    } else {
-                        nextIdx = Math.max(0, currentIdx - 1);
-                    }
-                    
-                    if (nextIdx !== currentIdx) {
-                        isAnimating = true;
-                        
-                        const targetSection = sections[nextIdx];
-                        const targetY = window.scrollY + targetSection.getBoundingClientRect().top;
-                        
-                        window.scrollTo({
-                            top: targetY,
-                            behavior: 'smooth' // Let the browser handle the buttery smooth slide
-                        });
-                        
-                        // Prevent multiple triggers while the browser is scrolling (roughly 800ms)
-                        setTimeout(() => {
-                            isAnimating = false;
-                        }, 900);
-                    }
-                }
-            }, { passive: false });
-            
-            // Allow normal keyboard navigation (arrows/space) but with smooth scroll
-            window.addEventListener('keydown', (e) => {
-                if (['ArrowUp', 'ArrowDown', 'Space'].includes(e.code)) {
-                    // Optional: You could also intercept keyboard for section-by-section,
-                    // but leaving it default gives a fallback for accessibility.
-                }
-            });
-        });
-    </script>
 </body>
 </html>
