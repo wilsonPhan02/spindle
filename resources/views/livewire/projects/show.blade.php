@@ -188,7 +188,7 @@ new #[Layout('layouts.app')] class extends Component {
                             if ($titleLen >= 25) { $dtlTitleSize = 'text-[22px]'; } elseif ($titleLen >= 15) { $dtlTitleSize = 'text-[26px]'; }
                         @endphp
 
-                        <div x-data="{ editingTitle: false, hoverTitle: false, localTitle: @entangle('title') }" @mouseover="hoverTitle = true" @mouseleave="hoverTitle = false" class="flex items-center gap-3 group">
+                        <div x-data="{ editingTitle: false, hoverTitle: false, localTitle: @entangle('title') }" @mouseover="hoverTitle = true" @mouseleave="hoverTitle = false" x-on:livewire:navigated.window="localTitle = $wire.title" class="flex items-center gap-3 group">
                             <h1
                                 x-show="!editingTitle"
                                 @dblclick="editingTitle = true; setTimeout(() => $refs.titleInput.focus(), 50)"

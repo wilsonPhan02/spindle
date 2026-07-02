@@ -123,7 +123,7 @@ new #[Layout('layouts.app')] class extends Component {
 
 }; ?>
 
-<div class="h-full flex flex-col overflow-hidden">
+<div class="h-screen flex flex-col overflow-hidden">
     <div class="pt-6 lg:pt-10 pb-4">
         <header class="flex justify-between items-center mb-10">
             <div class="flex items-center gap-3 text-app-subtitle-1 text-text-80">
