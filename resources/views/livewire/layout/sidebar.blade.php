@@ -13,6 +13,7 @@ new class extends Component {
     }
 
     #[On('project-pinned-updated')]
+    #[On('project-updated')]
     public function loadProjects()
     {
         $user = auth()->user();
@@ -23,11 +24,10 @@ new class extends Component {
                 ->latest('updated_at')
                 ->get();
 
-            // Just fetch recent 5 for now, unless pinned logic needs to be completely separate
             $this->recentProjects = $user->projects()
                 ->whereNull('archived_at')
                 ->latest('updated_at')
-                ->take(5)
+                ->take(20)
                 ->get();
         }
     }
@@ -141,20 +141,43 @@ new class extends Component {
             </div>
         </div>
 
-        <div x-data="{ open: true }">
+        <div x-data="{ open: true, viewAll: false }">
             <button @click="open = !open" class="flex items-center justify-between w-full text-app-feature text-text-70 mb-2 focus:outline-none hover:text-text-80 transition-colors">
                 <span>Recent</span>
                 <svg :class="open ? 'rotate-180' : ''" class="w-4 h-4 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
             </button>
             <div x-show="open" x-collapse>
                 @if(count($recentProjects) > 0)
-                    <div class="max-h-[160px] overflow-y-auto custom-scrollbar space-y-1 pr-1 -mr-1">
-                        @foreach($recentProjects as $rProject)
+                    {{-- Default: show first 8 only, no scroll --}}
+                    <div x-show="!viewAll" class="space-y-1">
+                        @foreach($recentProjects->take(8) as $rProject)
                             <a href="{{ route('projects.show', $rProject->project_id) }}" wire:navigate class="flex items-center gap-2 px-2 py-1.5 -mx-2 rounded-lg hover:bg-brand-150 transition-colors group">
                                 <x-icons.sidebar-book class="w-4 h-4 text-text-70 shrink-0" />
                                 <span class="text-[13px] font-medium text-text-80 truncate group-hover:text-text-100 transition-colors">{{ $rProject->title }}</span>
                             </a>
                         @endforeach
+                        @if(count($recentProjects) > 8)
+                            <button @click="viewAll = true" class="w-full text-center text-[11px] font-semibold text-[#8C7558] hover:text-[#5E4C38] py-1.5 transition-colors">
+                                View all ({{ count($recentProjects) }})
+                            </button>
+                        @endif
+                    </div>
+
+                    {{-- View All: show all with vertical scroll --}}
+                    <div x-show="viewAll" x-cloak class="relative">
+                        <div class="max-h-[350px] overflow-y-auto overflow-x-hidden custom-scrollbar space-y-1 pb-8">
+                            @foreach($recentProjects as $rProject)
+                                <a href="{{ route('projects.show', $rProject->project_id) }}" wire:navigate class="flex items-center gap-2 px-2 py-1.5 -mx-2 rounded-lg hover:bg-brand-150 transition-colors group">
+                                    <x-icons.sidebar-book class="w-4 h-4 text-text-70 shrink-0" />
+                                    <span class="text-[13px] font-medium text-text-80 truncate group-hover:text-text-100 transition-colors">{{ $rProject->title }}</span>
+                                </a>
+                            @endforeach
+                        </div>
+                        <div class="sticky bottom-0 left-0 right-0 bg-gradient-to-t from-brand-100 via-brand-100 to-transparent pt-4 -mt-8">
+                            <button @click="viewAll = false" class="w-full text-center text-[11px] font-semibold text-[#8C7558] hover:text-[#5E4C38] py-1 transition-colors">
+                                Show less
+                            </button>
+                        </div>
                     </div>
                 @else
                     <div class="flex flex-col items-center justify-center py-4 text-center opacity-60">

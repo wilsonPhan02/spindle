@@ -12,6 +12,7 @@ class Note extends Model
     use HasUuids;
 
     protected $primaryKey = 'note_id';
+    protected $touches = ['project'];
 
     /** Kolom UUID yang di-auto-generate oleh HasUuids */
     public function uniqueIds(): array
