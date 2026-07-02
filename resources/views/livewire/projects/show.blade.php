@@ -196,7 +196,7 @@ new #[Layout('layouts.app')] class extends Component {
                     </div>
                 </div>
 
-                <div x-data="{ addingCat: false }" class="mb-6">
+                <div x-data="{ addingCat: false, addCount: 0 }" class="mb-6">
                     <div class="flex items-center gap-2 mb-3">
                         <x-icons.category class="w-4 h-4 text-[#8C7558]" />
                         <span class="text-[11px] font-bold text-[#4A4A4A] uppercase tracking-[0.15em]">Categories</span>
@@ -231,18 +231,18 @@ new #[Layout('layouts.app')] class extends Component {
                             </div>
                         @endforeach
 
-                        <button x-show="!addingCat" @click="addingCat = true; $nextTick(() => $refs.catInput.focus())" class="px-2 py-1.5 rounded-md border border-[#D5C6A9] text-[#8C7558] hover:bg-[#EAE1D5] flex items-center justify-center transition-colors bg-transparent">
+                        <button x-show="!addingCat" @click="addingCat = true; addCount = 0; $nextTick(() => $refs.catInput.focus())" class="px-2 py-1.5 rounded-md border border-[#D5C6A9] text-[#8C7558] hover:bg-[#EAE1D5] flex items-center justify-center transition-colors bg-transparent">
                             <x-icons.add class="w-4 h-4" />
                         </button>
 
-                        <div x-show="addingCat" x-data="{ count: $wire.newCategoryName.length }" class="flex flex-col gap-1 bg-[#EAE1D5] px-2 py-1.5 rounded-md border border-[#D5C6A9]">
+                        <div x-show="addingCat" class="flex flex-col gap-1 bg-[#EAE1D5] px-2 py-1.5 rounded-md border border-[#D5C6A9]">
                             <div class="flex items-center gap-1">
-                                <input type="text" maxlength="20" @input="count = $event.target.value.length" x-model="$wire.newCategoryName" x-ref="catInput" @keyup.enter="addingCat = false; $wire.addCategory()" @blur="addingCat = false" placeholder="Category..." class="w-28 text-[13px] bg-transparent border-b-2 border-[#D5C6A9] outline-none px-1 py-0.5 text-[#2C2C2C] focus:border-[#A08866]"/>
+                                <input type="text" maxlength="20" @input="addCount = $event.target.value.length" x-model="$wire.newCategoryName" x-ref="catInput" @keyup.enter="addingCat = false; $wire.addCategory()" @blur="addingCat = false" placeholder="Category..." class="w-28 text-[13px] bg-transparent border-b-2 border-[#D5C6A9] outline-none px-1 py-0.5 text-[#2C2C2C] focus:border-[#A08866]"/>
                                 <button @mousedown.prevent="addingCat = false; $wire.addCategory()" class="text-[#A08866] hover:text-secondary-200 transition-colors">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
                                 </button>
                             </div>
-                            <span class="text-[10px] text-subtext-90 text-right pr-1" x-text="count + '/20'"></span>
+                            <span class="text-[10px] text-subtext-90 text-right pr-1" x-text="addCount + '/20'"></span>
                         </div>
                     </div>
                 </div>
