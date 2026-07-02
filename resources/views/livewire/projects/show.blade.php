@@ -209,18 +209,23 @@ new #[Layout('layouts.app')] class extends Component {
                                  @mouseleave="hoverCat = false"
                                  class="relative group">
                                 
-                                <div x-show="!editingCat" title="{{ $category->name }}" class="px-3 py-1.5 rounded-md bg-[#EAE1D5] text-[13px] text-[#4A4A4A] font-medium flex gap-1.5 items-center border border-transparent group-hover:border-[#D5C6A9] transition-colors">
-                                    <span @dblclick="editingCat = true; setTimeout(() => $refs.editCat{{ $category->category_id }}.focus(), 50)" class="cursor-pointer select-none truncate max-w-[130px] block">
+                                <div x-show="!editingCat" @dblclick="editingCat = true; setTimeout(() => $refs.editCat{{ $category->category_id }}.focus(), 50)" title="{{ $category->name }}" class="cursor-pointer px-3 py-1.5 rounded-md bg-[#EAE1D5] text-[13px] text-[#4A4A4A] font-medium flex gap-1.5 items-center border border-transparent group-hover:border-[#D5C6A9] transition-colors">
+                                    <span class="select-none truncate max-w-[130px] block">
                                         {{ $category->name }}
                                     </span>
                                     
-                                    <button wire:click="deleteCategory('{{ $category->category_id }}')" x-show="hoverCat" class="text-[#A08866] hover:text-[#E64C4C] transition-colors shrink-0 flex items-center justify-center">
+                                    <button wire:click.stop="deleteCategory('{{ $category->category_id }}')" x-show="hoverCat" class="text-[#A08866] hover:text-[#E64C4C] transition-colors shrink-0 flex items-center justify-center">
                                         <x-icons.delete class="w-3.5 h-3.5" />
                                     </button>
                                 </div>
 
-                                <div x-show="editingCat" class="flex flex-col gap-1 bg-[#EAE1D5] px-2 py-1.5 rounded-md absolute top-0 left-0 z-30 shadow-sm border border-[#D5C6A9]">
-                                    <input x-ref="editCat{{ $category->category_id }}" value="{{ $category->name }}" maxlength="20" @input="count = $event.target.value.length" @keyup.enter="editingCat = false; $wire.renameCategory('{{ $category->category_id }}', $el.value)" @blur="editingCat = false; $wire.renameCategory('{{ $category->category_id }}', $el.value)" class="w-24 text-[13px] text-[#2C2C2C] bg-transparent border-b-2 border-[#D5C6A9] outline-none px-1 py-0.5 focus:border-[#A08866]" />
+                                <div x-show="editingCat" @click.outside="editingCat = false; $wire.renameCategory('{{ $category->category_id }}', $refs.editCat{{ $category->category_id }}.value)" class="flex flex-col gap-1 bg-[#EAE1D5] px-2 py-1.5 rounded-md absolute top-0 left-0 z-30 shadow-sm border border-[#D5C6A9]">
+                                    <div class="flex items-center gap-1">
+                                        <input x-ref="editCat{{ $category->category_id }}" value="{{ $category->name }}" maxlength="20" @input="count = $event.target.value.length" @keyup.enter="editingCat = false; $wire.renameCategory('{{ $category->category_id }}', $el.value)" class="w-24 text-[13px] text-[#2C2C2C] bg-transparent border-b-2 border-[#D5C6A9] outline-none px-1 py-0.5 focus:border-[#A08866]" />
+                                        <button @click="editingCat = false; $wire.renameCategory('{{ $category->category_id }}', $refs.editCat{{ $category->category_id }}.value)" class="text-[#A08866] hover:text-secondary-200 transition-colors">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                                        </button>
+                                    </div>
                                     <span class="text-[10px] text-subtext-90 text-right pr-1" x-text="count + '/20'"></span>
                                 </div>
                             </div>
@@ -230,8 +235,13 @@ new #[Layout('layouts.app')] class extends Component {
                             <x-icons.add class="w-4 h-4" />
                         </button>
 
-                        <div x-show="addingCat" x-data="{ count: $wire.newCategoryName.length }" class="flex flex-col gap-1 bg-[#EAE1D5] px-2 py-1.5 rounded-md border border-[#D5C6A9]">
-                            <input type="text" maxlength="20" @input="count = $event.target.value.length" x-model="$wire.newCategoryName" x-ref="catInput" @keyup.enter="addingCat = false; count = 0; $wire.addCategory()" @click.outside="addingCat = false; $wire.newCategoryName = ''; count = 0;" placeholder="Category..." class="w-28 text-[13px] bg-transparent border-b-2 border-[#D5C6A9] outline-none px-1 py-0.5 text-[#2C2C2C] focus:border-[#A08866]"/>
+                        <div x-show="addingCat" x-data="{ count: $wire.newCategoryName.length }" @click.outside="addingCat = false; $wire.newCategoryName = ''; count = 0;" class="flex flex-col gap-1 bg-[#EAE1D5] px-2 py-1.5 rounded-md border border-[#D5C6A9]">
+                            <div class="flex items-center gap-1">
+                                <input type="text" maxlength="20" @input="count = $event.target.value.length" x-model="$wire.newCategoryName" x-ref="catInput" @keyup.enter="addingCat = false; count = 0; $wire.addCategory()" placeholder="Category..." class="w-28 text-[13px] bg-transparent border-b-2 border-[#D5C6A9] outline-none px-1 py-0.5 text-[#2C2C2C] focus:border-[#A08866]"/>
+                                <button @click="addingCat = false; count = 0; $wire.addCategory()" class="text-[#A08866] hover:text-secondary-200 transition-colors">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                                </button>
+                            </div>
                             <span class="text-[10px] text-subtext-90 text-right pr-1" x-text="count + '/20'"></span>
                         </div>
                     </div>
