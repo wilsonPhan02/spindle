@@ -120,21 +120,24 @@ new class extends Component {
                             <h2
                                 x-show="!editing"
                                 @dblclick="editing = true; setTimeout(() => $refs.nameInput.focus(), 50)"
-                                class="text-2xl font-merriweather text-text-100 cursor-pointer select-none hover:text-secondary-200 transition-colors"
-                                title="Double click to rename"
+                                class="text-2xl font-merriweather text-text-100 cursor-pointer select-none hover:text-secondary-200 transition-colors truncate"
+                                title="{{ $section->title }}"
                             >
-                                {{ $section->title }}
+                                {{ \Illuminate\Support\Str::limit($section->title, 30) }}
                             </h2>
 
-                            <input
-                                x-show="editing"
-                                x-model="newName"
-                                x-ref="nameInput"
-                                @keydown.enter="$wire.renameSection('{{ $section->section_id }}', newName); editing = false"
-                                @keydown.escape="editing = false; newName = '{{ $section->title }}'"
-                                @click.away="$wire.renameSection('{{ $section->section_id }}', newName); editing = false"
-                                class="text-2xl font-merriweather text-text-100 bg-transparent border-b border-secondary-200 outline-none w-1/2 focus:ring-0 px-0 py-0"
-                            >
+                            <div x-show="editing" class="flex items-center gap-3 w-1/2">
+                                <input
+                                    x-model="newName"
+                                    x-ref="nameInput"
+                                    maxlength="50"
+                                    @keydown.enter="$wire.renameSection('{{ $section->section_id }}', newName); editing = false"
+                                    @keydown.escape="editing = false; newName = '{{ $section->title }}'"
+                                    @click.away="$wire.renameSection('{{ $section->section_id }}', newName); editing = false"
+                                    class="text-2xl font-merriweather text-text-100 bg-transparent border-b border-secondary-200 outline-none w-full focus:ring-0 px-0 py-0"
+                                >
+                                <span class="text-[12px] text-text-80 font-medium whitespace-nowrap shrink-0" x-text="newName.length + '/50'"></span>
+                            </div>
                         </div>
 
                         <div class="relative shrink-0">
@@ -160,15 +163,20 @@ new class extends Component {
 
                         @foreach($section->projects as $project)
                             <a href="{{ route('projects.show', $project->project_id) }}" wire:navigate class="w-44 shrink-0 group cursor-pointer block">
-                                <div class="w-full aspect-[2/3] bg-[#B69F78] rounded-r-xl rounded-l-sm border-l-[6px] border-[#705D42] shadow-md relative mb-3 group-hover:shadow-lg transition-all group-hover:-translate-y-1">
-                                    <div class="absolute inset-1 border border-[#D5C6A9] opacity-40 rounded-r-lg pointer-events-none"></div>
-                                    <div class="absolute top-1.5 left-1.5 w-4 h-4 border-t border-l border-[#E2D6C0] opacity-60"></div>
-                                    <div class="absolute bottom-1.5 right-1.5 w-4 h-4 border-b border-r border-[#E2D6C0] opacity-60"></div>
-                                    <div class="absolute right-0 top-0 bottom-0 w-1.5 bg-white opacity-40 rounded-r-xl"></div>
+                                <div class="w-full aspect-[1/1.6] relative mb-3">
+                                    @if($project->cover_image_path)
+                                        <img src="{{ Storage::url($project->cover_image_path) }}" class="absolute inset-y-0 left-0 right-3 w-[calc(100%-12px)] h-full object-cover rounded-l-sm rounded-r-md shadow-md z-20 border-r border-black/10 transition-shadow duration-300 group-hover:shadow-xl" />
+                                        <div class="absolute top-2 bottom-2 right-1.5 w-3 bg-gradient-to-r from-[#E8E3D9] to-[#D5C6A9] border-y border-r border-[#C4B7A3] rounded-r-[2px] z-10 shadow-inner"></div>
+                                        <div class="absolute inset-y-0 right-0 w-6 bg-[#8C7558] rounded-r-md z-0 shadow-sm border-l border-black/20 transition-shadow duration-300 group-hover:shadow-lg"></div>
+                                    @else
+                                        <x-default-project class="absolute inset-y-0 left-0 right-3 w-[calc(100%-12px)] h-full text-[#B69F78] rounded-l-sm rounded-r-md shadow-md z-20 border-r border-black/10 transition-shadow duration-300 group-hover:shadow-xl" />
+                                        <div class="absolute top-2 bottom-2 right-1.5 w-3 bg-gradient-to-r from-[#E8E3D9] to-[#D5C6A9] border-y border-r border-[#C4B7A3] rounded-r-[2px] z-10 shadow-inner"></div>
+                                        <div class="absolute inset-y-0 right-0 w-6 bg-[#8C7558] rounded-r-md z-0 shadow-sm border-l border-black/20 transition-shadow duration-300 group-hover:shadow-lg"></div>
+                                    @endif
                                 </div>
 
                                 <div class="flex items-center gap-2 mb-1">
-                                    <x-icons.sidebar-book class="w-4 h-4 text-text-80 shrink-0" />
+                                    <x-icons.sidebar-book class="w-4 h-4 text-text-80 shrink-0 group-hover:text-secondary-200 transition-colors" />
                                     <h3 class="text-app-body-medium text-text-100 truncate group-hover:text-secondary-200 transition-colors">{{ $project->title }}</h3>
                                 </div>
                                 <p class="text-[11px] text-subtext-70">{{ $project->created_at->format('d F Y') }}</p>
