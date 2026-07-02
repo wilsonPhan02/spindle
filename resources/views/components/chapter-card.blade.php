@@ -1,6 +1,10 @@
-@props(['chapter'])
+@props(['chapter', 'sections' => []])
 
-<div class="flex flex-col w-full group cursor-pointer">
+<div 
+    x-data="{ open: false }" 
+    @mouseleave="open = false"
+    class="flex flex-col w-full group cursor-pointer"
+>
     
     <div class="flex justify-between items-end mb-1.5 px-1">
         
@@ -8,13 +12,74 @@
             Chapter {{ $chapter->order_index }}
         </div>
         
-        <button 
-            @click.stop="$dispatch('open-delete-dialog', { id: '{{ $chapter->chapter_card_id }}' })"
-            class="text-text-60 hover:text-danger-100 hover:bg-danger-100/10 p-1 rounded transition-all opacity-0 group-hover:opacity-100 focus:outline-none"
-            title="Delete Chapter"
-        >
-            <x-icons.delete-default size="w-4 h-4" color="currentColor"/>            
-        </button>
+        <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+            
+            <div class="relative" @click.outside="open = false">
+                <button 
+                    @click.stop="open = !open"
+                    :class="open ? 'bg-secondary-200/10 text-secondary-200' : 'text-text-60 hover:text-secondary-200 hover:bg-secondary-200/10'"
+                    class="p-1 rounded transition-all focus:outline-none"
+                    title="Move to another section"
+                >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
+                </button>
+
+                <div 
+                    x-show="open" 
+                    x-transition:enter="transition ease-out duration-150"
+                    x-transition:enter-start="opacity-0 scale-95 translate-y-1"
+                    x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                    x-transition:leave="transition ease-in duration-100"
+                    x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+                    x-transition:leave-end="opacity-0 scale-95 translate-y-1"
+                    class="absolute right-0 top-full mt-2 w-56 origin-top-right bg-card-bg border border-card-border rounded-lg shadow-xl z-50 flex flex-col max-h-52 overflow-y-auto custom-scrollbar"
+                    style="display: none;"
+                >
+                    <div class="sticky top-0 bg-card-bg/95 backdrop-blur-sm px-3 py-2 border-b border-card-border z-10">
+                        <span class="text-app-desc-feature font-bold uppercase text-text-40 tracking-wider">
+                            Move to Section
+                        </span>
+                    </div>
+                    
+                    <div class="py-1">
+                        @foreach($sections as $section)
+                            @php
+                                $isCurrentSection = $section->structure_section_id === $chapter->structure_section_id;
+                            @endphp
+                            
+                            <button 
+                                @if(!$isCurrentSection)
+                                    @click.stop="$dispatch('move-chapter', { chapterId: '{{ $chapter->chapter_card_id }}', targetSectionId: '{{ $section->structure_section_id }}' }); open = false"
+                                @endif
+                                @class([
+                                    'w-full text-left px-3 py-2 text-app-desc-feature transition-colors flex items-center justify-between group/item',
+                                    'text-text-40 cursor-not-allowed bg-brand-50/30' => $isCurrentSection,
+                                    'text-text-80 hover:bg-brand-100 hover:text-secondary-200' => !$isCurrentSection,
+                                ])
+                                @if($isCurrentSection) disabled @endif
+                            >
+                                <span class="truncate pr-2">{{ $section->title }}</span>
+                                
+                                @if($isCurrentSection)
+                                    <span class="text-[9px] uppercase font-bold text-text-50 bg-card-border px-1.5 py-0.5 rounded-sm shrink-0">
+                                        Current
+                                    </span>
+                                @endif
+                            </button>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+
+            <button 
+                @click.stop="$dispatch('open-delete-dialog', { id: '{{ $chapter->chapter_card_id }}' })"
+                class="text-text-60 hover:text-danger-100 hover:bg-danger-100/10 px-1 pb-1 rounded transition-all focus:outline-none"
+                title="Delete Chapter"
+            >
+                <x-icons.delete-default size="w-4 h-4" color="currentColor"/>            
+            </button>
+            
+        </div>
         
     </div>
     

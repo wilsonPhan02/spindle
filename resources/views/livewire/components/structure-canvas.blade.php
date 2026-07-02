@@ -100,6 +100,75 @@ new class extends Component {
             ->where('order_index', '>', $deletedOrder)
             ->decrement('order_index');
     }
+
+    #[On('move-chapter')]
+    public function moveChapterToSection($chapterId, $targetSectionId)
+    {
+        DB::transaction(function () use ($chapterId, $targetSectionId) {
+            $chapter = ChapterCard::where('project_id', $this->project->project_id)->find($chapterId);
+            if (!$chapter) return;
+
+            $oldOrder = $chapter->order_index;
+
+            ChapterCard::where('project_id', $this->project->project_id)
+                ->where('order_index', '>', $oldOrder)
+                ->where('chapter_card_id', '!=', $chapterId)
+                ->decrement('order_index');
+
+            $maxInTarget = ChapterCard::where('project_id', $this->project->project_id)
+                ->where('structure_section_id', $targetSectionId)
+                ->where('chapter_card_id', '!=', $chapterId)
+                ->max('order_index');
+
+            if ($maxInTarget) {
+                $newOrder = $maxInTarget + 1;
+            } else {
+                $sections = $this->currentTemplate->sections;
+                $targetIndex = $sections->search(fn($s) => $s->structure_section_id == $targetSectionId);
+                $prevSections = $sections->take($targetIndex)->pluck('structure_section_id');
+                
+                $maxPrev = ChapterCard::where('project_id', $this->project->project_id)
+                    ->whereIn('structure_section_id', $prevSections)
+                    ->max('order_index');
+                    
+                $newOrder = $maxPrev ? $maxPrev + 1 : 1;
+            }
+
+            ChapterCard::where('project_id', $this->project->project_id)
+                ->where('order_index', '>=', $newOrder)
+                ->where('chapter_card_id', '!=', $chapterId)
+                ->increment('order_index');
+
+            $chapter->update([
+                'structure_section_id' => $targetSectionId,
+                'order_index' => $newOrder
+            ]);
+        });
+
+        $sections = $this->currentTemplate->sections;
+        
+        $targetIndex = $sections->search(fn($s) => $s->structure_section_id == $targetSectionId);
+        
+        if ($targetIndex !== false) {
+            $this->activeSectionIndex = $targetIndex;
+        }
+    }
+
+    public function updateChapterOrder($orderedIds)
+    {
+        $chapters = ChapterCard::where('project_id', $this->project->project_id)
+            ->whereIn('chapter_card_id', $orderedIds)
+            ->get();
+
+        $availableIndexes = $chapters->pluck('order_index')->sort()->values()->toArray();
+
+        DB::transaction(function () use ($orderedIds, $availableIndexes) {
+            foreach ($orderedIds as $index => $chapterId) {
+                ChapterCard::where('chapter_card_id', $chapterId)
+                    ->update(['order_index' => $availableIndexes[$index]]);
+            }
+        });
+    }
 }; ?>
 
 <div class="h-full flex flex-col p-8 pt-13 relative overflow-hidden">
@@ -128,7 +197,8 @@ new class extends Component {
     <div class="flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar pb-24 py-8 px-5" 
          wire:key="section-{{ $this->currentTemplate->sections[$activeSectionIndex]->section_id }}">
     
-        <div x-data 
+        <div x-data="sortableList(@this)" 
+             x-ref="list"
              x-transition:enter="transition ease-out duration-300"
              x-transition:enter-start="transform translate-y-10 opacity-0"
              x-transition:enter-end="transform translate-y-0 opacity-100"
@@ -137,10 +207,21 @@ new class extends Component {
             @forelse($project->chapterCards()
                 ->where('structure_section_id', $this->currentTemplate->sections[$activeSectionIndex]->structure_section_id)
                 ->with('tags')
+                ->orderBy('order_index') 
                 ->get() as $chapter)
                 
-                <div class="w-full flex justify-center">
-                    <x-chapter-card :chapter="$chapter" />
+                <div class="w-full flex justify-center sortable-item cursor-move"
+                     data-id="{{ $chapter->chapter_card_id }}"
+                     wire:key="chapter-{{ $chapter->chapter_card_id }}">
+                     
+                    <div class="w-full pointer-events-none">
+                        <div class="pointer-events-auto w-full">
+                            <x-chapter-card 
+                                :chapter="$chapter" 
+                                :sections="$this->currentTemplate->sections" 
+                            />
+                        </div>
+                    </div>
                 </div>
             @empty
                 <div class="col-span-1 lg:col-span-2 xl:col-span-3 w-full h-64 flex items-center justify-center border-2 border-dashed border-brand-100 rounded-lg text-text-60 bg-transparent">
@@ -173,3 +254,26 @@ new class extends Component {
         </x-slot:icon>
     </x-confirm-dialog>
 </div>
+
+<script>
+    document.addEventListener('alpine:init', () => {
+        Alpine.data('sortableList', ($wire) => ({
+            init() {
+                new Sortable(this.$refs.list, {
+                    animation: 200,
+                    ghostClass: 'opacity-50',
+                    draggable: '.sortable-item',
+                    onEnd: (evt) => {
+                        if (evt.oldIndex === evt.newIndex) return;
+
+                        const items = Array.from(this.$refs.list.querySelectorAll('.sortable-item'));
+                        
+                        const newOrderIds = items.map(item => item.getAttribute('data-id'));
+                        
+                        $wire.updateChapterOrder(newOrderIds);
+                    }
+                });
+            }
+        }));
+    });
+</script>
