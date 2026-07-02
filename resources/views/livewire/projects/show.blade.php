@@ -204,12 +204,12 @@ new #[Layout('layouts.app')] class extends Component {
 
                     <div class="flex flex-wrap gap-2 items-center">
                         @foreach($project->categories as $category)
-                            <div x-data="{ editingCat: false, hoverCat: false, count: {{ strlen($category->name) }} }" @mouseover="hoverCat = true" @mouseleave="hoverCat = false" class="relative group">
+                            <div x-data="{ editingCat: false, count: {{ strlen($category->name) }} }" class="relative group">
                                 <div x-show="!editingCat" title="{{ $category->name }}" class="px-3 py-1.5 rounded-md bg-[#EAE1D5] text-[13px] text-[#4A4A4A] font-medium flex gap-2 items-center border border-transparent group-hover:border-[#D5C6A9] transition-colors max-w-[150px]">
                                     <span @dblclick="editingCat = true; setTimeout(() => $refs.editCat{{ $category->category_id }}.focus(), 50)" class="cursor-pointer select-none truncate block w-full">
                                         {{ $category->name }}
                                     </span>
-                                    <button wire:click="deleteCategory('{{ $category->category_id }}')" x-show="hoverCat" class="text-[#A08866] hover:text-[#E64C4C] transition-colors shrink-0">
+                                    <button wire:click="deleteCategory('{{ $category->category_id }}')" class="text-[#A08866] hover:text-[#E64C4C] transition-opacity duration-200 shrink-0 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto">
                                         <x-icons.delete class="w-3.5 h-3.5" />
                                     </button>
                                 </div>
