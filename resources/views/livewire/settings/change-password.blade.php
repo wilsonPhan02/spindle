@@ -31,7 +31,7 @@ new class extends Component {
         }
 
         Auth::user()->update([
-            'password' => Hash::make($this->new_password),
+            'password' => $this->new_password,
         ]);
 
         $this->reset(['current_password', 'new_password', 'new_password_confirmation']);

@@ -14,9 +14,9 @@ class Project extends Model
     protected $keyType = 'string';
 
     protected $fillable = [
-        'project_id', 'user_id', 'template_id', 'section_id',
-        'title', 'description', 'is_pinned', 'archived_at', 'synopsis',
-        'cover_image_path',
+        'user_id', 'template_id', 'section_id',
+        'title', 'synopsis', 'cover_image_path',
+        'is_pinned', 'archived_at',
     ];
 
     public function section()
@@ -33,6 +33,7 @@ class Project extends Model
         return $this->hasMany(ProjectCategory::class, 'project_id', 'project_id');
     }
 
+<<<<<<< HEAD
     public function characters() {
         return $this->hasMany(Character::class, 'project_id', 'project_id');
     }
@@ -105,4 +106,12 @@ class Project extends Model
             }
         }
     }
+=======
+    protected function casts(): array
+    {
+        return [
+            'archived_at' => 'datetime',
+        ];
+    }
+>>>>>>> f00383dd9da91d4f5aa9f414ecf868155467613f
 }

@@ -7,10 +7,31 @@
     'options' => []
 ])
 
-<div class="flex flex-col gap-2 w-full text-left">
-    <label class="text-web-body-small font-medium text-text-80">
-        {{ $label }}
-    </label>
+@php
+    $hasCounter = $attributes->has('maxlength') && !in_array($type, ['password', 'date', 'select']);
+@endphp
+
+<div class="flex flex-col gap-2 w-full text-left"
+    @if($hasCounter)
+        x-data="{ count: 0 }"
+        x-init="
+            $nextTick(() => { if($refs.input) count = $refs.input.value.length });
+            new MutationObserver(() => {
+                if ($refs.input && count !== $refs.input.value.length) {
+                    count = $refs.input.value.length;
+                }
+            }).observe($el, { attributes: true, childList: true, characterData: true, subtree: true });
+        "
+    @endif
+>
+    <div class="flex justify-between items-center">
+        <label class="text-web-body-small font-medium text-text-80">
+            {{ $label }}
+        </label>
+        @if($hasCounter)
+            <span class="text-xs text-subtext-90 font-medium" x-text="count + '/{{ $attributes->get('maxlength') }}'"></span>
+        @endif
+    </div>
 
     <div class="relative w-full" @if($type === 'password') x-data="{ show: false }" @endif>
         @php
@@ -100,6 +121,10 @@
                         wire:model="{{ $model }}" 
                     @endif
                     
+                    @if($hasCounter)
+                        @input="count = $event.target.value.length"
+                    @endif
+
                     name="{{ $name }}"
                     {{ $attributes->merge(['class' => "w-full px-6 $paddingRight py-3 bg-bg-main border $errorClasses rounded focus:border-secondary-250 outline-none transition-all text-subtext-90 text-web-body-small placeholder:text-subtext-90/50 cursor-pointer"]) }}
                 >
