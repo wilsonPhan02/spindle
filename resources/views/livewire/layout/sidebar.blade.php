@@ -91,14 +91,14 @@ new class extends Component {
             </button>
             <div x-show="open" x-collapse>
                 @if(count($pinnedProjects) > 0)
-                    <div class="max-h-[200px] overflow-y-auto custom-scrollbar space-y-1 pr-1 -mr-1">
+                    <div class="max-h-[160px] overflow-y-auto custom-scrollbar space-y-1 pr-1 -mr-1">
                         @foreach($pinnedProjects as $pProject)
                             <div class="group flex items-center justify-between px-2 py-1.5 -mx-2 rounded-lg hover:bg-brand-150 transition-colors">
                                 <a href="{{ route('projects.show', $pProject->project_id) }}" wire:navigate class="flex items-center gap-2 flex-1 min-w-0">
                                     <x-icons.sidebar-book class="w-4 h-4 text-text-70 shrink-0" />
                                     <span class="text-[13px] font-medium text-text-80 truncate group-hover:text-text-100 transition-colors">{{ $pProject->title }}</span>
                                 </a>
-                                <button wire:click="unpin('{{ $pProject->project_id }}')" class="opacity-0 group-hover:opacity-100 text-subtext-70 hover:text-[#E64C4C] transition-all p-1 shrink-0" title="Unpin Project">
+                                <button wire:click="unpin('{{ $pProject->project_id }}')" class="opacity-0 group-hover:opacity-100 text-subtext-70 hover:text-[#8C7558] transition-all p-1 shrink-0" title="Unpin Project">
                                     <x-icons.bookmark-slash class="w-3.5 h-3.5" />
                                 </button>
                             </div>
@@ -120,7 +120,7 @@ new class extends Component {
             </button>
             <div x-show="open" x-collapse>
                 @if(count($recentProjects) > 0)
-                    <div class="max-h-[200px] overflow-y-auto custom-scrollbar space-y-1 pr-1 -mr-1">
+                    <div class="max-h-[160px] overflow-y-auto custom-scrollbar space-y-1 pr-1 -mr-1">
                         @foreach($recentProjects as $rProject)
                             <a href="{{ route('projects.show', $rProject->project_id) }}" wire:navigate class="flex items-center gap-2 px-2 py-1.5 -mx-2 rounded-lg hover:bg-brand-150 transition-colors group">
                                 <x-icons.sidebar-book class="w-4 h-4 text-text-70 shrink-0" />
