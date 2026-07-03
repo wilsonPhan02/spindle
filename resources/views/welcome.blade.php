@@ -5,8 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Spindle — Spin A Yarn</title>
 
-    <link rel="icon" href="/favicon.ico" sizes="any">
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="/favicon.png?v=5" type="image/png">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
