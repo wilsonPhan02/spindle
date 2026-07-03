@@ -15,6 +15,7 @@ return new class extends Migration
             $table->string('title');
             $table->text('summary')->nullable();
             $table->unsignedInteger('order_index')->default(0);
+            $table->string('status')->default('In Progress');
             $table->timestamps();
         });
     }
