@@ -1,20 +1,20 @@
 @props([
-    'eventName',                        
-    'title',                            
-    'description',     
-    'confirmText',     
-    'cancelText' => 'No, Stay here',    
-    'submitAction',    
-    'iconColor' => 'text-danger-100', 
+    'eventName',
+    'title',
+    'description',
+    'confirmText',
+    'cancelText' => 'No, Stay here',
+    'submitAction',
+    'iconColor' => 'text-danger-100',
     'iconBg' => 'bg-danger-100/10',
     'btnColor' => 'bg-danger-100 hover:bg-red-600'
 ])
 
-<div 
-    x-data="{ show: false }" 
+<div
+    x-data="{ show: false }"
     @keydown.escape.window="show = false"
     x-on:{{ $eventName }}.window="show = true"
-    x-show="show" 
+    x-show="show"
     style="display: none;"
     class="fixed inset-0 z-50 flex items-center justify-center bg-text-80/75 backdrop-blur-[1.5px]"
     x-transition:enter="transition ease-out duration-300"
@@ -24,7 +24,7 @@
     x-transition:leave-start="opacity-100"
     x-transition:leave-end="opacity-0"
 >
-    <div 
+    <div
         @click.away="show = false"
         class="flex flex-col bg-white rounded-2xl shadow-xl w-full max-w-md px-12 py-8 text-center gap-8"
         x-transition:enter="transition ease-out duration-300"
@@ -46,14 +46,14 @@
         </div>
 
         <div class="flex gap-4 w-full justify-center">
-            <button 
-                @click="show = false" 
+            <button
+                @click="show = false"
                 class="flex-1 py-3 px-4 rounded-lg bg-brand-100 text-text-80 text-web-body-small font-semibold hover:bg-brand-150 transition-colors"
             >
                 {{ $cancelText }}
             </button>
-            <button 
-                wire:click="{{ $submitAction }}" 
+            <button
+                wire:click="{{ $submitAction }}"
                 class="flex-1 py-3 px-4 rounded-lg text-subtext-60 transition-colors text-web-body-small font-semibold {{ $btnColor }}"
             >
                 {{ $confirmText }}

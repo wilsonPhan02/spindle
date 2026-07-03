@@ -33,10 +33,76 @@ class Project extends Model
         return $this->hasMany(ProjectCategory::class, 'project_id', 'project_id');
     }
 
-    protected function casts(): array
+    public function characters() {
+        return $this->hasMany(Character::class, 'project_id', 'project_id');
+    }
+
+    public function relationshipTypes() {
+        return $this->hasMany(RelationshipType::class, 'project_id', 'project_id');
+    }
+
+    public function characterDetailGroups() {
+        return $this->hasMany(CharacterDetailGroup::class, 'project_id', 'project_id');
+    }
+
+    protected static function booted()
+    {
+        static::created(function (Project $project) {
+            $project->seedDefaultRelationshipTypes();
+            $project->seedDefaultCharacterDetailGroups();
+        });
+    }
+
+    public static function defaultRelationshipTypes(): array
     {
         return [
-            'archived_at' => 'datetime',
+            ['name' => 'Father', 'text_color' => '#1565C0', 'bg_color' => '#BBDEFB'],
+            ['name' => 'Mother', 'text_color' => '#AD1457', 'bg_color' => '#F8BBD0'],
+            ['name' => 'Sibling', 'text_color' => '#6A1B9A', 'bg_color' => '#E1BEE7'],
+            ['name' => 'Friend', 'text_color' => '#2E7D32', 'bg_color' => '#C8E6C9'],
+            ['name' => 'Rival', 'text_color' => '#E65100', 'bg_color' => '#FFE0B2'],
+            ['name' => 'Enemy', 'text_color' => '#C62828', 'bg_color' => '#FFCDD2'],
         ];
+    }
+
+    public function seedDefaultRelationshipTypes(): void
+    {
+        foreach (self::defaultRelationshipTypes() as $type) {
+            $this->relationshipTypes()->firstOrCreate(
+                ['name' => $type['name']],
+                $type
+            );
+        }
+    }
+
+    public static function defaultCharacterDetailGroups(): array
+    {
+        return [
+            [
+                'name' => 'Personal Identity',
+                'fields' => ['Gender', 'Age', 'Place of Birth', 'Date of Birth'],
+            ],
+            [
+                'name' => 'Physical Appearance',
+                'fields' => ['Height', 'Weight', 'Blood Type', 'Hair Color', 'Eye Color', 'Skin Color'],
+            ],
+        ];
+    }
+
+    public function seedDefaultCharacterDetailGroups(): void
+    {
+        foreach (self::defaultCharacterDetailGroups() as $groupIndex => $groupData) {
+            $group = $this->characterDetailGroups()->firstOrCreate(
+                ['name' => $groupData['name']],
+                ['order' => $groupIndex]
+            );
+
+            foreach ($groupData['fields'] as $fieldIndex => $fieldName) {
+                $group->fields()->firstOrCreate(
+                    ['name' => $fieldName],
+                    ['order' => $fieldIndex]
+                );
+            }
+        }
     }
 }
