@@ -252,18 +252,12 @@ new #[Layout('layouts.app')] class extends Component {
 }; ?>
 
 <div x-data="{ confirmingDelete: false }" class="p-6 lg:p-10 max-w-6xl mx-auto">
-    <header class="flex justify-between items-center mb-10">
-        <div class="flex items-center gap-3 text-app-subtitle-1 text-text-80">
-            <a href="{{ route('dashboard') }}" wire:navigate class="hover:text-secondary-200 transition-colors">Dashboard</a>
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-            <a href="{{ route('projects.show', $project) }}" wire:navigate class="hover:text-secondary-200 transition-colors truncate">{{ $project->title }}</a>
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-            <a href="{{ route('projects.characters', $project) }}" wire:navigate class="hover:text-secondary-200 transition-colors">Characters</a>
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-            <span class="text-text-100 font-semibold">{{ $nickName }}</span>
-        </div>
-        <x-logo class="h-8 w-auto text-text-100" />
-    </header>
+        <x-breadcrumb :items="[
+            ['label' => 'Dashboard', 'url' => route('dashboard')],
+            ['label' => $project->title, 'url' => route('projects.show', $project), 'truncate' => true],
+            ['label' => 'Characters', 'url' => route('projects.characters', $project)],
+            ['label' => $nickName, 'truncate' => true]
+        ]" />
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-2 items-start">
 

@@ -125,14 +125,10 @@ new #[Layout('layouts.app')] class extends Component {
     </style>
 
     <div class="p-6 lg:p-10 max-w-7xl mx-auto">
-        <header class="flex justify-between items-center mb-10">
-            <div class="flex items-center gap-3 text-[18px] text-[#7A7A7A]">
-                <a href="{{ route('dashboard') }}" wire:navigate class="hover:text-[#8C7558] transition-colors">Dashboard</a>
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-                <span class="text-[#2C2C2C] font-semibold truncate">{{ $title }}</span>
-            </div>
-            <x-logo class="h-8 w-auto text-text-100" />
-        </header>
+        <x-breadcrumb :items="[
+            ['label' => 'Dashboard', 'url' => route('dashboard')],
+            ['label' => $title, 'truncate' => true]
+        ]" />
 
         <div class="flex flex-col lg:flex-row gap-8 lg:gap-12 mb-16 items-stretch">
 
