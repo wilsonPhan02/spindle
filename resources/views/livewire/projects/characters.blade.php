@@ -125,16 +125,11 @@ new #[Layout('layouts.app')] class extends Component {
 
 <div class="px-6 pt-6 lg:px-10 lg:pt-10 max-w-7xl mx-auto h-screen flex flex-col overflow-hidden">
     <div class="mb-4">
-        <header class="flex justify-between items-center mb-10">
-            <div class="flex items-center gap-3 text-app-subtitle-1 text-text-80">
-                <a href="{{ route('dashboard') }}" wire:navigate class="hover:text-secondary-200 transition-colors">Dashboard</a>
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-                <a href="{{ route('projects.show', $project) }}" wire:navigate class="hover:text-secondary-200 transition-colors truncate">{{ $project->title }}</a>
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-                <span class="text-text-100 font-semibold">Characters</span>
-            </div>
-            <x-logo class="h-8 w-auto text-text-100" />
-        </header>
+        <x-breadcrumb :items="[
+            ['label' => 'Dashboard', 'url' => route('dashboard')],
+            ['label' => $project->title, 'url' => route('projects.show', $project), 'truncate' => true],
+            ['label' => 'Characters']
+        ]" />
 
         <div class="flex justify-between items-center">
             <h1 class="text-app-title-1 text-text-100">Characters Sheet</h1>

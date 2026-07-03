@@ -7,6 +7,7 @@ use Livewire\Attributes\Layout;
 use Livewire\WithFileUploads;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Livewire\Attributes\On;
 
 new #[Layout('layouts.app')] class extends Component {
     use WithFileUploads;
@@ -54,10 +55,12 @@ new #[Layout('layouts.app')] class extends Component {
     public function saveTitle() {
         $this->title = trim($this->title) ?: 'Untitled Project';
         $this->project->update(['title' => $this->title]);
+        $this->dispatch('project-updated');
     }
 
     public function saveSynopsis() {
         $this->project->update(['synopsis' => trim($this->synopsis)]);
+        $this->dispatch('project-updated');
     }
 
     public function addCategory() {
@@ -122,6 +125,11 @@ new #[Layout('layouts.app')] class extends Component {
         $this->project->save();
         $this->dispatch('project-pinned-updated');
     }
+
+    #[On('project-pinned-updated')]
+    public function refreshPinState() {
+        $this->project->refresh();
+    }
 }; ?>
 
 <div>
@@ -133,14 +141,10 @@ new #[Layout('layouts.app')] class extends Component {
     </style>
 
     <div class="p-6 lg:p-10 max-w-7xl mx-auto">
-        <header class="flex justify-between items-center mb-10">
-            <div class="flex items-center gap-3 text-[18px] text-[#7A7A7A]">
-                <a href="{{ route('dashboard') }}" wire:navigate class="hover:text-[#8C7558] transition-colors">Dashboard</a>
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-                <span class="text-[#2C2C2C] font-semibold truncate">{{ $title }}</span>
-            </div>
-            <x-logo class="h-8 w-auto text-text-100" />
-        </header>
+        <x-breadcrumb :items="[
+            ['label' => 'Dashboard', 'url' => route('dashboard')],
+            ['label' => $title, 'truncate' => true]
+        ]" />
 
         <div class="flex flex-col lg:flex-row gap-8 lg:gap-12 mb-16 items-stretch">
 
@@ -221,12 +225,12 @@ new #[Layout('layouts.app')] class extends Component {
                         <p class="text-[15px] text-[#7A7A7A] mt-2 truncate">from <span class="font-semibold text-[#4A4A4A]" title="{{ $project->section->title ?? 'Uncategorized' }}">{{ \Illuminate\Support\Str::limit($project->section->title ?? 'Uncategorized', 30) }}</span></p>
                     </div>
 
-                    <div class="flex items-center gap-3 shrink-0" @limit-reached.window="alert('Pinned projects have reached the maximum limit (10). You cannot pin more projects.')">
-                        <button wire:click="togglePin" class="text-[#8C7558] hover:text-[#5E4C38] transition-colors focus:outline-none" title="{{ $project->is_pinned ? 'Unpin Project' : 'Pin Project' }}">
+                    <div class="flex items-center gap-3 shrink-0" @limit-reached.window="alert('Marked projects have reached the maximum limit (10). You cannot mark more projects.')">
+                        <button wire:click="togglePin" class="text-[#8C7558] hover:text-[#5E4C38] transition-colors focus:outline-none" title="{{ $project->is_pinned ? 'Unmark Project' : 'Mark Project' }}">
                             @if($project->is_pinned)
-                                <x-icons.bookmark-solid class="w-5 h-5" />
+                                <x-icons.bookmark-solid class="w-6 h-6" />
                             @else
-                                <x-icons.bookmark class="w-5 h-5" />
+                                <x-icons.bookmark class="w-6 h-6" />
                             @endif
                         </button>
                     </div>
