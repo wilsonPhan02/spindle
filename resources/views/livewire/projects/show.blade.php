@@ -27,6 +27,9 @@ new #[Layout('layouts.app')] class extends Component {
     // Daftar karakter untuk ditampilkan di card Character
     public $recentCharacters = [];
 
+    // Daftar chapter untuk ditampilkan
+    public $recentChapters = [];
+
     public function mount(Project $project) {
         $this->project = $project;
         $this->title = $project->title;
@@ -41,6 +44,11 @@ new #[Layout('layouts.app')] class extends Component {
             ->with('hashtags')
             ->orderByDesc('updated_at')
             ->limit(10)
+            ->get();
+
+        $this->recentChapters = $project->chapterCards()
+            ->with(['tags', 'manuscript'])
+            ->orderBy('order_index')
             ->get();
     }
 
@@ -440,7 +448,7 @@ new #[Layout('layouts.app')] class extends Component {
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 @foreach([
-                    ['title' => 'Structure', 'icon' => 'no-structure', 'desc' => 'You Didn\'t Have Any Chapters!', 'btn' => 'View Structure', 'route' => null],
+                    ['title' => 'Structure', 'icon' => 'no-structure', 'desc' => 'You Didn\'t Have Any Chapters!', 'btn' => 'View Structure', 'route' => 'projects.structure'],
                     ['title' => 'Character', 'icon' => 'no-character', 'desc' => 'You Didn\'t Have Any Characters!', 'btn' => 'View Character', 'route' => 'projects.characters'],
                     ['title' => 'Notes', 'icon' => 'no-notes', 'desc' => 'You Didn\'t Have Any Notes!', 'btn' => 'View Notes', 'route' => 'projects.notes']
                 ] as $workspace)
@@ -509,6 +517,68 @@ new #[Layout('layouts.app')] class extends Component {
                                                 @endforeach
                                             </div>
                                         @endif
+                                    </div>
+                                </a>
+                            @endforeach
+                        </div>
+                    @elseif($workspace['title'] === 'Structure' && $recentChapters->isNotEmpty())
+                        <div class="flex-1 flex flex-col gap-3 overflow-y-auto pr-1.5 custom-scrollbar -mx-1.5 px-1.5 pb-2">
+                            @foreach($recentChapters as $chapter)
+                                <a href="{{ route($workspace['route'], ['project' => $project->project_id]) }}" 
+                                   wire:navigate 
+                                   class="flex flex-col bg-card-bg border border-1 border-card-border p-4 rounded-xl group cursor-pointer hover:bg-card-hover hover:border-secondary-150 hover:shadow-sm transition-all duration-200 shrink-0">
+                                    
+                                    <div class="text-app-desc-feature text-text-60 mb-1.5">
+                                        Chapter {{ $chapter->order_index }}
+                                    </div>
+
+                                    <div class="flex items-center gap-3 mb-2.5">
+                                        <x-icons.chapter-icon/>
+                                        <h4 class="text-[20px] font-merriweather font-medium text-text-80 truncate transition-colors">
+                                            {{ $chapter->title }}
+                                        </h4>
+                                    </div>
+
+                                    <div class="flex items-center gap-1.5 mb-3 flex-wrap">
+                                        <span class="text-app-body-small text-subtext-90 shrink-0">Tags :</span>
+                                        @if($chapter->tags->isNotEmpty())
+                                            @foreach($chapter->tags->take(2) as $tag)
+                                                <span class="px-2 py-0.5 border border-brand-200 bg-card-hover rounded text-app-caption text-secondary-100">
+                                                    {{ $tag->name }}
+                                                </span>
+                                            @endforeach
+                                            @if($chapter->tags->count() > 2)
+                                                <span class="px-1 text-app-caption text-secondary-100">
+                                                    +{{ $chapter->tags->count() - 2 }}
+                                                </span>
+                                            @endif
+                                        @else
+                                            <span class="px-2 py-0.5 rounded border border-dashed border-brand-200 bg-card-hover text-app-caption text-secondary-100">
+                                                No tags
+                                            </span>
+                                        @endif
+                                    </div>
+
+                                    <p class="text-app-body-small text-subtext-100 mb-4 line-clamp-2">
+                                        {{ $chapter->summary ?? 'No summary available for this chapter yet.' }}
+                                    </p>
+
+                                    <div class="flex flex-wrap items-center justify-between gap-x-2 gap-y-2 mt-auto pt-3">
+                                        <div class="flex items-center gap-2 text-subtext-90 whitespace-nowrap shrink-0">
+                                            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h8m-8 6h16"/></svg>
+                                            <span class="text-app-desc-feature">{{ $chapter->manuscript ? number_format($chapter->manuscript->count()) : 0 }} Drafts</span>
+                                        </div>
+
+                                        <span @class([
+                                            'text-app-caption px-2 py-1 rounded-md flex items-center gap-1.5 shadow-sm whitespace-nowrap shrink-0',
+                                            'bg-warning-100/50' => $chapter->status === 'In Progress',
+                                            'bg-success-100/50' => $chapter->status === 'Completed',
+                                            'bg-text-100' => !in_array($chapter->status, ['In Progress', 'Completed'])
+                                        ])>
+                                            <x-icons.chapter-status :status="$chapter->status" class="w-3.5 h-3.5 shrink-0" />
+                                            {{ $chapter->status ?? 'In Progress' }}
+                                        </span>
+                                        
                                     </div>
                                 </a>
                             @endforeach

@@ -13,8 +13,10 @@ return new class extends Migration
     {
         Schema::create('templates', function (Blueprint $table) {
             $table->uuid('template_id')->primary();
+            $table->foreignUuid('user_id')->nullable()->references('user_id')->on('users')->cascadeOnDelete();
             $table->string('name');
             $table->text('description')->nullable();
+            $table->string('image_preview')->nullable();
             $table->boolean('is_custom')->default(false);
             $table->timestamps();
         });

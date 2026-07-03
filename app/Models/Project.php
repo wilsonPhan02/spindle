@@ -33,6 +33,23 @@ class Project extends Model
         return $this->hasMany(ProjectCategory::class, 'project_id', 'project_id');
     }
 
+    public function template() 
+    {
+        return $this->belongsTo(Template::class, 'template_id', 'template_id');
+    }
+
+    public function chapterCards() 
+    {
+        return $this->hasMany(ChapterCard::class, 'project_id', 'project_id');
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'archived_at' => 'datetime',
+        ];
+    }
+
     public function characters() {
         return $this->hasMany(Character::class, 'project_id', 'project_id');
     }
