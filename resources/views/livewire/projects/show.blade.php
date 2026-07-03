@@ -260,17 +260,11 @@ new #[Layout('layouts.app')] class extends Component {
                     }
                 }" class="mb-0 w-full max-w-full">
                     <div class="flex items-center gap-3 mb-2">
-                        <div class="flex items-center gap-3">
-                            <x-icons.category class="w-4 h-4 text-text-80" />
-                            <span class="text-app-feature text-text-80">Categories</span>
-                        </div>
-                        <button x-show="!addingCat" @click="addingCat = true; addCount = 0; setTimeout(() => $refs.catInput.focus(), 50)" type="button"
-                            class="shrink-0 w-8 h-8 rounded-full bg-brand-100 flex items-center justify-center text-text-70 hover:bg-brand-150 transition-colors">
-                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
-                        </button>
+                        <x-icons.category class="w-4 h-4 text-text-80" />
+                        <span class="text-app-feature text-text-80">Categories</span>
                     </div>
 
-                    <div 
+                    <div
                         x-ref="scrollContainer"
                         @mousedown="startDrag"
                         @mouseleave="endDrag"
@@ -279,27 +273,20 @@ new #[Layout('layouts.app')] class extends Component {
                         @wheel.prevent="if (Math.abs($event.deltaY) > 0) { $el.scrollLeft += $event.deltaY; }"
                         class="flex gap-2 items-center overflow-x-auto pb-5 cursor-grab active:cursor-grabbing scroll-smooth [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-[#A08866] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-button]:hidden [scrollbar-width:thin] [scrollbar-color:#A08866_transparent]"
                     >
-                        <div x-show="addingCat" x-cloak class="relative flex items-center gap-1">
-                            <input type="text" maxlength="20"
-                                x-model="$wire.newCategoryName"
-                                x-ref="catInput"
-                                @input="addCount = $event.target.value.length"
-                                @keydown.enter="addingCat = false; $wire.addCategory()"
-                                @keydown.escape="addingCat = false; $wire.set('newCategoryName', '')"
-                                placeholder="Category..."
-                                class="px-3 py-2 rounded-full bg-brand-100 border border-secondary-100 outline-none text-app-body-small text-text-70 w-28 shrink-0">
-                            <button @click="addingCat = false; $wire.set('newCategoryName', '')" type="button"
-                                class="w-5 h-5 rounded-full flex items-center justify-center text-text-60 hover:bg-black/10 hover:text-danger-100 transition-colors">
-                                <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3"><path stroke-linecap="round" d="M6 18L18 6M6 6l12 12"/></svg>
-                            </button>
+                        <button x-show="!addingCat" @click="addingCat = true; addCount = 0; setTimeout(() => $refs.catInput.focus(), 50)" class="shrink-0 flex items-center gap-1 text-[#8C7558] hover:text-[#A08866] transition-colors p-1">
+                            <x-icons.add class="w-4 h-4 shrink-0" />
+                            @if($project->categories->count() == 0)
+                                <span class="text-[13px] font-medium">Add category</span>
+                            @endif
+                        </button>
+
+                        <div x-show="addingCat" class="flex items-center gap-1 bg-[#EAE1D5] pl-2 pr-1 py-1 rounded-md border border-[#D5C6A9] relative shrink-0">
+                                <input type="text" maxlength="20" @input="addCount = $event.target.value.length" x-model="$wire.newCategoryName" x-ref="catInput" @keyup.enter="addingCat = false; $wire.addCategory()" @blur="if(addingCat) { addingCat = false; $wire.set('newCategoryName', ''); }" @keydown.escape="addingCat = false; $wire.set('newCategoryName', '');" placeholder="Category..." class="w-28 text-[13px] bg-transparent border-b border-[#D5C6A9] outline-none px-1 py-0 text-[#2C2C2C] focus:border-[#A08866]"/>
+                                <button @mousedown.prevent="addingCat = false; $wire.addCategory()" class="text-[#A08866] hover:text-secondary-200 transition-colors shrink-0">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                                </button>
                             <span class="absolute -bottom-3.5 right-1 text-[9px] text-subtext-90 font-medium" x-text="addCount + '/20'"></span>
                         </div>
-
-                        @if($project->categories->count() == 0)
-                            <div x-show="!addingCat" class="px-3 py-1 rounded-md bg-[#EAE1D5]/50 border border-dashed border-[#D5C6A9] text-[12px] text-[#A08866]/80 font-medium flex items-center justify-center shrink-0 italic">
-                                Add your project category here
-                            </div>
-                        @endif
 
                         @foreach($project->categories as $category)
                             <div x-data="{ editingCat: false, hoverCat: false, count: {{ strlen($category->name) }} }" 
@@ -313,7 +300,7 @@ new #[Layout('layouts.app')] class extends Component {
                                     </span>
                                     
                                     <button wire:click.stop="deleteCategory('{{ $category->category_id }}')" x-show="hoverCat" class="text-[#A08866] hover:text-[#E64C4C] transition-colors shrink-0 flex items-center justify-center">
-                                        <x-icons.delete class="w-3.5 h-3.5" />
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3"><path stroke-linecap="round" d="M6 18L18 6M6 6l12 12"/></svg>
                                     </button>
                                 </div>
 
