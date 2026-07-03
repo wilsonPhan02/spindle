@@ -114,14 +114,20 @@ new class extends Component {
                      }, 150);
                  }
              }"
-             x-init="checkOverflow(); window.addEventListener('resize', () => checkOverflow())"
+             x-init="
+                 const resizeObserver = new ResizeObserver(() => {
+                     // Add a tiny delay to allow transitions (like sidebar toggle) to settle
+                     setTimeout(() => checkOverflow(), 50);
+                 });
+                 resizeObserver.observe($refs.container);
+             "
         >
             <style>
                 .welcome-marquee {
                     animation: welcome-slide var(--duration) linear infinite;
                 }
                 @keyframes welcome-slide {
-                    0%, 15% { transform: translateX(0); }
+                    0% { transform: translateX(0); }
                     85%, 100% { transform: translateX(var(--distance)); }
                 }
                 .mask-image-fade {
