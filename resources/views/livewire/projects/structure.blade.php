@@ -31,16 +31,11 @@ new #[Layout('layouts.app')] class extends Component {
     </style>
 
     <div class="p-6 lg:p-10 max-w-7xl mx-auto">
-        <header class="flex justify-between items-center mb-10">
-            <div class="flex items-center gap-3 text-web-body-large font-medium text-subtext-100">
-                <a href="{{ route('dashboard') }}" wire:navigate class="hover:text-secondary-200 transition-colors">Dashboard</a>
-                <x-icons.chevron size="w-4 h-4"/>
-                <a href="{{ route('projects.show', $project->project_id) }}" wire:navigate class="hover:text-secondary-200 transition-colors">{{ $project->title }}</a>
-                <x-icons.chevron size="w-4 h-4"/>
-                <span class="text-text-80 text-web-body-large truncate">Structure</span>
-            </div>
-            <x-logo class="h-8 w-auto text-text-100" />
-        </header>
+        <x-breadcrumb :items="[
+            ['label' => 'Dashboard', 'url' => route('dashboard')],
+            ['label' => $project->title, 'url' => route('projects.show', $project->project_id) ,'truncate' => true],
+            ['label' => 'Structure']            
+        ]" />
 
         <div class="flex justify-between items-end mb-6">
             <h1 class="text-app-title-1 text-text-80">Chapter Structure</h1>
