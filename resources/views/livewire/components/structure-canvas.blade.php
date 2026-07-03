@@ -173,7 +173,7 @@ new class extends Component {
 
 <div class="h-full flex flex-col p-8 px-5 relative overflow-hidden">
     <div class="flex items-center justify-between mb-3 transition-all duration-1000 shrink-0">
-        <div class="w-10">
+        <div class="w-10 self-start">
             @if($activeSectionIndex > 0)
                 <button wire:click="prevSection" class="p-2 rounded-full hover:bg-brand-100 transition-transform active:scale-95">
                     <x-icons.chevron rotate="180" color="text-text-80" />
@@ -181,11 +181,11 @@ new class extends Component {
             @endif
         </div>
 
-        <h2 class="text-app-title-1 text-text-80 transition-all duration-300 ease-in-out opacity-100 translate-x-0">
+        <h2 class="flex-1 text-center text-app-title-1 text-text-80 transition-all duration-300 ease-in-out opacity-100 translate-x-0">
             {{ $this->currentTemplate->sections[$activeSectionIndex]->title }}
         </h2>
 
-        <div class="w-10 flex justify-end">
+        <div class="w-10 flex justify-end self-start">
             @if($activeSectionIndex < $this->currentTemplate->sections->count() - 1)
                 <button wire:click="nextSection" class="p-2 rounded-full hover:bg-brand-100 transition-transform active:scale-95">
                     <x-icons.chevron rotate="0" color="text-text-80" />
@@ -224,8 +224,8 @@ new class extends Component {
                     </div>
                 </div>
             @empty
-                <div class="col-span-1 lg:col-span-2 xl:col-span-3 w-full h-32 flex items-center justify-center border-2 border-dashed border-brand-100 rounded-lg text-text-60 bg-transparent">
-                    <div class="flex flex-col items-center gap-2">
+                <div class="col-span-full w-full min-h-40 flex items-center justify-center border-2 border-dashed border-brand-100 rounded-lg text-text-60 bg-transparent">
+                    <div class="flex flex-col items-center justify-center gap-2 text-center w-full">
                         <x-icons.no-structure class="w-15 h-15 opacity-80" />
                         <span class="text-app-sub-feature">No chapters in this section yet.</span>
                     </div>

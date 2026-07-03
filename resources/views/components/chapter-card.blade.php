@@ -93,7 +93,7 @@
                 </h3>
             </div>
             
-            <p class="text-app-body-small text-text-90 line-clamp-6">
+            <p class="text-app-body-small text-text-90 line-clamp-5">
                 {{ $chapter->summary ?? 'No Description About This Chapter!' }}
             </p>
         </div>

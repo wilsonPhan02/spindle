@@ -4,10 +4,11 @@
     'description',     
     'confirmText',     
     'cancelText' => 'No, Stay here',    
-    'submitAction',    
+    'submitAction' => null,    
     'iconColor' => 'text-danger-100', 
     'iconBg' => 'bg-danger-100/10',
-    'btnColor' => 'bg-danger-100 hover:bg-red-600'
+    'btnColor' => 'bg-danger-100 hover:bg-red-600',
+    'showCancel' => true
 ])
 
 <div 
@@ -16,7 +17,7 @@
     x-on:{{ $eventName }}.window="show = true; itemId = $event.detail?.id || null"
     x-show="show" 
     style="display: none;"
-    class="fixed inset-0 z-50 flex items-center justify-center bg-text-80/75 backdrop-blur-[1.5px]"
+    class="fixed inset-0 z-1000 flex items-center justify-center bg-text-80/75 backdrop-blur-[1.5px]"
     x-transition:enter="transition ease-out duration-300"
     x-transition:enter-start="opacity-0"
     x-transition:enter-end="opacity-100"
@@ -46,17 +47,20 @@
         </div>
 
         <div class="flex gap-4 w-full justify-center">
-            <button 
-                @click="show = false" 
-                class="flex-1 py-3 px-4 rounded-lg bg-brand-100 text-text-80 text-web-body-small font-semibold hover:bg-brand-150 transition-colors"
-            >
-                {{ $cancelText }}
-            </button>
+            @if($showCancel)
+                <button 
+                    @click="show = false" 
+                    class="flex-1 py-2 px-4 rounded-lg border border-card-border text-text-70 text-web-body-small font-semibold hover:bg-card-hover transition-colors"
+                >
+                    {{ $cancelText }}
+                </button>
+            @endif
             <button 
                 @click="
-                    itemId 
-                        ? $wire.call('{{ $submitAction }}', itemId) 
-                        : $wire.call('{{ $submitAction }}'); 
+                    const action = '{{ $submitAction ?? '' }}';
+                    if (action) {
+                        itemId ? $wire.call(action, itemId) : $wire.call(action);
+                    }
                     show = false;
                 "
                 class="flex-1 py-3 px-4 rounded-lg text-subtext-60 transition-colors text-web-body-small font-semibold {{ $btnColor }}"
