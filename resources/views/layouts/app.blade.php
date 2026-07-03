@@ -27,7 +27,9 @@
         currentAvatarUrl = $event.detail.avatarUrl;
     "
 >
-    <livewire:layout.sidebar />
+    @persist('sidebar')
+        <livewire:layout.sidebar />
+    @endpersist
     <div
         x-show="!isPinned"
         @mouseenter="isHovered = true"
@@ -44,7 +46,7 @@
     </button>
 
     <main
-        class="flex-1 h-screen overflow-y-auto transition-all duration-300 ease-in-out"
+        class="flex-1 h-screen overflow-y-auto transition-all duration-300 ease-in-out scroll-smooth"
         :class="(isPinned || isHovered) ? 'ml-72 px-6 lg:px-10' : 'ml-0 px-14 lg:px-20'"
     >
         {{ $slot }}
