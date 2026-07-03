@@ -235,7 +235,7 @@ new class extends Component {
                                     <x-icons.sidebar-book class="w-4 h-4 text-text-80 shrink-0 group-hover:text-secondary-200 transition-colors" />
                                     <h3 class="text-app-body-medium text-text-100 truncate group-hover:text-secondary-200 transition-colors">{{ $project->title }}</h3>
                                 </div>
-                                <p class="text-[11px] text-subtext-70">{{ $project->created_at->format('d F Y') }}</p>
+                                <p class="text-[11px] font-medium text-subtext-90">{{ $project->created_at->format('d F Y') }}</p>
                             </a>
                         @endforeach
 
