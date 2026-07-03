@@ -122,11 +122,11 @@ new class extends Component {
 
     public function saveCustomTemplate() {
         $this->validate([
-            'customTemplateName' => 'required|string|max:255',
+            'customTemplateName' => 'required|string|max:100',
             'customTemplateDescription' => 'nullable|string',
             'customImagePreview' => 'nullable|image|max:2048',
             'customSections' => 'required|array|min:1',
-            'customSections.*.title' => 'required|string|max:255',
+            'customSections.*.title' => 'required|string|max:40',
             'customSections.*.goal' => 'nullable|string',
         ]);
 
@@ -338,8 +338,10 @@ new class extends Component {
                                         @endif
                                     </div>
 
-                                    <div class="absolute bottom-8 left-0 bg-bg-main px-6 py-2.5 rounded-r-lg shadow-lg opacity-0 group-hover:opacity-100 transition-all transform -translate-x-2 group-hover:translate-x-0 duration-300">
-                                        <span class="text-web-body-large text-text-60">{{ $template->name }}</span>
+                                    <div class="absolute bottom-8 left-0 bg-bg-main px-6 py-2.5 rounded-r-lg shadow-lg opacity-0 group-hover:opacity-100 transition-all transform -translate-x-2 group-hover:translate-x-0 duration-300 max-w-sm">
+                                        <span class="block truncate w-full text-web-body-large text-text-60" title="{{ $template->name }}">
+                                            {{ $template->name }}
+                                        </span>
                                     </div>
 
                                     @if($template->is_custom)
@@ -384,8 +386,8 @@ new class extends Component {
                     <div class="flex-1 overflow-y-auto custom-scrollbar px-10 md:px-14 pb-14 bg-bg-main">
                         <div class="flex flex-col items-center max-w-4xl mx-auto w-full">
                             
-                            <div class="text-center mb-10 w-full mt-4">
-                                <h1 class="text-web-title text-text-100 mb-6">
+                            <div class="text-center mb-10 w-full mt-4 max-w-xl mx-auto">
+                                <h1 class="block w-full truncate text-web-title text-text-100 mb-6" title="{{ $this->selectedTemplate->name }}">
                                     {{ $this->selectedTemplate->name }}
                                 </h1>
                                 <button wire:click="useTemplate" class="px-5 py-2 border border-brand-200 text-secondary-200 rounded-md hover:bg-brand-50 hover:text-secondary-300 transition-colors text-web-button">
