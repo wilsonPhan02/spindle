@@ -1,6 +1,6 @@
-@import 'tailwindcss';
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:wght@400;700&family=Montserrat:wght@400;500;600;700;800&display=swap');
 @plugin "@tailwindcss/typography";
+@import 'tailwindcss';
 
 @source '../views';
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
@@ -11,39 +11,39 @@
     --font-merriweather: 'Merriweather', serif;
     --font-montserrat: 'Montserrat', sans-serif;
     --font-inter: 'Inter', sans-serif;
-    
+
     /* Neutrals Colors */
     --color-text-60: rgb(104 101 99);
     --color-text-70: rgb(82 77 73);
     --color-text-80: rgb(55 50 46);
     --color-text-90: rgb(35 29 24);
-    --color-text-100: rgb(35 29 24);   
-    
-    /* Sub Text */     
+    --color-text-100: rgb(35 29 24);
+
+    /* Sub Text */
     --color-subtext-60: rgb(229 229 229);
     --color-subtext-70: rgb(217 217 217);
     --color-subtext-80: rgb(199 199 199);
     --color-subtext-90: rgb(152 152 152);
     --color-subtext-100: rgb(116 116 116);
-    
+
     /* Interactive */
     --color-interactive-100: rgb(53 117 255);
     --color-interactive-opacity: rgb(101 150 255);
-    
+
     /* Success */
     --color-success-100: rgb(0 192 89);
-    
+
     /* Warning */
-    --color-warning-100: rgb(255 190 0); 
-    
+    --color-warning-100: rgb(255 190 0);
+
     /* Danger */
     --color-danger-100: rgb(255 59 47);
     /* --- Background Colors --- */
-    
+
     /* Background */
     --color-bg-main: rgb(246 246 244);
     --color-bg-border: rgb(239 239 233);
-    
+
     /* Card */
     --color-card-bg: rgb(255 254 251);
     --color-card-hover: rgb(247 245 241);
@@ -54,17 +54,17 @@
     --color-brand-150: rgb(225 215 206);
     --color-brand-100: rgb(233 225 218);
     --color-brand-50: rgb(242 239 236);
-    --color-brand-10: rgb(247 245 244); 
+    --color-brand-10: rgb(247 245 244);
 
     /* --- Secondary --- */
     --color-secondary-300: rgb(118 81 55);
     --color-secondary-250: rgb(138 97 68);
-    --color-secondary-200: rgb(129 100 77); 
-    --color-secondary-150: rgb(154 125 102); 
-    --color-secondary-100: rgb(177 160 134); 
-    --color-secondary-50: rgb(198 179 149); 
-    --color-secondary-20: rgb(212 198 188); 
-    --color-secondary-10: rgb(217 197 164); 
+    --color-secondary-200: rgb(129 100 77);
+    --color-secondary-150: rgb(154 125 102);
+    --color-secondary-100: rgb(177 160 134);
+    --color-secondary-50: rgb(198 179 149);
+    --color-secondary-20: rgb(212 198 188);
+    --color-secondary-10: rgb(217 197 164);
     --color-secondary-5: rgb(244 236 229)
 }
 
@@ -74,7 +74,7 @@
     /* ==============================
        WEB STYLES
        ============================== */
-    
+
     .text-web-title {
         font-family: var(--font-merriweather);
         font-weight: 400; /* Regular */
@@ -253,7 +253,7 @@
     .flatpickr-calendar.static {
         @apply !bg-brand-10 !border !border-secondary-50 !rounded-xl !shadow-lg;
         @apply !right-0 !left-auto !mt-1;
-        
+
         transform: scale(0.9) !important;
         transform-origin: top right !important;
         font-family: var(--font-montserrat) !important;
@@ -265,7 +265,7 @@
 
     .flatpickr-monthDropdown-months {
         @apply !text-[17px] !font-medium !text-secondary-200 !bg-brand-10 !rounded-md !px-1;
-        @apply hover:!bg-brand-100 !transition-colors !cursor-pointer; 
+        @apply hover:!bg-brand-100 !transition-colors !cursor-pointer;
         height: 24px !important;
     }
 
@@ -306,7 +306,119 @@
 }
 
 
+/* ==============================
+   LANDING PAGE — SUBTLE ANIMATIONS
+   ============================== */
 @layer utilities {
+
+    /* Scroll reveal: elemen mulai turun + transparan, naik halus saat masuk viewport */
+    .reveal {
+        opacity: 0;
+        transform: translateY(28px);
+        transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1),
+                    transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+        will-change: opacity, transform;
+    }
+    .reveal.in-view {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    /* Varian arah & delay bertingkat */
+    .reveal-left  { transform: translateX(-32px); }
+    .reveal-right { transform: translateX(32px); }
+    .reveal-left.in-view, .reveal-right.in-view { transform: translateX(0); }
+    .reveal-d1 { transition-delay: 0.12s; }
+    .reveal-d2 { transition-delay: 0.24s; }
+    .reveal-d3 { transition-delay: 0.36s; }
+
+    /* Float lembut naik-turun (untuk ilustrasi) */
+    @keyframes float-soft {
+        0%, 100% { transform: translateY(0); }
+        50%      { transform: translateY(-14px); }
+    }
+    .animate-float      { animation: float-soft 6s ease-in-out infinite; }
+    .animate-float-slow { animation: float-soft 9s ease-in-out infinite; }
+
+    /* Putaran sangat lambat untuk spiral galaksi */
+    @keyframes spin-slow { to { transform: rotate(360deg); } }
+    .animate-spin-slow { animation: spin-slow 90s linear infinite; }
+
+    /* Kelap-kelip bintang */
+    @keyframes twinkle {
+        0%, 100% { opacity: 0.05; }
+        50%      { opacity: 1; }
+    }
+    .animate-twinkle { animation: twinkle 1.8s ease-in-out infinite; }
+
+    /* Awan menyapu perlahan di langit hero */
+    @keyframes cloud-drift   { from { transform: translateX(-6%); } to { transform: translateX(7%); } }
+    @keyframes cloud-drift-2 { from { transform: translateX(8%); }  to { transform: translateX(-9%); } }
+    .animate-cloud   { animation: cloud-drift   12s ease-in-out infinite alternate; }
+    .animate-cloud-2 { animation: cloud-drift-2 16s ease-in-out infinite alternate; }
+
+    /* Ayunan lembut (syal / figur hero) — organik seperti tertiup angin */
+    @keyframes sway {
+        0%, 100% { transform: rotate(-0.5deg); }
+        30%      { transform: rotate(0.6deg); }
+        55%      { transform: rotate(-0.2deg); }
+        75%      { transform: rotate(0.4deg); }
+    }
+    .animate-sway { animation: sway 9s ease-in-out infinite; transform-origin: 55% bottom; }
+
+    /* Kabut tipis menyapu di atas gunung */
+    @keyframes mist {
+        0%   { transform: translateX(-5%); opacity: 0.35; }
+        50%  { opacity: 0.7; }
+        100% { transform: translateX(7%); opacity: 0.35; }
+    }
+    .animate-mist { animation: mist 28s ease-in-out infinite alternate; }
+
+    /* Partikel benang/debu naik perlahan dari figur */
+    @keyframes mote-rise {
+        0%   { transform: translateY(0) translateX(0) scale(1); opacity: 0; }
+        12%  { opacity: 0.85; }
+        88%  { opacity: 0.6; }
+        100% { transform: translateY(-140px) translateX(18px) scale(0.6); opacity: 0; }
+    }
+    .animate-mote { animation: mote-rise linear infinite; }
+
+    /* Untaian benang berkibar (dipakai bersama SMIL pada path) */
+    @keyframes thread-flutter {
+        0%, 100% { transform: translateY(0) skewX(0deg); }
+        50%      { transform: translateY(-3px) skewX(3deg); }
+    }
+    .animate-thread { animation: thread-flutter 4.5s ease-in-out infinite; transform-origin: left center; }
+
+    /* Navbar: transparan di atas hero, jadi solid setelah scroll */
+    #site-nav {
+        transition: background-color 0.4s ease, box-shadow 0.4s ease, backdrop-filter 0.4s ease;
+    }
+    #site-nav.nav-scrolled {
+        background-color: rgba(246, 246, 244, 0.85);
+        backdrop-filter: blur(10px);
+        box-shadow: 0 1px 0 rgba(129, 100, 77, 0.12);
+    }
+
+    /* Garis bawah underline tumbuh saat hover nav */
+    .nav-link { position: relative; }
+    .nav-link::after {
+        content: "";
+        position: absolute;
+        left: 0; bottom: -4px;
+        width: 100%; height: 1.5px;
+        background: currentColor;
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform 0.35s ease;
+    }
+    .nav-link:hover::after { transform: scaleX(1); }
+
+    /* Hormati preferensi reduce-motion */
+    @media (prefers-reduced-motion: reduce) {
+        .reveal { opacity: 1 !important; transform: none !important; transition: none !important; }
+        .animate-float, .animate-float-slow, .animate-spin-slow, .animate-twinkle { animation: none !important; }
+    }
+
     /* Mengubah tampilan scrollbar khusus buat class custom-scrollbar */
     .custom-scrollbar::-webkit-scrollbar {
         width: 4px; /* Scrollbar tipis elegan */
@@ -322,6 +434,8 @@
         background-color: var(--color-secondary-100); /* Lebih gelap pas dihover */
     }
 
-    
+
 }
 
+@keyframes windBlow { 0% { transform: translateX(-100%); opacity: 0; } 50% { opacity: 1; } 100% { transform: translateX(300%); opacity: 0; } } .animate-wind-blow { animation: windBlow linear infinite; }
+@keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }

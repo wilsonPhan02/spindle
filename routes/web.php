@@ -35,10 +35,15 @@ Route::middleware('auth')->group(function () {
     Volt::route('/settings', 'settings.index')->name('settings');
     // Rute untuk ke detail project
     Volt::route('/projects/{project}', 'projects.show')->name('projects.show');
+    // Rute untuk halaman characters project
+    Volt::route('/projects/{project}/characters', 'projects.characters')->name('projects.characters');
+    // Rute untuk halaman characters detail project
+    Volt::route('/projects/{project}/characters/{character}', 'projects.character-detail')->name('projects.character.show');
     //Rute untuk ke structure project
     Volt::route('/projects/{project}/structure', 'projects.structure')->name('projects.structure');
     // Rute untuk halaman notes project
     Volt::route('/projects/{project}/notes', 'projects.notes')->name('projects.notes');
     // Rute untuk halaman archive
     Volt::route('/archive', 'archive.index')->name('archive');
+    
 });

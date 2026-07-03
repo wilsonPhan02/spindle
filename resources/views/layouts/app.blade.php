@@ -14,12 +14,23 @@
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+    <script>
+        document.addEventListener('alpine:init', () => {
+            Alpine.store('layout', {
+                isPinned: localStorage.getItem('sidebarPinned') !== null ? localStorage.getItem('sidebarPinned') === 'true' : true,
+                isHovered: false,
+                togglePin(val) {
+                    this.isPinned = val !== undefined ? val : !this.isPinned;
+                    localStorage.setItem('sidebarPinned', this.isPinned);
+                }
+            });
+        });
+    </script>
 </head>
 <body
     class="bg-bg-main antialiased min-h-screen flex overflow-hidden"
     x-data="{
-        isPinned: true,
-        isHovered: false,
         currentUsername: '{{ Auth::user()->profile?->username ?? explode('@', Auth::user()->email)[0] }}',
         currentAvatarUrl: '{{ Auth::user()->profile?->avatar_url ? Storage::url(Auth::user()->profile->avatar_url) : '' }}'
     }"
@@ -28,16 +39,18 @@
         currentAvatarUrl = $event.detail.avatarUrl;
     "
 >
-    <livewire:layout.sidebar />
+    @persist('sidebar')
+        <livewire:layout.sidebar />
+    @endpersist
     <div
-        x-show="!isPinned"
-        @mouseenter="isHovered = true"
+        x-show="!$store.layout.isPinned"
+        @mouseenter="$store.layout.isHovered = true"
         class="fixed inset-y-0 left-0 w-3 z-40 bg-transparent cursor-pointer"
     ></div>
 
     <button
-        x-show="!isPinned && !isHovered"
-        @click="isPinned = true"
+        x-show="!$store.layout.isPinned && !$store.layout.isHovered"
+        @click="$store.layout.togglePin(true)"
         x-transition.opacity
         class="fixed left-0 top-1/2 -translate-y-1/2 w-6 h-16 bg-brand-100 border border-subtext-70 border-l-0 rounded-r-full shadow-md z-50 flex items-center justify-center text-text-80 hover:bg-brand-150 transition-colors focus:outline-none"
     >
@@ -45,8 +58,8 @@
     </button>
 
     <main
-        class="flex-1 h-screen overflow-y-auto transition-all duration-300 ease-in-out"
-        :class="(isPinned || isHovered) ? 'ml-72 px-6 lg:px-10' : 'ml-0 px-14 lg:px-20'"
+        class="flex-1 h-screen overflow-y-auto transition-all duration-300 ease-in-out scroll-smooth"
+        :class="($store.layout.isPinned || $store.layout.isHovered) ? 'ml-72 px-6 lg:px-10' : 'ml-0 px-14 lg:px-20'"
     >
         {{ $slot }}
     </main>

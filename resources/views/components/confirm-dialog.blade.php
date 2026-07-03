@@ -25,7 +25,7 @@
     x-transition:leave-start="opacity-100"
     x-transition:leave-end="opacity-0"
 >
-    <div 
+    <div
         @click.away="show = false"
         class="flex flex-col bg-white rounded-2xl shadow-xl w-full max-w-md px-12 py-8 text-center gap-8"
         x-transition:enter="transition ease-out duration-300"

@@ -64,8 +64,14 @@ new class extends Component {
     }
 }; ?>
 
-<div class="p-10 max-w-7xl mx-auto">
-
+<div class="p-10 max-w-7xl mx-auto" x-data x-init="$nextTick(() => { 
+    if (window.location.hash) {
+        setTimeout(() => {
+            const el = document.getElementById(window.location.hash.substring(1));
+            if (el) el.scrollIntoView({behavior: 'smooth'});
+        }, 50);
+    }
+})">
     <header class="flex justify-between items-center mb-8">
         <span class="text-app-heading-2 text-text-100 font-semibold">Dashboard</span>
         <x-logo class="h-8 w-auto text-text-100" />
@@ -111,7 +117,7 @@ new class extends Component {
     @else
         <div class="space-y-12 mb-8">
             @foreach($sections as $section)
-                <div x-data="{ editing: false, newName: '{{ $section->title }}', menuOpen: false }" class="relative">
+                <div id="section-{{ $section->section_id }}" x-data="{ editing: false, newName: '{{ $section->title }}', menuOpen: false }" class="relative scroll-mt-8">
 
                     <div class="flex justify-between items-center border-b border-brand-150 pb-2 mb-6">
                         <div class="w-full">
