@@ -134,7 +134,7 @@ new #[Layout('layouts.app')] class extends Component {
             <x-logo class="h-8 w-auto text-text-100" />
         </header>
 
-        <div class="flex flex-col lg:flex-row gap-8 lg:gap-12 mb-16 items-stretch">
+        <div class="flex flex-col lg:flex-row gap-4 lg:gap-6 mb-16 items-stretch">
 
             <div
                 x-data="{ hoverCover: false }"
@@ -142,9 +142,11 @@ new #[Layout('layouts.app')] class extends Component {
                 @mouseleave="hoverCover = false"
                 class="relative w-full lg:w-[320px] xl:w-[360px] shrink-0 aspect-[1/1.6] z-10"
             >
+            {{-- last benerin --}}
                 @if($project->cover_image_path)
                     <!-- Image / Front Cover -->
-                    <img src="{{ Storage::url($project->cover_image_path) }}" class="absolute inset-y-0 left-0 right-4 w-[calc(100%-16px)] h-full object-cover rounded-l-md rounded-r-xl shadow-md z-20 border-r border-black/10" />
+                    <img src="{{ Storage::url($project->cover_image_path) }}" 
+                        class="absolute top-0 left-0 w-[calc(100%-16px)] h-full object-cover rounded-l-md rounded-r-xl shadow-md z-20 border-r border-black/10" />
                     <!-- Book pages on the right -->
                     <div class="absolute top-3.5 bottom-3.5 right-2 w-4 bg-gradient-to-r from-[#E8E3D9] to-[#D5C6A9] border-y border-r border-[#C4B7A3] rounded-r-sm z-10 shadow-inner"></div>
                     <!-- Back cover sticking out -->
@@ -180,7 +182,7 @@ new #[Layout('layouts.app')] class extends Component {
 
                 <div class="flex justify-between items-start mb-4">
                     <div class="flex-1 min-w-0 mr-4">
-                        <x-icons.sidebar-book class="w-8 h-8 text-[#A08866] mb-3" />
+                        <x-icons.sidebar-book class="w-8 h-8 text-secondary-100 mb-3" />
 
                         @php
                             $titleLen = strlen($title);
@@ -192,11 +194,11 @@ new #[Layout('layouts.app')] class extends Component {
                             <h1
                                 x-show="!editingTitle"
                                 @dblclick="editingTitle = true; setTimeout(() => $refs.titleInput.focus(), 50)"
-                                class="{{ $dtlTitleSize }} font-merriweather font-medium text-[#2C2C2C] transition-colors leading-tight cursor-pointer select-none group-hover:text-secondary-200 truncate"
+                                class="{{ $dtlTitleSize }} text-app-title-1 text-text-80 transition-colors leading-tight cursor-pointer select-none group-hover:text-secondary-200 truncate"
                             >
                                 <span x-text="localTitle || 'Untitled Project'"></span>
                             </h1>
-                            <button x-show="hoverTitle && !editingTitle" @click="editingTitle = true; setTimeout(() => $refs.titleInput.focus(), 50)" class="text-[#A08866] hover:text-secondary-200 transition-colors shrink-0">
+                            <button x-show="hoverTitle && !editingTitle" @click="editingTitle = true; setTimeout(() => $refs.titleInput.focus(), 50)" class="stroke-2 text-secondary-200 transition-colors shrink-0">
                                 <x-icons.rename class="w-5 h-5" />
                             </button>
 
@@ -207,20 +209,31 @@ new #[Layout('layouts.app')] class extends Component {
                                 @click.outside="if(editingTitle) { $wire.saveTitle(); editingTitle = false; }"
                                 @keydown.enter="$wire.saveTitle(); editingTitle = false"
                                 @keydown.escape="editingTitle = false; localTitle = '{{ addslashes($project->title) }}'"
-                                class="{{ $dtlTitleSize }} font-merriweather font-medium text-[#2C2C2C] bg-transparent border-b-2 border-[#D5C6A9] outline-none w-full focus:border-[#A08866] focus:ring-0 px-0 py-1"
+                                class="{{ $dtlTitleSize }} text-app-title-1 text-text-80 bg-transparent border-b-2 border-secondary-100 outline-none w-full focus:border-secondary-200 focus:ring-0 px-0 py-1"
                             />
                         </div>
-                        <p class="text-[15px] text-[#7A7A7A] mt-2 truncate">from <span class="font-semibold text-[#4A4A4A]" title="{{ $project->section->title ?? 'Uncategorized' }}">{{ \Illuminate\Support\Str::limit($project->section->title ?? 'Uncategorized', 30) }}</span></p>
+                        <p class="text-app-body-large text-subtext-100 mt-2 truncate">from <span class="text-text-80" title="{{ $project->section->title ?? 'Uncategorized' }}">{{ \Illuminate\Support\Str::limit($project->section->title ?? 'Uncategorized', 30) }}</span></p>
                     </div>
 
-                    <div class="flex items-center gap-3 shrink-0" @limit-reached.window="alert('Pinned projects have reached the maximum limit (10). You cannot pin more projects.')">
-                        <button wire:click="togglePin" class="text-[#8C7558] hover:text-[#5E4C38] transition-colors focus:outline-none" title="{{ $project->is_pinned ? 'Unpin Project' : 'Pin Project' }}">
+                    <div class="relative flex items-center gap-3 shrink-0" 
+                        x-data="{ hoverPin: false }"
+                        @mouseenter="hoverPin = true" @mouseleave="hoverPin = false"
+                        @limit-reached.window="alert('Pinned projects have reached the maximum limit (10). You cannot pin more projects.')">
+                        
+                        <button wire:click="togglePin"
+                            aria-label="{{ $project->is_pinned ? 'Unpin Project' : 'Pin Project' }}"
+                            class="text-secondary-100 hover:text-secondary-200 transition-colors focus:outline-none">
                             @if($project->is_pinned)
                                 <x-icons.bookmark-solid class="w-5 h-5" />
                             @else
                                 <x-icons.bookmark class="w-5 h-5" />
                             @endif
                         </button>
+
+                        <div x-show="hoverPin" x-transition.opacity.duration.150ms
+                            class="absolute top-full mt-1 -right-6 z-30 px-2 py-1.5 rounded-sm bg-secondary-150 text-[11px] text-bg-main text-app-desc-feature whitespace-nowrap shadow-md pointer-events-none">
+                            {{ $project->is_pinned ? 'Unpin Project' : 'Pin Project' }}
+                        </div>
                     </div>
                 </div>
 
@@ -246,13 +259,14 @@ new #[Layout('layouts.app')] class extends Component {
                         this.$refs.scrollContainer.scrollLeft = this.scrollLeft - walk;
                     }
                 }" class="mb-0 w-full max-w-full">
-                    <div class="flex items-center gap-3 mb-1.5">
-                        <div class="flex items-center gap-2">
-                            <x-icons.category class="w-4 h-4 text-[#8C7558]" />
-                            <span class="text-[11px] font-bold text-[#4A4A4A] uppercase tracking-[0.15em]">Categories</span>
+                    <div class="flex items-center gap-3 mb-2">
+                        <div class="flex items-center gap-3">
+                            <x-icons.category class="w-4 h-4 text-text-80" />
+                            <span class="text-app-feature text-text-80">Categories</span>
                         </div>
-                        <button x-show="!addingCat" @click="addingCat = true; addCount = 0; setTimeout(() => $refs.catInput.focus(), 50)" class="text-[#8C7558] hover:text-[#A08866] transition-colors p-1 -ml-1">
-                            <x-icons.add class="w-4 h-4" />
+                        <button x-show="!addingCat" @click="addingCat = true; addCount = 0; setTimeout(() => $refs.catInput.focus(), 50)" type="button"
+                            class="shrink-0 w-8 h-8 rounded-full bg-brand-100 flex items-center justify-center text-text-70 hover:bg-brand-150 transition-colors">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
                         </button>
                     </div>
 
@@ -265,11 +279,19 @@ new #[Layout('layouts.app')] class extends Component {
                         @wheel.prevent="if (Math.abs($event.deltaY) > 0) { $el.scrollLeft += $event.deltaY; }"
                         class="flex gap-2 items-center overflow-x-auto pb-5 cursor-grab active:cursor-grabbing scroll-smooth [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-[#A08866] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-button]:hidden [scrollbar-width:thin] [scrollbar-color:#A08866_transparent]"
                     >
-                        <div x-show="addingCat" class="flex items-center gap-1 bg-[#EAE1D5] pl-2 pr-1 py-1 rounded-md border border-[#D5C6A9] relative shrink-0">
-                                <input type="text" maxlength="20" @input="addCount = $event.target.value.length" x-model="$wire.newCategoryName" x-ref="catInput" @keyup.enter="addingCat = false; $wire.addCategory()" @blur="if(addingCat) { addingCat = false; $wire.set('newCategoryName', ''); }" @keydown.escape="addingCat = false; $wire.set('newCategoryName', '');" placeholder="Category..." class="w-28 text-[13px] bg-transparent border-b border-[#D5C6A9] outline-none px-1 py-0 text-[#2C2C2C] focus:border-[#A08866]"/>
-                                <button @mousedown.prevent="addingCat = false; $wire.addCategory()" class="text-[#A08866] hover:text-secondary-200 transition-colors shrink-0">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
-                                </button>
+                        <div x-show="addingCat" x-cloak class="relative flex items-center gap-1">
+                            <input type="text" maxlength="20"
+                                x-model="$wire.newCategoryName"
+                                x-ref="catInput"
+                                @input="addCount = $event.target.value.length"
+                                @keydown.enter="addingCat = false; $wire.addCategory()"
+                                @keydown.escape="addingCat = false; $wire.set('newCategoryName', '')"
+                                placeholder="Category..."
+                                class="px-3 py-2 rounded-full bg-brand-100 border border-secondary-100 outline-none text-app-body-small text-text-70 w-28 shrink-0">
+                            <button @click="addingCat = false; $wire.set('newCategoryName', '')" type="button"
+                                class="w-5 h-5 rounded-full flex items-center justify-center text-text-60 hover:bg-black/10 hover:text-danger-100 transition-colors">
+                                <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3"><path stroke-linecap="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                            </button>
                             <span class="absolute -bottom-3.5 right-1 text-[9px] text-subtext-90 font-medium" x-text="addCount + '/20'"></span>
                         </div>
 
