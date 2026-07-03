@@ -348,19 +348,19 @@ new class extends Component {
         <div class="space-y-6 shrink-0">
             <div x-data="{ open: true, viewAll: false }">
             <button @click="open = !open" class="flex items-center justify-between w-full text-app-feature text-text-70 mb-2 focus:outline-none hover:text-text-80 transition-colors">
-                <span>Pinned</span>
+                <span>Marked</span>
             </button>
             <div x-show="open" x-collapse>
                 @if(count($pinnedProjects) > 0)
                     <div class="space-y-1 pb-2">
                         @foreach($pinnedProjects->take(3) as $pProject)
-                            <div class="group flex items-center justify-between px-2 py-1.5 -mx-2 rounded-lg hover:bg-brand-150 transition-colors">
+                            <div x-data="{ rowHovered: false }" @mouseenter="rowHovered = true" @mouseleave="rowHovered = false" wire:key="marked-{{ $pProject->project_id }}" class="group flex items-center justify-between px-2 py-1.5 -mx-2 rounded-lg hover:bg-brand-150 transition-colors">
                                 <a href="{{ route('projects.show', $pProject->project_id) }}" wire:navigate class="flex items-center gap-2 flex-1 min-w-0">
                                     <x-icons.sidebar-book class="w-4 h-4 text-text-70 shrink-0" />
-                                    <span class="text-[13px] font-medium text-text-80 truncate group-hover:text-text-100 transition-colors">{{ $pProject->title }}</span>
+                                    <span class="text-[13px] font-medium text-text-80 truncate transition-colors" :class="rowHovered ? 'text-text-100' : ''">{{ $pProject->title }}</span>
                                 </a>
-                                <button wire:click="unpin('{{ $pProject->project_id }}')" class="opacity-0 group-hover:opacity-100 text-subtext-70 hover:text-[#8C7558] transition-all p-1 shrink-0" title="Unpin Project">
-                                    <x-icons.bookmark-slash class="w-3.5 h-3.5" />
+                                <button wire:click="unpin('{{ $pProject->project_id }}')" class="transition-all p-1 shrink-0 text-[#A08866] hover:text-[#8C7558] opacity-0 group-hover:opacity-100" :class="rowHovered ? 'opacity-100' : 'opacity-0'" title="Unmark Project">
+                                    <x-icons.bookmark-slash class="w-4 h-4" />
                                 </button>
                             </div>
                         @endforeach
@@ -368,13 +368,13 @@ new class extends Component {
                         @if(count($pinnedProjects) > 3)
                             <div x-show="viewAll" x-collapse x-cloak class="space-y-1 mt-1">
                                 @foreach($pinnedProjects->skip(3) as $pProject)
-                                    <div class="group flex items-center justify-between px-2 py-1.5 -mx-2 rounded-lg hover:bg-brand-150 transition-colors">
+                                    <div x-data="{ rowHovered: false }" @mouseenter="rowHovered = true" @mouseleave="rowHovered = false" wire:key="marked-more-{{ $pProject->project_id }}" class="group flex items-center justify-between px-2 py-1.5 -mx-2 rounded-lg hover:bg-brand-150 transition-colors">
                                         <a href="{{ route('projects.show', $pProject->project_id) }}" wire:navigate class="flex items-center gap-2 flex-1 min-w-0">
                                             <x-icons.sidebar-book class="w-4 h-4 text-text-70 shrink-0" />
-                                            <span class="text-[13px] font-medium text-text-80 truncate group-hover:text-text-100 transition-colors">{{ $pProject->title }}</span>
+                                            <span class="text-[13px] font-medium text-text-80 truncate transition-colors" :class="rowHovered ? 'text-text-100' : ''">{{ $pProject->title }}</span>
                                         </a>
-                                        <button wire:click="unpin('{{ $pProject->project_id }}')" class="opacity-0 group-hover:opacity-100 text-subtext-70 hover:text-[#8C7558] transition-all p-1 shrink-0" title="Unpin Project">
-                                            <x-icons.bookmark-slash class="w-3.5 h-3.5" />
+                                        <button wire:click="unpin('{{ $pProject->project_id }}')" class="transition-all p-1 shrink-0 text-[#A08866] hover:text-[#8C7558] opacity-0 group-hover:opacity-100" :class="rowHovered ? 'opacity-100' : 'opacity-0'" title="Unmark Project">
+                                            <x-icons.bookmark-slash class="w-4 h-4" />
                                         </button>
                                     </div>
                                 @endforeach
@@ -387,7 +387,7 @@ new class extends Component {
                 @else
                     <div class="flex flex-col items-center justify-center py-4 text-center opacity-60">
                         <x-icons.sidebar-pen class="w-8 h-8 text-secondary-150 mb-1" />
-                        <p class="text-app-desc-feature text-secondary-200">No Pinned Projects!</p>
+                        <p class="text-app-desc-feature text-secondary-200">No Marked Projects!</p>
                     </div>
                 @endif
             </div>
