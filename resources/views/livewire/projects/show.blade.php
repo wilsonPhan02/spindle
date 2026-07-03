@@ -7,6 +7,7 @@ use Livewire\Attributes\Layout;
 use Livewire\WithFileUploads;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Livewire\Attributes\On;
 
 new #[Layout('layouts.app')] class extends Component {
     use WithFileUploads;
@@ -46,10 +47,12 @@ new #[Layout('layouts.app')] class extends Component {
     public function saveTitle() {
         $this->title = trim($this->title) ?: 'Untitled Project';
         $this->project->update(['title' => $this->title]);
+        $this->dispatch('project-updated');
     }
 
     public function saveSynopsis() {
         $this->project->update(['synopsis' => trim($this->synopsis)]);
+        $this->dispatch('project-updated');
     }
 
     public function addCategory() {
@@ -113,6 +116,11 @@ new #[Layout('layouts.app')] class extends Component {
         $this->project->is_pinned = !$this->project->is_pinned;
         $this->project->save();
         $this->dispatch('project-pinned-updated');
+    }
+
+    #[On('project-pinned-updated')]
+    public function refreshPinState() {
+        $this->project->refresh();
     }
 }; ?>
 
@@ -209,12 +217,12 @@ new #[Layout('layouts.app')] class extends Component {
                         <p class="text-[15px] text-[#7A7A7A] mt-2 truncate">from <span class="font-semibold text-[#4A4A4A]" title="{{ $project->section->title ?? 'Uncategorized' }}">{{ \Illuminate\Support\Str::limit($project->section->title ?? 'Uncategorized', 30) }}</span></p>
                     </div>
 
-                    <div class="flex items-center gap-3 shrink-0" @limit-reached.window="alert('Pinned projects have reached the maximum limit (10). You cannot pin more projects.')">
-                        <button wire:click="togglePin" class="text-[#8C7558] hover:text-[#5E4C38] transition-colors focus:outline-none" title="{{ $project->is_pinned ? 'Unpin Project' : 'Pin Project' }}">
+                    <div class="flex items-center gap-3 shrink-0" @limit-reached.window="alert('Marked projects have reached the maximum limit (10). You cannot mark more projects.')">
+                        <button wire:click="togglePin" class="text-[#8C7558] hover:text-[#5E4C38] transition-colors focus:outline-none" title="{{ $project->is_pinned ? 'Unmark Project' : 'Mark Project' }}">
                             @if($project->is_pinned)
-                                <x-icons.bookmark-solid class="w-5 h-5" />
+                                <x-icons.bookmark-solid class="w-6 h-6" />
                             @else
-                                <x-icons.bookmark class="w-5 h-5" />
+                                <x-icons.bookmark class="w-6 h-6" />
                             @endif
                         </button>
                     </div>
