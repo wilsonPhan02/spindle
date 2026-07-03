@@ -274,14 +274,14 @@ new #[Layout('layouts.app')] class extends Component {
                         @wheel="$event.preventDefault(); $el.scrollLeft += ($event.deltaX !== 0 ? $event.deltaX : $event.deltaY)"
                         class="flex gap-2 items-center overflow-x-auto pb-5 cursor-grab active:cursor-grabbing scroll-smooth [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-secondary-100 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-button]:hidden [scrollbar-width:thin] [scrollbar-color:#A08866_transparent]"
                     >
-                        <button x-show="!addingCat" @click="addingCat = true; addCount = 0; setTimeout(() => $refs.catInput.focus(), 50)" class="shrink-0 flex items-center gap-1 rounded-full bg-brand-100 hover:bg-brand-200 text-secondary-100 hover:text-secondary-150 transition-colors p-2">
+                        <button x-show="!addingCat" @click="addingCat = true; addCount = 0; setTimeout(() => $refs.catInput.focus(), 50)" class="shrink-0 flex items-center gap-1 rounded-md bg-brand-100 hover:bg-brand-200 text-secondary-150 hover:text-secondary-150 transition-colors p-2">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3"><path stroke-linecap="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
                             @if($project->categories->count() == 0)
                                 <span class="text-app-desc-feature">Add category</span>
                             @endif
                         </button>
 
-                        <div x-show="addingCat" class="flex items-center gap-1 bg-brand-100 pl-3 pr-1.5 py-2 rounded-full border border-brand-150 relative shrink-0">
+                        <div x-show="addingCat" class="flex items-center gap-1 bg-brand-100 pl-3 pr-1.5 py-2 rounded-md border border-brand-150 relative shrink-0">
                                 <input type="text" maxlength="20" 
                                         @input="addCount = $event.target.value.length" x-model="$wire.newCategoryName" x-ref="catInput" 
                                         @keyup.enter="addingCat = false; $wire.addCategory()" 
@@ -304,7 +304,7 @@ new #[Layout('layouts.app')] class extends Component {
                                  @mouseleave="hoverCat = false"
                                  class="relative group shrink-0">
                                 
-                                <div x-show="!editingCat" @dblclick="editingCat = true; $nextTick(() => $refs.editCatInput.focus())" title="{{ $category->name }}" class="cursor-pointer px-3 py-2 rounded-full bg-brand-100 text-app-body-small text-text-80 flex gap-1.5 items-center border border-transparent group-hover:border-brand-150 transition-colors">
+                                <div x-show="!editingCat" @dblclick="editingCat = true; $nextTick(() => $refs.editCatInput.focus())" title="{{ $category->name }}" class="cursor-pointer px-3 py-2 rounded-md bg-brand-100 text-app-body-small text-text-80 flex gap-1.5 items-center border border-transparent group-hover:border-brand-150 transition-colors">
                                     <span class="select-none truncate max-w-[130px] block">
                                         {{ $category->name }}
                                     </span>
@@ -314,7 +314,7 @@ new #[Layout('layouts.app')] class extends Component {
                                     </button>
                                 </div>
 
-                                <div x-show="editingCat" class="flex items-center gap-1 bg-brand-100 pl-3 pr-1.5 py-2 rounded-full border border-secondary-150 relative">
+                                <div x-show="editingCat" class="flex items-center gap-1 bg-brand-100 pl-3 pr-1.5 py-2 rounded-md border border-secondary-150 relative">
                                         <input x-ref="editCatInput" 
                                             value="{{ $category->name }}" 
                                             maxlength="20" 
@@ -489,7 +489,7 @@ new #[Layout('layouts.app')] class extends Component {
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 3.5V8h5" />
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6M9 16.5h6" />
                                         </svg>
-                                        <p class="text-app-title-1 leading-none text-[18px] text-text-80 truncate group-hover:text-secondary-200 transition-colors min-w-0">{{ $note->title }}</p>
+                                        <p class="text-app-title-1 leading-normal text-[18px] text-text-80 truncate group-hover:text-secondary-200 transition-colors min-w-0">{{ $note->title }}</p>
                                     </div>
 
                                     @php
@@ -503,7 +503,7 @@ new #[Layout('layouts.app')] class extends Component {
                                         $cleanBody = trim(preg_replace('/\s+/', ' ', $cleanBody));
                                     @endphp
 
-                                    <p class="text-app-body-small text-text-70" style="display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden;">
+                                    <p class="text-app-body-small text-subtext-100 line-clamp-3" style="display:-webkit-box; -webkit-box-orient:vertical; overflow:hidden;">
                                         {{ $cleanBody ?: 'No content yet' }}
                                     </p>
                                 </a>
@@ -526,23 +526,36 @@ new #[Layout('layouts.app')] class extends Component {
                                     </div>
                                     <div class="min-w-0 flex-1 gap-1 py-1">
                                         <p class="text-app-title-1 leading-none text-[18px] text-text-80 truncate group-hover:text-secondary-200 transition-colors">{{ $character->nick_name }}</p>
-                                        @if($character->hashtags->isNotEmpty())
-                                            @php
-                                                $visibleTags = $character->hashtags->take(1);
-                                                $remainingTagCount = $character->hashtags->count() - $visibleTags->count();
-                                            @endphp
                                             <div class="mt-1.5">
                                                 <div class="flex items-center gap-1 flex-nowrap overflow-hidden">
-                                                    <span class="text-[11px] text-text-80 shrink-0">Tags :</span>
-                                                    @foreach($visibleTags as $tag)
-                                                        <span class="px-2 py-0.5 rounded-full bg-brand-100 text-[11px] text-text-70 shrink-0 truncate max-w-[80px]">{{ $tag->name }}</span>
-                                                    @endforeach
+                                                    <span class="text-app-body-small text-subtext-90 shrink-0">Tags :</span>
+                                                    
+                                                    @if($character->hashtags->isNotEmpty())
+                                                        @php
+                                                            $visibleTags = $character->hashtags->take(1);
+                                                            $remainingTagCount = $character->hashtags->count() - $visibleTags->count();
+                                                        @endphp
+                                                        
+                                                        @foreach($visibleTags as $tag)
+                                                            <span class="px-2 py-0.5 rounded-full bg-brand-100 text-app-caption text-text-70 shrink-0 truncate max-w-[80px]">
+                                                                {{ $tag->name }}
+                                                            </span>
+                                                        @endforeach
+                                                    @else
+                                                        {{-- Empty State --}}
+                                                        <span class="px-2 py-0.5 rounded border border-dashed border-brand-200 bg-card-hover text-app-caption text-secondary-100 shrink-0">
+                                                            No tags
+                                                        </span>
+                                                    @endif
                                                 </div>
-                                                @if($remainingTagCount > 0)
-                                                    <span class="inline-block mt-1 px-2 py-0.5 rounded-full bg-brand-150 text-[11px] text-text-70">+{{ $remainingTagCount }} tags</span>
+
+                                                {{-- Remaining Tags Badge --}}
+                                                @if(!empty($remainingTagCount) && $remainingTagCount > 0)
+                                                    <span class="inline-block mt-1 px-2 py-0.5 rounded-full bg-brand-150 text-app-caption text-text-70">
+                                                        +{{ $remainingTagCount }} tags
+                                                    </span>
                                                 @endif
                                             </div>
-                                        @endif
                                     </div>
                                 </a>
                             @endforeach
@@ -560,7 +573,7 @@ new #[Layout('layouts.app')] class extends Component {
 
                                     <div class="flex items-center gap-3 mb-2.5">
                                         <x-icons.chapter-icon/>
-                                        <h4 class="text-[20px] font-merriweather font-medium text-text-80 truncate transition-colors">
+                                        <h4 class="text-[18px] text-app-title-1 leading-normal text-text-80 truncate transition-colors">
                                             {{ $chapter->title }}
                                         </h4>
                                     </div>
