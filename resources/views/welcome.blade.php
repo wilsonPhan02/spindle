@@ -6,6 +6,10 @@
     <title>Spindle — Spin A Yarn</title>
 
     <link rel="icon" href="/favicon.png?v=5" type="image/png">
+    
+    <!-- Preload critical hero assets for instant paint -->
+    <link rel="preload" as="image" href="{{ asset('images/landing/hero-figure.png') }}">
+    <link rel="preload" as="image" href="{{ asset('images/landing/mtn-peak2.png') }}">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
@@ -167,7 +171,7 @@
                         <div class="reveal reveal-d{{ $loop->iteration }} {{ $tilt }} w-[300px] max-w-[80%] transition-all duration-500 hover:z-20">
                             <div class="animate-float hover:[animation-play-state:paused]" style="animation-delay: {{ $loop->index * 1.1 }}s; transform-style: preserve-3d;">
                                 <div class="tilt-container relative w-full h-auto cursor-pointer" style="perspective: 1000px;">
-                                    <img src="{{ $img($file) }}" alt="The Great Tangle"
+                                    <img src="{{ $img($file) }}" alt="The Great Tangle" loading="lazy"
                                          class="tilt-element w-full h-auto drop-shadow-[0_24px_40px_rgba(0,0,0,0.45)] transition-transform duration-[200ms] ease-out pointer-events-none"
                                          style="transform-style: preserve-3d; transform: rotateX(0deg) rotateY(0deg) scale(1);">
                                 </div>
@@ -178,27 +182,22 @@
             </div>
         </section>
     
-    <section id="about" class="relative min-h-screen flex flex-col justify-center overflow-hidden bg-[#2a1f17] py-20">
+    <section id="about" class="relative min-h-screen flex flex-col justify-center overflow-hidden bg-[#2a1f17] py-20 scroll-mt-24">
         @include('partials.starfield')
         <div class="relative z-10 mx-auto grid max-w-[1240px] grid-cols-1 items-center gap-12 px-6 lg:px-[52px] lg:grid-cols-2 mt-12 lg:mt-24">
             
             
             <div class="reveal reveal-left relative order-2 h-[500px] w-full lg:order-1">
                 
-                <img src="{{ $img('hand.png') }}" alt=""
+                <img src="{{ $img('hand.png') }}" alt="" loading="lazy"
                      class="pointer-events-none absolute top-1/2 left-[-15%] lg:left-[-10%] z-0 w-[100%] lg:w-[500px] max-w-none -translate-y-[40%] select-none">
                 
                 <!-- Spindle Tool/Card (Foreground) -->
-                <div class="animate-float hover:[animation-play-state:paused] absolute top-1/2 left-[24%] lg:left-[28%] z-10 w-[200px] lg:w-[260px] -translate-y-[85%] rotate-[8deg]" style="transform-style: preserve-3d;">
-                    <div class="tilt-container relative w-full h-auto cursor-pointer" style="perspective: 1000px;">
-                        <img src="{{ $img('group47.png') }}" alt="The Spindle"
-                             class="tilt-element w-full h-auto drop-shadow-[0_30px_40px_rgba(0,0,0,0.5)] transition-transform duration-[200ms] ease-out pointer-events-none"
-                             style="transform-style: preserve-3d; transform: rotateX(0deg) rotateY(0deg) scale(1);">
-                    </div>
-                </div>
+                <img src="{{ $img('group47.png') }}" alt="The Spindle" loading="lazy"
+                     class="animate-float absolute top-1/2 left-[24%] lg:left-[28%] z-10 w-[200px] lg:w-[260px] -translate-y-[85%] rotate-[8deg] drop-shadow-[0_30px_40px_rgba(0,0,0,0.5)]">
             </div>
 
-            <div class="reveal reveal-right order-1 lg:order-2">
+            <div class="reveal reveal-right order-1 lg:order-2 -mt-12 lg:-mt-24">
                 <p class="font-montserrat text-[18px] font-semibold text-brand-200">WHO WE ARE?</p>
                 <h2 class="mt-1 text-web-title text-brand-10">But Spindle<br>Come as Solution</h2>
                 <p class="mt-6 max-w-[500px] font-montserrat text-[18px] leading-[28px] text-brand-200 opacity-90">
@@ -211,7 +210,7 @@
 </div>
 
     
-    <section id="writers" class="relative min-h-screen flex flex-col justify-center overflow-hidden bg-brand-50 py-20">
+    <section id="writers" class="relative min-h-screen flex flex-col justify-center overflow-hidden bg-brand-50 py-20 scroll-mt-24">
         <div class="mx-auto max-w-[1240px] px-6 lg:px-[52px] text-center -mt-4">
             <p class="reveal font-montserrat text-[18px] font-semibold text-secondary-200">OUR MISSION</p>
             <h2 class="mt-1 text-web-title text-text-80">
@@ -234,7 +233,7 @@
                         @for ($i = 0; $i < 4; $i++)
                             <div class="carousel-scale-item w-[70vw] sm:w-[400px] lg:w-[500px] shrink-0 px-2 transition-transform duration-75">
                                 <div class="overflow-hidden rounded-2xl border border-card-border bg-card-bg shadow-[0_20px_40px_rgba(43,31,23,0.25)]">
-                                    <img src="{{ $img('writers-center.png') }}" alt="Spindle dashboard preview" class="w-full object-cover">
+                                    <img src="{{ $img('writers-center.png') }}" alt="Spindle dashboard preview" loading="lazy" class="w-full object-cover">
                                 </div>
                             </div>
                         @endfor
@@ -244,7 +243,7 @@
                         @for ($i = 0; $i < 4; $i++)
                             <div class="carousel-scale-item w-[70vw] sm:w-[400px] lg:w-[500px] shrink-0 px-2 transition-transform duration-75">
                                 <div class="overflow-hidden rounded-2xl border border-card-border bg-card-bg shadow-[0_20px_40px_rgba(43,31,23,0.25)]">
-                                    <img src="{{ $img('writers-center.png') }}" alt="Spindle dashboard preview" class="w-full object-cover">
+                                    <img src="{{ $img('writers-center.png') }}" alt="Spindle dashboard preview" loading="lazy" class="w-full object-cover">
                                 </div>
                             </div>
                         @endfor
@@ -255,7 +254,7 @@
     </section>
 
     
-    <section id="tools" class="relative min-h-screen flex flex-col justify-center overflow-hidden bg-brand-50 pt-24 pb-8">
+    <section id="tools" class="relative min-h-screen flex flex-col justify-center overflow-hidden bg-brand-50 pt-24 pb-8 scroll-mt-32">
         <div class="mx-auto max-w-[1240px] px-6 lg:px-[52px] -mt-16">
             <p class="reveal font-montserrat text-[18px] font-semibold text-secondary-200">WHY CHOOSE US</p>
             <h2 class="reveal reveal-d1 mt-1 max-w-[599px] text-web-title text-text-80">We Provide A Tools For Writing</h2>
@@ -566,16 +565,16 @@
                     const localY = e.pageY - container.offsetTop;
                     const localX = e.pageX - container.offsetLeft;
                     
-                    // Burst of stars (tighter, smaller supernova)
-                    const burstCount = 15 + Math.random() * 8;
+                    // Burst of stars (balanced size and count)
+                    const burstCount = 10 + Math.random() * 5;
                     for (let i = 0; i < burstCount; i++) {
                         const angle = Math.random() * Math.PI * 2;
                         const speed = 0.5 + Math.random() * 1.5; 
                         particles.push({
                             x: localX,
                             y: localY,
-                            size: Math.random() * 5 + 3.0, // Made stars bigger
-                            life: 1.0 + Math.random() * 0.5, // Slightly longer life to see the big stars
+                            size: Math.random() * 3.0 + 2.0, // Medium stars
+                            life: 1.0 + Math.random() * 0.5, // Standard life
                             vx: Math.cos(angle) * speed,
                             vy: Math.sin(angle) * speed
                         });
@@ -597,19 +596,36 @@
                         continue;
                     }
                     
+                    // Inner bright core
                     ctx.beginPath();
                     ctx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2);
                     ctx.fillStyle = `rgba(255, 255, 255, ${p.life})`;
                     ctx.fill();
                     
-                    // Add subtle glow
-                    ctx.shadowBlur = 6;
-                    ctx.shadowColor = "white";
+                    // Hardware-accelerated fake glow (thinner as requested)
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, (p.size * p.life) * 1.6, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(255, 255, 255, ${p.life * 0.15})`;
+                    ctx.fill();
                 }
                 
-                requestAnimationFrame(drawStars);
+                if (isVisible) {
+                    requestAnimationFrame(drawStars);
+                }
             }
-            drawStars();
+
+            // Performance Optimization: Only run animation when canvas is visible
+            let isVisible = false;
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    const wasVisible = isVisible;
+                    isVisible = entry.isIntersecting;
+                    if (isVisible && !wasVisible) {
+                        drawStars(); // Kickstart the loop
+                    }
+                });
+            });
+            observer.observe(canvas);
         });
 
         // Leaf Burst Effect
@@ -740,10 +756,23 @@
                     item.style.transform = `scale(${scale})`;
                 });
                 
-                requestAnimationFrame(updateScales);
+                if (isVisible) {
+                    requestAnimationFrame(updateScales);
+                }
             }
             
-            requestAnimationFrame(updateScales);
+            // Performance Optimization: Only calculate layout if carousel is visible
+            let isVisible = false;
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    const wasVisible = isVisible;
+                    isVisible = entry.isIntersecting;
+                    if (isVisible && !wasVisible) {
+                        updateScales();
+                    }
+                });
+            });
+            observer.observe(track);
         });
 
         // Smart Navbar (Hide on scroll down, show on scroll up)
@@ -874,31 +903,31 @@
             }, { passive: true });
             
             function animateParallax() {
-                // Smooth interpolation (lerp)
-                currentY += (scrollY - currentY) * 0.1;
-                
-                parallaxWraps.forEach(wrap => {
-                    // Increased speed significantly to make it very obvious
-                    const speed = parseFloat(wrap.dataset.speed || 0.4) * 1.5; 
-                    const parent = wrap.parentElement;
-                    if (!parent) return;
+                // Only run heavy DOM calculations if the page has actually scrolled
+                if (Math.abs(scrollY - currentY) > 0.1) {
+                    // Smooth interpolation (lerp)
+                    currentY += (scrollY - currentY) * 0.1;
                     
-                    const rect = parent.getBoundingClientRect();
-                    
-                    // Add padding to visibility check so it doesn't suddenly stop animating at edges
-                    if (rect.bottom > -200 && rect.top < window.innerHeight + 200) {
-                        // Calculate smoothed rect top!
-                        const smoothTop = rect.top + (scrollY - currentY);
-                        // Move background in the opposite direction of scroll to make it slower
-                        const yPos = -(smoothTop * speed);
-                        wrap.style.transform = `translate3d(0, ${yPos}px, 0)`;
-                    }
-                });
+                    parallaxWraps.forEach(wrap => {
+                        const speed = parseFloat(wrap.dataset.speed || 0.4) * 1.5; 
+                        const parent = wrap.parentElement;
+                        if (!parent) return;
+                        
+                        const rect = parent.getBoundingClientRect();
+                        
+                        if (rect.bottom > -200 && rect.top < window.innerHeight + 200) {
+                            const smoothTop = rect.top + (scrollY - currentY);
+                            const yPos = -(smoothTop * speed);
+                            wrap.style.transform = `translate3d(0, ${yPos}px, 0)`;
+                        }
+                    });
+                }
                 requestAnimationFrame(animateParallax);
             }
             animateParallax();
         });
     </script>
+
 
     <script>
         // True Scroll-Jacking (Section-by-Section)
@@ -1137,8 +1166,8 @@
                             // Smoother falloff for better response without being too explosive
                             const force = Math.pow((repelRadius - dist) / repelRadius, 1.5);
                             
-                            p.vx += (dx / dist) * force * 2.0; // Increased pushing force
-                            p.vy += (dy / dist) * force * 2.0;
+                            p.vx += (dx / dist) * force * 1.2; // Slowed down pushing force
+                            p.vy += (dy / dist) * force * 1.2;
                         }
                         
                         // Higher friction when scattering makes particles feel heavier and slide less
@@ -1159,16 +1188,27 @@
 
                     // Draw
                     ctx.fillStyle = p.color;
-                    // Slightly larger size based on perspective scale
                     const size = p.baseSize * scale;
-                    // For a more glowing look, use fillRect but we could add shadowBlur for some (expensive)
-                    // We'll stick to fillRect but make the size varied
                     ctx.fillRect(screenX + p.offsetX, screenY + p.offsetY, size, size);
                 }
 
-                requestAnimationFrame(animate);
+                if (isVisible) {
+                    requestAnimationFrame(animate);
+                }
             }
-            animate();
+            
+            // Performance Optimization: Pause galaxy rendering when off-screen
+            let isVisible = false;
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    const wasVisible = isVisible;
+                    isVisible = entry.isIntersecting;
+                    if (isVisible && !wasVisible) {
+                        animate();
+                    }
+                });
+            });
+            observer.observe(canvas);
         };
     });
     </script>
