@@ -345,16 +345,16 @@
 
     /* Kelap-kelip bintang */
     @keyframes twinkle {
-        0%, 100% { opacity: 0.05; }
+        0%, 100% { opacity: 0.2; }
         50%      { opacity: 1; }
     }
-    .animate-twinkle { animation: twinkle 1.8s ease-in-out infinite; }
+    .animate-twinkle { animation: twinkle 3.5s ease-in-out infinite; }
 
     /* Awan menyapu perlahan di langit hero */
     @keyframes cloud-drift   { from { transform: translateX(-6%); } to { transform: translateX(7%); } }
     @keyframes cloud-drift-2 { from { transform: translateX(8%); }  to { transform: translateX(-9%); } }
-    .animate-cloud   { animation: cloud-drift   12s ease-in-out infinite alternate; }
-    .animate-cloud-2 { animation: cloud-drift-2 16s ease-in-out infinite alternate; }
+    .animate-cloud   { animation: cloud-drift   22s ease-in-out infinite alternate; }
+    .animate-cloud-2 { animation: cloud-drift-2 30s ease-in-out infinite alternate; }
 
     /* Ayunan lembut (syal / figur hero) — organik seperti tertiup angin */
     @keyframes sway {
