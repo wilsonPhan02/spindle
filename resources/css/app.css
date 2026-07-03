@@ -239,6 +239,14 @@
         letter-spacing: 0;
     }
 
+    .text-app-caption {
+        font-family: var(--font-montserrat);
+        font-weight: 500; /* Medium */
+        font-size: 0.67rem; /* 12px */
+        line-height: 1rem; /* 16px */
+        letter-spacing: 0;
+    }
+
     /* ==============================
        FLATPICKR CUSTOM
        ============================== */

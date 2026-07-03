@@ -125,7 +125,7 @@ new class extends Component {
     @if($isOpen)
         <div class="fixed inset-0 z-[100] flex items-center justify-center bg-text-100/30 backdrop-blur-sm transition-opacity">
             
-            <div class="relative bg-bg-main w-full max-w-4xl h-[90vh] rounded-2xl shadow-2xl flex flex-col overflow-hidden mx-4 border border-bg-border">
+            <div class="relative bg-bg-main w-full max-w-3xl h-[90vh] rounded-2xl shadow-2xl flex flex-col overflow-hidden mx-4 border border-bg-border">
                 
                 <button wire:click="closeModal" class="absolute top-6 right-6 w-10 h-10 rounded-full border border-brand-200 text-text-60 hover:bg-brand-50 hover:text-secondary-200 flex items-center justify-center transition-colors z-50 bg-bg-main">
                     <x-icons.add-default rotate="45"/>
@@ -143,9 +143,9 @@ new class extends Component {
                         <div class="flex flex-col gap-8 items-center w-full">
                             @foreach($this->availableTemplates as $template)
                                 <div wire:click="viewDetail('{{ $template->template_id }}')" 
-                                     class="group relative w-full max-w-2xl h-auto bg-[#212121] rounded-xl overflow-hidden cursor-pointer border border-transparent hover:border-brand-200 transition-all p-8 md:p-12 shadow-sm">
+                                     class="group relative w-full max-w-lg aspect-[16/9] bg-[#212121] rounded-xl overflow-hidden cursor-pointer border border-transparent hover:border-brand-200 transition-all p-8 md:p-12 shadow-sm">
                                     
-                                    <div class="w-full flex items-center justify-center transition-all duration-300 group-hover:blur-[1px] group-hover:opacity-90">
+                                    <div class="w-full max-w-2xl h-full flex items-center justify-center transition-all duration-300 group-hover:blur-[1px] group-hover:opacity-90">
                                         @if($template->image_preview)
                                             <x-dynamic-component :component="$template->image_preview" class="w-full max-w-lg h-auto" />
                                         @else
@@ -191,9 +191,9 @@ new class extends Component {
                                 </button>
                             </div>
 
-                            <div class="w-full bg-[#1C1C1C] rounded-xl p-8 flex items-center justify-center mb-8">
+                            <div class="w-full max-w-xl h-[60vh] bg-[#1C1C1C] rounded-xl p-8 flex items-center justify-center mb-8">
                                 @if($this->selectedTemplate->image_preview)
-                                    <x-dynamic-component :component="$this->selectedTemplate->image_preview" class="w-full h-auto max-w-2xl" />
+                                    <x-dynamic-component :component="$this->selectedTemplate->image_preview" class="w-full h-auto max-w-lg" />
                                 @endif
                             </div>
                             

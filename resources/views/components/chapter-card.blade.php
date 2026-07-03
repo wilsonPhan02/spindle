@@ -83,7 +83,7 @@
         
     </div>
     
-    <div class="bg-card-bg border border-card-border rounded-lg shadow-md flex flex-col flex-1 overflow-hidden transition-all group-hover:border-secondary-200 group-hover:shadow-lg group-hover:bg-card-hover min-h-[260px]">
+    <div class="bg-card-bg border border-card-border rounded-lg shadow-md flex flex-col flex-col-1 overflow-hidden transition-all group-hover:border-secondary-200 group-hover:shadow-lg group-hover:bg-card-hover min-h-[230px]">
         
         <div class="p-5 flex-1 flex flex-col">
             
@@ -98,23 +98,23 @@
             </p>
         </div>
 
-        <div class="bg-brand-100 px-5 py-4 flex flex-col gap-2 group-hover:bg-brand-150">
+        <div class="bg-brand-100 px-3 py-3 flex flex-col gap-2 group-hover:bg-brand-150">
             
             <div class="flex items-center gap-2 overflow-hidden">
                 @if($chapter->tags->isNotEmpty())
                     @foreach($chapter->tags->take(2) as $tag)
-                        <span class="text-app-desc-feature text-secondary-100 bg-brand-100 border border-brand-200 px-2 py-0.5 rounded truncate max-w-[80px]">
+                        <span class="text-app-caption text-secondary-100 bg-brand-100 border border-brand-200 px-2 py-0.5 rounded truncate max-w-[80px]">
                             {{ $tag->name }}
                         </span>
                     @endforeach
 
                     @if($chapter->tags->count() > 2)
-                        <span class="text-app-desc-feature text-secondary-100 px-1">
+                        <span class="text-app-caption text-secondary-100 px-1">
                             +{{ $chapter->tags->count() - 2 }} more
                         </span>
                     @endif
                 @else
-                    <span class="text-app-desc-feature text-secondary-100 bg-card-hover border border-dashed border-brand-200 px-2 py-0.5 rounded italic">
+                    <span class="text-app-caption text-secondary-100 bg-card-hover border border-dashed border-brand-200 px-2 py-0.5 rounded italic">
                         No tag here
                     </span>
                 @endif
@@ -127,7 +127,7 @@
                 </span>
                 
                 <span @class([
-                    'text-app-desc-feature text-text-80 px-2.5 py-1.5 rounded-md flex items-center gap-1.5 shadow-sm',
+                    'text-app-caption text-text-80 px-2 py-1 rounded-md flex items-center gap-1.5 shadow-sm',
                     'bg-warning-100/70' => $chapter->status === 'In Progress',
                     'bg-success-100/70' => $chapter->status === 'Completed',
                     'bg-text-100' => !in_array($chapter->status, ['In Progress', 'Completed'])

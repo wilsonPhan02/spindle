@@ -51,16 +51,16 @@ new #[Layout('layouts.app')] class extends Component {
         </div>
 
         @if(!$project->template_id)
-            <div class="relative w-full h-[600px] bg-dot-pattern border border-brand-100 rounded-md flex flex-col items-center justify-center shadow-sm">
+            <div class="relative w-full h-[calc(82vh-120px)] bg-dot-pattern border border-brand-100 rounded-md flex flex-col items-center justify-center shadow-sm">
                 <x-icons.no-structure class="mb-6"/>
-                <h2 class="text-app-heading-1 text-brand-200 mb-2">You Didn't Use Any Structure!</h2>
-                <p class="text-app-subtitle-1 text-brand-200 mb-2">Choose your structure now and start writing</p>
+                <h2 class="text-app-heading-2 text-brand-200 mb-2">You Didn't Use Any Structure!</h2>
+                <p class="text-app-feature text-brand-200 mb-2">Choose your structure now and start writing</p>
                 <button wire:click="addTemplate" class="flex items-center gap-4 bg-secondary-100 hover:bg-secondary-150 text-bg-main px-6 py-2.5 rounded-md text-app-body-medium transition-colors mt-4 shadow-sm">
                     <x-icons.add-default size="w-4 h-4"/> Add Structure
                 </button>
             </div>
         @else
-            <div class="relative w-full h-[600px] bg-dot-pattern border border-brand-100 rounded-md shadow-sm overflow-hidden">
+            <div class="relative w-full h-[calc(82vh-120px)] bg-dot-pattern border border-brand-100 rounded-md shadow-sm overflow-hidden">
                 <livewire:components.structure-canvas :project="$project" />
             </div>
         @endif
