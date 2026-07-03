@@ -6,6 +6,7 @@ use App\Models\User;
 use Livewire\Attributes\Title;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rules\Password;
 
 new #[Layout('layouts.guest')] #[Title('Sign Up - Spindle')] class extends Component
 {
@@ -19,12 +20,24 @@ new #[Layout('layouts.guest')] #[Title('Sign Up - Spindle')] class extends Compo
         // 1. Validasi
         $this->validate([
             'email' => ['required', 'email', 'unique:users,email'],
-            'password' => ['required', 'min:8'],
+            'password' => [
+                'required', 
+                Password::min(8)
+                    ->mixedCase()
+                    ->letters()
+                    ->numbers()
+                    ->symbols()
+            ],
             'password_confirmation' => ['required', 'same:password'],
             'terms' => ['accepted'],
         ], [
             'terms.accepted' => 'You must agree to the terms and conditions.',
-            'password_confirmation.same' => 'The password confirmation does not match.'
+            'password_confirmation.same' => 'The password confirmation does not match.',
+            'password.min' => 'Password must be at least 8 characters and contain at least one uppercase character, one lowercase character, one number, and one special character.',
+            'password.letters' => 'Password must be at least 8 characters and contain at least one uppercase character, one lowercase character, one number, and one special character.',
+            'password.mixed' => 'Password must be at least 8 characters and contain at least one uppercase character, one lowercase character, one number, and one special character.',
+            'password.numbers' => 'Password must be at least 8 characters and contain at least one uppercase character, one lowercase character, one number, and one special character.',
+            'password.symbols' => 'Password must be at least 8 characters and contain at least one uppercase character, one lowercase character, one number, and one special character.',
         ]);
 
         // 2. Simpan User (profile dibuat otomatis via User::booted())
