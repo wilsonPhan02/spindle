@@ -52,6 +52,7 @@ new #[Layout('layouts.app')] class extends Component {
             $section->update(['archived_at' => null]);
             $section->projects()->whereNotNull('archived_at')->update(['archived_at' => null]);
             $this->loadArchived();
+            $this->dispatch('project-updated');
         }
     }
 
@@ -66,6 +67,7 @@ new #[Layout('layouts.app')] class extends Component {
                 $section->projects()->whereNotNull('archived_at')->delete();
             }
             $this->loadArchived();
+            $this->dispatch('project-updated');
         }
     }
 
@@ -78,6 +80,7 @@ new #[Layout('layouts.app')] class extends Component {
                 $project->section->update(['archived_at' => null]);
             }
             $this->loadArchived();
+            $this->dispatch('project-updated');
         }
     }
 
@@ -86,6 +89,7 @@ new #[Layout('layouts.app')] class extends Component {
         if ($project) {
             $project->delete();
             $this->loadArchived();
+            $this->dispatch('project-updated');
         }
     }
 }; ?>
