@@ -25,12 +25,13 @@ new class extends Component {
                 ->where('is_pinned', true)
                 ->whereNull('archived_at')
                 ->latest('updated_at')
+                ->take(10)
                 ->get();
 
             $this->recentProjects = $user->projects()
                 ->whereNull('archived_at')
                 ->latest('updated_at')
-                ->take(20)
+                ->take(10)
                 ->get();
         }
     }
