@@ -402,14 +402,25 @@ new class extends Component {
                                     @else
                                         <x-dynamic-component :component="$this->selectedTemplate->image_preview" class="w-full h-auto max-w-lg" />
                                     @endif
+                                @else
+                                    <div class="flex flex-col items-center justify-center h-48 text-brand-200">
+                                        <x-icons.no-structure class="w-12 h-12 opacity-50 mb-2"/>
+                                        <span class="text-app-desc-feature">No Preview Available</span>
+                                    </div>
                                 @endif
                             </div>
                             
+                            
                             <div class="w-full mb-12 px-3">
                                 <hr class="mb-4 border-text-60 border-t-1">
-                                <p class="text-web-body-small text-text-70 leading-relaxed whitespace-pre-wrap">{{ $this->selectedTemplate->description }}</p>
+                                @if ($this->selectedTemplate->description)
+                                    <p class="text-web-body-small text-text-70 leading-relaxed whitespace-pre-wrap">{{ $this->selectedTemplate->description }}</p>
+                                @else
+                                    <p class="text-center text-web-body-small text-text-70 leading-relaxed whitespace-pre-wrap">No description for this template</p>
+                                @endif
                                 <hr class="mt-4 border-text-60 border-t-1">
                             </div>
+                            
 
                             <div class="w-full flex flex-col gap-10 px-3">
                                 @forelse($this->selectedTemplate->sections as $section)
@@ -417,9 +428,13 @@ new class extends Component {
                                         <h3 class="text-web-heading-1 text-text-90 mb-4">
                                             {{ $section->title }}
                                         </h3>
-                                        <div class="prose prose-stone prose-p:text-text-70 prose-li:text-text-70 prose-strong:text-text-80 max-w-none text-web-body-small leading-relaxed">
-                                            {!! Str::markdown($section->goal) !!}
-                                        </div>
+                                        @if ($section->goal)
+                                            <div class="prose prose-stone prose-p:text-text-70 prose-li:text-text-70 prose-strong:text-text-80 max-w-none text-web-body-small leading-relaxed">
+                                                {!! Str::markdown($section->goal) !!}
+                                            </div>
+                                        @else
+                                            <p class=" text-text-60 italic text-app-body-small">No details for this section yet.</p>
+                                        @endif
                                     </div>
                                 @empty
                                     <p class="text-center text-text-60 italic text-app-body-small">No detailed steps for this template yet.</p>
