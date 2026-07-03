@@ -72,12 +72,9 @@ new class extends Component {
         }, 50);
     }
 })">
-    <header class="flex justify-between items-center mb-8">
-        <div class="flex items-center gap-3 text-[18px] text-[#7A7A7A]">
-            <span class="text-[#2C2C2C] font-semibold">Dashboard</span>
-        </div>
-        <x-logo class="h-8 w-auto text-text-100" />
-    </header>
+    <x-breadcrumb :items="[
+        ['label' => 'Dashboard']
+    ]" />
 
     @php
         $displayName = Auth::user()->profile?->username ?? explode('@', Auth::user()->email)[0];

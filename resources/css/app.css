@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:wght@400;700&family=Montserrat:wght@400;500;600;700;800&display=swap');
+@plugin "@tailwindcss/typography";
 @import 'tailwindcss';
 
 @source '../views';
@@ -234,6 +235,14 @@
         font-family: var(--font-montserrat);
         font-weight: 500; /* Medium */
         font-size: 0.75rem; /* 12px */
+        line-height: 1rem; /* 16px */
+        letter-spacing: 0;
+    }
+
+    .text-app-caption {
+        font-family: var(--font-montserrat);
+        font-weight: 500; /* Medium */
+        font-size: 0.67rem; /* 12px */
         line-height: 1rem; /* 16px */
         letter-spacing: 0;
     }

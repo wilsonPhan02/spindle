@@ -6,6 +6,10 @@
     <title>Spindle — Spin A Yarn</title>
 
     <link rel="icon" href="/favicon.png?v=5" type="image/png">
+    
+    <!-- Preload critical hero assets for instant paint -->
+    <link rel="preload" as="image" href="{{ asset('images/landing/hero-figure.png') }}">
+    <link rel="preload" as="image" href="{{ asset('images/landing/mtn-peak2.png') }}">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
@@ -27,6 +31,13 @@
             animation: mountainRise 1.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
             animation-delay: 0.3s;
             opacity: 0;
+        }
+        @keyframes book-wave {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); } /* Very subtle wave */
+        }
+        .animate-book-wave {
+            animation: book-wave 4s ease-in-out infinite;
         }
     </style>
 </head>
@@ -131,12 +142,11 @@
     
     <div id="dark-universe" class="relative">
         
-        <section class="relative overflow-hidden bg-[#2a1f17]">
+        <section class="relative bg-[#2a1f17]">
             
             <div class="pointer-events-none absolute inset-0 z-0">
-                <div class="absolute right-[4%] top-1/2 h-[520px] w-[520px] max-w-[86%] -translate-y-1/2">
-                    <img src="{{ $img('galaxy-spiral.png') }}" alt=""
-                         class="animate-spin-slow h-full w-full object-contain opacity-80" style="animation-duration: 220s;">
+                <div class="absolute right-[0%] top-[55%] h-[750px] w-[1100px] max-w-none -translate-y-1/2">
+                    <canvas id="galaxy-particle-canvas" class="h-full w-full"></canvas>
                 </div>
             </div>
             @include('partials.starfield')
@@ -156,32 +166,38 @@
                 <p class="reveal font-montserrat text-[18px] text-brand-200">However, every Writer faces the same monster</p>
                 <h2 class="reveal reveal-d1 mt-2 font-merriweather text-[44px] font-bold italic text-brand-10">“The Great Tangle”</h2>
 
-                <div class="mt-14 flex flex-wrap items-center justify-center gap-6">
+                <div class="mt-14 flex flex-wrap items-center justify-center gap-6" style="perspective: 1500px;">
                     @foreach(['tangle-1.png' => 'rotate-[-5deg]', 'tangle-2.png' => 'lg:-translate-y-4 z-10', 'tangle-3.png' => 'rotate-[5deg]'] as $file => $tilt)
-                        <img src="{{ $img($file) }}" alt="The Great Tangle"
-                             class="reveal reveal-d{{ $loop->iteration }} animate-float w-[300px] max-w-[80%] {{ $tilt }} drop-shadow-[0_24px_40px_rgba(0,0,0,0.45)]"
-                             style="animation-delay: {{ $loop->index * 1.1 }}s">
+                        <div class="reveal reveal-d{{ $loop->iteration }} {{ $tilt }} w-[300px] max-w-[80%] transition-all duration-500 hover:z-20">
+                            <div class="animate-float hover:[animation-play-state:paused]" style="animation-delay: {{ $loop->index * 1.1 }}s; transform-style: preserve-3d;">
+                                <div class="tilt-container relative w-full h-auto cursor-pointer" style="perspective: 1000px;">
+                                    <img src="{{ $img($file) }}" alt="The Great Tangle" loading="lazy"
+                                         class="tilt-element w-full h-auto drop-shadow-[0_24px_40px_rgba(0,0,0,0.45)] transition-transform duration-[200ms] ease-out pointer-events-none"
+                                         style="transform-style: preserve-3d; transform: rotateX(0deg) rotateY(0deg) scale(1);">
+                                </div>
+                            </div>
+                        </div>
                     @endforeach
                 </div>
             </div>
         </section>
     
-    <section id="about" class="relative min-h-screen flex flex-col justify-center overflow-hidden bg-[#2a1f17] py-20">
+    <section id="about" class="relative min-h-screen flex flex-col justify-center overflow-hidden bg-[#2a1f17] py-20 scroll-mt-24">
         @include('partials.starfield')
         <div class="relative z-10 mx-auto grid max-w-[1240px] grid-cols-1 items-center gap-12 px-6 lg:px-[52px] lg:grid-cols-2 mt-12 lg:mt-24">
             
             
             <div class="reveal reveal-left relative order-2 h-[500px] w-full lg:order-1">
                 
-                <img src="{{ $img('hand.png') }}" alt=""
+                <img src="{{ $img('hand.png') }}" alt="" loading="lazy"
                      class="pointer-events-none absolute top-1/2 left-[-15%] lg:left-[-10%] z-0 w-[100%] lg:w-[500px] max-w-none -translate-y-[40%] select-none">
                 
-                
-                <img src="{{ $img('group47.png') }}" alt="The Spindle"
+                <!-- Spindle Tool/Card (Foreground) -->
+                <img src="{{ $img('group47.png') }}" alt="The Spindle" loading="lazy"
                      class="animate-float absolute top-1/2 left-[24%] lg:left-[28%] z-10 w-[200px] lg:w-[260px] -translate-y-[85%] rotate-[8deg] drop-shadow-[0_30px_40px_rgba(0,0,0,0.5)]">
             </div>
 
-            <div class="reveal reveal-right order-1 lg:order-2">
+            <div class="reveal reveal-right order-1 lg:order-2 -mt-12 lg:-mt-24">
                 <p class="font-montserrat text-[18px] font-semibold text-brand-200">WHO WE ARE?</p>
                 <h2 class="mt-1 text-web-title text-brand-10">But Spindle<br>Come as Solution</h2>
                 <p class="mt-6 max-w-[500px] font-montserrat text-[18px] leading-[28px] text-brand-200 opacity-90">
@@ -194,7 +210,7 @@
 </div>
 
     
-    <section id="writers" class="relative min-h-screen flex flex-col justify-center overflow-hidden bg-brand-50 py-20">
+    <section id="writers" class="relative min-h-screen flex flex-col justify-center overflow-hidden bg-brand-50 py-20 scroll-mt-24">
         <div class="mx-auto max-w-[1240px] px-6 lg:px-[52px] text-center -mt-4">
             <p class="reveal font-montserrat text-[18px] font-semibold text-secondary-200">OUR MISSION</p>
             <h2 class="mt-1 text-web-title text-text-80">
@@ -217,7 +233,7 @@
                         @for ($i = 0; $i < 4; $i++)
                             <div class="carousel-scale-item w-[70vw] sm:w-[400px] lg:w-[500px] shrink-0 px-2 transition-transform duration-75">
                                 <div class="overflow-hidden rounded-2xl border border-card-border bg-card-bg shadow-[0_20px_40px_rgba(43,31,23,0.25)]">
-                                    <img src="{{ $img('writers-center.png') }}" alt="Spindle dashboard preview" class="w-full object-cover">
+                                    <img src="{{ $img('writers-center.png') }}" alt="Spindle dashboard preview" loading="lazy" class="w-full object-cover">
                                 </div>
                             </div>
                         @endfor
@@ -227,7 +243,7 @@
                         @for ($i = 0; $i < 4; $i++)
                             <div class="carousel-scale-item w-[70vw] sm:w-[400px] lg:w-[500px] shrink-0 px-2 transition-transform duration-75">
                                 <div class="overflow-hidden rounded-2xl border border-card-border bg-card-bg shadow-[0_20px_40px_rgba(43,31,23,0.25)]">
-                                    <img src="{{ $img('writers-center.png') }}" alt="Spindle dashboard preview" class="w-full object-cover">
+                                    <img src="{{ $img('writers-center.png') }}" alt="Spindle dashboard preview" loading="lazy" class="w-full object-cover">
                                 </div>
                             </div>
                         @endfor
@@ -238,7 +254,7 @@
     </section>
 
     
-    <section id="tools" class="relative min-h-screen flex flex-col justify-center overflow-hidden bg-brand-50 pt-24 pb-8">
+    <section id="tools" class="relative min-h-screen flex flex-col justify-center overflow-hidden bg-brand-50 pt-24 pb-8 scroll-mt-32">
         <div class="mx-auto max-w-[1240px] px-6 lg:px-[52px] -mt-16">
             <p class="reveal font-montserrat text-[18px] font-semibold text-secondary-200">WHY CHOOSE US</p>
             <h2 class="reveal reveal-d1 mt-1 max-w-[599px] text-web-title text-text-80">We Provide A Tools For Writing</h2>
@@ -336,23 +352,29 @@
                     Join Us Now
                 </a>
                 
-                <div class="mt-10 flex items-end justify-center gap-2 px-4 pb-10">
-                    @php
-                        $books = [
-                            [210,'#9A7D66',34],[264,'#e1d7ce',30],[236,'#81644D',40],[276,'#c9beb5',32],
-                            [242,'#b1a086',34],[222,'#9A7D66',30],[252,'#81644D',40],[248,'#c9beb5',32],
-                            [244,'#b1a086',36],[224,'#9A7D66',34],[190,'#81644D',54],[200,'#c9beb5',46],
-                            [224,'#b1a086',40],[276,'#81644D',40],
-                        ];
-                    @endphp
-                    @foreach($books as $i => $b)
-                        <span class="animate-float-slow relative inline-block rounded-t-sm"
-                              style="height: {{ $b[0] }}px; width: {{ $b[2] }}px; animation-delay: {{ $i * 0.25 }}s;
-                                     background: linear-gradient(90deg, rgba(0,0,0,0.2), transparent 30%, transparent 70%, rgba(255,255,255,0.18)), {{ $b[1] }};">
-                            <span class="absolute inset-x-1 top-4 h-0.5 rounded bg-black/15"></span>
-                            <span class="absolute inset-x-1 bottom-3 h-2 rounded-sm bg-white/25"></span>
-                        </span>
-                    @endforeach
+                <div class="mt-10 flex justify-center px-4 pb-10">
+                    <!-- Tight wrapper so hover only triggers when actually on the books -->
+                    <div id="books-container" class="flex items-end gap-2 cursor-pointer h-[280px]">
+                        @php
+                            $books = [
+                                [210,'#9A7D66',34],[264,'#e1d7ce',30],[236,'#81644D',40],[276,'#c9beb5',32],
+                                [242,'#b1a086',34],[222,'#9A7D66',30],[252,'#81644D',40],[248,'#c9beb5',32],
+                                [244,'#b1a086',36],[224,'#9A7D66',34],[190,'#81644D',54],[200,'#c9beb5',46],
+                                [224,'#b1a086',40],[276,'#81644D',40],
+                            ];
+                        @endphp
+                        @foreach($books as $i => $b)
+                            <span class="book-wrapper animate-book-wave inline-block" style="animation-delay: {{ $i * 0.2 }}s;">
+                                <span class="book-item relative inline-block rounded-t-sm origin-bottom"
+                                      style="height: {{ $b[0] }}px; width: {{ $b[2] }}px;
+                                             background: linear-gradient(90deg, rgba(0,0,0,0.2), transparent 30%, transparent 70%, rgba(255,255,255,0.18)), {{ $b[1] }};
+                                             box-shadow: 0 5px 15px rgba(0,0,0,0.25);">
+                                    <span class="absolute inset-x-1 top-4 h-0.5 rounded bg-black/15"></span>
+                                    <span class="absolute inset-x-1 bottom-3 h-2 rounded-sm bg-white/25"></span>
+                                </span>
+                            </span>
+                        @endforeach
+                    </div>
                 </div>
             </div>
         </div>
@@ -543,16 +565,16 @@
                     const localY = e.pageY - container.offsetTop;
                     const localX = e.pageX - container.offsetLeft;
                     
-                    // Burst of stars (tighter, smaller supernova)
-                    const burstCount = 15 + Math.random() * 8;
+                    // Burst of stars (balanced size and count)
+                    const burstCount = 10 + Math.random() * 5;
                     for (let i = 0; i < burstCount; i++) {
                         const angle = Math.random() * Math.PI * 2;
                         const speed = 0.5 + Math.random() * 1.5; 
                         particles.push({
                             x: localX,
                             y: localY,
-                            size: Math.random() * 5 + 3.0, // Made stars bigger
-                            life: 1.0 + Math.random() * 0.5, // Slightly longer life to see the big stars
+                            size: Math.random() * 3.0 + 2.0, // Medium stars
+                            life: 1.0 + Math.random() * 0.5, // Standard life
                             vx: Math.cos(angle) * speed,
                             vy: Math.sin(angle) * speed
                         });
@@ -574,19 +596,36 @@
                         continue;
                     }
                     
+                    // Inner bright core
                     ctx.beginPath();
                     ctx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2);
                     ctx.fillStyle = `rgba(255, 255, 255, ${p.life})`;
                     ctx.fill();
                     
-                    // Add subtle glow
-                    ctx.shadowBlur = 6;
-                    ctx.shadowColor = "white";
+                    // Hardware-accelerated fake glow (thinner as requested)
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, (p.size * p.life) * 1.6, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(255, 255, 255, ${p.life * 0.15})`;
+                    ctx.fill();
                 }
                 
-                requestAnimationFrame(drawStars);
+                if (isVisible) {
+                    requestAnimationFrame(drawStars);
+                }
             }
-            drawStars();
+
+            // Performance Optimization: Only run animation when canvas is visible
+            let isVisible = false;
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    const wasVisible = isVisible;
+                    isVisible = entry.isIntersecting;
+                    if (isVisible && !wasVisible) {
+                        drawStars(); // Kickstart the loop
+                    }
+                });
+            });
+            observer.observe(canvas);
         });
 
         // Leaf Burst Effect
@@ -717,10 +756,23 @@
                     item.style.transform = `scale(${scale})`;
                 });
                 
-                requestAnimationFrame(updateScales);
+                if (isVisible) {
+                    requestAnimationFrame(updateScales);
+                }
             }
             
-            requestAnimationFrame(updateScales);
+            // Performance Optimization: Only calculate layout if carousel is visible
+            let isVisible = false;
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    const wasVisible = isVisible;
+                    isVisible = entry.isIntersecting;
+                    if (isVisible && !wasVisible) {
+                        updateScales();
+                    }
+                });
+            });
+            observer.observe(track);
         });
 
         // Smart Navbar (Hide on scroll down, show on scroll up)
@@ -744,6 +796,102 @@
     </script>
 
     <script>
+        // Dynamic 3D Card Tilt Effect
+        document.addEventListener('DOMContentLoaded', () => {
+            const containers = document.querySelectorAll('.tilt-container');
+            
+            containers.forEach(container => {
+                const element = container.querySelector('.tilt-element');
+                
+                container.addEventListener('mousemove', (e) => {
+                    const rect = container.getBoundingClientRect();
+                    const x = e.clientX - rect.left; 
+                    const y = e.clientY - rect.top;  
+                    
+                    const centerX = rect.width / 2;
+                    const centerY = rect.height / 2;
+                    
+                    // Calculate tilt based on mouse distance from center
+                    // Pushes the hovered area INWARDS
+                    const rotateX = ((centerY - y) / centerY) * 18; 
+                    const rotateY = ((x - centerX) / centerX) * 18;
+                    
+                    element.style.transform = `scale(1.08) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+                });
+                
+                container.addEventListener('mouseleave', () => {
+                    // Reset to flat when mouse leaves
+                    element.style.transform = `scale(1) rotateX(0deg) rotateY(0deg)`;
+                });
+            });
+        });
+
+        // Dynamic Books Wave Effect
+        document.addEventListener('DOMContentLoaded', () => {
+            const container = document.getElementById('books-container');
+            if (!container) return;
+            
+            const items = container.querySelectorAll('.book-item');
+            
+            const booksData = Array.from(items).map(book => ({
+                el: book,
+                currentLift: 0,
+                targetLift: 0
+            }));
+            
+            let isHovering = false;
+            let mouseX = 0;
+            const radius = 220; 
+            
+            container.addEventListener('mouseenter', () => {
+                isHovering = true;
+            });
+            
+            container.addEventListener('mousemove', (e) => {
+                mouseX = e.clientX;
+            });
+            
+            container.addEventListener('mouseleave', () => {
+                isHovering = false;
+            });
+            
+            function animateBooks() {
+                booksData.forEach(data => {
+                    if (isHovering) {
+                        const rect = data.el.getBoundingClientRect();
+                        const bookCenterX = rect.left + rect.width / 2;
+                        const dist = Math.abs(mouseX - bookCenterX);
+                        
+                        if (dist < radius) {
+                            const intensity = Math.cos((dist / radius) * (Math.PI / 2));
+                            data.targetLift = intensity * 40; // Increased lift for a more pronounced wave
+                        } else {
+                            data.targetLift = 0;
+                        }
+                    } else {
+                        data.targetLift = 0;
+                    }
+                    
+                    // Smooth linear interpolation (lerp)
+                    data.currentLift += (data.targetLift - data.currentLift) * 0.08;
+                    
+                    // Apply transform
+                    if (Math.abs(data.targetLift - data.currentLift) > 0.1 || data.currentLift > 0.1) {
+                        data.el.style.transform = `translateY(-${data.currentLift}px)`;
+                    } else if (data.currentLift <= 0.1 && data.el.style.transform !== 'translateY(0px)') {
+                        data.currentLift = 0;
+                        data.el.style.transform = 'translateY(0px)';
+                    }
+                });
+                
+                requestAnimationFrame(animateBooks);
+            }
+            
+            animateBooks();
+        });
+    </script>
+
+    <script>
         // Parallax Depth Effect
         document.addEventListener('DOMContentLoaded', () => {
             const parallaxWraps = document.querySelectorAll('.parallax-wrap');
@@ -755,31 +903,31 @@
             }, { passive: true });
             
             function animateParallax() {
-                // Smooth interpolation (lerp)
-                currentY += (scrollY - currentY) * 0.1;
-                
-                parallaxWraps.forEach(wrap => {
-                    // Increased speed significantly to make it very obvious
-                    const speed = parseFloat(wrap.dataset.speed || 0.4) * 1.5; 
-                    const parent = wrap.parentElement;
-                    if (!parent) return;
+                // Only run heavy DOM calculations if the page has actually scrolled
+                if (Math.abs(scrollY - currentY) > 0.1) {
+                    // Smooth interpolation (lerp)
+                    currentY += (scrollY - currentY) * 0.1;
                     
-                    const rect = parent.getBoundingClientRect();
-                    
-                    // Add padding to visibility check so it doesn't suddenly stop animating at edges
-                    if (rect.bottom > -200 && rect.top < window.innerHeight + 200) {
-                        // Calculate smoothed rect top!
-                        const smoothTop = rect.top + (scrollY - currentY);
-                        // Move background in the opposite direction of scroll to make it slower
-                        const yPos = -(smoothTop * speed);
-                        wrap.style.transform = `translate3d(0, ${yPos}px, 0)`;
-                    }
-                });
+                    parallaxWraps.forEach(wrap => {
+                        const speed = parseFloat(wrap.dataset.speed || 0.4) * 1.5; 
+                        const parent = wrap.parentElement;
+                        if (!parent) return;
+                        
+                        const rect = parent.getBoundingClientRect();
+                        
+                        if (rect.bottom > -200 && rect.top < window.innerHeight + 200) {
+                            const smoothTop = rect.top + (scrollY - currentY);
+                            const yPos = -(smoothTop * speed);
+                            wrap.style.transform = `translate3d(0, ${yPos}px, 0)`;
+                        }
+                    });
+                }
                 requestAnimationFrame(animateParallax);
             }
             animateParallax();
         });
     </script>
+
 
     <script>
         // True Scroll-Jacking (Section-by-Section)
@@ -844,6 +992,225 @@
                 }
             });
         });
+    </script>
+
+    <script>
+    // 3D Particle Galaxy with Magnetic Repel
+    document.addEventListener("DOMContentLoaded", () => {
+        const canvas = document.getElementById('galaxy-particle-canvas');
+        if (!canvas) return;
+        
+        const ctx = canvas.getContext('2d');
+        
+        function resizeCanvas() {
+            const rect = canvas.parentElement.getBoundingClientRect();
+            canvas.width = rect.width;
+            canvas.height = rect.height;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        const img = new Image();
+        img.src = "{{ $img('galaxy-spiral.png') }}";
+        img.onload = () => {
+            const offCanvas = document.createElement('canvas');
+            const size = 250; // Significantly higher resolution for a much denser particle count
+            offCanvas.width = size;
+            const aspect = img.height / (img.width || 1);
+            offCanvas.height = size * aspect;
+            
+            const offCtx = offCanvas.getContext('2d', { willReadFrequently: true });
+            offCtx.drawImage(img, 0, 0, offCanvas.width, offCanvas.height);
+            const imgData = offCtx.getImageData(0, 0, offCanvas.width, offCanvas.height).data;
+
+            const particles = [];
+            for (let y = 0; y < offCanvas.height; y++) {
+                for (let x = 0; x < offCanvas.width; x++) {
+                    const index = (y * offCanvas.width + x) * 4;
+                    const a = imgData[index + 3];
+                    
+                    // Probabilistic spawning: bright pixels (arms) are dense, faint pixels (gaps) are sparse.
+                    // Lowered strictness to allow much more stardust to spawn overall.
+                    const brightness = a / 255;
+                    if (brightness > 0.03 && Math.random() < Math.pow(brightness, 1.1)) { 
+                        const nx = (x / offCanvas.width) - 0.5;
+                        const ny = (y / offCanvas.height) - 0.5;
+                        const dist = Math.sqrt(nx*nx + ny*ny);
+                        
+                        // Thinner Z spread so the spiral arms don't blur into a cloud
+                        const zSpread = 70 * Math.max(0, 0.5 - dist);
+                        
+                        particles.push({
+                            baseX: nx * 620, // Slightly larger base spread
+                            baseY: ny * 620,
+                            z: (Math.random() - 0.5) * zSpread,
+                            // Boost opacity slightly so the fine dust is highly visible
+                            color: `rgba(${imgData[index]}, ${imgData[index+1]}, ${imgData[index+2]}, ${Math.min(1, brightness * 2.0)})`,
+                            baseSize: Math.random() * 1.8 + 1.2, // Finer stardust
+                            offsetX: 0,
+                            offsetY: 0,
+                            vx: 0,
+                            vy: 0
+                        });
+                    }
+                }
+            }
+
+            let spinAngle = 0;
+            let wobbleAngle = 0;
+            
+            // Coin tilt relative to the "floor" - reduced for less extreme wobble
+            const tiltAngle = 5 * Math.PI / 180; 
+            const cosTilt = Math.cos(tiltAngle);
+            const sinTilt = Math.sin(tiltAngle);
+
+            // Camera angle looking down at the floor (closer to 0 makes it flatter on the floor)
+            const camTilt = -18 * Math.PI / 180; 
+            const cosCam = Math.cos(camTilt);
+            const sinCam = Math.sin(camTilt);
+
+            let mouseX = -1000;
+            let mouseY = -1000;
+            let isHovering = false;
+            
+            window.addEventListener('mousemove', (e) => {
+                const rect = canvas.getBoundingClientRect();
+                mouseX = e.clientX - rect.left;
+                mouseY = e.clientY - rect.top;
+                
+                // Check if mouse is within the general area of the galaxy
+                // The visual center of the galaxy is offset to 68% of the canvas width
+                const dx = mouseX - rect.width * 0.68;
+                const dy = mouseY - rect.height / 2;
+                if (dx * dx + dy * dy < 350 * 350) {
+                    isHovering = true;
+                } else {
+                    isHovering = false;
+                }
+            });
+            
+            // Handle mouse leaving the window entirely
+            window.addEventListener('mouseout', (e) => {
+                if (!e.relatedTarget) {
+                    isHovering = false;
+                    mouseX = -1000;
+                    mouseY = -1000;
+                }
+            });
+
+            const baseSpinSpeed = -0.0003;
+            const baseWobbleSpeed = 0.002;
+
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                // Keep the rotation dynamic (never stop)
+                spinAngle += baseSpinSpeed;
+                wobbleAngle += baseWobbleSpeed;
+
+                const cosS = Math.cos(spinAngle);
+                const sinS = Math.sin(spinAngle);
+                const cosW = Math.cos(wobbleAngle);
+                const sinW = Math.sin(wobbleAngle);
+
+                // Offset the center to the right side of the canvas
+                // So the default galaxy stays away from text, but particles can fly into text on the left
+                const cx = canvas.width * 0.68; 
+                const cy = canvas.height / 2;
+
+                for (let i = 0; i < particles.length; i++) {
+                    const p = particles[i];
+
+                    // 1. Spin in its own 2D plane
+                    const sX = p.baseX * cosS - p.baseY * sinS;
+                    const sY = p.baseX * sinS + p.baseY * cosS;
+                    const sZ = p.z; // Thickness
+
+                    // 2. Map to 3D floor (X is horizontal, Y is vertical, Z is depth)
+                    // The galaxy lies flat on the XZ plane.
+                    const fX = sX;
+                    const fY = sZ; 
+                    const fZ = sY;
+
+                    // 3. Tilt the disk slightly from the floor (almost falling)
+                    const tX = fX;
+                    const tY = fY * cosTilt - fZ * sinTilt;
+                    const tZ = fY * sinTilt + fZ * cosTilt;
+
+                    // 4. Wobble around the vertical Y axis
+                    const wX = tX * cosW - tZ * sinW;
+                    const wY = tY;
+                    const wZ = tX * sinW + tZ * cosW;
+
+                    // 5. Camera tilt (looking down at the floor)
+                    const cX = wX;
+                    const cY = wY * cosCam - wZ * sinCam;
+                    const cZ = wY * sinCam + wZ * cosCam;
+
+                    // 6. Perspective projection
+                    const fov = 900;
+                    const scale = fov / (fov + cZ);
+                    
+                    let screenX = cx + cX * scale;
+                    let screenY = cy + cY * scale;
+
+                    // 7. Magnetic Repel (Interactive Scatter)
+                    if (isHovering) {
+                        const dx = screenX - mouseX;
+                        const dy = screenY - mouseY;
+                        const distSq = dx * dx + dy * dy;
+                        const repelRadius = 120; // Increased radius for better sensitivity
+                        
+                        if (distSq < repelRadius * repelRadius && distSq > 0) {
+                            const dist = Math.sqrt(distSq);
+                            // Smoother falloff for better response without being too explosive
+                            const force = Math.pow((repelRadius - dist) / repelRadius, 1.5);
+                            
+                            p.vx += (dx / dist) * force * 1.2; // Slowed down pushing force
+                            p.vy += (dy / dist) * force * 1.2;
+                        }
+                        
+                        // Higher friction when scattering makes particles feel heavier and slide less
+                        p.vx *= 0.82;
+                        p.vy *= 0.82;
+                        
+                        p.offsetX += p.vx;
+                        p.offsetY += p.vy;
+                    } else {
+                        // Return to original position smoothly and very slowly (No bounce!)
+                        p.offsetX += (0 - p.offsetX) * 0.025;
+                        p.offsetY += (0 - p.offsetY) * 0.025;
+                        
+                        // Clear velocity so momentum doesn't cause a bounce later
+                        p.vx = 0;
+                        p.vy = 0;
+                    }
+
+                    // Draw
+                    ctx.fillStyle = p.color;
+                    const size = p.baseSize * scale;
+                    ctx.fillRect(screenX + p.offsetX, screenY + p.offsetY, size, size);
+                }
+
+                if (isVisible) {
+                    requestAnimationFrame(animate);
+                }
+            }
+            
+            // Performance Optimization: Pause galaxy rendering when off-screen
+            let isVisible = false;
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    const wasVisible = isVisible;
+                    isVisible = entry.isIntersecting;
+                    if (isVisible && !wasVisible) {
+                        animate();
+                    }
+                });
+            });
+            observer.observe(canvas);
+        };
+    });
     </script>
 </body>
 </html>

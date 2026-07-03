@@ -1267,22 +1267,17 @@ new #[Layout('layouts.app')] class extends Component {
 
         .drag-handle { cursor: grab; opacity: 0; transition: opacity 0.12s; }
         .tab-item:hover .drag-handle { opacity: 1; }
-        .drag-handle:active { cursor: grabbing; }
+                                        .drag-handle:active { cursor: grabbing; }
     </style>
 
     <div class="p-6 lg:p-10 max-w-7xl mx-auto">
 
         {{-- Breadcrumb --}}
-        <header class="flex justify-between items-center mb-8">
-            <div class="flex items-center gap-3 text-[18px] text-[#7A7A7A]">
-                <a href="{{ route('dashboard') }}" wire:navigate class="hover:text-[#8C7558] transition-colors">Dashboard</a>
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-                <a href="{{ route('projects.show', $project) }}" wire:navigate class="hover:text-[#8C7558] transition-colors truncate max-w-[160px]">{{ $project->title }}</a>
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-                <span class="text-[#2C2C2C] font-semibold">Notes</span>
-            </div>
-            <x-logo class="h-8 w-auto text-text-100" />
-        </header>
+        <x-breadcrumb :items="[
+            ['label' => 'Dashboard', 'url' => route('dashboard')],
+            ['label' => $project->title, 'url' => route('projects.show', $project), 'truncate' => true],
+            ['label' => 'Notes']
+        ]" />
 
         <h2 class="text-[28px] font-merriweather text-[#2C2C2C] mb-6">Project Notes</h2>
 
