@@ -94,11 +94,55 @@ new class extends Component {
         <div class="w-48 md:w-56 lg:w-60 mb-2 shrink-0 pointer-events-none">
             <x-left-dashboard class="w-full h-auto block" />
         </div>
-        <div class="flex-1 self-center text-center px-4 md:px-8 z-10 min-w-0 flex flex-col items-center">
-            <h1 class="{{ $titleSize }} font-merriweather text-text-100 mb-2 w-full truncate transition-all duration-300" title="Welcome {{ $displayName }}!">
-                Welcome <span class="font-bold">{{ $displayName }}!</span>
-            </h1>
-            <p class="text-app-body-large text-text-80 truncate w-full">Are u ready to spin the <span class="italic">yarn</span>?</p>
+        <div class="flex-1 self-center px-4 md:px-8 z-10 min-w-0 flex flex-col items-center"
+             x-data="{
+                 overflows: false,
+                 distance: 0,
+                 duration: 10,
+                 checkOverflow() {
+                     // Check after fonts render
+                     setTimeout(() => {
+                         const container = this.$refs.container.clientWidth;
+                         const text = this.$refs.text.scrollWidth;
+                         if (text > container) {
+                             this.overflows = true;
+                             this.distance = (text + 48) - container + 24; // 48 for px-6, 24 for buffer
+                             this.duration = Math.max(5, this.distance / 15); // slower speed
+                         } else {
+                             this.overflows = false;
+                         }
+                     }, 150);
+                 }
+             }"
+             x-init="checkOverflow(); window.addEventListener('resize', () => checkOverflow())"
+        >
+            <style>
+                .welcome-marquee {
+                    animation: welcome-slide var(--duration) linear infinite;
+                }
+                @keyframes welcome-slide {
+                    0%, 15% { transform: translateX(0); }
+                    85%, 100% { transform: translateX(var(--distance)); }
+                }
+                .mask-image-fade {
+                    -webkit-mask-image: linear-gradient(to right, transparent, black 24px, black calc(100% - 24px), transparent);
+                    mask-image: linear-gradient(to right, transparent, black 24px, black calc(100% - 24px), transparent);
+                }
+            </style>
+            
+            <div x-ref="container" class="w-full overflow-hidden flex" :class="overflows ? 'justify-start mask-image-fade' : 'justify-center'">
+                <div x-ref="text" 
+                     class="whitespace-nowrap"
+                     :class="overflows ? 'welcome-marquee text-left px-6' : 'text-center'"
+                     :style="overflows ? `--distance: -${distance}px; --duration: ${duration}s;` : ''"
+                >
+                    <h1 class="{{ $titleSize }} font-merriweather text-text-100 mb-2">
+                        Welcome <span class="font-bold">{{ $displayName }}!</span>
+                    </h1>
+                </div>
+            </div>
+            
+            <p class="text-app-body-large text-text-80 truncate w-full text-center">Are u ready to spin the <span class="italic">yarn</span>?</p>
         </div>
         <div class="w-48 md:w-56 lg:w-60 shrink-0 pointer-events-none flex justify-end">
             <x-right-dashboard class="w-full h-auto block" />
