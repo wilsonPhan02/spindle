@@ -24,14 +24,20 @@ new class extends Component {
             $this->pinnedProjects = $user->projects()
                 ->where('is_pinned', true)
                 ->whereNull('archived_at')
+                ->whereHas('section', function($query) {
+                    $query->whereNull('archived_at');
+                })
                 ->latest('updated_at')
                 ->take(10)
                 ->get();
 
             $this->recentProjects = $user->projects()
                 ->whereNull('archived_at')
+                ->whereHas('section', function($query) {
+                    $query->whereNull('archived_at');
+                })
                 ->latest('updated_at')
-                ->take(10)
+                ->take(15)
                 ->get();
         }
     }
@@ -400,16 +406,16 @@ new class extends Component {
             <div x-show="open" x-collapse>
                 @if(count($recentProjects) > 0)
                     <div class="space-y-1 pb-2">
-                        @foreach($recentProjects->take(3) as $rProject)
+                        @foreach($recentProjects->take(8) as $rProject)
                             <a href="{{ route('projects.show', $rProject->project_id) }}" wire:navigate class="flex items-center gap-2 px-2 py-1.5 -mx-2 rounded-lg hover:bg-brand-150 transition-colors group">
                                 <x-icons.sidebar-book class="w-4 h-4 text-text-70 shrink-0" />
                                 <span class="text-[13px] font-medium text-text-80 truncate group-hover:text-text-100 transition-colors">{{ $rProject->title }}</span>
                             </a>
                         @endforeach
                         
-                        @if(count($recentProjects) > 3)
+                        @if(count($recentProjects) > 8)
                             <div x-show="viewAll" x-collapse x-cloak class="space-y-1 mt-1">
-                                @foreach($recentProjects->skip(3) as $rProject)
+                                @foreach($recentProjects->skip(8) as $rProject)
                                     <a href="{{ route('projects.show', $rProject->project_id) }}" wire:navigate class="flex items-center gap-2 px-2 py-1.5 -mx-2 rounded-lg hover:bg-brand-150 transition-colors group">
                                         <x-icons.sidebar-book class="w-4 h-4 text-text-70 shrink-0" />
                                         <span class="text-[13px] font-medium text-text-80 truncate group-hover:text-text-100 transition-colors">{{ $rProject->title }}</span>

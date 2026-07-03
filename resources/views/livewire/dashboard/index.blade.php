@@ -18,7 +18,7 @@ new class extends Component {
             ->with(['projects' => function ($query) {
                 $query->whereNull('archived_at')->orderBy('created_at', 'desc');
             }])
-            ->orderBy('created_at')
+            ->orderByDesc('created_at')
             ->get();
     }
 
@@ -34,6 +34,7 @@ new class extends Component {
         ]);
 
         $this->loadSections();
+        $this->dispatch('project-updated');
     }
 
     public function renameSection($sectionId, $newTitle) {
@@ -52,6 +53,7 @@ new class extends Component {
                 'title' => 'Untitled Project'
             ]);
             $this->loadSections();
+            $this->dispatch('project-updated');
         }
     }
 
@@ -60,6 +62,7 @@ new class extends Component {
         if ($section) {
             $section->update(['archived_at' => now()]);
             $this->loadSections();
+            $this->dispatch('project-updated');
         }
     }
 }; ?>
@@ -148,7 +151,7 @@ new class extends Component {
                                 <svg class="w-6 h-6 text-text-80" fill="currentColor" viewBox="0 0 24 24"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
                             </button>
 
-                            <div x-show="menuOpen" style="display: none;" class="absolute right-0 mt-2 w-48 bg-white border border-brand-150 rounded-lg shadow-lg z-10 py-1">
+                            <div x-show="menuOpen" style="display: none;" class="absolute right-0 mt-2 w-48 bg-white border border-brand-150 rounded-lg shadow-lg z-50 py-1">
                                 <button wire:click="addProject('{{ $section->section_id }}')" @click="menuOpen = false" class="w-full text-left px-4 py-2 text-app-body-medium text-text-80 hover:bg-brand-10 flex items-center gap-3">
                                     <x-icons.add class="w-4 h-4" /> Add Project
                                 </button>
@@ -197,9 +200,17 @@ new class extends Component {
             @endforeach
         </div>
 
-        <button wire:click="addSection" class="w-full py-3 border border-brand-200 bg-[#EFEBE6] rounded-lg text-subtext-80 hover:bg-[#E5DED5] transition-colors flex items-center justify-center gap-2">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
-            Add New Section
-        </button>
     @endif
+
+    <!-- Floating Action Button for Add Section -->
+    <button wire:click="addSection" class="group fixed bottom-10 right-10 flex flex-row-reverse items-center bg-secondary-200 text-brand-10 rounded-full h-14 w-14 hover:w-44 transition-all duration-300 ease-out shadow-xl hover:bg-secondary-250 overflow-hidden z-50 focus:outline-none">
+        <div class="flex items-center justify-center shrink-0 w-14 h-14">
+            <svg class="w-6 h-6 transition-transform duration-300 group-hover:rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
+            </svg>
+        </div>
+        <span class="whitespace-nowrap font-medium text-[15px] opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex-1 text-right pr-2">
+            Add Section
+        </span>
+    </button>
 </div>

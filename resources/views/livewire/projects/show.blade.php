@@ -35,6 +35,10 @@ new #[Layout('layouts.app')] class extends Component {
         $this->title = $project->title;
         $this->synopsis = $project->synopsis ?? '';
 
+        // Touch the project so it moves to the top of recent projects
+        $this->project->touch();
+        $this->dispatch('project-updated');
+
         $this->recentNotes = Note::where('project_id', $project->project_id)
             ->orderByDesc('updated_at')
             ->limit(10)
@@ -110,6 +114,7 @@ new #[Layout('layouts.app')] class extends Component {
 
     public function archiveProject() {
         $this->project->update(['archived_at' => now()]);
+        $this->dispatch('project-updated');
         $this->redirect(route('dashboard'), navigate: true);
     }
 
