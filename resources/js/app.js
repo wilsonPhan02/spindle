@@ -1,7 +1,9 @@
+import collapse from '@alpinejs/collapse';
 import './whiteboard';
 
 // ---- Komponen carousel (From Writers To Writers) ----
 document.addEventListener('alpine:init', () => {
+    window.Alpine.plugin(collapse);
     Alpine.data('carousel', () => ({
         active: 0,
         slides: 0,
