@@ -437,5 +437,21 @@
 
 }
 
+/* ==============================
+   LIVEWIRE NAVIGATION PROGRESS BAR
+   ============================== */
+#nprogress .bar {
+    background: var(--color-secondary-250) !important;
+    height: 2px !important;
+}
+#nprogress .peg {
+    box-shadow: 0 0 16px 3px var(--color-secondary-150), 0 0 8px 2px var(--color-secondary-200) !important;
+    opacity: 1 !important;
+}
+#nprogress .spinner-icon {
+    border-top-color: var(--color-secondary-250) !important;
+    border-left-color: var(--color-secondary-250) !important;
+}
+
 @keyframes windBlow { 0% { transform: translateX(-100%); opacity: 0; } 50% { opacity: 1; } 100% { transform: translateX(300%); opacity: 0; } } .animate-wind-blow { animation: windBlow linear infinite; }
 @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
