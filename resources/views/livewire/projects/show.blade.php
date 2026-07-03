@@ -47,10 +47,12 @@ new #[Layout('layouts.app')] class extends Component {
     public function saveTitle() {
         $this->title = trim($this->title) ?: 'Untitled Project';
         $this->project->update(['title' => $this->title]);
+        $this->dispatch('project-updated');
     }
 
     public function saveSynopsis() {
         $this->project->update(['synopsis' => trim($this->synopsis)]);
+        $this->dispatch('project-updated');
     }
 
     public function addCategory() {
