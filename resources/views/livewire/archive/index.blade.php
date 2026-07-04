@@ -194,7 +194,13 @@ new #[Layout('layouts.app')] class extends Component {
                                 </div>
 
                                 <div class="flex items-center gap-2 mb-1">
-                                    <x-icons.sidebar-book class="w-4 h-4 text-text-80 shrink-0" />
+                                    @if($project->icon_type === 'emoji')
+                                        <span class="text-[16px] leading-none shrink-0">{{ $project->icon }}</span>
+                                    @elseif($project->icon_type === 'image' && $project->icon)
+                                        <img src="{{ asset('storage/' . $project->icon) }}" alt="" class="w-4 h-4 object-cover rounded shrink-0">
+                                    @else
+                                        <x-icons.sidebar-book class="w-4 h-4 text-text-80 shrink-0" />
+                                    @endif
                                     <h3 class="text-app-body-medium text-text-100 truncate">{{ $project->title }}</h3>
                                 </div>
                                 <p class="text-[11px] text-subtext-70">{{ $project->created_at->format('d F Y') }}</p>

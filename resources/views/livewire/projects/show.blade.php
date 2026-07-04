@@ -243,16 +243,16 @@ new #[Layout('layouts.app')] class extends Component {
                 @endif
 
                 <div x-show="hoverCover" x-transition class="absolute bottom-5 left-5 z-30 flex gap-2">
-                    <label class="flex items-center gap-2 px-3 py-1.5 bg-[#1F2328]/95 border border-white/10 rounded-md cursor-pointer hover:bg-[#2A2F36] transition-colors shadow-lg">
-                        <x-icons.upload class="w-4 h-4 text-white" />
-                        <span class="text-[13px] text-white font-medium tracking-wide">Upload Cover</span>
+                    <label class="flex items-center gap-2 px-3 py-1.5 bg-text-80/95 border border-text-60 rounded-md cursor-pointer hover:bg-text-80 transition-colors shadow-lg">
+                        <x-icons.upload class="w-4 h-4 text-bg-main" />
+                        <span class="text-bg-main text-app-desc-feature">Upload Cover</span>
                         <input type="file" wire:model.live="cover_image" class="hidden" accept="image/*">
                     </label>
 
                     @if($project->cover_image_path)
-                        <button wire:click="deleteCover" class="flex items-center gap-2 px-3 py-1.5 bg-[#1F2328]/95 border border-white/10 rounded-md cursor-pointer hover:bg-[#2A2F36] transition-colors shadow-lg">
-                            <x-icons.delete class="w-4 h-4 text-[#E64C4C]" />
-                            <span class="text-[13px] text-[#E64C4C] font-medium tracking-wide">Remove</span>
+                        <button wire:click="deleteCover" class="flex items-center gap-2 px-3 py-1.5 bg-text-80/95 border border-text-60 rounded-md cursor-pointer hover:bg-text-80 transition-colors shadow-lg">
+                            <x-icons.delete class="w-4 h-4 text-danger-100" />
+                            <span class="text-app-desc-feature text-danger-100">Remove</span>
                         </button>
                     @endif
 
@@ -286,23 +286,19 @@ new #[Layout('layouts.app')] class extends Component {
                         
                         {{-- Ikon Dinamis --}}
                         <div class="relative inline-block group mb-3">
-                            <div class="w-10 h-10 flex items-center justify-center cursor-pointer rounded transition-colors group-hover:bg-brand-100" 
+                            <div class="w-10 h-10 flex items-center justify-center cursor-pointer rounded transition-colors group-hover:bg-brand-100"
+                                title="{{ $project->icon_type === 'default' ? 'Add Icon' : 'Change Icon' }}"
                                 @click="showIconPicker = !showIconPicker">
-                                
+
                                 @if($project->icon_type === 'emoji')
                                     <span class="text-[32px] leading-none">{{ $project->icon }}</span>
                                 @elseif($project->icon_type === 'image' && $project->icon)
-                                    <img src="{{ asset('storage/' . $project->icon) }}" 
-                                        alt="Project Icon" 
+                                    <img src="{{ asset('storage/' . $project->icon) }}"
+                                        alt="Project Icon"
                                         class="w-8 h-8 object-cover rounded">
                                 @else
                                     <x-icons.sidebar-book class="w-8 h-8 text-secondary-100" />
                                 @endif
-                            </div>
-
-                            {{-- Tooltip Hover --}}
-                            <div class="absolute -top-7 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-text-90 text-white text-[11px] px-2 py-1 rounded whitespace-nowrap pointer-events-none z-10 shadow-sm font-sans">
-                                {{ $project->icon_type === 'default' ? 'Add Icon' : 'Change Icon' }}
                             </div>
                         </div>
 
