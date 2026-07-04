@@ -416,7 +416,7 @@ new #[Layout('layouts.app')] class extends Component {
                     </div>
 
                     <div class="flex items-center gap-3 shrink-0" @limit-reached.window="alert('Marked projects have reached the maximum limit (10). You cannot mark more projects.')">
-                        <button wire:click="togglePin" class="text-secondary-100 hover:text-secondary-200 transition-colors focus:outline-none" title="{{ $project->is_pinned ? 'Unmark Project' : 'Mark Project' }}">
+                        <button wire:click="togglePin" class="text-secondary-100 cursor-pointer hover:text-secondary-200 transition-colors focus:outline-none" title="{{ $project->is_pinned ? 'Unmark Project' : 'Mark Project' }}">
                             @if($project->is_pinned)
                                 <x-icons.bookmark-solid class="w-6 h-6" />
                             @else
@@ -462,7 +462,7 @@ new #[Layout('layouts.app')] class extends Component {
                         @wheel="$event.preventDefault(); $el.scrollLeft += ($event.deltaX !== 0 ? $event.deltaX : $event.deltaY)"
                         class="flex gap-2 items-center overflow-x-auto pb-5 cursor-grab active:cursor-grabbing scroll-smooth [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-secondary-100 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-button]:hidden [scrollbar-width:thin] [scrollbar-color:#A08866_transparent]"
                     >
-                        <button x-show="!addingCat" @click="addingCat = true; addCount = 0; setTimeout(() => $refs.catInput.focus(), 50)" class="shrink-0 flex items-center gap-1 rounded-md bg-brand-100 hover:bg-brand-200 text-secondary-150 hover:text-secondary-150 transition-colors p-2">
+                        <button x-show="!addingCat" @click="addingCat = true; addCount = 0; setTimeout(() => $refs.catInput.focus(), 50)" class="shrink-0 flex items-center gap-1 cursor-pointer rounded-md bg-brand-100 hover:bg-brand-200 text-secondary-150 hover:text-secondary-150 transition-colors p-2">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3"><path stroke-linecap="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
                             @if($project->categories->count() == 0)
                                 <span class="text-app-desc-feature">Add category</span>
@@ -571,7 +571,7 @@ new #[Layout('layouts.app')] class extends Component {
                         <div x-show="isOverflowing && localSyn.trim() !== '' && !editingSyn" class="absolute bottom-6 left-0 w-full flex justify-center">
                             <button
                                 @click="showMore = !showMore; if(!showMore) { $nextTick(() => checkOverflow()); $refs.synText.scrollTop = 0; }"
-                                class="text-app-feature text-text-70 hover:text-secondary-200 flex items-center gap-1 z-10 px-4 py-1 rounded-full transition-colors"
+                                class="text-app-feature text-text-70 hover:text-secondary-200 cursor-pointer flex items-center gap-1 z-10 px-4 py-1 rounded-full transition-colors"
                             >
                                 <svg class="w-4 h-4 transition-transform" :class="showMore ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
                                 <span x-text="showMore ? 'Show Less' : 'Show More'"></span>
@@ -582,6 +582,7 @@ new #[Layout('layouts.app')] class extends Component {
                     <textarea
                         x-show="editingSyn"
                         x-model="localSyn"
+                                class="text-app-feature text-text-70 hover:text-secondary-200 cursor-pointer flex items-center gap-1 z-10 px-4 py-1 rounded-full transition-colors"
                         x-ref="synInput"
                         @click.outside="if(editingSyn) { $wire.saveSynopsis(); editingSyn = false; showMore = false; $nextTick(() => checkOverflow()); }"
                         @keydown.ctrl.enter="$wire.saveSynopsis(); editingSyn = false; showMore = false; $nextTick(() => checkOverflow())"
@@ -594,7 +595,7 @@ new #[Layout('layouts.app')] class extends Component {
                     <button
                         wire:click="archiveProject"
                         wire:confirm="Are you sure you want to archive this project? You can restore it from the Archive page."
-                        class="flex items-center gap-1.5 py-2 px-4 rounded-md border border-text-70 hover:border-danger-100/80 text-text-70 hover:text-danger-100 hover:bg-danger-100/10 transition-colors opacity-70 hover:opacity-100">
+                        class="flex items-center gap-1.5 py-2 px-4 cursor-pointer rounded-md border border-text-70 hover:border-danger-100/80 text-text-70 hover:text-danger-100 hover:bg-danger-100/10 transition-colors opacity-70 hover:opacity-100">
                         <x-icons.archive class="w-3.5 h-3.5" /> Move To Archive
                     </button>
                     <div
