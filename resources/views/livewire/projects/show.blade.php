@@ -571,7 +571,7 @@ new #[Layout('layouts.app')] class extends Component {
                         <div x-show="isOverflowing && localSyn.trim() !== '' && !editingSyn" class="absolute bottom-6 left-0 w-full flex justify-center">
                             <button
                                 @click="showMore = !showMore; if(!showMore) { $nextTick(() => checkOverflow()); $refs.synText.scrollTop = 0; }"
-                                class="text-app-body-medium font-bold text-[#2C2C2C] hover:text-secondary-200 flex items-center gap-1 z-10 px-4 py-1 rounded-full bg-[#EAE1D5]/50 hover:bg-[#EAE1D5] transition-colors"
+                                class="text-app-feature text-text-70 hover:text-secondary-200 flex items-center gap-1 z-10 px-4 py-1 rounded-full transition-colors"
                             >
                                 <svg class="w-4 h-4 transition-transform" :class="showMore ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
                                 <span x-text="showMore ? 'Show Less' : 'Show More'"></span>
@@ -583,9 +583,9 @@ new #[Layout('layouts.app')] class extends Component {
                         x-show="editingSyn"
                         x-model="localSyn"
                         x-ref="synInput"
-                        @click.outside="if(editingSyn) { $wire.saveSynopsis(); editingSyn = false; }"
-                        @keydown.ctrl.enter="$wire.saveSynopsis(); editingSyn = false"
-                        @keydown.escape="editingSyn = false; localSyn = `{{ addslashes($project->synopsis ?? '') }}`"
+                        @click.outside="if(editingSyn) { $wire.saveSynopsis(); editingSyn = false; showMore = false; $nextTick(() => checkOverflow()); }"
+                        @keydown.ctrl.enter="$wire.saveSynopsis(); editingSyn = false; showMore = false; $nextTick(() => checkOverflow())"
+                        @keydown.escape="editingSyn = false; showMore = false; localSyn = `{{ addslashes($project->synopsis ?? '') }}`; $nextTick(() => checkOverflow())"
                         class="w-full mt-2 lg:flex-1 lg:min-h-0 min-h-[150px] text-app-body-medium text-text-60 bg-transparent border-2 border-[#D5C6A9] rounded-md outline-none resize-none p-4 focus:border-[#A08866] transition-colors custom-scrollbar"
                     ></textarea>
                 </div>
