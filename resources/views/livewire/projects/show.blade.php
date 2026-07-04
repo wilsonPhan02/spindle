@@ -21,6 +21,11 @@ new #[Layout('layouts.app')] class extends Component {
     public $newCategoryName = '';
     public $cover_image;
 
+    //Properti untuk kustomisasi ikon
+    public string $icon_type = 'default';
+    public string $icon_emoji = '';
+    public $icon_image;
+
     // Daftar 10 notes yang terakhir diedit, untuk ditampilkan di card Notes
     public $recentNotes = [];
 
@@ -50,6 +55,11 @@ new #[Layout('layouts.app')] class extends Component {
             ->with(['tags', 'manuscript'])
             ->orderBy('order_index')
             ->get();
+
+        $this->icon_type = $project->icon_type ?? 'default';
+        if ($this->icon_type === 'emoji') {
+            $this->icon_emoji = $project->icon;
+        }
     }
 
     public function saveTitle() {
@@ -130,6 +140,69 @@ new #[Layout('layouts.app')] class extends Component {
     public function refreshPinState() {
         $this->project->refresh();
     }
+
+    // Menyimpan ikon langsung dari klik emoji di UI
+    public function setEmoji($emoji)
+    {
+        $this->icon_type = 'emoji';
+        $this->icon_emoji = $emoji;
+        
+        if ($this->project->icon_type === 'image' && $this->project->icon) {
+            Storage::disk('public')->delete($this->project->icon);
+        }
+        
+        $this->project->update([
+            'icon_type' => 'emoji',
+            'icon'      => $emoji,
+        ]);
+
+        $this->dispatch('project-updated');
+    }
+
+    // Menyimpan ikon dari tab Upload Image
+    public function saveIcon()
+    {
+        $this->validate([
+            'icon_image' => 'nullable|file|mimes:jpeg,png,jpg,svg,webp|max:2048',
+        ]);
+
+        if ($this->icon_image) {
+            if ($this->project->icon_type === 'image' && $this->project->icon) {
+                Storage::disk('public')->delete($this->project->icon);
+            }
+            
+            $path = $this->icon_image->store('project-icons', 'public');
+            
+            $this->project->update([
+                'icon_type' => 'image',
+                'icon'      => $path,
+            ]);
+
+            $this->icon_type = 'image';
+            $this->icon_image = null;
+
+            $this->dispatch('project-updated');
+        }
+    }
+
+    // Menghapus ikon (Kembali ke Default Book)
+    public function removeIcon()
+    {
+        if ($this->project->icon_type === 'image' && $this->project->icon) {
+            Storage::disk('public')->delete($this->project->icon);
+        }
+        
+        $this->icon_type = 'default';
+        $this->icon_emoji = '';
+        $this->icon_image = null;
+        
+        $this->project->update([
+            'icon_type' => 'default',
+            'icon'      => null,
+        ]);
+
+        $this->dispatch('project-updated');
+    }
 }; ?>
 
 <div>
@@ -154,7 +227,7 @@ new #[Layout('layouts.app')] class extends Component {
                 @mouseleave="hoverCover = false"
                 class="relative w-full lg:w-[320px] xl:w-[360px] shrink-0 aspect-[1/1.6] z-10"
             >
-            {{-- last benerin --}}
+            
                 @if($project->cover_image_path)
                     <!-- Image / Front Cover -->
                     <img src="{{ Storage::url($project->cover_image_path) }}" 
@@ -182,6 +255,22 @@ new #[Layout('layouts.app')] class extends Component {
                             <span class="text-[13px] text-[#E64C4C] font-medium tracking-wide">Remove</span>
                         </button>
                     @endif
+
+                    @once
+                        <script type="module" src="https://cdn.jsdelivr.net/npm/emoji-picker-element@1/index.js"></script>
+                        <style>
+                            emoji-picker {
+                                width: 100%;
+                                height: 300px;
+                                --background: #FDFBF7; /* Warna warm-white */
+                                --border-color: transparent;
+                                --indicator-color: #8B7355; /* Aksen warna tua/hangat */
+                                --font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+                                --button-hover-background: #f0eadd;
+                                --search-background: #f0eadd;
+                            }
+                        </style>
+                    @endonce
                 </div>
 
                 <div wire:loading.flex wire:target="cover_image" class="absolute inset-y-0 left-0 right-4 w-[calc(100%-16px)] bg-[#F5EFE9]/70 backdrop-blur-md z-40 items-center justify-center rounded-l-md rounded-r-lg transition-all">
@@ -192,9 +281,107 @@ new #[Layout('layouts.app')] class extends Component {
             <div class="flex-1 min-w-0 relative">
                 <div class="static lg:absolute inset-0 bg-brand-50 border border-brand-150 p-8 pb-16 rounded-lg flex flex-col">
 
-                <div class="flex justify-between items-start mb-4">
+                <div class="flex justify-between items-start mb-4" x-data="{ showIconPicker: false, tab: 'emoji' }">
                     <div class="flex-1 min-w-0 mr-4">
-                        <x-icons.sidebar-book class="w-8 h-8 text-secondary-100 mb-3" />
+                        
+                        {{-- Ikon Dinamis --}}
+                        <div class="relative inline-block group mb-3">
+                            <div class="w-10 h-10 flex items-center justify-center cursor-pointer rounded transition-colors group-hover:bg-brand-100" 
+                                @click="showIconPicker = !showIconPicker">
+                                
+                                @if($project->icon_type === 'emoji')
+                                    <span class="text-[32px] leading-none">{{ $project->icon }}</span>
+                                @elseif($project->icon_type === 'image' && $project->icon)
+                                    <img src="{{ asset('storage/' . $project->icon) }}" 
+                                        alt="Project Icon" 
+                                        class="w-8 h-8 object-cover rounded">
+                                @else
+                                    <x-icons.sidebar-book class="w-8 h-8 text-secondary-100" />
+                                @endif
+                            </div>
+
+                            {{-- Tooltip Hover --}}
+                            <div class="absolute -top-7 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-text-90 text-white text-[11px] px-2 py-1 rounded whitespace-nowrap pointer-events-none z-10 shadow-sm font-sans">
+                                {{ $project->icon_type === 'default' ? 'Add Icon' : 'Change Icon' }}
+                            </div>
+                        </div>
+
+                        {{-- Pop-up Notion Style --}}
+                        <div x-show="showIconPicker" 
+                            @click.away="showIconPicker = false"
+                            x-transition.opacity.duration.200ms
+                            class="absolute left-10 top-12 z-50 w-80 rounded-lg border border-brand-200 bg-bg-main shadow-xl flex flex-col"
+                            style="display: none;">
+                            
+                            {{-- Header & Tabs --}}
+                            <div class="flex items-center justify-between px-3 pt-3 border-b border-brand-200">
+                                <div class="flex gap-4">
+                                    <button @click="tab = 'emoji'" 
+                                            :class="tab === 'emoji' ? 'border-text-80 text-text-80' : 'border-transparent text-text-60 hover:text-text-80'"
+                                            class="px-1 py-1.5 text-app-feature border-b-2 transition-colors">
+                                        Emoji
+                                    </button>
+                                    <button @click="tab = 'upload'" 
+                                            :class="tab === 'upload' ? 'border-text-80 text-text-80' : 'border-transparent text-text-60 hover:text-text-80'"
+                                            class="px-1 py-1.5 text-app-feature border-b-2 transition-colors">
+                                        Upload
+                                    </button>
+                                </div>
+                                
+                                {{-- Tombol Remove --}}
+                                <button wire:click="removeIcon" 
+                                        @click="showIconPicker = false"
+                                        class="text-danger-100 hover:bg-danger-100/10 transition-colors flex items-center gap-1 p-1 rounded-md" 
+                                        title="Remove Icon">
+                                    <x-icons.delete class="w-4 h-4" />
+                                </button>
+                            </div>
+
+                            {{-- Tab Emoji (Web Component) --}}
+                            <div x-show="tab === 'emoji'">
+                                <emoji-picker class="border-0 shadow-none rounded-b-lg" 
+                                            @emoji-click="
+                                                $wire.setEmoji($event.detail.unicode); 
+                                                showIconPicker = false;
+                                            ">
+                                </emoji-picker>
+                            </div>
+
+                            {{-- Tab Upload Image --}}
+                            <div x-show="tab === 'upload'" class="p-4">
+                                <p class="text-text-60 text-app-desc-feature mb-3">Upload custom image (Max 2MB)</p>
+                                
+                                <input type="file" id="icon-image-upload" wire:model.live="icon_image" class="hidden" accept=".jpg,.jpeg,.png,.svg,.webp">
+                                
+                                <div class="flex items-center mb-3">
+                                    <label for="icon-image-upload" 
+                                        class="mr-3 py-1.5 px-3 rounded-md text-app-desc-feature font-semibold bg-brand-150 text-text-80 hover:bg-brand-200 transition-colors cursor-pointer">
+                                        Browse Image
+                                    </label>
+                                    
+                                    <div class="text-app-desc-feature text-text-70">
+                                        <span wire:loading.remove wire:target="icon_image">
+                                            {{ $icon_image ? 'Image selected' : 'No file chosen' }}
+                                        </span>
+                                        <span wire:loading wire:target="icon_image" class="animate-pulse">
+                                            Uploading...
+                                        </span>
+                                    </div>
+                                </div>
+                                
+                                @if ($icon_image)
+                                    <div class="mb-3 flex flex-col items-center p-3 border border-dashed border-brand-300 rounded-md bg-card-hover">
+                                        <img src="{{ $icon_image->temporaryUrl() }}" class="w-16 h-16 object-cover rounded shadow-sm">
+                                    </div>
+                                    
+                                    <button wire:click="saveIcon" @click="showIconPicker = false" 
+                                            class="w-full py-2 bg-secondary-100 text-bg-main font-medium text-app-feature rounded-md hover:bg-secondary-200 transition-colors">
+                                        Submit Image
+                                    </button>
+                                @endif
+                            </div>
+
+                        </div>
 
                         @php
                             $titleLen = strlen($title);
