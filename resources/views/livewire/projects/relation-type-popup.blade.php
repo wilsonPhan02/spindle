@@ -181,7 +181,17 @@ new class extends Component {
     <div
         x-show="showPopup"
         style="display: none;"
-        class="fixed inset-0 z-50 flex items-center justify-center bg-text-80/50 backdrop-blur-[1.5px]"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-text-80/50 backdrop-blur-[1.5px]
+                [&::-webkit-scrollbar]:w-1.5 
+                [&::-webkit-scrollbar-track]:bg-transparent 
+                [&::-webkit-scrollbar-thumb]:bg-[var(--color-brand-50)] 
+                [&::-webkit-scrollbar-thumb]:rounded-full 
+                [&::-webkit-scrollbar-thumb:hover]:bg-[var(--color-brand-100)] 
+                [&::-webkit-scrollbar-button]:w-0 
+                [&::-webkit-scrollbar-button]:h-0
+                [&::-webkit-scrollbar-button]:!hidden
+                [scrollbar-width:thin] 
+                [scrollbar-color:#D5C6A9_transparent]"
     >
         <div
             @click.away="close()"

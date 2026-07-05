@@ -222,7 +222,7 @@ new class extends Component {
     class="fixed inset-0 z-50 flex items-center justify-center bg-text-80/75 backdrop-blur-[1.5px]"
     wire:ignore
 >
-    <div @click.away="show = false" class="bg-brand-10 rounded-2xl border-2 border-brand-150 shadow-2xl w-full max-w-2xl p-10 flex flex-col gap-6 relative">
+    <div @click.away="show = false" class="bg-brand-10 rounded-2xl border-2 border-brand-150 shadow-2xl w-full max-h-[90vh] max-w-2xl p-10 flex flex-col gap-6 relative">
 
         <button @click="show = false" class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full text-text-60 hover:bg-brand-100 transition-colors">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" d="M6 18L18 6M6 6l12 12"/></svg>
