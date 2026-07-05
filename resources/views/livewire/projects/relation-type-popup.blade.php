@@ -71,6 +71,7 @@ new class extends Component {
     x-data="{
         showPopup: false,
         editingRelationId: null,
+        editingRelationSavedTypeId: null,
         selectedTypeId: null,
         newTypeName: '',
         newTypePalette: { textColor: '#8C7558', bgColor: '#EAE1D5' },
@@ -124,12 +125,14 @@ new class extends Component {
             this.close();
         },
         async deleteType(typeId) {
+            const shouldCloseForEdit = this.editingRelationId && this.editingRelationSavedTypeId === typeId;
             this.types = this.types.filter(t => t.id !== typeId);
             if (this.selectedTypeId === typeId) this.selectedTypeId = null;
             this.pendingDeleteTypeId = null;
             this.confirmingDeleteType = false;
             await this.$wire.call('deleteRelationshipType', typeId);
             window.dispatchEvent(new CustomEvent('relation-type-deleted', { detail: { typeId } }));
+            if (shouldCloseForEdit) this.close();
         },
         async deleteRelation() {
             if (!this.editingRelationId) return;
@@ -141,6 +144,7 @@ new class extends Component {
         close() {
             this.showPopup = false;
             this.editingRelationId = null;
+            this.editingRelationSavedTypeId = null;
             this.selectedTypeId = null;
             this.newTypeName = '';
             this.newTypePalette = { textColor: '#8C7558', bgColor: '#EAE1D5' };
@@ -155,6 +159,7 @@ new class extends Component {
     }"
     @open-relation-type-popup.window="
         editingRelationId = null;
+        editingRelationSavedTypeId = null;
         selectedTypeId = null;
         newTypeName = '';
         newTypePalette = { textColor: '#8C7558', bgColor: '#EAE1D5' };
@@ -167,6 +172,7 @@ new class extends Component {
     "
     @open-edit-relation-popup.window="
         editingRelationId = $event.detail.relationId;
+        editingRelationSavedTypeId = $event.detail.typeId ?? null;
         selectedTypeId = $event.detail.typeId ?? null;
         charFromName = $event.detail.charFromName ?? null;
         charToName = $event.detail.charToName ?? null;
@@ -181,17 +187,7 @@ new class extends Component {
     <div
         x-show="showPopup"
         style="display: none;"
-        class="fixed inset-0 z-50 flex items-center justify-center bg-text-80/50 backdrop-blur-[1.5px]
-                [&::-webkit-scrollbar]:w-1.5 
-                [&::-webkit-scrollbar-track]:bg-transparent 
-                [&::-webkit-scrollbar-thumb]:bg-[var(--color-brand-50)] 
-                [&::-webkit-scrollbar-thumb]:rounded-full 
-                [&::-webkit-scrollbar-thumb:hover]:bg-[var(--color-brand-100)] 
-                [&::-webkit-scrollbar-button]:w-0 
-                [&::-webkit-scrollbar-button]:h-0
-                [&::-webkit-scrollbar-button]:!hidden
-                [scrollbar-width:thin] 
-                [scrollbar-color:#D5C6A9_transparent]"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-text-80/50 backdrop-blur-[1.5px]"
     >
         <div
             @click.away="close()"
@@ -232,7 +228,7 @@ new class extends Component {
                 </div>
 
                 <div class="flex flex-col gap-3">
-                    <div class="flex flex-wrap gap-2 max-h-40 overflow-y-auto">
+                    <div class="flex flex-wrap gap-2 max-h-40 overflow-y-auto custom-scrollbar">
                         <template x-for="rt in types" :key="rt.id">
                             <div
                                 class="flex items-center gap-1 rounded-full pl-3 pr-1.5 py-1.5 border-2 transition-all"

@@ -211,12 +211,6 @@ new #[Layout('layouts.app')] class extends Component {
 }; ?>
 
 <div>
-    <style>
-        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background-color: #D5C6A9; border-radius: 10px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background-color: #B69F78; }
-    </style>
 
     <div class="p-6 lg:p-10 max-w-7xl mx-auto">
         <x-breadcrumb :items="[
