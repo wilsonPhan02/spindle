@@ -245,8 +245,13 @@ new class extends Component {
                 <div class="flex flex-col gap-3 text-left">
                     <div class="flex items-center gap-2 min-w-0">
                         <template x-if="editingGroupId !== group.id">
-                            <h3 class="text-app-subheading-2 text-secondary-200 truncate min-w-0 shrink" x-text="group.name"></h3>
+                            <h3 
+                                class="text-app-subheading-2 text-secondary-200 truncate min-w-0 shrink cursor-pointer" 
+                                @dblclick="editingGroupId = group.id; editGroupName = group.name" 
+                                x-text="group.name"
+                            ></h3>
                         </template>
+                        
                         <template x-if="editingGroupId === group.id">
                             <input
                                 type="text"
@@ -293,7 +298,7 @@ new class extends Component {
                             </div>
                         </template>
 
-                        <button x-show="!showNewFieldInput[group.id]" @click="showNewFieldInput[group.id] = true" type="button" class="w-7 h-7 rounded-full bg-brand-100 flex items-center justify-center text-text-70 hover:bg-brand-150 transition-colors">
+                        <button x-show="!showNewFieldInput[group.id]" @click="showNewFieldInput[group.id] = true" type="button" class="w-7 h-7 cursor-pointer  rounded-full bg-brand-100 flex items-center justify-center text-text-70 hover:bg-brand-150 transition-colors">
                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
                         </button>
                         <div x-show="showNewFieldInput[group.id]" class="flex items-center gap-1">
@@ -307,7 +312,7 @@ new class extends Component {
                                 placeholder="New field..."
                                 class="px-3 py-1.5 rounded-full bg-brand-100 border border-secondary-200 outline-none text-app-body-medium text-text-90 w-28"
                             >
-                            <button @click="showNewFieldInput[group.id] = false; newFieldName[group.id] = ''; fieldNameError = ''" type="button" class="w-5 h-5 rounded-full flex items-center justify-center text-text-60 hover:bg-black/10 hover:text-danger-100 transition-colors">
+                            <button @click="showNewFieldInput[group.id] = false; newFieldName[group.id] = ''; fieldNameError = ''" type="button" class="w-5 h-5 cursor-pointer rounded-full flex items-center justify-center text-text-60 hover:bg-black/10 hover:text-danger-100 transition-colors">
                                 <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3"><path stroke-linecap="round" d="M6 18L18 6M6 6l12 12"/></svg>
                             </button>
                         </div>
@@ -338,7 +343,7 @@ new class extends Component {
         </div>
 
         <div class="flex justify-end">
-            <button @click="showNewGroupInput = true" type="button" class="px-8 py-4 rounded-lg bg-secondary-100 text-bg-main text-app-feature hover:bg-secondary-200 transition-colors">
+            <button @click="showNewGroupInput = true" type="button" class="cursor-pointer px-8 py-4 rounded-lg bg-secondary-100 text-bg-main text-app-feature hover:bg-secondary-200 transition-colors">
                 + Add Group
             </button>
         </div>

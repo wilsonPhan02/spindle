@@ -136,7 +136,7 @@ new #[Layout('layouts.app')] class extends Component {
 
             <button
                 @click="window.dispatchEvent(new CustomEvent('open-edit-characters'))"
-                class="flex items-center gap-4 text-web-button text-[var(--color-text-60)] p-2 rounded hover:bg-[var(--color-brand-50)] hover:text-[var(--color-secondary-200)] transition-colors"
+                class=" cursor-pointer flex items-center gap-4 text-web-button text-[var(--color-text-60)] p-2 rounded hover:bg-[var(--color-brand-50)] hover:text-[var(--color-secondary-200)] transition-colors"
             >
                 Edit Character Details
                 <x-icons.rename class="w-4 h-4 stroke-2 group-hover:text-[var(--color-secondary-200)] transition-colors" />
@@ -198,7 +198,7 @@ new #[Layout('layouts.app')] class extends Component {
                             <button
                                 x-show="hoverSelf && !addingRelation"
                                 @click.stop="startAddRelation(char.id)"
-                                class="absolute -top-10 left-1/2 -translate-x-1/2 whitespace-nowrap p-2 rounded-full bg-brand-150 border border-brand-100 text-app-desc-feature font-semibold text-text-80 hover:bg-brand-200 transition-colors shadow-sm"
+                                class=" cursor-pointer absolute -top-10 left-1/2 -translate-x-1/2 whitespace-nowrap p-2 rounded-full bg-brand-150 border border-brand-100 text-app-desc-feature font-semibold text-text-80 hover:bg-brand-200 transition-colors shadow-sm"
                             >
                                 + Add Relation
                             </button>
@@ -284,7 +284,7 @@ new #[Layout('layouts.app')] class extends Component {
                     @mouseenter="hoverAdd = true"
                     @mouseleave="hoverAdd = false"
                     wire:click="addCharacter"
-                    class="w-12 h-12 rounded-full bg-brand-150 border border-secondary-100 text-text-80 flex items-center justify-center hover:bg-brand-200 transition-colors shadow-sm"
+                    class="w-12 h-12 cursor-pointer  rounded-full bg-brand-150 border border-secondary-100 text-text-80 flex items-center justify-center hover:bg-brand-200 transition-colors shadow-sm"
                 >
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3"><path stroke-linecap="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
                 </button>
