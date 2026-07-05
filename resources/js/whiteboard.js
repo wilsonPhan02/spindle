@@ -151,7 +151,13 @@ document.addEventListener('alpine:init', () => {
         selectTarget(id) {
             this.pendingTargetId = id;
             this.addingRelation = false;
-            window.dispatchEvent(new CustomEvent('open-relation-type-popup', { detail: { relationId: null } }));
+            const fromChar = this.characters.find(c => c.id === this.relationSourceId);
+            const toChar = this.characters.find(c => c.id === id);
+            window.dispatchEvent(new CustomEvent('open-relation-type-popup', { detail: {
+                relationId: null,
+                charFromName: fromChar?.name ?? null,
+                charToName: toChar?.name ?? null,
+            } }));
         },
         openEditRelation(rel) {
             const fromChar = this.characters.find(c => c.id === rel.from);

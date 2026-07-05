@@ -343,7 +343,7 @@ new class extends Component {
         </div>
 
         <div class="flex justify-end">
-            <button @click="showNewGroupInput = true" type="button" class="cursor-pointer px-8 py-4 rounded-lg bg-secondary-100 text-bg-main text-app-feature hover:bg-secondary-200 transition-colors">
+            <button @click="showNewGroupInput = true" type="button" class="cursor-pointer px-8 py-4 rounded-lg bg-secondary-100 text-bg-main text-app-feature hover:bg-secondary-150 transition-colors">
                 + Add Group
             </button>
         </div>

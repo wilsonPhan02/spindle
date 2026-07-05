@@ -609,7 +609,7 @@ new #[Layout('layouts.app')] class extends Component {
                                 </template>
                                 <div x-show="types.length === 0" class="px-3 py-2 text-app-desc-feature text-subtext-70 italic">No types yet</div>
                                 <div class="border-t border-brand-150">
-                                    <div @click="typeOpen = false; window.dispatchEvent(new CustomEvent('open-relation-type-popup', { detail: { relationId: null } }))"
+                                    <div @click="typeOpen = false; window.dispatchEvent(new CustomEvent('open-relation-type-popup', { detail: { relationId: null, charFromName: '{{ $nickName }}', charToName: selectedChar ? selectedChar.name : null } }))"
                                         class="px-3 py-2 flex items-center gap-2 text-app-desc-feature font-semibold text-secondary-200 hover:bg-brand-100 cursor-pointer">
                                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
                                         Add New Relation

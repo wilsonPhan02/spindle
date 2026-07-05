@@ -190,7 +190,7 @@ new #[Layout('layouts.app')] class extends Component {
                         @mousedown.stop="startDragChar($event, char)"
                         @click="if (!dragMoved) { if (addingRelation && relationSourceId !== char.id) { selectTarget(char.id) } else if (!addingRelation) { openCharacterInfo(char) } }"
                         :data-character-id="char.id"
-                        class="absolute flex flex-col items-center gap-2 pt-11 px-6 select-none"
+                        class="absolute cursor-pointer flex flex-col items-center gap-2 pt-11 px-6 select-none"
                         :class="draggingId === char.id ? 'cursor-grabbing z-40' : 'cursor-grab z-20'"
                         :style="`top: ${char.top - 44}px; left: ${char.left - 24}px;`"
                     >
