@@ -160,9 +160,9 @@ new #[Layout('layouts.app')] class extends Component {
             @mousemove="if (characters.length > 0) { onPan($event); onDragChar($event); }"
             @mouseup="stopPan(); stopDragChar()"
             @mouseleave="stopPan(); stopDragChar()"
-            :style="`background-image: radial-gradient(circle, #C9BBA3 ${1.5 * zoom}px, transparent ${1.5 * zoom}px); background-size: ${22 * zoom}px ${22 * zoom}px; background-position: ${panX}px ${panY}px;`"
+            :style="`background-image: radial-gradient(circle, var(--color-brand-150) ${1.5 * zoom}px, transparent ${1.5 * zoom}px); background-size: ${22 * zoom}px ${22 * zoom}px; background-position: ${panX}px ${panY}px;`"
             :class="characters.length === 0 ? 'cursor-default' : (isAnyPopupOpen() ? 'cursor-auto' : (panning ? 'cursor-grabbing' : 'cursor-grab'))"
-            class="relative w-full h-full rounded-xl border border-brand-200 bg-[#F5EFE9] overflow-hidden"
+            class="relative w-full h-full rounded-xl border border-brand-200 bg-brand-10 overflow-hidden"
             wire:ignore
         >
             <div x-ref="canvas" class="absolute inset-0 origin-top-left" :style="`transform: translate(${panX}px, ${panY}px) scale(${zoom}); width: 2400px; height: 1800px;`">
@@ -195,11 +195,10 @@ new #[Layout('layouts.app')] class extends Component {
                         :style="`top: ${char.top - 44}px; left: ${char.left - 24}px;`"
                     >
                         <div class="relative w-20 h-20">
-                            {{-- Tombol Add Relation, muncul saat hover & belum dalam mode pilih target --}}
                             <button
                                 x-show="hoverSelf && !addingRelation"
                                 @click.stop="startAddRelation(char.id)"
-                                class="absolute -top-9 left-1/2 -translate-x-1/2 whitespace-nowrap p-2 rounded-full bg-brand-150 border border-brand-100 text-app-desc-feature font-semibold text-text-80 hover:bg-brand-200 transition-colors shadow-sm"
+                                class="absolute -top-10 left-1/2 -translate-x-1/2 whitespace-nowrap p-2 rounded-full bg-brand-150 border border-brand-100 text-app-desc-feature font-semibold text-text-80 hover:bg-brand-200 transition-colors shadow-sm"
                             >
                                 + Add Relation
                             </button>
@@ -216,7 +215,7 @@ new #[Layout('layouts.app')] class extends Component {
                                 <x-icons.default-avatar x-show="!char.imagePath" class="w-full h-full" />
                             </div>
                         </div>
-                        <span class="text-app-feature text-text-80 border border-brand-100 bg-brand-100 px-2 py-1 rounded" x-text="char.name"></span>
+                        <span class="text-app-caption font-semibold max-w-20 text-text-80 border border-brand-100 bg-brand-100 px-2 py-1 rounded truncate" x-text="char.name"></span>
                     </div>
                 </template>
 

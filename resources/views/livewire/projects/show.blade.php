@@ -267,9 +267,9 @@ new #[Layout('layouts.app')] class extends Component {
                             emoji-picker {
                                 width: 100%;
                                 height: 300px;
-                                --background: #FDFBF7; /* Warna warm-white */
+                                --background: #FDFBF7;
                                 --border-color: transparent;
-                                --indicator-color: #8B7355; /* Aksen warna tua/hangat */
+                                --indicator-color: #8B7355;
                                 --font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
                                 --button-hover-background: #f0eadd;
                                 --search-background: #f0eadd;

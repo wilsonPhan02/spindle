@@ -4,7 +4,7 @@
     style="display: none;"
     class="fixed inset-0 z-50 flex items-center justify-center bg-text-80/50 backdrop-blur-[1.5px] p-4 sm:p-6"
 >
-    <div @click.away="closeCharacterInfo()" class="bg-bg-main border border-brand-150 rounded-xl shadow-xl w-auto overflow-hidden relative max-h-[100vh] overflow-y-auto">
+    <div @click.away="closeCharacterInfo()" class="bg-bg-main border border-brand-150 rounded-xl shadow-xl w-auto overflow-hidden relative max-h-[calc(100vh-2rem)] sm:max-h-[calc(100vh-2rem)] overflow-y-auto">
         <template x-if="infoCharacter">
             <div x-data="{ confirmingDelete: false }">
                 {{-- X close button --}}
@@ -16,7 +16,7 @@
                 </button>
 
                 {{-- Normal view: stacked on mobile, side-by-side on sm+ --}}
-                <div x-show="!confirmingDelete" class="flex flex-col sm:flex-row">
+                <div x-show="!confirmingDelete" class="flex flex-col sm:flex-row sm:max-h-[min(30.5rem,calc(100vh-2rem))]">
                     {{-- Left: image --}}
                     <div class="shrink-0 p-4 sm:p-5 sm:pr-0 flex sm:block">
                         <div class="w-full aspect-[3/4] sm:w-84 bg-brand-100 relative overflow-hidden rounded-xl flex items-center justify-center">
@@ -25,10 +25,10 @@
                         </div>
                     </div>
                     {{-- Right: content --}}
-                    <div class="flex flex-col flex-1 min-w-0 p-5 sm:p-7 sm:w-108 gap-4">
+                    <div class="flex flex-col flex-1 min-w-0 sm:min-h-0 p-5 sm:p-7 sm:w-108 gap-4">
                         <div>
-                            <h3 class="text-app-title-1 text-text-80" x-text="infoCharacter.fullName"></h3>
-                            <p class="text-app-subtitle-1 text-text-60">Nickname : <span x-text="infoCharacter.name"></span></p>
+                            <h3 class="text-app-title-1 text-text-80 truncate" :title="infoCharacter.fullName" x-text="infoCharacter.fullName"></h3>
+                            <p class="text-app-subtitle-1 text-text-60 truncate" >Nickname : <span x-text="infoCharacter.name" :title="infoCharacter.name"></span></p>
                         </div>
                         
                         <hr class="border-t border-1 border-brand-150 w-full" />
@@ -72,13 +72,19 @@
                                 ></span>
                             </div>
                         </div>
-                        <div>
-                            <p class="text-app-feature text-text-70 mb-2">Backstory</p>
-                            <p class="text-app-body-medium text-text-60 break-words line-clamp-3" x-text="infoCharacter.bio || 'No Description Yet'"></p>
+                        <div class="sm:flex-1 sm:min-h-0 flex flex-col">
+                            <p class="text-app-feature text-text-70 mb-2 shrink-0">Backstory</p>
+                            <p
+                                class="text-app-body-medium text-text-60 break-words line-clamp-5"
+                                x-text="infoCharacter.bio || 'No Description Yet'"
+                            ></p>
                         </div>
-                        <div class="flex flex-col gap-2.5 mt-auto pt-2">
-                            <button @click="viewCharacterDetail()" class="w-full py-3 rounded-lg bg-brand-150 text-app-feature text-text-80 hover:bg-brand-200 transition-colors">View Detail</button>
-                            <button @click="confirmingDelete = true" class="w-full py-3 rounded-lg border border-danger-100 text-app-feature text-danger-100 hover:bg-danger-100/10 transition-colors">Delete Character</button>
+                        <div class="flex gap-2.5 mt-2">
+                            <button @click="confirmingDelete = true" class="p-3 rounded-lg cursor-pointer border border-danger-100 text-danger-100 hover:bg-danger-100/10 transition-colors"
+                            title="Delete Character">
+                                <x-icons.delete class="w-5 h-5"/>
+                            </button>
+                            <button @click="viewCharacterDetail()" class="w-full p-3 cursor-pointer rounded-lg bg-brand-150 text-app-feature text-text-80 hover:bg-brand-200 transition-colors">Edit Character Detail</button>
                         </div>
                     </div>
                 </div>

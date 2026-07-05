@@ -199,7 +199,7 @@ new #[Layout('layouts.app')] class extends Component {
 
     #[Renderless]
     public function addTag(string $name) {
-        $name = trim($name);
+        $name = mb_substr(trim($name), 0, 20);
         if ($name === '') return null;
 
         $tag = Hashtag::firstOrCreate(['slug' => Str::slug($name)], ['name' => $name]);
@@ -215,15 +215,28 @@ new #[Layout('layouts.app')] class extends Component {
 
     public function updated($property) {
         if (in_array($property, ['fullName', 'nickName', 'bio'])) {
-            if ($property === 'nickName') {
-                $isDuplicate = $this->project->characters()
-                    ->where('nick_name', $this->nickName)
-                    ->where('character_id', '!=', $this->character->character_id)
-                    ->exists();
-                $isDuplicate
-                    ? ($this->nickNameError = 'Nickname already taken.')
-                    : ($this->nickNameError = '');
+            if ($property === 'fullName') {
+                $this->fullName = mb_substr(ltrim($this->fullName), 0, 60);
+                if (trim($this->fullName) === '') {
+                    $this->fullName = 'New Character';
+                }
             }
+
+            if ($property === 'nickName') {
+                $this->nickName = mb_substr(ltrim($this->nickName), 0, 20);
+
+                if (trim($this->nickName) === '') {
+                    $this->nickName = 'New Character';
+                    $this->nickNameError = '';
+                } else {
+                    $isDuplicate = $this->project->characters()
+                        ->where('nick_name', $this->nickName)
+                        ->where('character_id', '!=', $this->character->character_id)
+                        ->exists();
+                    $this->nickNameError = $isDuplicate ? 'Nickname already taken.' : '';
+                }
+            }
+
             $this->character->update([
                 'full_name' => $this->fullName,
                 'nick_name' => $this->nickNameError ? $this->character->nick_name : $this->nickName,
@@ -260,16 +273,114 @@ new #[Layout('layouts.app')] class extends Component {
         ]" />
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-2 items-start">
-
+        
         {{-- KOLOM KIRI: nama, backstory, dan detail group/field --}}
         <div class="lg:col-span-2 bg-brand-10 border border-brand-150 rounded-2xl p-8 flex flex-col gap-6 h-full">
-            <div class="flex flex-col gap-1">
-                <input type="text" wire:model.live.debounce.500ms="fullName" @blur="$wire.$commit()" placeholder="Full Name"
-                    class="text-app-title-1 text-text-100 bg-transparent outline-none w-full">
+
+            <div class="flex justify-between items-center w-full">
+    
+                <!-- Tombol Kiri (< Back) -->
+                <a href="{{route('projects.characters', $project)}}"
+                        class="flex items-center gap-1.5 text-app-feature text-text-60 hover:text-text-90 transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                    </svg>
+                    Back
+                </a>
+
+                <!-- Tombol Kanan (Trash / Delete) -->
+                <button type="button" 
+                        @click="confirmingDelete = true" 
+                        class="p-1.5 text-danger-100/80 border hover:text-danger-100 hover:bg-danger-100/10 rounded-md transition-colors" 
+                        title="Delete Character">
+                    <!-- Menggunakan komponen ikon delete milikmu, ukurannya diperkecil agar proporsional untuk header -->
+                    <x-icons.delete class="w-3 h-3 border-none"/>
+                </button>
+
+            </div>
+            <div
+                class="flex flex-col gap-1"
+                x-data="{
+                    editingFullName: false,
+                    editingNickName: false,
+                    fullNameDraft: @js($fullName),
+                    fullNameDisplay: @js($fullName),
+                    fullNameCount: {{ mb_strlen($fullName) }},
+                    nickNameCount: {{ mb_strlen($nickName) }},
+                    init() {
+                        this.$wire.$watch('fullName', (value) => {
+                            this.fullNameDisplay = value;
+                            this.fullNameCount = value.length;
+                        });
+                    },
+                    startEditFullName() {
+                        this.fullNameDraft = this.fullNameDisplay;
+                        this.fullNameCount = this.fullNameDraft.length;
+                        this.editingFullName = true;
+                        this.$nextTick(() => this.$refs.fullNameInput.focus());
+                    },
+                    cancelFullNameEdit() {
+                        this.fullNameDraft = this.fullNameDisplay;
+                        this.fullNameCount = this.fullNameDisplay.length;
+                        this.editingFullName = false;
+                    },
+                    commitFullNameEdit() {
+                        const typed = this.fullNameDraft.trim();
+                        const finalValue = typed === '' ? 'New Character' : this.fullNameDraft;
+                        this.fullNameDraft = finalValue;
+                        this.fullNameDisplay = finalValue;
+                        this.fullNameCount = finalValue.length;
+                        this.editingFullName = false;
+                        this.$wire.set('fullName', finalValue, true);
+                    },
+                    stripLeadingSpace(e, countProp) {
+                        if (e.target.value.startsWith(' ')) {
+                            e.target.value = e.target.value.replace(/^\s+/, '');
+                        }
+                        this[countProp] = e.target.value.length;
+                    },
+                }"
+            >
+                <div class="flex items-end gap-2">
+                    <h1
+                        x-show="!editingFullName"
+                        @click="startEditFullName()"
+                        x-text="fullNameDisplay"
+                        class="text-app-title-1 text-text-100 truncate cursor-text"
+                    ></h1>
+
+                    <div x-show="editingFullName" x-cloak class="flex items-center gap-2 flex-1 min-w-0 border-b border-subtext-70">
+                        <input
+                            type="text"
+                            x-ref="fullNameInput"
+                            x-model="fullNameDraft"
+                            x-init="$el.addEventListener('input', (e) => stripLeadingSpace(e, 'fullNameCount'), true)"
+                            @blur="commitFullNameEdit()"
+                            @keydown.enter="$event.target.blur()"
+                            @keydown.escape="$event.target.blur()"
+                            maxlength="60"
+                            placeholder="Full Name"
+                            class="text-app-title-1 text-text-100 bg-transparent outline-none w-full truncate"
+                        >
+                        <button type="button" @mousedown.prevent @click="cancelFullNameEdit()" class="shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-text-60 hover:bg-black/10 hover:text-danger-100 transition-colors">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3"><path stroke-linecap="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                        </button>
+                    </div>
+                </div>
+                <span x-show="editingFullName" x-cloak class="text-app-desc-feature text-subtext-70">
+                    <span x-text="fullNameCount"></span>/60
+                </span>
                 <div class="flex items-center gap-2 text-app-body-medium text-subtext-90">
                     <span>Nickname :</span>
-                    <input type="text" wire:model.live.debounce.500ms="nickName" @blur="$wire.$commit()" placeholder="Nickname"
+                    <input type="text" wire:model="nickName"
+                        x-init="$el.addEventListener('input', (e) => stripLeadingSpace(e, 'nickNameCount'), true)"
+                        @focus="editingNickName = true; nickNameCount = $event.target.value.length"
+                        @blur="editingNickName = false; $wire.$commit()"
+                        @keydown.enter="$event.target.blur()"
+                        @keydown.escape="$event.target.blur()"
+                        maxlength="20" placeholder="Nickname"
                         class="bg-transparent text-text-60 outline-none border-b transition-colors {{ $nickNameError ? 'border-danger-100' : 'border-transparent focus:border-subtext-70' }}">
+                    <span x-show="editingNickName" x-cloak class="text-app-desc-feature text-subtext-70"><span x-text="nickNameCount"></span>/20</span>
                 </div>
                 @if($nickNameError)
                     <span class="text-app-desc-feature text-danger-100">{{ $nickNameError }}</span>
@@ -309,8 +420,6 @@ new #[Layout('layouts.app')] class extends Component {
                     <p class="text-subtext-90 font-medium text-app-feature">No detail groups yet.</p>
                 @endforelse
             </div>
-                <hr class="border-t border-brand-200 w-full" />
-                <button @click="confirmingDelete = true" class="w-full py-3 rounded-lg border border-danger-100 text-app-feature text-danger-100 hover:bg-danger-100/10 transition-colors">Delete Character</button>
         </div>
 
         {{-- KOLOM KANAN: foto, tag, relationship --}}
@@ -380,19 +489,24 @@ new #[Layout('layouts.app')] class extends Component {
                     >
                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
                     </button>
-                    <div x-show="showNewTagInput" x-cloak class="flex items-center gap-1">
-                        <input
-                            type="text"
-                            x-model="newTagName"
-                            x-init="$watch('showNewTagInput', value => { if (value) $nextTick(() => $el.focus()) })"
-                            @keydown.enter="addTag()"
-                            @keydown.escape="showNewTagInput = false; newTagName = ''"
-                            placeholder="New tag..."
-                            class="px-3 py-2 rounded-full bg-brand-100 border border-secondary-100 outline-none text-app-body-small text-text-70 w-28 shrink-0"
-                        >
-                        <button @click="showNewTagInput = false; newTagName = ''" type="button" class="w-5 h-5 rounded-full flex items-center justify-center text-text-60 hover:bg-black/10 hover:text-danger-100 transition-colors">
-                            <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3"><path stroke-linecap="round" d="M6 18L18 6M6 6l12 12"/></svg>
-                        </button>
+                    <div x-show="showNewTagInput" x-cloak class="flex flex-col gap-1">
+                        <div class="flex items-center gap-1">
+                            <input
+                                type="text"
+                                x-model="newTagName"
+                                x-init="$watch('showNewTagInput', value => { if (value) $nextTick(() => $el.focus()) })"
+                                @input="if (newTagName.startsWith(' ')) newTagName = newTagName.replace(/^\s+/, '')"
+                                @keydown.enter="addTag()"
+                                @keydown.escape="showNewTagInput = false; newTagName = ''"
+                                maxlength="20"
+                                placeholder="New tag..."
+                                class="px-3 py-2 rounded-full bg-brand-100 border border-secondary-100 outline-none text-app-body-small text-text-70 w-28 shrink-0"
+                            >
+                            <button @click="showNewTagInput = false; newTagName = ''" type="button" class="w-5 h-5 rounded-full flex items-center justify-center text-text-60 hover:bg-black/10 hover:text-danger-100 transition-colors">
+                                <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3"><path stroke-linecap="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                            </button>
+                        </div>
+                        <span class="text-app-desc-feature text-subtext-70" x-text="newTagName.length + '/20'"></span>
                     </div>
                 </div>
             </div>
