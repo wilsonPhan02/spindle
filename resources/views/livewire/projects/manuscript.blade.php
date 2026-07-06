@@ -175,6 +175,35 @@ new #[Layout('layouts.app')] class extends Component {
                 'content' => $this->editorBody,
                 'word_count' => $wordCount,
             ]);
+
+        $firstDraft = Manuscript::where('chapter_card_id', $this->chapterCard->chapter_card_id)
+            ->orderBy('created_at')
+            ->first();
+
+        if ($firstDraft && $firstDraft->manuscript_id === $this->activeDraftId) {
+            $html = $this->editorBody ?? '';
+            $html = preg_replace('/<(br|\/p|\/div|\/h[1-6]|\/li|\/tr|\/blockquote|\/pre)[^>]*>/i', "\n", $html);
+            $cleanText = html_entity_decode(strip_tags($html), ENT_QUOTES, 'UTF-8');
+            $cleanText = preg_replace('/[ \t]+/', ' ', trim($cleanText));
+
+            if ($cleanText !== '') {
+                $extracted = $cleanText;
+                if (preg_match_all('/[^.!?\r\n]+[.!?]?/', $cleanText, $matches) && !empty($matches[0])) {
+                    $sents = [];
+                    foreach ($matches[0] as $m) {
+                        $c = trim($m);
+                        if ($c !== '') $sents[] = $c;
+                    }
+                    if (!empty($sents)) {
+                        $extracted = implode(' ', array_slice($sents, 0, 2));
+                    }
+                }
+                $this->chapterCard->update(['summary' => trim($extracted)]);
+            } elseif ($cleanText === '' && empty(trim($this->chapterCard->summary ?? ''))) {
+                $this->chapterCard->update(['summary' => null]);
+            }
+        }
+
         $this->chapterCard->touch();
         $this->chapterCard->refresh();
     }
@@ -325,6 +354,7 @@ new #[Layout('layouts.app')] class extends Component {
                 } else {
                     $displaySummary = $text;
                 }
+                $this->chapterCard->update(['summary' => trim($displaySummary)]);
             }
         }
 

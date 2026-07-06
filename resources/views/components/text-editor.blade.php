@@ -986,7 +986,7 @@
     </div>
 
     {{-- Word Count Footer inside Editor Sheet --}}
-    <div class="px-8 lg:px-10 py-2.5 text-[12px] text-[#8C7558] font-medium border-t border-transparent select-none shrink-0 bg-brand-50">
+    <div class="px-8 lg:px-10 py-2.5 text-[12px] text-[#8C7558] font-medium border-t border-transparent select-none shrink-0 bg-brand-50 right-8">
         <span x-text="wordCount + ' words'"></span>
     </div>
 </div>

@@ -98,12 +98,12 @@
             </p>
         </div>
 
-        <div class="bg-brand-100 px-3 py-3 flex flex-col gap-2 group-hover:bg-brand-150">
+        <div class="bg-brand-100 px-2 py-3 flex flex-col gap-2 group-hover:bg-brand-150">
             
-            <div class="flex items-center gap-2 overflow-hidden">
+            <div class="flex items-center gap-1 overflow-hidden">
                 @if($chapter->tags->isNotEmpty())
                     @foreach($chapter->tags->take(2) as $tag)
-                        <span class="text-app-caption text-secondary-100 bg-brand-100 border border-brand-200 px-2 py-0.5 rounded truncate max-w-[80px]">
+                        <span class="text-app-caption text-secondary-100 bg-card-hover border border-brand-200 px-2 py-0.5 rounded truncate max-w-[80px]">
                             {{ $tag->name }}
                         </span>
                     @endforeach
@@ -128,8 +128,8 @@
                 
                 <span @class([
                     'text-app-caption text-text-80 px-2 py-1 rounded-md flex items-center gap-1.5 shadow-sm',
-                    'bg-warning-100/70' => $chapter->status === 'In Progress',
-                    'bg-success-100/70' => $chapter->status === 'Completed',
+                    'bg-warning-100/50' => $chapter->status === 'In Progress',
+                    'bg-success-100/50' => $chapter->status === 'Completed',
                     'bg-text-100' => !in_array($chapter->status, ['In Progress', 'Completed'])
                 ])>
                     <x-icons.chapter-status :status="$chapter->status" />
