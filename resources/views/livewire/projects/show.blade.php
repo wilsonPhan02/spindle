@@ -52,7 +52,6 @@ new #[Layout('layouts.app')] class extends Component {
         $this->recentCharacters = $project->characters()
             ->with('hashtags')
             ->orderByDesc('updated_at')
-            ->limit(10)
             ->get();
 
         $this->recentChapters = $project->chapterCards()
