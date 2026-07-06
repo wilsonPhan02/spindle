@@ -288,7 +288,13 @@ new class extends Component {
                                 </div>
 
                                 <div class="flex items-center gap-2 mb-1">
-                                    <x-icons.sidebar-book class="w-4 h-4 text-text-80 shrink-0 group-hover:text-secondary-200 transition-colors" />
+                                    @if($project->icon_type === 'emoji')
+                                        <span class="text-[16px] leading-none shrink-0">{{ $project->icon }}</span>
+                                    @elseif($project->icon_type === 'image' && $project->icon)
+                                        <img src="{{ asset('storage/' . $project->icon) }}" alt="" class="w-4 h-4 object-cover rounded shrink-0">
+                                    @else
+                                        <x-icons.sidebar-book class="w-4 h-4 text-text-80 shrink-0 group-hover:text-secondary-200 transition-colors" />
+                                    @endif
                                     <h3 class="text-app-body-medium text-text-100 truncate group-hover:text-secondary-200 transition-colors">{{ $project->title }}</h3>
                                 </div>
                                 <p class="text-[11px] font-medium text-subtext-90">{{ $project->created_at->format('d F Y') }}</p>
