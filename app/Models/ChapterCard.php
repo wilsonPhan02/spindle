@@ -36,4 +36,9 @@ class ChapterCard extends Model
     {
         return $this->belongsToMany(Tag::class, 'chapter_tag', 'chapter_card_id', 'tag_id');
     }
+
+    public function characters()
+    {
+        return $this->belongsToMany(Character::class, 'chapter_character', 'chapter_card_id', 'character_id');
+    }
 }

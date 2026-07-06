@@ -42,4 +42,9 @@ class Character extends Model
     {
         return $this->hasMany(CharacterDetailValue::class, 'character_id', 'character_id');
     }
+
+    public function chapters()
+    {
+        return $this->belongsToMany(ChapterCard::class, 'chapter_character', 'character_id', 'chapter_card_id');
+    }
 }
