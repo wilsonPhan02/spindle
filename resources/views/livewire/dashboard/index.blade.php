@@ -91,7 +91,7 @@ new class extends Component {
     @endphp
 
     <div class="bg-[#F5EFE9] rounded-xl overflow-hidden mb-8 shadow-sm h-[200px] flex justify-between items-end">
-        <div class="w-48 md:w-56 lg:w-60 mb-2 shrink-0 pointer-events-none">
+        <div class="w-36 md:w-44 lg:w-48 mb-10 shrink-0 pointer-events-none">
             <x-left-dashboard class="w-full h-auto block" />
         </div>
         <div class="flex-1 self-center px-4 md:px-8 z-10 min-w-0 flex flex-col items-center"
@@ -150,19 +150,14 @@ new class extends Component {
             
             <p class="text-app-body-large text-text-80 truncate w-full text-center">Are u ready to spin the <span class="italic">yarn</span>?</p>
         </div>
-        <div class="w-48 md:w-56 lg:w-60 shrink-0 pointer-events-none flex justify-end">
+        <div class="w-36 md:w-44 lg:w-48 mb-8 shrink-0 pointer-events-none flex justify-end">
             <x-right-dashboard class="w-full h-auto block" />
         </div>
     </div>
 
     @if(count($sections) === 0)
-        <button wire:click="addSection" class="w-full py-3 mb-16 border border-brand-200 rounded-lg text-subtext-80 hover:bg-[#F5EFE9] transition-colors flex items-center justify-center gap-2">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
-            Add New Section
-        </button>
-
         <div class="flex flex-col items-center justify-center mt-12">
-            <x-empty-dashboard class="w-64 h-64 mb-6 opacity-80" />
+            <x-empty-dashboard class="w-48 h-48 mb-6 opacity-80" />
             <h2 class="text-app-heading-1 text-subtext-80 mb-2">Looks like it's a bit quiet in here...</h2>
             <p class="text-app-body-large text-subtext-70">Ready to create a new one?</p>
         </div>
