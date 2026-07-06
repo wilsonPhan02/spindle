@@ -463,6 +463,33 @@ new #[Layout('layouts.app')] class extends Component {
 
             <div class="flex flex-col gap-4 mb-4">
                 <h3 class="text-app-feature text-text-100 pb-2 border-b border-brand-150">Tags</h3>
+                <button
+                    x-show="!showNewTagInput"
+                    @click="showNewTagInput = true"
+                    type="button"
+                    class="shrink-0 w-8 h-8 rounded-full bg-brand-100 flex items-center justify-center text-text-70 hover:bg-brand-150 transition-colors"
+                >
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+                </button>
+                <div x-show="showNewTagInput" x-cloak class="flex items-center gap-1">
+                    <div class="relative shrink-0">
+                        <input
+                            type="text"
+                            x-model="newTagName"
+                            x-init="$watch('showNewTagInput', value => { if (value) $nextTick(() => $el.focus()) })"
+                            @input="if (newTagName.startsWith(' ')) newTagName = newTagName.replace(/^\s+/, '')"
+                            @keydown.enter="addTag()"
+                            @keydown.escape="showNewTagInput = false; newTagName = ''"
+                            maxlength="20"
+                            placeholder="New tag..."
+                            class="pl-3 pr-11 py-2 rounded-full bg-brand-100 border border-secondary-100 outline-none text-app-body-small text-text-70 w-36"
+                        >
+                        <span class="absolute right-3 top-1/2 -translate-y-1/2 text-app-desc-feature text-subtext-70 pointer-events-none" x-text="newTagName.length + '/20'"></span>
+                    </div>
+                    <button @click="showNewTagInput = false; newTagName = ''" type="button" class="w-5 h-5 rounded-full flex items-center justify-center text-text-60 hover:bg-black/10 hover:text-danger-100 transition-colors">
+                        <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3"><path stroke-linecap="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                </div>
                 <div
                     x-data="{
                         showNewTagInput: false,
@@ -495,33 +522,6 @@ new #[Layout('layouts.app')] class extends Component {
                         </span>
                     </template>
 
-                    <button
-                        x-show="!showNewTagInput"
-                        @click="showNewTagInput = true"
-                        type="button"
-                        class="shrink-0 w-8 h-8 rounded-full bg-brand-100 flex items-center justify-center text-text-70 hover:bg-brand-150 transition-colors"
-                    >
-                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
-                    </button>
-                    <div x-show="showNewTagInput" x-cloak class="flex items-center gap-1">
-                        <div class="relative shrink-0">
-                            <input
-                                type="text"
-                                x-model="newTagName"
-                                x-init="$watch('showNewTagInput', value => { if (value) $nextTick(() => $el.focus()) })"
-                                @input="if (newTagName.startsWith(' ')) newTagName = newTagName.replace(/^\s+/, '')"
-                                @keydown.enter="addTag()"
-                                @keydown.escape="showNewTagInput = false; newTagName = ''"
-                                maxlength="20"
-                                placeholder="New tag..."
-                                class="pl-3 pr-11 py-2 rounded-full bg-brand-100 border border-secondary-100 outline-none text-app-body-small text-text-70 w-36"
-                            >
-                            <span class="absolute right-3 top-1/2 -translate-y-1/2 text-app-desc-feature text-subtext-70 pointer-events-none" x-text="newTagName.length + '/20'"></span>
-                        </div>
-                        <button @click="showNewTagInput = false; newTagName = ''" type="button" class="w-5 h-5 rounded-full flex items-center justify-center text-text-60 hover:bg-black/10 hover:text-danger-100 transition-colors">
-                            <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3"><path stroke-linecap="round" d="M6 18L18 6M6 6l12 12"/></svg>
-                        </button>
-                    </div>
                 </div>
             </div>
 
