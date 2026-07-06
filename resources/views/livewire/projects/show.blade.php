@@ -321,6 +321,17 @@ new #[Layout('layouts.app')] class extends Component {
                                     }
                                 `;
                                 picker.shadowRoot.appendChild(style);
+
+                                // Optimization: Block hover events inside the skin tone menu
+                                // EmojiMart v5 causes massive lag by re-rendering all emojis on hover to preview skin tones.
+                                // Stopping these events prevents the live preview, eliminating the lag entirely.
+                                ['mouseover', 'mouseout', 'mouseenter', 'mouseleave'].forEach(evt => {
+                                    picker.shadowRoot.addEventListener(evt, (e) => {
+                                        if (e.target.closest && e.target.closest('.menu')) {
+                                            e.stopPropagation();
+                                        }
+                                    }, true); // Use capture phase to intercept before Preact
+                                });
                             } catch(e) {}
                         }, 50);
                     }
