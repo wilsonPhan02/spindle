@@ -403,11 +403,11 @@ new #[Layout('layouts.app')] class extends Component {
                 </h3>
 
                 @forelse($detailGroups as $group)
-                    <div class="flex flex-col gap-3 {{ $loop->first ? '' : 'border-t border-brand-150 pt-6' }}">
+                    <div wire:key="group-{{ $group['id'] }}" class="flex flex-col gap-3 {{ $loop->first ? '' : 'border-t border-brand-150 pt-6' }}">
                         <h4 class="text-app-heading-2 text-secondary-80 mb-2">{{ $group['name'] }}</h4>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                             @forelse($group['fields'] as $field)
-                                <div class="flex flex-col gap-1 text-left">
+                                <div wire:key="field-{{ $field['id'] }}" class="flex flex-col gap-1 text-left">
                                     <label class="text-app-feature text-text-70">{{ $field['name'] }}</label>
                                     <input type="text" wire:model.live.debounce.500ms="detailValues.{{ $field['id'] }}" @blur="$wire.$commit()" value="{{ $detailValues[$field['id']] ?? '' }}" placeholder="Enter value"
                                         class="w-full px-4 py-2 bg-bg-main border-1 border-secondary-100 rounded-lg focus:border-secondary-250 focus:border-2 outline-none transition-all text-subtext-100 text-app-body-medium placeholder:text-subtext-80">

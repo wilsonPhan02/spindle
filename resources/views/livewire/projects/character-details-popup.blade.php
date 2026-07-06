@@ -103,6 +103,39 @@ new class extends Component {
             ->update(['name' => $name]);
         $this->dispatch('detail-groups-changed');
     }
+
+    #[Renderless]
+    public function updateGroupOrder($orderedGroupIds) {
+        $groups = $this->project->characterDetailGroups()->whereIn('character_detail_group_id', $orderedGroupIds)->get();
+        $availableOrders = $groups->pluck('order')->sort()->values()->toArray();
+
+        DB::transaction(function () use ($orderedGroupIds, $availableOrders) {
+            foreach ($orderedGroupIds as $index => $groupId) {
+                CharacterDetailGroup::where('character_detail_group_id', $groupId)->update(['order' => $availableOrders[$index]]);
+            }
+        });
+
+        $this->dispatch('detail-groups-changed');
+    }
+
+    #[Renderless]
+    public function updateFieldOrder($groupId, $orderedFieldIds) {
+        $group = $this->project->characterDetailGroups()->where('character_detail_group_id', $groupId)->first();
+        if (! $group) {
+            return;
+        }
+
+        $fields = $group->fields()->whereIn('character_detail_field_id', $orderedFieldIds)->get();
+        $availableOrders = $fields->pluck('order')->sort()->values()->toArray();
+
+        DB::transaction(function () use ($orderedFieldIds, $availableOrders) {
+            foreach ($orderedFieldIds as $index => $fieldId) {
+                CharacterDetailField::where('character_detail_field_id', $fieldId)->update(['order' => $availableOrders[$index]]);
+            }
+        });
+
+        $this->dispatch('detail-groups-changed');
+    }
 }; ?>
 
 {{-- MODAL: Character Details (kelola Group & Field template, bukan per-karakter) — komponen reusable,
@@ -124,6 +157,34 @@ new class extends Component {
         newGroupName: '',
         groupNameError: '',
         fieldNameError: '',
+        init() {
+            new Sortable(this.$refs.groupList, {
+                animation: 200,
+                ghostClass: 'opacity-50',
+                handle: '.drag-handle',
+                draggable: '.sortable-group',
+                onEnd: (evt) => {
+                    if (evt.oldIndex === evt.newIndex) return;
+                    const orderedIds = Array.from(this.$refs.groupList.querySelectorAll('.sortable-group')).map(el => el.getAttribute('data-id'));
+                    this.detailGroups.sort((a, b) => orderedIds.indexOf(a.id) - orderedIds.indexOf(b.id));
+                    this.$wire.call('updateGroupOrder', orderedIds);
+                },
+            });
+        },
+        initFieldSortable(el, groupId) {
+            new Sortable(el, {
+                animation: 200,
+                ghostClass: 'opacity-50',
+                draggable: '.sortable-field',
+                onEnd: (evt) => {
+                    if (evt.oldIndex === evt.newIndex) return;
+                    const orderedIds = Array.from(el.querySelectorAll('.sortable-field')).map(item => item.getAttribute('data-id'));
+                    const group = this.detailGroups.find(g => g.id === groupId);
+                    if (group) group.fields.sort((a, b) => orderedIds.indexOf(a.id) - orderedIds.indexOf(b.id));
+                    this.$wire.call('updateFieldOrder', groupId, orderedIds);
+                },
+            });
+        },
         resetDetailUi() {
             this.editingGroupId = null;
             this.editGroupName = '';
@@ -230,14 +291,18 @@ new class extends Component {
 
         <h2 class="text-app-title-1 text-text-100">Character Details</h2>
 
-        <div class="flex flex-col gap-6 max-h-[28rem] overflow-y-auto pr-2 custom-scrollbar">
+        <div class="flex flex-col gap-6 max-h-[28rem] overflow-y-auto pr-2 custom-scrollbar" x-ref="groupList">
             <template x-for="group in detailGroups" :key="group.id">
-                <div class="flex flex-col gap-3 text-left">
+                <div class="group/detail flex items-start gap-1 sortable-group" :data-id="group.id">
+                    <div class="drag-handle shrink-0 p-1.5 opacity-0 group-hover/detail:opacity-100 text-text-60 hover:text-text-80 cursor-grab active:cursor-grabbing transition-opacity">
+                        <x-icons.drag-handle class="w-1.5 h-3" />
+                    </div>
+                    <div class="flex-1 min-w-0 flex flex-col gap-3 text-left">
                     <div class="flex items-center gap-2 min-w-0">
                         <template x-if="editingGroupId !== group.id">
-                            <h3 
-                                class="text-app-subheading-2 text-secondary-200 truncate min-w-0 shrink cursor-pointer" 
-                                @dblclick="editingGroupId = group.id; editGroupName = group.name" 
+                            <h3
+                                class="text-app-subheading-2 text-secondary-200 truncate min-w-0 shrink cursor-pointer"
+                                @dblclick="editingGroupId = group.id; editGroupName = group.name"
                                 x-text="group.name"
                             ></h3>
                         </template>
@@ -263,9 +328,9 @@ new class extends Component {
                     </div>
                     <p x-show="editingGroupId === group.id && groupNameError" style="display:none;" class="text-app-desc-feature text-danger-100 -mt-1" x-text="groupNameError"></p>
 
-                    <div class="flex flex-wrap items-center gap-2">
+                    <div class="flex flex-wrap items-center gap-2" x-init="initFieldSortable($el, group.id)">
                         <template x-for="field in group.fields" :key="field.id">
-                            <div class="flex items-center gap-1 rounded-full bg-brand-100 pl-4 pr-2 py-2 max-w-full min-w-0">
+                            <div class="flex items-center gap-1 rounded-full bg-brand-100 pl-4 pr-2 py-2 max-w-full min-w-0 sortable-field cursor-move" :data-id="field.id">
                                 <template x-if="editingFieldId !== field.id">
                                     <span @click="editingFieldId = field.id; editFieldName = field.name" class="text-app-body-medium text-text-80 cursor-text truncate min-w-0 flex-1" x-text="field.name"></span>
                                 </template>
@@ -308,6 +373,7 @@ new class extends Component {
                         </div>
                     </div>
                     <p x-show="(showNewFieldInput[group.id] || group.fields.some(f => f.id === editingFieldId)) && fieldNameError" style="display:none;" class="text-app-desc-feature text-danger-100" x-text="fieldNameError"></p>
+                    </div>
                 </div>
             </template>
 
