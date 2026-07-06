@@ -62,7 +62,7 @@
     </button>
 
     <main
-        class="flex-1 h-screen overflow-y-auto transition-all duration-300 ease-in-out scroll-smooth"
+        class="flex-1 h-screen overflow-y-auto [scrollbar-gutter:stable] transition-all duration-300 ease-in-out scroll-smooth"
         :class="($store.layout.isPinned || $store.layout.isHovered) ? 'ml-72 px-6 lg:px-10' : 'ml-0 px-14 lg:px-20'"
     >
         {{ $slot }}
