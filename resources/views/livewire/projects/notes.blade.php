@@ -121,11 +121,15 @@ new #[Layout('layouts.app')] class extends Component {
         $note = Note::where('note_id', $noteId)
                     ->where('project_id', $this->project->project_id)
                     ->first();
+        if (!$note) return;
+
         $trimmed = trim($newTitle);
         $hasCopy = str_ends_with($trimmed, ' (Copy)');
         $base = $hasCopy ? substr($trimmed, 0, -7) : $trimmed;
         $finalTitle = mb_substr($base, 0, 25) . ($hasCopy ? ' (Copy)' : '');
+
         if ($finalTitle === '' || $finalTitle === ' (Copy)') return;
+
         $note->update(['title' => $finalTitle]);
     }
 
@@ -139,13 +143,12 @@ new #[Layout('layouts.app')] class extends Component {
 
     private function cloneNoteRecursive(Note $source, ?string $newParentId, int $depth): Note
     {
-        $baseTitle = preg_replace('/ \(Copy\)$/', '', $source->title);
         $clone = Note::create([
             'project_id'     => $this->project->project_id,
             'parent_note_id' => $newParentId,
             'depth'          => $depth,
             'sort_order'     => $this->nextSortOrder($newParentId),
-            'title'          => mb_substr($baseTitle . ' (Copy)', 0, 25),
+            'title'          => $source->title . ' (Copy)',
             'body'           => $source->body,
         ]);
         foreach ($source->children as $child) {
@@ -328,8 +331,6 @@ new #[Layout('layouts.app')] class extends Component {
         menuPos: { top: 0, left: 0 },
         renamingId: null,
         renameValue: '',
-        originalBaseTitle: '',
-        hadCopySuffix: false,
         collapsed: {},
 
         toggleCollapse(id) {
@@ -365,9 +366,7 @@ new #[Layout('layouts.app')] class extends Component {
 
         startRename(id, currentTitle) {
             this.renamingId = id;
-            this.hadCopySuffix = currentTitle.endsWith(' (Copy)');
-            this.originalBaseTitle = currentTitle.replace(/ \(Copy\)$/, '');
-            this.renameValue = this.originalBaseTitle;
+            this.renameValue = currentTitle;
             this.openMenuId = null;
             this.$nextTick(() => {
                 const el = document.getElementById('rename_' + id);
@@ -375,12 +374,8 @@ new #[Layout('layouts.app')] class extends Component {
             });
         },
         commitRename(id) {
-            let finalName = this.renameValue.trim();
-            if (finalName !== '') {
-                if (finalName === this.originalBaseTitle && this.hadCopySuffix) {
-                    finalName = finalName + ' (Copy)';
-                }
-                $wire.renameNote(id, finalName);
+            if (this.renameValue.trim() !== '') {
+                $wire.renameNote(id, this.renameValue);
             }
             this.renamingId = null;
         },
@@ -431,18 +426,21 @@ new #[Layout('layouts.app')] class extends Component {
 
         onEditorMouseMove(e) {
             if (this.isDraggingBlock) return;
-
-            // Jangan sembunyikan atau berkedip jika kursor ada di atas drag handle itu sendiri
-            if (e.target.closest('[draggable=true]') || e.target.closest('.cursor-grab')) {
-                return;
-            }
-
             const editor = document.getElementById('note-editor');
             if (!editor) return;
+            const editorRect = editor.getBoundingClientRect();
 
-            let block = e.target;
-            
-            if (block === editor) {
+            let block = null;
+            const elements = document.elementsFromPoint(e.clientX, e.clientY);
+
+            for (let el of elements) {
+                if (el.parentElement === editor) {
+                    block = el;
+                    break;
+                }
+            }
+
+            if (!block) {
                 const children = Array.from(editor.children);
                 for (let child of children) {
                     const rect = child.getBoundingClientRect();
@@ -451,38 +449,18 @@ new #[Layout('layouts.app')] class extends Component {
                         break;
                     }
                 }
-            } else {
-                while (block && block.parentElement !== editor) {
-                    block = block.parentElement;
-                }
             }
 
-            if (block && block.parentElement === editor) {
-                const text = block.textContent.trim();
-                const hasImage = block.querySelector('img') !== null;
-                const hasTodo = block.classList.contains('todo-item');
-                const hasHr = block.tagName && block.tagName.toLowerCase() === 'hr';
-                const isLineEmpty = text === '' && !hasImage && !hasTodo && !hasHr;
-
-                if (isLineEmpty) {
-                    this.blockDragHandle.show = false;
-                    this.blockDragHandle.block = null;
-                    return;
-                }
-
+            if (block) {
                 const rect = block.getBoundingClientRect();
-                const editorRect = editor.getBoundingClientRect();
-                
                 this.blockDragHandle.show = true;
                 this.blockDragHandle.left = 10;
 
+                // Menempatkan titik 6 pas di tengah secara vertikal pada blok tersebut
                 let topPos = rect.top - editorRect.top + (rect.height / 2) - 12;
 
                 this.blockDragHandle.top = topPos;
                 this.blockDragHandle.block = block;
-            } else {
-                this.blockDragHandle.show = false;
-                this.blockDragHandle.block = null;
             }
         },
 
@@ -993,13 +971,9 @@ new #[Layout('layouts.app')] class extends Component {
                 }
             });
 
-            editorEl.addEventListener('input', () => {
-                this.scheduleSave();
-                this.blockDragHandle.show = false;
-            });
+            editorEl.addEventListener('input', () => this.scheduleSave());
 
             editorEl.addEventListener('keydown', (e) => {
-                this.blockDragHandle.show = false;
                 if (e.altKey && (e.key === 'ArrowUp' || e.key === 'ArrowDown')) {
                     e.preventDefault();
                     const sel = window.getSelection();
@@ -1713,7 +1687,9 @@ new #[Layout('layouts.app')] class extends Component {
                         class="context-menu-item w-full flex items-center gap-2.5 px-3 py-2 text-left text-[#E64C4C]"
                         @click="
                             closeMenu();
-                            $dispatch('open-delete-note-dialog', { id: menuNoteId });
+                            if(confirm('Delete \'' + menuNoteTitle + '\'? All sub-tabs will also be deleted.')) {
+                                $wire.deleteNote(menuNoteId);
+                            }
                         "
                     >
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1727,20 +1703,6 @@ new #[Layout('layouts.app')] class extends Component {
 
         </div>
     </div>
-
-    <x-confirm-dialog
-        eventName="open-delete-note-dialog"
-        title="Delete Note?"
-        description="Are you sure you want to permanently delete this note? All sub-tabs will also be deleted. This action cannot be undone."
-        confirmText="Yes, Delete"
-        cancelText="Cancel"
-        submitAction="deleteNote"
-        btnColor="bg-danger-100 hover:bg-danger-100/90 text-white"
-    >
-        <x-slot:icon>
-            <x-icons.delete-default size="w-15 h-15" color="currentColor" />
-        </x-slot:icon>
-    </x-confirm-dialog>
 </div>
 
 <script>
