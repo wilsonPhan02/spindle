@@ -68,6 +68,19 @@
     --color-secondary-5: rgb(244 236 229)
 }
 
+@layer base {
+    button,
+    a,
+    input[type="button"],
+    input[type="submit"],
+    input[type="reset"],
+    select,
+    label,
+    [role="button"] {
+        cursor: pointer !important;
+    }
+}
+
 /* --- Text Styles Library (Composite Properties) --- */
 @layer components {
 
