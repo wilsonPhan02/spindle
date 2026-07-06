@@ -587,9 +587,8 @@ new #[Layout('layouts.app')] class extends Component {
 
                 <div class="absolute bottom-4 text-app-desc-feature text-[11px] left-8 right-8 flex justify-between items-center">
                     <button
-                        wire:click="archiveProject"
-                        wire:confirm="Are you sure you want to archive this project? You can restore it from the Archive page."
-                        class="flex items-center gap-1.5 py-2 px-4 cursor-pointer rounded-md border border-text-70 hover:border-danger-100/80 text-text-70 hover:text-danger-100 hover:bg-danger-100/10 transition-colors opacity-70 hover:opacity-100">
+                        @click="$dispatch('open-archive-project-dialog')"
+                        class="flex items-center gap-1.5 px-2 py-1 -ml-2 rounded-md text-[11px] font-medium text-[#A08866] hover:text-[#E64C4C] hover:bg-[#E64C4C]/10 transition-colors opacity-70 hover:opacity-100">
                         <x-icons.archive class="w-3.5 h-3.5" /> Move To Archive
                     </button>
                     <div
@@ -830,4 +829,20 @@ new #[Layout('layouts.app')] class extends Component {
             </div>
         </div>
     </div>
+    
+    <x-confirm-dialog
+        eventName="open-archive-project-dialog"
+        title="Archive this Project?"
+        description="Are you sure you want to archive this project? You can restore it from the Archive page."
+        confirmText="Yes, Archive"
+        cancelText="Cancel"
+        submitAction="archiveProject"
+        iconColor="text-warning-100"
+        iconBg="bg-warning-100/10"
+        btnColor="bg-warning-100 hover:bg-warning-100/90 text-white"
+    >
+        <x-slot:icon>
+            <x-icons.archive class="w-12 h-12" />
+        </x-slot:icon>
+    </x-confirm-dialog>
 </div>

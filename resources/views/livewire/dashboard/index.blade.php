@@ -208,17 +208,73 @@ new class extends Component {
                                 <button @click="editing = true; menuOpen = false; setTimeout(() => $refs.nameInput.focus(), 50)" class="w-full text-left px-4 py-2 text-app-body-medium text-text-80 hover:bg-brand-10 flex items-center gap-3">
                                     <x-icons.rename class="w-4 h-4" /> Rename
                                 </button>
-                                <button wire:click="archiveSection('{{ $section->section_id }}')" wire:confirm="Are you sure you want to archive this section? You can restore it from the Archive page." @click="menuOpen = false" class="w-full text-left px-4 py-2 text-app-body-medium text-text-80 hover:bg-brand-10 flex items-center gap-3">
+                                <button @click="$dispatch('open-archive-section-dialog', { id: '{{ $section->section_id }}' }); menuOpen = false" class="w-full text-left px-4 py-2 text-app-body-medium text-text-80 hover:bg-brand-10 flex items-center gap-3">
                                     <x-icons.archive class="w-4 h-4" /> Archive
                                 </button>
                             </div>
                         </div>
                     </div>
 
-                    <div class="flex gap-6 overflow-x-auto pb-4">
+                    <div class="flex gap-6 overflow-x-auto pb-4 custom-scrollbar"
+                         x-data="{ 
+                             isDown: false, 
+                             isDragging: false,
+                             canScroll: false,
+                             startX: 0, 
+                             scrollLeft: 0,
+                             checkScrollable() {
+                                 this.canScroll = this.$el.scrollWidth > this.$el.clientWidth;
+                             },
+                             handleWheel(e) {
+                                 if (this.canScroll && e.deltaY !== 0) {
+                                     const atLeft = this.$el.scrollLeft <= 0 && e.deltaY < 0;
+                                     const atRight = Math.ceil(this.$el.scrollLeft + this.$el.clientWidth) >= this.$el.scrollWidth && e.deltaY > 0;
+                                     
+                                     if (!atLeft && !atRight) {
+                                         e.preventDefault();
+                                         this.$el.scrollBy({ left: e.deltaY * 1.5, behavior: 'smooth' });
+                                     }
+                                 }
+                             },
+                             startDrag(e) {
+                                 this.checkScrollable();
+                                 if (!this.canScroll) return;
+                                 this.isDown = true;
+                                 this.isDragging = false;
+                                 this.startX = e.pageX - this.$el.offsetLeft;
+                                 this.scrollLeft = this.$el.scrollLeft;
+                             },
+                             stopDrag() {
+                                 this.isDown = false;
+                                 setTimeout(() => this.isDragging = false, 200);
+                             },
+                             doDrag(e) {
+                                 if (!this.isDown) return;
+                                 const x = e.pageX - this.$el.offsetLeft;
+                                 const walk = (x - this.startX) * 1.5;
+                                 if (Math.abs(walk) > 5) {
+                                     this.isDragging = true;
+                                     e.preventDefault();
+                                 }
+                                 this.$el.scrollLeft = this.scrollLeft - walk;
+                             }
+                         }"
+                         :class="{ 
+                             'cursor-grab active:cursor-grabbing': canScroll, 
+                             '[&_a]:pointer-events-none [&_button]:pointer-events-none': isDragging 
+                         }"
+                         x-init="checkScrollable()"
+                         @mouseenter="checkScrollable()"
+                         @wheel="handleWheel($event)"
+                         @mousedown="startDrag($event)"
+                         @mouseleave="stopDrag()"
+                         @mouseup="stopDrag()"
+                         @mousemove="doDrag($event)"
+                         @click.capture="if(isDragging) { $event.preventDefault(); $event.stopPropagation(); }"
+                    >
 
                         @foreach($section->projects as $project)
-                            <a href="{{ route('projects.show', $project->project_id) }}" wire:navigate class="w-44 shrink-0 group cursor-pointer block">
+                            <a href="{{ route('projects.show', $project->project_id) }}" draggable="false" @dragstart.prevent wire:navigate class="w-44 shrink-0 group cursor-pointer block select-none">
                                 <div class="w-full aspect-[1/1.6] relative mb-3">
                                     @if($project->cover_image_path)
                                         <img src="{{ Storage::url($project->cover_image_path) }}" class="absolute inset-y-0 left-0 right-3 w-[calc(100%-12px)] h-full object-cover rounded-l-sm rounded-r-md shadow-md z-20 border-r border-black/10 transition-shadow duration-300 group-hover:shadow-xl" />
@@ -245,7 +301,7 @@ new class extends Component {
                             </a>
                         @endforeach
 
-                        <button wire:click="addProject('{{ $section->section_id }}')" class="w-44 shrink-0 aspect-[2/3] border-2 border-dashed border-brand-200 rounded-xl flex flex-col items-center justify-center text-subtext-80 hover:border-secondary-200 hover:text-secondary-200 hover:bg-[#F5EFE9] transition-all group mb-3">
+                        <button wire:click="addProject('{{ $section->section_id }}')" class="w-44 shrink-0 aspect-[2/3] border-2 border-dashed border-brand-200 rounded-xl flex flex-col items-center justify-center text-subtext-80 hover:border-secondary-200 hover:text-secondary-200 hover:bg-[#F5EFE9] transition-all group mb-3 select-none">
                             <svg class="w-8 h-8 mb-2 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                             <span class="text-sm font-medium">New Project</span>
                         </button>
@@ -269,4 +325,20 @@ new class extends Component {
             Add Section
         </span>
     </button>
+
+    <x-confirm-dialog
+        eventName="open-archive-section-dialog"
+        title="Archive this Section?"
+        description="Are you sure you want to archive this section? You can restore it from the Archive page."
+        confirmText="Yes, Archive"
+        cancelText="Cancel"
+        submitAction="archiveSection"
+        iconColor="text-warning-100"
+        iconBg="bg-warning-100/10"
+        btnColor="bg-warning-100 hover:bg-warning-100/90 text-white"
+    >
+        <x-slot:icon>
+            <x-icons.archive class="w-12 h-12" />
+        </x-slot:icon>
+    </x-confirm-dialog>
 </div>
