@@ -84,7 +84,7 @@
                             title="Delete Character">
                                 <x-icons.delete class="w-5 h-5"/>
                             </button>
-                            <button @click="viewCharacterDetail()" class="w-full p-3 cursor-pointer rounded-lg bg-brand-150 text-app-feature text-text-80 hover:bg-brand-200 transition-colors">Edit Character Detail</button>
+                            <button @click="viewCharacterDetail()" class="w-full p-3 cursor-pointer rounded-lg bg-secondary-100 text-app-feature text-bg-main hover:bg-secondary-150 transition-colors">Edit Character Detail</button>
                         </div>
                     </div>
                 </div>
