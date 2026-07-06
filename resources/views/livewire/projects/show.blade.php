@@ -103,7 +103,12 @@ new #[Layout('layouts.app')] class extends Component {
     }
 
     public function updatedCoverImage() {
-        $this->validate(['cover_image' => 'image|max:5048']);
+        $this->validate([
+            'cover_image' => 'image|max:5120'
+        ], [
+            'cover_image.max' => 'The selected image is too large. The maximum allowed file size is 5MB.',
+            'cover_image.image' => 'The selected file type is not supported. Please upload an image.',
+        ]);
         if ($this->project->cover_image_path && Storage::disk('public')->exists($this->project->cover_image_path)) {
             Storage::disk('public')->delete($this->project->cover_image_path);
         }
@@ -168,6 +173,9 @@ new #[Layout('layouts.app')] class extends Component {
     {
         $this->validate([
             'icon_image' => 'nullable|file|mimes:jpeg,png,jpg,svg,webp|max:2048',
+        ], [
+            'icon_image.max' => 'The selected image is too large. The maximum allowed file size is 2MB.',
+            'icon_image.mimes' => 'The selected file type is not supported. Please upload a JPG, PNG, SVG, or WEBP.',
         ]);
 
         if ($this->icon_image) {
@@ -186,6 +194,7 @@ new #[Layout('layouts.app')] class extends Component {
             $this->icon_image = null;
 
             $this->dispatch('project-updated');
+            $this->dispatch('close-icon-picker');
         }
     }
 
@@ -220,7 +229,49 @@ new #[Layout('layouts.app')] class extends Component {
         <div class="flex flex-col lg:flex-row gap-4 lg:gap-6 mb-16 items-stretch">
 
             <div
-                x-data="{ hoverCover: false }"
+                x-data="{ 
+                    hoverCover: false, 
+                    isUploading: false, 
+                    progress: 0, 
+                    clientError: null,
+                    showCropper: false,
+                    cropImageUrl: null,
+                    cropperInstance: null,
+                    
+                    cancelCrop() {
+                        this.showCropper = false;
+                        if (this.cropperInstance) {
+                            this.cropperInstance.destroy();
+                            this.cropperInstance = null;
+                        }
+                        this.cropImageUrl = null;
+                        if(this.$refs.coverInput) this.$refs.coverInput.value = null;
+                    },
+                    
+                    applyCrop() {
+                        if (!this.cropperInstance) return;
+                        
+                        const canvas = this.cropperInstance.getCroppedCanvas({
+                            width: 600,
+                            height: 960
+                        });
+                        
+                        canvas.toBlob((blob) => {
+                            const file = new File([blob], 'cover.jpg', { type: 'image/jpeg', lastModified: Date.now() });
+                            
+                            this.cancelCrop();
+                            
+                            this.isUploading = true;
+                            this.progress = 0;
+                            
+                            @this.upload('cover_image', file,
+                                (uploadedFilename) => { this.isUploading = false; },
+                                () => { this.isUploading = false; },
+                                (e) => { this.progress = e.detail.progress; }
+                            );
+                        }, 'image/jpeg', 0.9);
+                    }
+                }"
                 @mouseover="hoverCover = true"
                 @mouseleave="hoverCover = false"
                 class="relative w-full lg:w-[320px] xl:w-[360px] shrink-0 aspect-[1/1.6] z-10"
@@ -240,11 +291,57 @@ new #[Layout('layouts.app')] class extends Component {
                     <div class="absolute inset-y-0 right-0 w-8 bg-[#8C7558] rounded-r-xl z-0 shadow-xl border-l border-black/20"></div>
                 @endif
 
-                <div x-show="hoverCover" x-transition class="absolute bottom-5 left-5 z-30 flex gap-2">
+                {{-- Inline Cropper UI for Cover --}}
+                <div x-show="showCropper" style="display: none;" class="absolute inset-0 z-40 bg-brand-50 rounded-l-md rounded-r-xl border border-brand-200 overflow-hidden flex flex-col">
+                    <div class="flex-1 w-full relative">
+                        <img x-ref="cropperImg" :src="cropImageUrl" class="block max-w-full" alt="Crop Preview">
+                    </div>
+                    <div class="absolute bottom-4 left-0 right-0 flex justify-center gap-2 z-50">
+                        <button @click="cancelCrop()" type="button" class="px-4 py-1.5 bg-bg-main/90 backdrop-blur text-text-70 text-[11px] font-bold uppercase tracking-wider rounded-md border border-text-60 hover:bg-bg-main shadow-lg transition-colors">Cancel</button>
+                        <button @click="applyCrop()" type="button" class="px-4 py-1.5 bg-secondary-100/95 backdrop-blur text-bg-main text-[11px] font-bold uppercase tracking-wider rounded-md shadow-lg border border-secondary-200 hover:bg-secondary-200 transition-colors">Save</button>
+                    </div>
+                </div>
+
+                <div x-show="hoverCover && !showCropper" x-transition class="absolute bottom-5 left-5 z-30 flex gap-2">
                     <label class="flex items-center gap-2 px-3 py-1.5 bg-text-80/95 border border-text-60 rounded-md cursor-pointer hover:bg-text-80 transition-colors shadow-lg">
                         <x-icons.upload class="w-4 h-4 text-bg-main" />
                         <span class="text-bg-main text-app-desc-feature">Upload Cover</span>
-                        <input type="file" wire:model.live="cover_image" class="hidden" accept="image/*">
+                        <input type="file" x-ref="coverInput" class="hidden" accept="image/*"
+                            @change="
+                                const file = $event.target.files[0];
+                                if (file) {
+                                    if (file.size > 5 * 1024 * 1024) {
+                                        clientError = 'The selected image is too large. The maximum allowed file size is 5MB.';
+                                        $event.target.value = '';
+                                    } else {
+                                        clientError = null;
+                                        
+                                        const reader = new FileReader();
+                                        reader.onload = (e) => { 
+                                            cropImageUrl = e.target.result;
+                                            showCropper = true;
+                                            
+                                            $nextTick(() => {
+                                                if (cropperInstance) cropperInstance.destroy();
+                                                cropperInstance = new Cropper($refs.cropperImg, {
+                                                    aspectRatio: 1 / 1.6,
+                                                    viewMode: 1,
+                                                    dragMode: 'move',
+                                                    background: false,
+                                                    guides: false,
+                                                    center: true,
+                                                    highlight: false,
+                                                    cropBoxMovable: false,
+                                                    cropBoxResizable: false,
+                                                    minCropBoxWidth: 100,
+                                                    minCropBoxHeight: 160,
+                                                });
+                                            });
+                                        };
+                                        reader.readAsDataURL(file);
+                                    }
+                                }
+                            ">
                     </label>
 
                     @if($project->cover_image_path)
@@ -253,12 +350,33 @@ new #[Layout('layouts.app')] class extends Component {
                             <span class="text-app-desc-feature text-danger-100">Remove</span>
                         </button>
                     @endif
-
-
                 </div>
+                {{-- Client-side Error --}}
+                <template x-if="clientError">
+                    <div class="absolute inset-x-4 top-4 bg-danger-100/95 text-bg-main text-[12px] font-medium px-3 py-2.5 rounded shadow-xl z-50 flex items-start gap-2">
+                        <svg class="w-4 h-4 mt-0.5 shrink-0 text-bg-main" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                        <span x-text="clientError" class="flex-1 leading-relaxed"></span>
+                        <button @click="clientError = null" class="shrink-0 ml-2 p-0.5 hover:bg-black/20 rounded transition-colors" title="Dismiss"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+                    </div> 
+                </template>
 
-                <div wire:loading.flex wire:target="cover_image" class="absolute inset-y-0 left-0 right-4 w-[calc(100%-16px)] bg-[#F5EFE9]/70 backdrop-blur-md z-40 items-center justify-center rounded-l-md rounded-r-lg transition-all">
-                    <svg class="animate-spin h-8 w-8 text-secondary-200" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                {{-- Server-side Error --}}
+                @error('cover_image') 
+                    <div x-data="{ show: true }" x-show="show" class="absolute inset-x-4 top-4 bg-danger-100/95 text-bg-main text-[12px] font-medium px-3 py-2.5 rounded shadow-xl z-50 flex items-start gap-2">
+                        <svg class="w-4 h-4 mt-0.5 shrink-0 text-bg-main" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                        <span class="flex-1 leading-relaxed">{{ $message }}</span>
+                        <button @click="show = false" class="shrink-0 ml-2 p-0.5 hover:bg-black/20 rounded transition-colors" title="Dismiss"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+                    </div> 
+                @enderror
+
+                {{-- Progress Overlay --}}
+                <div x-show="isUploading" x-transition class="absolute inset-y-0 left-0 right-4 w-[calc(100%-16px)] bg-[#F5EFE9]/80 backdrop-blur-md z-40 flex flex-col items-center justify-center rounded-l-md rounded-r-lg">
+                    <svg class="animate-spin h-8 w-8 text-secondary-200 mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                    <div class="text-secondary-200 font-semibold text-sm">Uploading... <span x-text="progress + '%'"></span></div>
+                    
+                    <div class="w-3/4 bg-brand-150 rounded-full h-1.5 mt-3 overflow-hidden shadow-inner mx-auto">
+                        <div class="bg-secondary-100 h-full rounded-full transition-all duration-200 ease-out" :style="`width: ${progress}%`"></div>
+                    </div>
                 </div>
             </div>
 
@@ -357,6 +475,7 @@ new #[Layout('layouts.app')] class extends Component {
 
                         {{-- Pop-up Notion Style --}}
                         <div x-show="showIconPicker" 
+                            x-on:close-icon-picker.window="showIconPicker = false"
                             @click.away="showIconPicker = false"
                             x-transition:enter="transition ease-out duration-200"
                             x-transition:enter-start="opacity-0 -translate-y-2 scale-95"
@@ -368,16 +487,16 @@ new #[Layout('layouts.app')] class extends Component {
                             style="display: none;">
                             
                             {{-- Header & Tabs --}}
-                            <div class="flex items-center justify-between px-3 pt-3 border-b border-brand-200">
+                            <div class="flex items-center justify-between px-4 border-b border-brand-200">
                                 <div class="flex gap-4">
                                     <button @click="tab = 'emoji'" 
                                             :class="tab === 'emoji' ? 'border-text-80 text-text-80' : 'border-transparent text-text-60 hover:text-text-80'"
-                                            class="px-1 py-1.5 text-app-feature border-b-2 transition-colors">
+                                            class="px-1 py-2.5 text-app-feature border-b-2 transition-colors -mb-[1px]">
                                         Emoji
                                     </button>
                                     <button @click="tab = 'upload'" 
                                             :class="tab === 'upload' ? 'border-text-80 text-text-80' : 'border-transparent text-text-60 hover:text-text-80'"
-                                            class="px-1 py-1.5 text-app-feature border-b-2 transition-colors">
+                                            class="px-1 py-2.5 text-app-feature border-b-2 transition-colors -mb-[1px]">
                                         Upload
                                     </button>
                                 </div>
@@ -385,7 +504,7 @@ new #[Layout('layouts.app')] class extends Component {
                                 {{-- Tombol Remove --}}
                                 <button wire:click="removeIcon" 
                                         @click="showIconPicker = false"
-                                        class="text-danger-100 hover:bg-danger-100/10 transition-colors flex items-center gap-1 p-1 rounded-md" 
+                                        class="text-danger-100 hover:bg-danger-100/10 transition-colors flex items-center gap-1 p-1.5 rounded-md" 
                                         title="Remove Icon">
                                     <x-icons.delete class="w-4 h-4" />
                                 </button>
@@ -401,37 +520,152 @@ new #[Layout('layouts.app')] class extends Component {
                             </div>
 
                             {{-- Tab Upload Image --}}
-                            <div x-show="tab === 'upload'" class="p-4">
+                            <div x-show="tab === 'upload'" class="p-4 flex flex-col min-h-[318px]"
+                                x-data="{ 
+                                    isUploading: false, 
+                                    progress: 0, 
+                                    clientError: null,
+                                    showCropper: false,
+                                    cropImageUrl: null,
+                                    cropperInstance: null,
+                                    
+                                    cancelCrop() {
+                                        this.showCropper = false;
+                                        if (this.cropperInstance) {
+                                            this.cropperInstance.destroy();
+                                            this.cropperInstance = null;
+                                        }
+                                        this.cropImageUrl = null;
+                                        if(this.$refs.iconInput) this.$refs.iconInput.value = null;
+                                    },
+                                    
+                                    applyCrop() {
+                                        if (!this.cropperInstance) return;
+                                        
+                                        const canvas = this.cropperInstance.getCroppedCanvas({
+                                            width: 400,
+                                            height: 400
+                                        });
+                                        
+                                        canvas.toBlob((blob) => {
+                                            const file = new File([blob], 'icon.jpg', { type: 'image/jpeg', lastModified: Date.now() });
+                                            
+                                            this.cancelCrop();
+                                            
+                                            this.isUploading = true;
+                                            this.progress = 0;
+                                            
+                                            @this.upload('icon_image', file,
+                                                (uploadedFilename) => { this.isUploading = false; },
+                                                () => { this.isUploading = false; },
+                                                (e) => { this.progress = e.detail.progress; }
+                                            );
+                                        }, 'image/jpeg', 0.9);
+                                    }
+                                }">
+                                
+                                <div x-show="!showCropper">
+                                
                                 <p class="text-text-60 text-app-desc-feature mb-3">Upload custom image (Max 2MB)</p>
                                 
-                                <input type="file" id="icon-image-upload" wire:model.live="icon_image" class="hidden" accept=".jpg,.jpeg,.png,.svg,.webp">
+                                <input type="file" id="icon-image-upload" x-ref="iconInput"
+                                    class="hidden" accept=".jpg,.jpeg,.png,.svg,.webp"
+                                    @change="
+                                        const file = $event.target.files[0];
+                                        if (file) {
+                                            if (file.size > 2 * 1024 * 1024) {
+                                                clientError = 'The selected image is too large. The maximum allowed file size is 2MB.';
+                                                $event.target.value = '';
+                                            } else {
+                                                clientError = null;
+                                                
+                                                const reader = new FileReader();
+                                                reader.onload = (e) => { 
+                                                    cropImageUrl = e.target.result;
+                                                    showCropper = true;
+                                                    
+                                                    $nextTick(() => {
+                                                        if (cropperInstance) cropperInstance.destroy();
+                                                        cropperInstance = new Cropper($refs.iconCropperImg, {
+                                                            aspectRatio: 1,
+                                                            viewMode: 1,
+                                                            dragMode: 'move',
+                                                            background: false,
+                                                            guides: false,
+                                                            center: true,
+                                                            highlight: false,
+                                                            cropBoxMovable: false,
+                                                            cropBoxResizable: false,
+                                                            minCropBoxWidth: 100,
+                                                            minCropBoxHeight: 100,
+                                                        });
+                                                    });
+                                                };
+                                                reader.readAsDataURL(file);
+                                            }
+                                        }
+                                    ">
                                 
                                 <div class="flex items-center mb-3">
                                     <label for="icon-image-upload" 
-                                        class="mr-3 py-1.5 px-3 rounded-md text-app-desc-feature font-semibold bg-brand-150 text-text-80 hover:bg-brand-200 transition-colors cursor-pointer">
+                                        class="mr-3 py-1.5 px-3 rounded-md text-app-desc-feature font-semibold bg-brand-150 text-text-80 hover:bg-brand-200 transition-colors cursor-pointer"
+                                        :class="{ 'opacity-50 pointer-events-none': isUploading }">
                                         Browse Image
                                     </label>
                                     
-                                    <div class="text-app-desc-feature text-text-70">
-                                        <span wire:loading.remove wire:target="icon_image">
+                                    <div class="text-app-desc-feature text-text-70 flex-1 min-w-0 flex items-center justify-between">
+                                        <span x-show="!isUploading" wire:loading.remove wire:target="icon_image">
                                             {{ $icon_image ? 'Image selected' : 'No file chosen' }}
                                         </span>
-                                        <span wire:loading wire:target="icon_image" class="animate-pulse">
-                                            Uploading...
+                                        <span x-show="isUploading" class="text-secondary-100 font-medium">
+                                            Uploading... <span x-text="progress + '%'"></span>
                                         </span>
                                     </div>
                                 </div>
+
+                                {{-- Progress Bar --}}
+                                <div x-show="isUploading" x-transition class="w-full bg-brand-150 rounded-full h-1.5 mb-3 overflow-hidden shadow-inner">
+                                    <div class="bg-secondary-100 h-full rounded-full transition-all duration-200 ease-out" :style="`width: ${progress}%`"></div>
+                                </div>
+
+                                {{-- Client-side Error --}}
+                                <template x-if="clientError">
+                                    <div class="bg-danger-100/10 border border-danger-100/20 text-danger-100 text-[13px] font-medium px-3 py-2 rounded-md mt-2 mb-3 flex items-start gap-2">
+                                        <svg class="w-4 h-4 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                                        <span x-text="clientError"></span>
+                                    </div> 
+                                </template>
+
+                                {{-- Server-side Error --}}
+                                @error('icon_image') 
+                                    <div class="bg-danger-100/10 border border-danger-100/20 text-danger-100 text-[13px] font-medium px-3 py-2 rounded-md mt-2 mb-3 flex items-start gap-2">
+                                        <svg class="w-4 h-4 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                                        <span>{{ $message }}</span>
+                                    </div> 
+                                @enderror
                                 
                                 @if ($icon_image)
                                     <div class="mb-3 flex flex-col items-center p-3 border border-dashed border-brand-300 rounded-md bg-card-hover">
                                         <img src="{{ $icon_image->temporaryUrl() }}" class="w-16 h-16 object-cover rounded shadow-sm">
                                     </div>
                                     
-                                    <button wire:click="saveIcon" @click="showIconPicker = false" 
+                                    <button wire:click="saveIcon" 
                                             class="w-full py-2 bg-secondary-100 text-bg-main font-medium text-app-feature rounded-md hover:bg-secondary-200 transition-colors">
                                         Submit Image
                                     </button>
                                 @endif
+                                </div>
+                                
+                                {{-- Inline Cropper UI for Icon --}}
+                                <div x-show="showCropper" style="display: none;" class="flex-1 flex flex-col gap-3">
+                                    <div class="w-full aspect-square bg-brand-50 rounded border border-brand-200 flex items-center justify-center overflow-hidden">
+                                        <img x-ref="iconCropperImg" :src="cropImageUrl" class="block max-w-full" alt="Crop Preview">
+                                    </div>
+                                    <div class="flex justify-end gap-2">
+                                        <button @click="cancelCrop()" type="button" class="px-3 py-1.5 text-app-desc-feature font-semibold text-text-70 hover:bg-brand-100 rounded transition-colors">Cancel</button>
+                                        <button @click="applyCrop()" type="button" class="px-3 py-1.5 bg-secondary-100 text-bg-main text-app-desc-feature font-semibold rounded shadow hover:bg-secondary-200 transition-colors">Save</button>
+                                    </div>
+                                </div>
                             </div>
 
                         </div>
