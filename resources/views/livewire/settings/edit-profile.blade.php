@@ -44,7 +44,10 @@ new class extends Component {
             'occupation' => 'nullable|string|max:60',
             'birth_date' => 'nullable|date',
             'gender' => 'nullable|in:male,female',
-            'new_photo' => 'nullable|image|max:1024',
+            'new_photo' => 'nullable|image|max:5120',
+        ], [
+            'new_photo.max' => 'The selected image is too large. The maximum allowed file size is 5MB.',
+            'new_photo.image' => 'The selected file type is not supported. Please upload an image.',
         ]);
 
         $user = auth()->user();

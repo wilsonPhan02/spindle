@@ -13,7 +13,7 @@ class Relationship extends Model
     public $incrementing = false;
     protected $keyType = 'string';
 
-    protected $fillable = ['from_id', 'to_id', 'relationship_type_id', 'context'];
+    protected $fillable = ['from_id', 'to_id', 'relationship_type_id', 'context', 'curve_offset'];
 
     public function from()
     {

@@ -14,6 +14,8 @@ new #[Layout('layouts.app')] class extends Component {
     public ?string $activeNoteId = null;
     public string $editorBody = '';
     public $uploadFile;
+    public array $undoStack = [];
+    public array $redoStack = [];
 
     public function mount(Project $project): void
     {
@@ -75,8 +77,98 @@ new #[Layout('layouts.app')] class extends Component {
     }
 
     // -----------------------------------------------------------------------
-    // Actions
+    // Actions & Undo System
     // -----------------------------------------------------------------------
+
+    public function pushUndo(string $action, array $data, string $message): void
+    {
+        $this->undoStack[] = [
+            'action' => $action,
+            'data'   => $data,
+        ];
+        $this->redoStack = [];
+        
+        $this->dispatch('show-undo-toast', message: $message);
+    }
+
+    public function undo(): void
+    {
+        if (empty($this->undoStack)) return;
+
+        $lastAction = array_pop($this->undoStack);
+        $action = $lastAction['action'];
+        $data   = $lastAction['data'];
+
+        if ($action === 'add') {
+            $note = Note::find($data['note_id']);
+            if ($note) $note->delete();
+            
+            if ($this->activeNoteId === $data['note_id']) {
+                $this->activeNoteId = null;
+                $this->editorBody = '';
+                $next = Note::where('project_id', $this->project->project_id)
+                            ->whereNull('parent_note_id')->orderBy('sort_order')->first();
+                if ($next) {
+                    $this->activeNoteId = $next->note_id;
+                    $this->editorBody = $next->body ?? '';
+                }
+            }
+        } elseif ($action === 'remove') {
+            $note = Note::withTrashed()->find($data['note_id']);
+            if ($note) {
+                $note->restore();
+                $this->selectNote($note->note_id);
+            }
+        } elseif ($action === 'rename') {
+            $note = Note::find($data['note_id']);
+            if ($note) {
+                $note->update(['title' => $data['old_title']]);
+            }
+        }
+        
+        $this->redoStack[] = $lastAction;
+        $this->dispatch('show-undo-toast', message: 'Action undone.');
+    }
+
+    public function redo(): void
+    {
+        if (empty($this->redoStack)) return;
+
+        $lastAction = array_pop($this->redoStack);
+        $action = $lastAction['action'];
+        $data   = $lastAction['data'];
+
+        if ($action === 'add') {
+            $note = Note::withTrashed()->find($data['note_id']);
+            if ($note) {
+                $note->restore();
+                $this->selectNote($note->note_id);
+            }
+        } elseif ($action === 'remove') {
+            $note = Note::find($data['note_id']);
+            if ($note) {
+                $note->delete();
+                if ($this->activeNoteId === $data['note_id']) {
+                    $this->activeNoteId = null;
+                    $this->editorBody = '';
+                    $next = Note::where('project_id', $this->project->project_id)
+                                ->whereNull('parent_note_id')->orderBy('sort_order')->first();
+                    if ($next) {
+                        $this->activeNoteId = $next->note_id;
+                        $this->editorBody = $next->body ?? '';
+                    }
+                }
+            }
+        } elseif ($action === 'rename') {
+            $note = Note::find($data['note_id']);
+            if ($note) {
+                $note->update(['title' => $data['new_title']]);
+            }
+        }
+        
+        $this->undoStack[] = $lastAction;
+        $this->dispatch('show-undo-toast', message: 'Action redone.');
+    }
 
     public function addNote(): void
     {
@@ -88,6 +180,7 @@ new #[Layout('layouts.app')] class extends Component {
             'title'          => $this->nextDefaultTitle(null),
             'body'           => '',
         ]);
+        $this->pushUndo('add', ['note_id' => $note->note_id], 'Note created.');
         $this->selectNote($note->note_id);
     }
 
@@ -104,6 +197,7 @@ new #[Layout('layouts.app')] class extends Component {
             'title'          => $this->nextDefaultTitle($parentId),
             'body'           => '',
         ]);
+        $this->pushUndo('add', ['note_id' => $note->note_id], 'Sub tab created.');
         $this->selectNote($note->note_id);
     }
 
@@ -121,10 +215,15 @@ new #[Layout('layouts.app')] class extends Component {
         $note = Note::where('note_id', $noteId)
                     ->where('project_id', $this->project->project_id)
                     ->first();
-        if (!$note) return;
         $trimmed = trim($newTitle);
-        if ($trimmed === '') return;
-        $note->update(['title' => $trimmed]);
+        $hasCopy = str_ends_with($trimmed, ' (Copy)');
+        $base = $hasCopy ? substr($trimmed, 0, -7) : $trimmed;
+        $finalTitle = mb_substr($base, 0, 25) . ($hasCopy ? ' (Copy)' : '');
+        if ($finalTitle === '' || $finalTitle === ' (Copy)') return;
+        
+        $this->pushUndo('rename', ['note_id' => $noteId, 'old_title' => $note->title, 'new_title' => $finalTitle], 'Note renamed.');
+        
+        $note->update(['title' => $finalTitle]);
     }
 
     public function duplicateNote(string $noteId): void
@@ -132,17 +231,19 @@ new #[Layout('layouts.app')] class extends Component {
         $source = Note::with('childrenRecursive')->find($noteId);
         if (!$source) return;
         $duplicate = $this->cloneNoteRecursive($source, $source->parent_note_id, $source->depth);
+        $this->pushUndo('add', ['note_id' => $duplicate->note_id], 'Note duplicated.');
         $this->selectNote($duplicate->note_id);
     }
 
     private function cloneNoteRecursive(Note $source, ?string $newParentId, int $depth): Note
     {
+        $baseTitle = preg_replace('/ \(Copy\)$/', '', $source->title);
         $clone = Note::create([
             'project_id'     => $this->project->project_id,
             'parent_note_id' => $newParentId,
             'depth'          => $depth,
             'sort_order'     => $this->nextSortOrder($newParentId),
-            'title'          => $source->title . ' (Copy)',
+            'title'          => mb_substr($baseTitle . ' (Copy)', 0, 25),
             'body'           => $source->body,
         ]);
         foreach ($source->children as $child) {
@@ -159,6 +260,9 @@ new #[Layout('layouts.app')] class extends Component {
         if (!$note) return;
 
         $wasActive = ($this->activeNoteId === $noteId);
+        
+        $this->pushUndo('remove', ['note_id' => $noteId], 'Note deleted.');
+        
         $note->delete();
 
         if ($wasActive) {
@@ -314,6 +418,22 @@ new #[Layout('layouts.app')] class extends Component {
 }; ?>
 
 <div
+    @keydown.window.ctrl.z="
+        const tag = document.activeElement ? document.activeElement.tagName.toLowerCase() : '';
+        const isEditable = document.activeElement ? document.activeElement.isContentEditable : false;
+        if(tag !== 'input' && tag !== 'textarea' && !isEditable && !$event.shiftKey) {
+            $event.preventDefault();
+            $wire.undo();
+        }
+    "
+    @keydown.window.ctrl.shift.z="
+        const tag = document.activeElement ? document.activeElement.tagName.toLowerCase() : '';
+        const isEditable = document.activeElement ? document.activeElement.isContentEditable : false;
+        if(tag !== 'input' && tag !== 'textarea' && !isEditable) {
+            $event.preventDefault();
+            $wire.redo();
+        }
+    "
     x-data="{
         // ========================
         // TAB STATE
@@ -325,7 +445,10 @@ new #[Layout('layouts.app')] class extends Component {
         menuPos: { top: 0, left: 0 },
         renamingId: null,
         renameValue: '',
+        originalBaseTitle: '',
+        hadCopySuffix: false,
         collapsed: {},
+
 
         toggleCollapse(id) {
             this.collapsed[id] = !this.collapsed[id];
@@ -360,7 +483,9 @@ new #[Layout('layouts.app')] class extends Component {
 
         startRename(id, currentTitle) {
             this.renamingId = id;
-            this.renameValue = currentTitle;
+            this.hadCopySuffix = currentTitle.endsWith(' (Copy)');
+            this.originalBaseTitle = currentTitle.replace(/ \(Copy\)$/, '');
+            this.renameValue = this.originalBaseTitle;
             this.openMenuId = null;
             this.$nextTick(() => {
                 const el = document.getElementById('rename_' + id);
@@ -368,8 +493,12 @@ new #[Layout('layouts.app')] class extends Component {
             });
         },
         commitRename(id) {
-            if (this.renameValue.trim() !== '') {
-                $wire.renameNote(id, this.renameValue);
+            let finalName = this.renameValue.trim();
+            if (finalName !== '') {
+                if (finalName === this.originalBaseTitle && this.hadCopySuffix) {
+                    finalName = finalName + ' (Copy)';
+                }
+                $wire.renameNote(id, finalName);
             }
             this.renamingId = null;
         },
@@ -420,21 +549,18 @@ new #[Layout('layouts.app')] class extends Component {
 
         onEditorMouseMove(e) {
             if (this.isDraggingBlock) return;
-            const editor = document.getElementById('note-editor');
-            if (!editor) return;
-            const editorRect = editor.getBoundingClientRect();
 
-            let block = null;
-            const elements = document.elementsFromPoint(e.clientX, e.clientY);
-
-            for (let el of elements) {
-                if (el.parentElement === editor) {
-                    block = el;
-                    break;
-                }
+            // Jangan sembunyikan atau berkedip jika kursor ada di atas drag handle itu sendiri
+            if (e.target.closest('[draggable=true]') || e.target.closest('.cursor-grab')) {
+                return;
             }
 
-            if (!block) {
+            const editor = document.getElementById('note-editor');
+            if (!editor) return;
+
+            let block = e.target;
+            
+            if (block === editor) {
                 const children = Array.from(editor.children);
                 for (let child of children) {
                     const rect = child.getBoundingClientRect();
@@ -443,18 +569,38 @@ new #[Layout('layouts.app')] class extends Component {
                         break;
                     }
                 }
+            } else {
+                while (block && block.parentElement !== editor) {
+                    block = block.parentElement;
+                }
             }
 
-            if (block) {
+            if (block && block.parentElement === editor) {
+                const text = block.textContent.trim();
+                const hasImage = block.querySelector('img') !== null;
+                const hasTodo = block.classList.contains('todo-item');
+                const hasHr = block.tagName && block.tagName.toLowerCase() === 'hr';
+                const isLineEmpty = text === '' && !hasImage && !hasTodo && !hasHr;
+
+                if (isLineEmpty) {
+                    this.blockDragHandle.show = false;
+                    this.blockDragHandle.block = null;
+                    return;
+                }
+
                 const rect = block.getBoundingClientRect();
+                const editorRect = editor.getBoundingClientRect();
+                
                 this.blockDragHandle.show = true;
                 this.blockDragHandle.left = 10;
 
-                // Menempatkan titik 6 pas di tengah secara vertikal pada blok tersebut
                 let topPos = rect.top - editorRect.top + (rect.height / 2) - 12;
 
                 this.blockDragHandle.top = topPos;
                 this.blockDragHandle.block = block;
+            } else {
+                this.blockDragHandle.show = false;
+                this.blockDragHandle.block = null;
             }
         },
 
@@ -965,9 +1111,13 @@ new #[Layout('layouts.app')] class extends Component {
                 }
             });
 
-            editorEl.addEventListener('input', () => this.scheduleSave());
+            editorEl.addEventListener('input', () => {
+                this.scheduleSave();
+                this.blockDragHandle.show = false;
+            });
 
             editorEl.addEventListener('keydown', (e) => {
+                this.blockDragHandle.show = false;
                 if (e.altKey && (e.key === 'ArrowUp' || e.key === 'ArrowDown')) {
                     e.preventDefault();
                     const sel = window.getSelection();
@@ -1639,63 +1789,91 @@ new #[Layout('layouts.app')] class extends Component {
                     x-transition:leave-end="opacity-0 scale-95"
                     @click.outside="closeMenu()"
                     x-bind:style="`position: fixed; top: ${menuPos.top}px; left: ${menuPos.left}px; z-index: 9999;`"
-                    class="w-44 bg-white border border-[#E0D5C5] rounded-lg shadow-lg py-1 text-[13px] text-[#2C2C2C]"
+                    class="w-48 bg-white border border-brand-150 rounded-lg shadow-lg py-1 overflow-hidden z-50"
                     style="display: none;"
                 >
                     <button
                         x-show="!menuNoteIsLeaf"
-                        class="context-menu-item w-full flex items-center gap-2.5 px-3 py-2 text-left"
+                        class="w-full text-left px-4 py-2 text-app-body-medium text-text-80 hover:bg-brand-10 flex items-center gap-3 transition-colors"
                         @click="closeMenu(); $wire.addSubTab(menuNoteId)"
                     >
-                        <svg class="w-4 h-4 text-[#8C7558]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                        </svg>
+                        <x-icons.add class="w-4 h-4 shrink-0 text-text-80" />
                         Add Sub-Tab
                     </button>
 
                     <button
-                        class="context-menu-item w-full flex items-center gap-2.5 px-3 py-2 text-left"
+                        class="w-full text-left px-4 py-2 text-app-body-medium text-text-80 hover:bg-brand-10 flex items-center gap-3 transition-colors"
                         @click="closeMenu(); startRename(menuNoteId, menuNoteTitle)"
                     >
-                        <svg class="w-4 h-4 text-[#8C7558]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                        </svg>
+                        <x-icons.rename class="w-4 h-4 shrink-0 text-text-80" />
                         Rename
                     </button>
 
                     <button
-                        class="context-menu-item w-full flex items-center gap-2.5 px-3 py-2 text-left"
+                        class="w-full text-left px-4 py-2 text-app-body-medium text-text-80 hover:bg-brand-10 flex items-center gap-3 transition-colors"
                         @click="closeMenu(); $wire.duplicateNote(menuNoteId)"
                     >
-                        <svg class="w-4 h-4 text-[#8C7558]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                  d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
-                        </svg>
+                        <x-icons.duplicate class="w-4 h-4 shrink-0 text-text-80" />
                         Duplicate
                     </button>
 
-                    <div class="h-px bg-[#E8DED2] my-1"></div>
+                    <div class="h-px bg-brand-150 my-1"></div>
 
                     <button
-                        class="context-menu-item w-full flex items-center gap-2.5 px-3 py-2 text-left text-[#E64C4C]"
+                        class="w-full text-left px-4 py-2 text-app-body-medium text-danger-100 hover:bg-danger-100/5 flex items-center gap-3 transition-colors"
                         @click="
                             closeMenu();
-                            if(confirm('Delete \'' + menuNoteTitle + '\'? All sub-tabs will also be deleted.')) {
-                                $wire.deleteNote(menuNoteId);
-                            }
+                            $dispatch('open-delete-note-dialog', { id: menuNoteId });
                         "
                     >
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                        </svg>
+                        <x-icons.delete class="w-4 h-4 shrink-0 text-danger-100" />
                         Delete
                     </button>
                 </div>
             </template>
 
         </div>
+    </div>
+
+    <x-confirm-dialog
+        eventName="open-delete-note-dialog"
+        title="Delete Note?"
+        description="Are you sure you want to permanently delete this note? All sub-tabs will also be deleted. This action cannot be undone."
+        confirmText="Yes, Delete"
+        cancelText="Cancel"
+        submitAction="deleteNote"
+        btnColor="bg-danger-100 hover:bg-danger-100/90 text-white"
+    >
+        <x-slot:icon>
+            <x-icons.delete class="w-15 h-15" />
+        </x-slot:icon>
+    </x-confirm-dialog>
+
+    {{-- Undo Toast Notification --}}
+    <div x-data="{ show: false, message: '', timeout: null }"
+         @show-undo-toast.window="
+            message = $event.detail.message;
+            show = true;
+            clearTimeout(timeout);
+            timeout = setTimeout(() => show = false, 7000);
+         "
+         x-show="show"
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0 translate-y-4"
+         x-transition:enter-end="opacity-100 translate-y-0"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100 translate-y-0"
+         x-transition:leave-end="opacity-0 translate-y-4"
+         class="fixed bottom-6 right-6 bg-brand-10 border border-brand-150 text-text-80 p-4 rounded-xl shadow-xl flex items-center gap-4 z-50 max-w-sm"
+         style="display: none;"
+    >
+         <span x-text="message" class="text-app-body-medium font-medium flex-1"></span>
+         <button @click="$wire.undo(); show = false" class="text-app-feature text-secondary-200 font-semibold hover:text-secondary-100 hover:bg-secondary-200/10 px-3 py-1.5 rounded-lg transition-colors border border-secondary-200">
+             Undo
+         </button>
+         <button @click="show = false" class="text-text-60 hover:text-text-100 p-1 rounded-md hover:bg-black/5 transition-colors">
+             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+         </button>
     </div>
 </div>
 
@@ -1735,3 +1913,4 @@ document.addEventListener('DOMContentLoaded', function() {
 
 });
 </script>
+

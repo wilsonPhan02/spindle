@@ -24,6 +24,15 @@ new class extends Component {
         return $this->project->template()->with('sections')->first();
     }
 
+    #[Computed]
+    public function groupedChapters() {
+        return ChapterCard::where('project_id', $this->project->project_id)
+            ->with('tags')
+            ->orderBy('order_index')
+            ->get()
+            ->groupBy('structure_section_id');
+    }
+
     public function nextSection() {
         if (!$this->currentTemplate) return;
 
@@ -194,50 +203,50 @@ new class extends Component {
         </div>
     </div>
 
-    <div class="flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar pb-24 px-5" 
-         wire:key="section-{{ $this->currentTemplate->sections[$activeSectionIndex]->section_id }}">
-    
-        <div x-data="sortableList(@this)" 
-             x-ref="list"
-             x-transition:enter="transition ease-out duration-300"
-             x-transition:enter-start="transform translate-y-10 opacity-0"
-             x-transition:enter-end="transform translate-y-0 opacity-100"
-             class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 justify-items-center">
+    <div class="flex-1 flex overflow-hidden relative">
+        @foreach($this->currentTemplate->sections as $index => $section)
+            <div class="w-full h-full flex-shrink-0 transition-transform duration-500 ease-in-out overflow-y-auto overflow-x-hidden custom-scrollbar pb-24 px-5"
+                 style="transform: translateX(-{{ $activeSectionIndex * 100 }}%);"
+                 wire:key="section-{{ $section->structure_section_id }}">
             
-            @forelse($project->chapterCards()
-                ->where('structure_section_id', $this->currentTemplate->sections[$activeSectionIndex]->structure_section_id)
-                ->with('tags')
-                ->orderBy('order_index') 
-                ->get() as $chapter)
-                
-                <div class="w-full flex justify-center sortable-item cursor-move"
-                     data-id="{{ $chapter->chapter_card_id }}"
-                     wire:key="chapter-{{ $chapter->chapter_card_id }}">
-                     
-                    <div class="w-full pointer-events-none">
-                        <div class="pointer-events-auto w-full">
-                            <x-chapter-card 
-                                :chapter="$chapter" 
-                                :sections="$this->currentTemplate->sections" 
-                            />
+                <div x-data="sortableList(@this)" 
+                     class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 justify-items-center">
+                    
+                    @php
+                        $chaptersForSection = $this->groupedChapters->get($section->structure_section_id, collect());
+                    @endphp
+
+                    @forelse($chaptersForSection as $chapter)
+                        <div class="w-full flex justify-center sortable-item cursor-move"
+                             data-id="{{ $chapter->chapter_card_id }}"
+                             wire:key="chapter-{{ $chapter->chapter_card_id }}">
+                             
+                            <div class="w-full pointer-events-none">
+                                <div class="pointer-events-auto w-full">
+                                    <x-chapter-card 
+                                        :chapter="$chapter" 
+                                        :sections="$this->currentTemplate->sections" 
+                                    />
+                                </div>
+                            </div>
                         </div>
-                    </div>
+                    @empty
+                        <div class="col-span-full w-full min-h-40 flex items-center justify-center border-2 border-dashed border-brand-100 rounded-lg text-text-60 bg-transparent">
+                            <div class="flex flex-col items-center justify-center gap-2 text-center w-full">
+                                <x-icons.no-structure class="w-15 h-15 opacity-80" />
+                                <span class="text-app-sub-feature">No chapters in this section yet.</span>
+                            </div>
+                        </div>
+                    @endforelse
                 </div>
-            @empty
-                <div class="col-span-full w-full min-h-40 flex items-center justify-center border-2 border-dashed border-brand-100 rounded-lg text-text-60 bg-transparent">
-                    <div class="flex flex-col items-center justify-center gap-2 text-center w-full">
-                        <x-icons.no-structure class="w-15 h-15 opacity-80" />
-                        <span class="text-app-sub-feature">No chapters in this section yet.</span>
-                    </div>
-                </div>
-            @endforelse
-        </div>
+            </div>
+        @endforeach
     </div>
 
     <button wire:click="addChapter" wire:loading.attr="disabled" class="absolute bottom-8 right-10 z-10 w-12 h-12 bg-secondary-100 rounded-full flex items-center justify-center shadow-xl hover:bg-secondary-200 hover:-translate-y-1 transition-all duration-200 disabled:opacity-50 disabled:hover:translate-y-0 disabled:cursor-not-allowed border-1 border-bg-main">
         <div wire:loading wire:target="addChapter" class="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
         <div wire:loading.remove wire:target="addChapter">
-            <x-icons.add-default class="text-white w-4 h-4" />
+            <x-icons.add class="text-white w-4 h-4" />
         </div>
     </button>
 
@@ -250,7 +259,7 @@ new class extends Component {
         submitAction="deleteChapter"
     >
         <x-slot:icon>
-            <x-icons.delete-default size="w-10 h-10" color="currentColor"/>
+            <x-icons.delete class="w-10 h-10" />
         </x-slot:icon>
     </x-confirm-dialog>
 </div>

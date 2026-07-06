@@ -306,7 +306,7 @@ new class extends Component {
             <div class="relative bg-bg-main w-full max-w-3xl h-[90vh] rounded-2xl shadow-2xl flex flex-col overflow-hidden mx-4 border border-bg-border">
                 
                 <button wire:click="closeModal" class="absolute top-6 right-6 w-10 h-10 rounded-full border border-brand-200 text-text-60 hover:bg-brand-50 hover:text-secondary-200 flex items-center justify-center transition-colors z-50 bg-bg-main">
-                    <x-icons.add-default rotate="45"/>
+                    <x-icons.add class="rotate-45 transform" />
                 </button>
 
                 @if($step === 1)
@@ -357,7 +357,7 @@ new class extends Component {
                                             <button @click.stop wire:click="attemptDeleteTemplate('{{ $template->template_id }}')" 
                                                     class="flex items-center gap-2 px-2 py-1 bg-bg-main/95 backdrop-blur-sm border border-danger-100/50 text-danger-100 rounded-sm hover:bg-danger-100 hover:border-danger-100 hover:text-brand-50 transition-all shadow-md group/btn" 
                                                     title="Delete Structure">
-                                                <x-icons.delete-default size="w-3 h-3" color="currentColor"/>
+                                                <x-icons.delete class="w-3 h-3" />
                                                 <span class="text-app-caption font-semibold">Delete</span>
                                             </button>
                                             
@@ -387,7 +387,7 @@ new class extends Component {
                         <div class="flex flex-col items-center max-w-4xl mx-auto w-full">
                             
                             <div class="text-center mb-10 w-full mt-4 max-w-xl mx-auto">
-                                <h1 class="block w-full truncate text-web-title text-text-100 mb-6" title="{{ $this->selectedTemplate->name }}">
+                                <h1 class="block w-full text-3xl font-bold text-text-100 mb-6 break-words" title="{{ $this->selectedTemplate->name }}">
                                     {{ $this->selectedTemplate->name }}
                                 </h1>
                                 <button wire:click="useTemplate" class="px-5 py-2 border border-brand-200 text-secondary-200 rounded-md hover:bg-brand-50 hover:text-secondary-300 transition-colors text-web-button">
@@ -503,7 +503,7 @@ new class extends Component {
                                                 wire:click.prevent="removeImage" 
                                                 class="absolute top-3 right-3 z-30 p-1.5 pt-0 bg-danger-100/90 text-white rounded-md hover:bg-danger-100 transition-all shadow-md opacity-0 group-hover:opacity-100" 
                                                 title="Remove Image">
-                                            <x-icons.delete-default size="w-4 h-4" color="currentColor"/>
+                                            <x-icons.delete class="w-4 h-4" />
                                         </button>
                                             <input type="file" wire:model="customImagePreview" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
 
@@ -550,7 +550,7 @@ new class extends Component {
                                             
                                             @if(count($customSections) > 1)
                                                 <button type="button" wire:click="removeCustomSection({{ $index }})" class="text-text-60/70 hover:text-danger-100 p-1.5 pt-0 rounded-md hover:bg-danger-100/10 transition-colors mt-1" title="Remove section">
-                                                    <x-icons.delete-default size="w-4 h-4" color="currentColor"/>
+                                                    <x-icons.delete class="w-4 h-4" />
                                                 </button>
                                             @endif
                                         </div>
@@ -564,7 +564,7 @@ new class extends Component {
                                 @error('customSections') <span class="text-danger-100 text-xs">{{ $message }}</span> @enderror
 
                                 <button type="button" wire:click="addCustomSection" class="w-full py-4 border-2 border-dashed border-card-border rounded-xl text-text-60 hover:text-secondary-200 hover:border-brand-200 hover:bg-brand-50/50 transition-all flex items-center justify-center gap-2 group focus:outline-none text-web-button">
-                                    <x-icons.add-default class="w-4 h-4"/>
+                                    <x-icons.add class="w-4 h-4" />
                                     Add New Section
                                 </button>
                             </div>
@@ -593,7 +593,7 @@ new class extends Component {
         submitAction="confirmDeleteTemplate"
     >
         <x-slot:icon>
-            <x-icons.delete-default size="w-15 h-15" color="currentColor"/>
+            <x-icons.delete class="w-15 h-15" />
         </x-slot:icon>
     </x-confirm-dialog>
 

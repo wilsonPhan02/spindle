@@ -16,7 +16,8 @@ class Project extends Model
     protected $fillable = [
         'user_id', 'template_id', 'section_id',
         'title', 'synopsis', 'cover_image_path',
-        'is_pinned', 'archived_at',
+        'is_pinned', 'archived_at', 'icon_type', 
+        'icon',
     ];
 
     public function section()
@@ -73,12 +74,12 @@ class Project extends Model
     public static function defaultRelationshipTypes(): array
     {
         return [
-            ['name' => 'Father', 'text_color' => '#1565C0', 'bg_color' => '#BBDEFB'],
-            ['name' => 'Mother', 'text_color' => '#AD1457', 'bg_color' => '#F8BBD0'],
+            ['name' => 'Parent', 'text_color' => '#1565C0', 'bg_color' => '#BBDEFB'],
             ['name' => 'Sibling', 'text_color' => '#6A1B9A', 'bg_color' => '#E1BEE7'],
             ['name' => 'Friend', 'text_color' => '#2E7D32', 'bg_color' => '#C8E6C9'],
-            ['name' => 'Rival', 'text_color' => '#E65100', 'bg_color' => '#FFE0B2'],
             ['name' => 'Enemy', 'text_color' => '#C62828', 'bg_color' => '#FFCDD2'],
+            ['name' => 'Neighbor', 'text_color' => '#00838F', 'bg_color' => '#B2EBF2'],
+            ['name' => 'Lover', 'text_color' => '#AD1457', 'bg_color' => '#F8BBD0'],
         ];
     }
 

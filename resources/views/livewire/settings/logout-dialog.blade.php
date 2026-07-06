@@ -8,11 +8,17 @@ new class extends Component {
         session()->invalidate();
         session()->regenerateToken();
         
-        return redirect()->route('login'); 
+        $this->dispatch('clear-auth-session');
     }
 }; ?>
 
-<div>
+<div x-data="{
+    clearAuth() {
+        sessionStorage.removeItem('auth_email');
+        sessionStorage.removeItem('auth_password');
+        window.location.href = '{{ route('login') }}';
+    }
+}" @clear-auth-session.window="clearAuth()">
     <x-confirm-dialog
         eventName="open-logout-dialog"
         title="Log out"

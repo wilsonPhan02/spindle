@@ -98,7 +98,7 @@ new #[Layout('layouts.app')] class extends Component {
             <!-- Delete Account -->
             <x-settings-items variant="menu" label="Delete Account" danger="true" @click="$dispatch('open-delete-dialog')">
                 <x-slot:icon>
-                    <x-icons.delete-default size="w-5 h-5" color="currentColor"/>
+                    <x-icons.delete class="w-5 h-5" />
                 </x-slot:icon>
             </x-settings-items>
         </div>
@@ -112,5 +112,6 @@ new #[Layout('layouts.app')] class extends Component {
     <livewire:settings.edit-profile wire:key="modal-edit-{{ auth()->user()->profile->avatar_url }}"/>
 
 </div>
+
 
 

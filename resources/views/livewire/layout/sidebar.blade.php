@@ -37,7 +37,7 @@ new class extends Component {
                     $query->whereNull('archived_at');
                 })
                 ->latest('updated_at')
-                ->take(15)
+                ->take(10)
                 ->get();
         }
     }
@@ -105,6 +105,8 @@ new class extends Component {
                     'badge_prefix' => 'title: ',
                     'badge_keyword' => $p->title,
                     'url' => $url,
+                    'icon_type' => $p->icon_type,
+                    'icon' => $p->icon,
                     'score' => $this->calculateRelevance($p->title, $query)
                 ];
             }
@@ -123,6 +125,8 @@ new class extends Component {
                     'title' => $c->project->title,
                     'matched_categories' => [$c->name],
                     'url' => $url,
+                    'icon_type' => $c->project->icon_type,
+                    'icon' => $c->project->icon,
                     'score' => $this->calculateRelevance($c->name, $query)
                 ];
             } else {
@@ -272,8 +276,7 @@ new class extends Component {
             try { recentSearches = JSON.parse(localStorage.getItem('recentSearches') || '[]'); }
             catch(e) { recentSearches = []; }
         "
-        "
-        class="flex flex-col flex-1 overflow-y-auto px-6 pb-6 custom-scrollbar"
+        class="flex flex-col flex-1 overflow-y-auto [scrollbar-gutter:stable] px-6 pb-6 custom-scrollbar"
     >
         @if($this->searchResultsData !== null)
             <div wire:key="search-results-block" wire:transition>
@@ -310,7 +313,13 @@ new class extends Component {
                             @endif
                                 <div class="flex items-center gap-2 min-w-0 flex-1">
                                     @if($item['type'] === 'project' || $item['type'] === 'category')
-                                        <x-icons.sidebar-book class="w-4 h-4 text-secondary-150 shrink-0" />
+                                        @if(($item['icon_type'] ?? null) === 'emoji')
+                                            <span class="text-[16px] leading-none shrink-0">{{ $item['icon'] }}</span>
+                                        @elseif(($item['icon_type'] ?? null) === 'image' && !empty($item['icon']))
+                                            <img src="{{ asset('storage/' . $item['icon']) }}" alt="" class="w-4 h-4 object-cover rounded shrink-0">
+                                        @else
+                                            <x-icons.sidebar-book class="w-4 h-4 text-secondary-150 shrink-0" />
+                                        @endif
                                     @elseif($item['type'] === 'section')
                                         <x-icons.list class="w-4 h-4 text-[#8C7558] shrink-0" />
                                     @endif
@@ -352,17 +361,23 @@ new class extends Component {
         @endif
 
         <div class="space-y-6 shrink-0">
-            <div x-data="{ open: true, viewAll: false }">
-            <button @click="open = !open" class="flex items-center justify-between w-full text-app-feature text-text-70 mb-2 focus:outline-none hover:text-text-80 transition-colors">
+            <div x-data="{ viewAll: false }">
+            <div class="flex items-center justify-between w-full text-app-feature text-text-70 mb-2">
                 <span>Marked</span>
-            </button>
-            <div x-show="open" x-collapse>
+            </div>
+            <div>
                 @if(count($pinnedProjects) > 0)
                     <div class="space-y-1 pb-2">
                         @foreach($pinnedProjects->take(3) as $pProject)
                             <div x-data="{ rowHovered: false }" @mouseenter="rowHovered = true" @mouseleave="rowHovered = false" wire:key="marked-{{ $pProject->project_id }}" class="group flex items-center justify-between px-2 py-1.5 -mx-2 rounded-lg hover:bg-brand-150 transition-colors">
                                 <a href="{{ route('projects.show', $pProject->project_id) }}" wire:navigate class="flex items-center gap-2 flex-1 min-w-0">
-                                    <x-icons.sidebar-book class="w-4 h-4 text-text-70 shrink-0" />
+                                    @if($pProject->icon_type === 'emoji')
+                                        <span class="text-[16px] leading-none shrink-0">{{ $pProject->icon }}</span>
+                                    @elseif($pProject->icon_type === 'image' && $pProject->icon)
+                                        <img src="{{ asset('storage/' . $pProject->icon) }}" alt="" class="w-4 h-4 object-cover rounded shrink-0">
+                                    @else
+                                        <x-icons.sidebar-book class="w-4 h-4 text-text-70 shrink-0" />
+                                    @endif
                                     <span class="text-[13px] font-medium text-text-80 truncate transition-colors" :class="rowHovered ? 'text-text-100' : ''">{{ $pProject->title }}</span>
                                 </a>
                                 <button wire:click="unpin('{{ $pProject->project_id }}')" class="transition-all p-1 shrink-0 text-[#A08866] hover:text-[#8C7558] opacity-0 group-hover:opacity-100" :class="rowHovered ? 'opacity-100' : 'opacity-0'" title="Unmark Project">
@@ -370,13 +385,19 @@ new class extends Component {
                                 </button>
                             </div>
                         @endforeach
-                        
+
                         @if(count($pinnedProjects) > 3)
                             <div x-show="viewAll" x-collapse x-cloak class="space-y-1 mt-1">
                                 @foreach($pinnedProjects->skip(3) as $pProject)
                                     <div x-data="{ rowHovered: false }" @mouseenter="rowHovered = true" @mouseleave="rowHovered = false" wire:key="marked-more-{{ $pProject->project_id }}" class="group flex items-center justify-between px-2 py-1.5 -mx-2 rounded-lg hover:bg-brand-150 transition-colors">
                                         <a href="{{ route('projects.show', $pProject->project_id) }}" wire:navigate class="flex items-center gap-2 flex-1 min-w-0">
-                                            <x-icons.sidebar-book class="w-4 h-4 text-text-70 shrink-0" />
+                                            @if($pProject->icon_type === 'emoji')
+                                                <span class="text-[16px] leading-none shrink-0">{{ $pProject->icon }}</span>
+                                            @elseif($pProject->icon_type === 'image' && $pProject->icon)
+                                                <img src="{{ asset('storage/' . $pProject->icon) }}" alt="" class="w-4 h-4 object-cover rounded shrink-0">
+                                            @else
+                                                <x-icons.sidebar-book class="w-4 h-4 text-text-70 shrink-0" />
+                                            @endif
                                             <span class="text-[13px] font-medium text-text-80 truncate transition-colors" :class="rowHovered ? 'text-text-100' : ''">{{ $pProject->title }}</span>
                                         </a>
                                         <button wire:click="unpin('{{ $pProject->project_id }}')" class="transition-all p-1 shrink-0 text-[#A08866] hover:text-[#8C7558] opacity-0 group-hover:opacity-100" :class="rowHovered ? 'opacity-100' : 'opacity-0'" title="Unmark Project">
@@ -399,25 +420,37 @@ new class extends Component {
             </div>
         </div>
 
-        <div x-data="{ open: true, viewAll: false }">
-            <button @click="open = !open" class="flex items-center justify-between w-full text-app-feature text-text-70 mb-2 focus:outline-none hover:text-text-80 transition-colors">
+        <div x-data="{ viewAll: false }">
+            <div class="flex items-center justify-between w-full text-app-feature text-text-70 mb-2">
                 <span>Recent</span>
-            </button>
-            <div x-show="open" x-collapse>
+            </div>
+            <div>
                 @if(count($recentProjects) > 0)
                     <div class="space-y-1 pb-2">
-                        @foreach($recentProjects->take(8) as $rProject)
+                        @foreach($recentProjects->take(3) as $rProject)
                             <a href="{{ route('projects.show', $rProject->project_id) }}" wire:navigate class="flex items-center gap-2 px-2 py-1.5 -mx-2 rounded-lg hover:bg-brand-150 transition-colors group">
-                                <x-icons.sidebar-book class="w-4 h-4 text-text-70 shrink-0" />
+                                @if($rProject->icon_type === 'emoji')
+                                    <span class="text-[16px] leading-none shrink-0">{{ $rProject->icon }}</span>
+                                @elseif($rProject->icon_type === 'image' && $rProject->icon)
+                                    <img src="{{ asset('storage/' . $rProject->icon) }}" alt="" class="w-4 h-4 object-cover rounded shrink-0">
+                                @else
+                                    <x-icons.sidebar-book class="w-4 h-4 text-text-70 shrink-0" />
+                                @endif
                                 <span class="text-[13px] font-medium text-text-80 truncate group-hover:text-text-100 transition-colors">{{ $rProject->title }}</span>
                             </a>
                         @endforeach
                         
-                        @if(count($recentProjects) > 8)
+                        @if(count($recentProjects) > 3)
                             <div x-show="viewAll" x-collapse x-cloak class="space-y-1 mt-1">
-                                @foreach($recentProjects->skip(8) as $rProject)
+                                @foreach($recentProjects->skip(3) as $rProject)
                                     <a href="{{ route('projects.show', $rProject->project_id) }}" wire:navigate class="flex items-center gap-2 px-2 py-1.5 -mx-2 rounded-lg hover:bg-brand-150 transition-colors group">
-                                        <x-icons.sidebar-book class="w-4 h-4 text-text-70 shrink-0" />
+                                        @if($rProject->icon_type === 'emoji')
+                                            <span class="text-[16px] leading-none shrink-0">{{ $rProject->icon }}</span>
+                                        @elseif($rProject->icon_type === 'image' && $rProject->icon)
+                                            <img src="{{ asset('storage/' . $rProject->icon) }}" alt="" class="w-4 h-4 object-cover rounded shrink-0">
+                                        @else
+                                            <x-icons.sidebar-book class="w-4 h-4 text-text-70 shrink-0" />
+                                        @endif
                                         <span class="text-[13px] font-medium text-text-80 truncate group-hover:text-text-100 transition-colors">{{ $rProject->title }}</span>
                                     </a>
                                 @endforeach

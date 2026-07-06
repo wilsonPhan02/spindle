@@ -14,8 +14,12 @@ new #[Layout('layouts.guest')] #[Title('Sign In - Spindle')] class extends Compo
     public function login()
     {
         $this->validate([
-            'email' => ['required'],
+            'email' => ['required', 'email:filter'],
             'password' => ['required'],
+        ], [
+            'email.required' => 'Email is required.',
+            'email.email' => 'Please enter a valid email address.',
+            'password.required' => 'Password is required.',
         ]);
 
         if (Auth::attempt(['email' => $this->email, 'password' => $this->password], $this->remember)) {
@@ -23,7 +27,7 @@ new #[Layout('layouts.guest')] #[Title('Sign In - Spindle')] class extends Compo
             return redirect()->intended('/dashboard');
         }
 
-        $this->addError('email', 'The provided credentials do not match our records.');
+        $this->addError('login_failed', 'Invalid email or password');
     }
 };
 ?>
@@ -44,11 +48,20 @@ new #[Layout('layouts.guest')] #[Title('Sign In - Spindle')] class extends Compo
 
             <h1 class="mb-5 text-2xl font-merriweather text-center text-text-80">Sign In</h1>
 
-            <form wire:submit="login" class="space-y-3">
+            <form wire:submit="login" novalidate x-data @submit="$wire.email = $refs.email.value; $wire.password = $refs.password.value" class="space-y-3">
+
+                @error('login_failed')
+                    <div class="p-3 mb-2 rounded-lg bg-danger-100/10 border border-danger-100/50 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-danger-100 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                        <span class="text-app-body-medium text-danger-100 font-medium">{{ $message }}</span>
+                    </div>
+                @enderror
 
                 <div>
-                    <label class="block mb-1 text-app-body-medium text-text-80">Email / Username</label>
-                    <input type="text" wire:model="email" placeholder="Enter your email or username"
+                    <label class="block mb-1 text-app-body-medium text-text-80">Email</label>
+                    <input type="email" wire:model="email" x-ref="email" placeholder="Enter your email"
+                        x-init="setTimeout(() => { let v = sessionStorage.getItem('auth_email'); if(v && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) { $el.value = v; $wire.email = v; } }, 10)"
+                        @input="sessionStorage.setItem('auth_email', $el.value)"
                         class="w-full px-4 py-2 bg-white border border-subtext-70 rounded-md focus:ring-2 focus:ring-secondary-200 outline-none transition-all placeholder-subtext-90 text-app-body-medium text-text-80">
                     @error('email') <span class="text-app-body-small text-danger-100 mt-1 block">{{ $message }}</span> @enderror
                 </div>
@@ -56,7 +69,9 @@ new #[Layout('layouts.guest')] #[Title('Sign In - Spindle')] class extends Compo
                 <div class="mb-5" x-data="{ show: false }">
                     <label class="block mb-1 text-app-body-medium text-text-80">Password</label>
                     <div class="relative">
-                        <input :type="show ? 'text' : 'password'" wire:model="password" placeholder="Enter your password"
+                        <input :type="show ? 'text' : 'password'" wire:model="password" x-ref="password" placeholder="Enter your password"
+                            x-init="setTimeout(() => { let e = sessionStorage.getItem('auth_email'); let v = sessionStorage.getItem('auth_password'); if(v && e && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)) { $el.value = v; $wire.password = v; } }, 10)"
+                            @input="sessionStorage.setItem('auth_password', $el.value)"
                             class="w-full px-4 py-2 pr-10 bg-white border border-subtext-70 rounded-md focus:ring-2 focus:ring-secondary-200 outline-none transition-all placeholder-subtext-90 text-app-body-medium text-text-80">
 
                         <button type="button" @click="show = !show" class="absolute inset-y-0 right-0 flex items-center pr-3 text-subtext-90 hover:text-text-80 focus:outline-none transition-colors">
@@ -113,7 +128,7 @@ new #[Layout('layouts.guest')] #[Title('Sign In - Spindle')] class extends Compo
 
             <p class="text-app-body-medium text-center text-text-80">
                 Don't have an account?
-                <a href="{{ route('register') }}" class="text-interactive-100 hover:underline">Sign up</a>
+                <a href="{{ route('register') }}" wire:navigate class="text-interactive-100 hover:underline">Sign up</a>
             </p>
 
         </div>
