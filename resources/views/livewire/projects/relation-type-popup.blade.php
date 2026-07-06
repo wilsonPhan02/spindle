@@ -53,9 +53,27 @@ new class extends Component {
     #[Renderless]
     public function updateRelationship(string $relationshipId, string $typeId): void {
         $characterIds = $this->project->characters()->pluck('character_id');
-        Relationship::where('relationship_id', $relationshipId)
+        $relationship = Relationship::where('relationship_id', $relationshipId)
             ->where(fn ($q) => $q->whereIn('from_id', $characterIds)->orWhereIn('to_id', $characterIds))
-            ->update(['relationship_type_id' => $typeId]);
+            ->first();
+
+        if (! $relationship) {
+            return;
+        }
+
+        $duplicate = Relationship::where('relationship_id', '!=', $relationshipId)
+            ->where('relationship_type_id', $typeId)
+            ->where(function ($query) use ($relationship) {
+                $query->where(fn ($q) => $q->where('from_id', $relationship->from_id)->where('to_id', $relationship->to_id))
+                    ->orWhere(fn ($q) => $q->where('from_id', $relationship->to_id)->where('to_id', $relationship->from_id));
+            })
+            ->exists();
+
+        if ($duplicate) {
+            return;
+        }
+
+        $relationship->update(['relationship_type_id' => $typeId]);
     }
 
     #[Renderless]
@@ -81,6 +99,7 @@ new class extends Component {
         confirmingDeleteType: false,
         charFromName: null,
         charToName: null,
+        usedTypeIds: [],
         types: @js($relationshipTypes),
         palette: [
             { textColor: '#43A047', bgColor: '#C8E6C9' },
@@ -100,6 +119,16 @@ new class extends Component {
             const name = this.newTypeName.trim().toLowerCase();
             if (name === '') return false;
             return this.types.some(t => t.name.trim().toLowerCase() === name);
+        },
+        isTypeDisabled(typeId) {
+            return this.usedTypeIds.includes(typeId) && typeId !== this.editingRelationSavedTypeId;
+        },
+        selectType(typeId) {
+            if (this.isTypeDisabled(typeId)) return;
+            this.selectedTypeId = typeId;
+            this.newTypeName = '';
+            this.newTypePalette = { textColor: '#8C7558', bgColor: '#EAE1D5' };
+            this.showColorPicker = false;
         },
         async saveRelation() {
             let type = null;
@@ -154,6 +183,7 @@ new class extends Component {
             this.confirmingDeleteType = false;
             this.charFromName = null;
             this.charToName = null;
+            this.usedTypeIds = [];
             window.dispatchEvent(new CustomEvent('relation-popup-closed'));
         },
     }"
@@ -168,6 +198,7 @@ new class extends Component {
         confirmingDeleteType = false;
         charFromName = $event.detail.charFromName ?? null;
         charToName = $event.detail.charToName ?? null;
+        usedTypeIds = $event.detail.usedTypeIds ?? [];
         showPopup = true;
     "
     @open-edit-relation-popup.window="
@@ -176,6 +207,7 @@ new class extends Component {
         selectedTypeId = $event.detail.typeId ?? null;
         charFromName = $event.detail.charFromName ?? null;
         charToName = $event.detail.charToName ?? null;
+        usedTypeIds = $event.detail.usedTypeIds ?? [];
         newTypeName = '';
         newTypePalette = { textColor: '#8C7558', bgColor: '#EAE1D5' };
         showColorPicker = false;
@@ -232,11 +264,14 @@ new class extends Component {
                         <template x-for="rt in types" :key="rt.id">
                             <div
                                 class="flex items-center gap-1 rounded-full pl-3 pr-1.5 py-1.5 border-2 transition-all"
+                                :class="isTypeDisabled(rt.id) ? 'opacity-40' : ''"
                                 :style="`background-color: ${rt.bgColor}; border-color: ${selectedTypeId === rt.id ? rt.textColor : 'transparent'};`"
                             >
                                 <button
-                                    @click="selectedTypeId = rt.id; newTypeName = ''; newTypePalette = { textColor: '#8C7558', bgColor: '#EAE1D5' }; showColorPicker = false"
+                                    @click="selectType(rt.id)"
+                                    :disabled="isTypeDisabled(rt.id)"
                                     class="text-app-body-medium"
+                                    :class="isTypeDisabled(rt.id) ? 'cursor-not-allowed' : ''"
                                     :style="`color: ${rt.textColor}`"
                                     x-text="rt.name"
                                 ></button>

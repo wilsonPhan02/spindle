@@ -21,6 +21,10 @@ document.addEventListener('alpine:init', () => {
         dragStartX: 0, dragStartY: 0,
         dragOrigTop: 0, dragOrigLeft: 0,
         dragMoved: false,
+        draggingLabelRelId: null,
+        dragLabelStartX: 0, dragLabelStartY: 0,
+        dragLabelOrigOffset: 0,
+        labelDragMoved: false,
 
         init() {
             window.addEventListener('open-relation-type-popup', () => { this.relPopupOpen = true; });
@@ -70,6 +74,24 @@ document.addEventListener('alpine:init', () => {
             const c = this.characters.find(c => c.id === id);
             return c ? { x: c.left + 40, y: c.top + 40 } : { x: 0, y: 0 };
         },
+        // Kalau ada lebih dari 1 relasi antara pasangan karakter yang sama, tiap
+        // relasi dikasih index simetris di sekitar 0 (mis. N=3 -> -1, 0, 1) supaya
+        // garisnya bisa di-"bengkokkan" ke sisi yang berbeda dan tidak numpuk.
+        getGroupOffsetIndex(rel) {
+            const siblings = this.relationships.filter(r =>
+                (r.from === rel.from && r.to === rel.to) || (r.from === rel.to && r.to === rel.from)
+            );
+            if (siblings.length <= 1) return 0;
+            const idx = siblings.findIndex(r => r.id === rel.id);
+            return idx - (siblings.length - 1) / 2;
+        },
+        // Kalau user pernah drag label relasi ini, pakai offset manual yang tersimpan.
+        // Kalau belum pernah, pakai offset otomatis berdasarkan grouping index.
+        getCurveOffset(rel) {
+            return (rel.curveOffset !== null && rel.curveOffset !== undefined)
+                ? rel.curveOffset
+                : this.getGroupOffsetIndex(rel) * 26;
+        },
         relationLine(rel) {
             const from = this.getCenter(rel.from);
             const to = this.getCenter(rel.to);
@@ -77,20 +99,49 @@ document.addEventListener('alpine:init', () => {
             const dy = to.y - from.y;
             const dist = Math.hypot(dx, dy) || 1;
             const radius = 40;
-            const x1 = from.x + (dx / dist) * radius;
-            const y1 = from.y + (dy / dist) * radius;
-            const length = Math.max(0, dist - radius * 2);
+            const ux = dx / dist, uy = dy / dist;
+            const x1 = from.x + ux * radius;
+            const y1 = from.y + uy * radius;
+            const x2 = to.x - ux * radius;
+            const y2 = to.y - uy * radius;
             const angle = Math.atan2(dy, dx);
             // Sudut label di-clamp ke -90..90 derajat, supaya tulisan tetap mengikuti
             // arah garis tapi tidak pernah terbalik/upside-down dari arah manapun.
             let labelAngle = angle;
             if (labelAngle > Math.PI / 2) labelAngle -= Math.PI;
             else if (labelAngle < -Math.PI / 2) labelAngle += Math.PI;
-            return {
-                x1, y1, length, angle, labelAngle,
-                midX: x1 + Math.cos(angle) * length / 2,
-                midY: y1 + Math.sin(angle) * length / 2,
-            };
+
+            // Titik kontrol quadratic-bezier digeser tegak lurus terhadap garis A-B
+            // sejauh "bend" px (manual kalau pernah di-drag, otomatis kalau belum).
+            const bend = this.getCurveOffset(rel);
+            const px = -uy, py = ux;
+            const mx = (x1 + x2) / 2, my = (y1 + y2) / 2;
+            const controlX = mx + px * bend;
+            const controlY = my + py * bend;
+
+            // Titik tengah kurva (t=0.5) dipakai buat posisi label. Tangent
+            // quadratic-bezier di t=0.5 sejajar dengan garis lurus P0-P2, jadi
+            // labelAngle di atas tetap valid tanpa perlu dihitung ulang.
+            const midX = 0.25 * x1 + 0.5 * controlX + 0.25 * x2;
+            const midY = 0.25 * y1 + 0.5 * controlY + 0.25 * y2;
+
+            return { x1, y1, x2, y2, labelAngle, controlX, controlY, midX, midY };
+        },
+        edgePathsMarkup() {
+            return this.relationships.map(rel => {
+                const line = this.relationLine(rel);
+                const color = /^#[0-9a-fA-F]{3,8}$/.test(rel.textColor) ? rel.textColor : '#8C7558';
+                const d = `M ${line.x1} ${line.y1} Q ${line.controlX} ${line.controlY} ${line.x2} ${line.y2}`;
+                const hit = `<path d="${d}" stroke="transparent" stroke-width="14" fill="none" pointer-events="stroke" style="cursor:pointer" data-rel-id="${rel.id}"></path>`;
+                const visible = `<path d="${d}" stroke="${color}" stroke-width="2" fill="none" pointer-events="none"></path>`;
+                return hit + visible;
+            }).join('');
+        },
+        onEdgeClick(e) {
+            const target = e.target.closest('[data-rel-id]');
+            if (!target) return;
+            const rel = this.relationships.find(r => r.id === target.getAttribute('data-rel-id'));
+            if (rel) this.openEditRelation(rel);
         },
         startDragChar(e, char) {
             this.draggingId = char.id;
@@ -120,6 +171,41 @@ document.addEventListener('alpine:init', () => {
             }
             this.draggingId = null;
         },
+        startDragLabel(e, rel) {
+            this.draggingLabelRelId = rel.id;
+            this.dragLabelStartX = e.clientX;
+            this.dragLabelStartY = e.clientY;
+            this.dragLabelOrigOffset = this.getCurveOffset(rel);
+            this.labelDragMoved = false;
+        },
+        onDragLabel(e) {
+            if (this.draggingLabelRelId === null) return;
+            const rel = this.relationships.find(r => r.id === this.draggingLabelRelId);
+            if (!rel) return;
+
+            const dx = (e.clientX - this.dragLabelStartX) / this.zoom;
+            const dy = (e.clientY - this.dragLabelStartY) / this.zoom;
+            if (Math.abs(dx) > 3 || Math.abs(dy) > 3) this.labelDragMoved = true;
+
+            // Proyeksikan pergeseran mouse ke arah tegak lurus garis A-B, supaya
+            // gerakan sejajar garis diabaikan dan cuma "bengkokan"-nya yang berubah.
+            const from = this.getCenter(rel.from);
+            const to = this.getCenter(rel.to);
+            const dist = Math.hypot(to.x - from.x, to.y - from.y) || 1;
+            const px = -(to.y - from.y) / dist, py = (to.x - from.x) / dist;
+            const delta = dx * px + dy * py;
+
+            rel.curveOffset = this.dragLabelOrigOffset + delta;
+        },
+        stopDragLabel() {
+            if (this.draggingLabelRelId !== null && this.labelDragMoved) {
+                const rel = this.relationships.find(r => r.id === this.draggingLabelRelId);
+                if (rel) {
+                    this.$wire.call('updateRelationshipCurve', rel.id, rel.curveOffset);
+                }
+            }
+            this.draggingLabelRelId = null;
+        },
         startAddRelation(id) {
             this.addingRelation = true;
             this.relationSourceId = id;
@@ -148,6 +234,11 @@ document.addEventListener('alpine:init', () => {
             this.$wire.call('deleteCharacter', id);
             this.closeCharacterInfo();
         },
+        relatedTypeIds(idA, idB) {
+            return this.relationships
+                .filter(r => (r.from === idA && r.to === idB) || (r.from === idB && r.to === idA))
+                .map(r => r.typeId);
+        },
         selectTarget(id) {
             this.pendingTargetId = id;
             this.addingRelation = false;
@@ -157,6 +248,7 @@ document.addEventListener('alpine:init', () => {
                 relationId: null,
                 charFromName: fromChar?.name ?? null,
                 charToName: toChar?.name ?? null,
+                usedTypeIds: this.relatedTypeIds(this.relationSourceId, id),
             } }));
         },
         openEditRelation(rel) {
@@ -167,6 +259,7 @@ document.addEventListener('alpine:init', () => {
                 typeId: rel.typeId,
                 charFromName: fromChar?.name ?? null,
                 charToName: toChar?.name ?? null,
+                usedTypeIds: this.relatedTypeIds(rel.from, rel.to),
             }}));
         },
         isAnyPopupOpen() {

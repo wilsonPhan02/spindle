@@ -150,6 +150,17 @@ new #[Layout('layouts.app')] class extends Component {
             return;
         }
 
+        $duplicate = Relationship::where('relationship_type_id', $this->newRelationTypeId)
+            ->where(function ($query) {
+                $query->where(fn ($q) => $q->where('from_id', $this->character->character_id)->where('to_id', $this->newRelationTargetId))
+                    ->orWhere(fn ($q) => $q->where('from_id', $this->newRelationTargetId)->where('to_id', $this->character->character_id));
+            })
+            ->exists();
+
+        if ($duplicate) {
+            return;
+        }
+
         $relationship = Relationship::create([
             'from_id' => $this->character->character_id,
             'to_id' => $this->newRelationTargetId,
@@ -521,7 +532,13 @@ new #[Layout('layouts.app')] class extends Component {
                 </div>
 
                 @if($showAddRelation)
-                    @php $relatedIds = collect($relationships)->pluck('otherId')->filter()->values()->all(); @endphp
+                    @php
+                        $relatedTypesByChar = collect($relationships)
+                            ->filter(fn ($r) => $r['otherId'])
+                            ->groupBy('otherId')
+                            ->map(fn ($group) => $group->pluck('typeId')->values()->all())
+                            ->all();
+                    @endphp
                     <div
                         class="flex flex-col gap-2 p-3 rounded-lg bg-brand-100/60"
                         x-data="{
@@ -529,16 +546,25 @@ new #[Layout('layouts.app')] class extends Component {
                             typeOpen: false,
                             selectedChar: null,
                             selectedType: null,
-                            relatedIds: @js($relatedIds),
+                            relatedTypesByChar: @js($relatedTypesByChar),
                             characters: @js($otherCharacters),
                             types: @js($relationshipTypes),
                             selectChar(char) {
-                                if (this.relatedIds.includes(char.id)) return;
                                 this.selectedChar = char;
                                 this.charOpen = false;
                                 $wire.set('newRelationTargetId', char.id);
+                                const usedTypes = this.relatedTypesByChar[char.id] || [];
+                                if (this.selectedType && usedTypes.includes(this.selectedType.id)) {
+                                    this.selectedType = null;
+                                    $wire.set('newRelationTypeId', null);
+                                }
+                            },
+                            isTypeUsed(typeId) {
+                                if (!this.selectedChar) return false;
+                                return (this.relatedTypesByChar[this.selectedChar.id] || []).includes(typeId);
                             },
                             selectType(type) {
+                                if (this.isTypeUsed(type.id)) return;
                                 this.selectedType = type;
                                 this.typeOpen = false;
                                 $wire.set('newRelationTypeId', type.id);
@@ -572,10 +598,7 @@ new #[Layout('layouts.app')] class extends Component {
                                 <template x-for="char in characters" :key="char.id">
                                     <div
                                         @click="selectChar(char)"
-                                        class="px-3 py-2 text-app-desc-feature text-text-80 flex items-center justify-between"
-                                        :class="relatedIds.includes(char.id)
-                                            ? 'opacity-40 cursor-not-allowed'
-                                            : 'hover:bg-brand-100 cursor-pointer'"
+                                        class="px-3 py-2 text-app-desc-feature text-text-80 flex items-center justify-between hover:bg-brand-100 cursor-pointer"
                                     >
                                         <span x-text="char.name"></span>
                                     </div>
@@ -600,7 +623,10 @@ new #[Layout('layouts.app')] class extends Component {
                             <div x-show="typeOpen" x-cloak
                                 class="absolute z-20 w-full mt-1 bg-bg-main border border-brand-150 rounded-lg shadow-md overflow-hidden max-h-48 overflow-y-auto custom-scrollbar">
                                 <template x-for="type in types" :key="type.id">
-                                    <div @click="selectType(type)" class="px-3 py-2 hover:bg-brand-100 cursor-pointer flex items-center">
+                                    <div @click="selectType(type)"
+                                        class="px-3 py-2 flex items-center"
+                                        :class="isTypeUsed(type.id) ? 'opacity-40 cursor-not-allowed' : 'hover:bg-brand-100 cursor-pointer'"
+                                    >
                                         <span
                                             class="px-2.5 py-1 rounded-full text-app-desc-feature font-semibold"
                                             :style="`background-color: ${type.bgColor}; color: ${type.textColor}`"
@@ -610,7 +636,7 @@ new #[Layout('layouts.app')] class extends Component {
                                 </template>
                                 <div x-show="types.length === 0" class="px-3 py-2 text-app-desc-feature text-subtext-70 italic">No types yet</div>
                                 <div class="border-t border-brand-150">
-                                    <div @click="typeOpen = false; window.dispatchEvent(new CustomEvent('open-relation-type-popup', { detail: { relationId: null, charFromName: '{{ $character->nick_name }}', charToName: selectedChar ? selectedChar.name : null } }))"
+                                    <div @click="typeOpen = false; window.dispatchEvent(new CustomEvent('open-relation-type-popup', { detail: { relationId: null, charFromName: '{{ $character->nick_name }}', charToName: selectedChar ? selectedChar.name : null, usedTypeIds: selectedChar ? (relatedTypesByChar[selectedChar.id] || []) : [] } }))"
                                         class="px-3 py-2 flex items-center gap-2 text-app-desc-feature font-semibold text-secondary-200 hover:bg-brand-100 cursor-pointer">
                                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
                                         Add New Relation
@@ -645,9 +671,12 @@ new #[Layout('layouts.app')] class extends Component {
                     @relation-type-deleted.window="$wire.call('refreshRelationships')"
                 >
                     @forelse($relationships as $relationship)
+                        @php
+                            $usedTypeIdsForOther = collect($relationships)->where('otherId', $relationship['otherId'])->pluck('typeId')->values()->all();
+                        @endphp
                         <div class="grid grid-cols-[1fr_auto_1fr_auto] items-center gap-x-2 text-text-80 text-app-body-small w-full">
                             <div class="bg-brand-100 px-3 py-1.5 rounded-md truncate cursor-pointer hover:bg-brand-150 transition-colors"
-                                @click="window.dispatchEvent(new CustomEvent('open-edit-relation-popup', { detail: { relationId: '{{ $relationship['id'] }}', typeId: '{{ $relationship['typeId'] }}', charFromName: '{{ $character->nick_name }}', charToName: '{{ $relationship['otherName'] }}' } }))">
+                                @click="window.dispatchEvent(new CustomEvent('open-edit-relation-popup', { detail: { relationId: '{{ $relationship['id'] }}', typeId: '{{ $relationship['typeId'] }}', charFromName: '{{ $character->nick_name }}', charToName: '{{ $relationship['otherName'] }}', usedTypeIds: @js($usedTypeIdsForOther) } }))">
                                 {{ $relationship['otherName'] }}
                             </div>
 
@@ -655,7 +684,7 @@ new #[Layout('layouts.app')] class extends Component {
 
                             <div class="px-3 py-1.5 rounded-md text-center truncate cursor-pointer hover:opacity-80 transition-opacity"
                                 style="background-color: {{ $relationship['bgColor'] }}; color: {{ $relationship['textColor'] }};"
-                                @click="window.dispatchEvent(new CustomEvent('open-edit-relation-popup', { detail: { relationId: '{{ $relationship['id'] }}', typeId: '{{ $relationship['typeId'] }}', charFromName: '{{ $character->nick_name }}', charToName: '{{ $relationship['otherName'] }}' } }))">
+                                @click="window.dispatchEvent(new CustomEvent('open-edit-relation-popup', { detail: { relationId: '{{ $relationship['id'] }}', typeId: '{{ $relationship['typeId'] }}', charFromName: '{{ $character->nick_name }}', charToName: '{{ $relationship['otherName'] }}', usedTypeIds: @js($usedTypeIdsForOther) } }))">
                                 {{ $relationship['typeName'] }}
                             </div>
 
