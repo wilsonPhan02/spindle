@@ -20,7 +20,6 @@ new #[Layout('layouts.app')] class extends Component {
     public function mount(Project $project) {
         $this->project = $project;
         $this->project->seedDefaultRelationshipTypes();
-        $this->project->seedDefaultCharacterDetailGroups();
         $this->loadCharacters();
         $this->loadRelationshipTypes();
         $this->loadRelationships();
@@ -51,6 +50,7 @@ new #[Layout('layouts.app')] class extends Component {
             'name' => $relationship->relationshipType->name,
             'textColor' => $relationship->relationshipType->text_color,
             'bgColor' => $relationship->relationshipType->bg_color,
+            'curveOffset' => $relationship->curve_offset,
         ];
     }
 
@@ -101,6 +101,13 @@ new #[Layout('layouts.app')] class extends Component {
         ]);
     }
 
+    public function updateRelationshipCurve($id, $offset) {
+        $characterIds = $this->projectCharacterIds();
+        Relationship::where('relationship_id', $id)
+            ->where(fn ($q) => $q->whereIn('from_id', $characterIds)->orWhereIn('to_id', $characterIds))
+            ->update(['curve_offset' => $offset]);
+    }
+
     public function deleteCharacter($characterId) {
         // Relationship, hashtag, dan detail value milik karakter ini ikut terhapus (cascadeOnDelete di migration)
         $this->project->characters()->where('character_id', $characterId)->delete();
@@ -109,6 +116,17 @@ new #[Layout('layouts.app')] class extends Component {
     }
 
     public function createRelationship($fromId, $toId, $relationshipTypeId) {
+        $duplicate = Relationship::where('relationship_type_id', $relationshipTypeId)
+            ->where(function ($query) use ($fromId, $toId) {
+                $query->where(fn ($q) => $q->where('from_id', $fromId)->where('to_id', $toId))
+                    ->orWhere(fn ($q) => $q->where('from_id', $toId)->where('to_id', $fromId));
+            })
+            ->exists();
+
+        if ($duplicate) {
+            return null;
+        }
+
         $relationship = Relationship::create([
             'from_id' => $fromId,
             'to_id' => $toId,
@@ -133,14 +151,6 @@ new #[Layout('layouts.app')] class extends Component {
 
         <div class="flex justify-between items-center">
             <h1 class="text-app-title-1 text-text-100">Characters Sheet</h1>
-
-            <button
-                @click="window.dispatchEvent(new CustomEvent('open-edit-characters'))"
-                class="flex items-center gap-4 text-web-button text-[var(--color-text-60)] p-2 rounded hover:bg-[var(--color-brand-50)] hover:text-[var(--color-secondary-200)] transition-colors"
-            >
-                Edit Character Details
-                <x-icons.rename class="w-4 h-4 stroke-2 group-hover:text-[var(--color-secondary-200)] transition-colors" />
-            </button>
         </div>
     </div>
 
@@ -157,29 +167,30 @@ new #[Layout('layouts.app')] class extends Component {
             x-on:character-created.window="characters.push($event.detail.character)"
             @wheel.prevent="if (characters.length > 0) onWheel($event)"
             @mousedown="if (characters.length > 0) startPan($event)"
-            @mousemove="if (characters.length > 0) { onPan($event); onDragChar($event); }"
-            @mouseup="stopPan(); stopDragChar()"
-            @mouseleave="stopPan(); stopDragChar()"
-            :style="`background-image: radial-gradient(circle, #C9BBA3 ${1.5 * zoom}px, transparent ${1.5 * zoom}px); background-size: ${22 * zoom}px ${22 * zoom}px; background-position: ${panX}px ${panY}px;`"
+            @mousemove="if (characters.length > 0) { onPan($event); onDragChar($event); onDragLabel($event); }"
+            @mouseup="stopPan(); stopDragChar(); stopDragLabel()"
+            @mouseleave="stopPan(); stopDragChar(); stopDragLabel()"
+            :style="`background-image: radial-gradient(circle, var(--color-brand-150) ${1.5 * zoom}px, transparent ${1.5 * zoom}px); background-size: ${22 * zoom}px ${22 * zoom}px; background-position: ${panX}px ${panY}px;`"
             :class="characters.length === 0 ? 'cursor-default' : (isAnyPopupOpen() ? 'cursor-auto' : (panning ? 'cursor-grabbing' : 'cursor-grab'))"
-            class="relative w-full h-full rounded-xl border border-brand-200 bg-[#F5EFE9] overflow-hidden"
+            class="relative w-full h-full rounded-xl border border-brand-200 bg-brand-10 overflow-hidden"
             wire:ignore
         >
             <div x-ref="canvas" class="absolute inset-0 origin-top-left" :style="`transform: translate(${panX}px, ${panY}px) scale(${zoom}); width: 2400px; height: 1800px;`">
 
                 {{-- Garis relasi (di belakang karakter), tetap tampil selama sesi --}}
-                {{-- Pakai div yang diputar (bukan SVG), karena <template x-for> tidak bisa
-                     meng-clone elemen SVG dengan namespace yang benar. Posisi dihitung ulang
-                     tiap render lewat relationLine(), jadi ikut bergerak saat karakter di-drag --}}
-                <template x-for="rel in relationships" :key="'line-' + rel.id">
-                    <div
-                        class="absolute z-10 cursor-pointer"
-                        :style="`left: ${relationLine(rel).x1}px; top: ${relationLine(rel).y1 - 7}px; width: ${relationLine(rel).length}px; height: 14px; transform-origin: left center; transform: rotate(${relationLine(rel).angle}rad);`"
-                        @click="openEditRelation(rel)"
-                    >
-                        <div class="absolute inset-x-0 top-1/2 -translate-y-1/2 h-[2px]" :style="`background-color: ${rel.textColor};`"></div>
-                    </div>
-                </template>
+                {{-- Digambar sebagai SVG <path> lewat x-html (bukan <template x-for>),
+                     karena Alpine tidak bisa meng-clone elemen SVG dengan namespace yang
+                     benar lewat template cloning. Melengkung otomatis kalau ada lebih dari
+                     1 relasi antara pasangan karakter yang sama, supaya tidak tumpang tindih.
+                     Posisi dihitung ulang tiap render lewat relationLine(), jadi ikut
+                     bergerak saat karakter di-drag. --}}
+                <svg
+                    class="absolute inset-0 z-10 pointer-events-none"
+                    :width="canvasW" :height="canvasH"
+                    style="overflow: visible;"
+                    @click="onEdgeClick($event)"
+                    x-html="edgePathsMarkup()"
+                ></svg>
 
                 {{-- Posisi karakter dibuat reaktif (bukan dari Blade statis) supaya bisa di-drag --}}
                 <template x-for="char in characters" :key="char.id">
@@ -190,16 +201,15 @@ new #[Layout('layouts.app')] class extends Component {
                         @mousedown.stop="startDragChar($event, char)"
                         @click="if (!dragMoved) { if (addingRelation && relationSourceId !== char.id) { selectTarget(char.id) } else if (!addingRelation) { openCharacterInfo(char) } }"
                         :data-character-id="char.id"
-                        class="absolute flex flex-col items-center gap-2 pt-11 px-6 select-none"
+                        class="absolute cursor-pointer flex flex-col items-center gap-2 pt-11 px-6 select-none"
                         :class="draggingId === char.id ? 'cursor-grabbing z-40' : 'cursor-grab z-20'"
                         :style="`top: ${char.top - 44}px; left: ${char.left - 24}px;`"
                     >
                         <div class="relative w-20 h-20">
-                            {{-- Tombol Add Relation, muncul saat hover & belum dalam mode pilih target --}}
                             <button
                                 x-show="hoverSelf && !addingRelation"
                                 @click.stop="startAddRelation(char.id)"
-                                class="absolute -top-9 left-1/2 -translate-x-1/2 whitespace-nowrap p-2 rounded-full bg-brand-150 border border-brand-100 text-app-desc-feature font-semibold text-text-80 hover:bg-brand-200 transition-colors shadow-sm"
+                                class=" cursor-pointer absolute -top-10 left-1/2 -translate-x-1/2 whitespace-nowrap p-2 rounded-full bg-brand-150 border border-brand-100 text-app-desc-feature font-semibold text-text-80 hover:bg-brand-200 transition-colors shadow-sm"
                             >
                                 + Add Relation
                             </button>
@@ -216,17 +226,21 @@ new #[Layout('layouts.app')] class extends Component {
                                 <x-icons.default-avatar x-show="!char.imagePath" class="w-full h-full" />
                             </div>
                         </div>
-                        <span class="text-app-feature text-text-80 border border-brand-100 bg-brand-100 px-2 py-1 rounded" x-text="char.name"></span>
+                        <span class="text-app-caption font-semibold max-w-20 text-text-80 border border-brand-100 bg-brand-100 px-2 py-1 rounded truncate" x-text="char.name"></span>
                     </div>
                 </template>
 
                 {{-- Label nama relasi, dirender terpisah supaya tidak pernah tertutup garis,
-                     tapi z-index-nya di bawah semua karakter supaya karakter selalu tampil di atas label --}}
+                     tapi z-index-nya di bawah semua karakter supaya karakter selalu tampil di atas label.
+                     Bisa di-drag tegak lurus terhadap garis A-B buat atur bentuk kurvanya sendiri
+                     (disimpan per-relasi lewat updateRelationshipCurve, lihat curveOffset). --}}
                 <template x-for="rel in relationships" :key="'label-' + rel.id">
                     <span
-                        class="absolute z-[15] text-app-desc-feature font-semibold cursor-pointer whitespace-nowrap px-2 py-1 rounded"
+                        class="absolute z-[15] text-app-desc-feature font-semibold whitespace-nowrap px-2 py-1 rounded select-none"
+                        :class="draggingLabelRelId === rel.id ? 'cursor-grabbing' : 'cursor-grab'"
                         :style="`left: ${relationLine(rel).midX}px; top: ${relationLine(rel).midY}px; transform: translate(-50%, -50%) rotate(${relationLine(rel).labelAngle}rad); color: ${rel.textColor}; background-color: ${rel.bgColor};`"
-                        @click="openEditRelation(rel)"
+                        @mousedown.stop="startDragLabel($event, rel)"
+                        @click="if (!labelDragMoved) openEditRelation(rel)"
                         x-text="rel.name"
                     ></span>
                 </template>
@@ -277,22 +291,22 @@ new #[Layout('layouts.app')] class extends Component {
                 <span
                     x-show="hoverAdd"
                     x-transition
-                    class="absolute -top-11 right-0 whitespace-nowrap p-2 rounded-full bg-brand-150 border border-brand-200 text-app-desc-feature font-semibold text-text-80 shadow-sm"
+                    class="absolute -top-11 right-0 whitespace-nowrap p-2 rounded-md bg-text-100/60 text-app-caption font-semibold text-bg-main shadow-sm"
                 >
                     Add New Character
                 </span>
-                <button
+                <button 
                     @mouseenter="hoverAdd = true"
                     @mouseleave="hoverAdd = false"
                     wire:click="addCharacter"
-                    class="w-12 h-12 rounded-full bg-brand-150 border border-secondary-100 text-text-80 flex items-center justify-center hover:bg-brand-200 transition-colors shadow-sm"
-                >
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3"><path stroke-linecap="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+                    class="w-12 h-12 bg-secondary-100 rounded-full flex items-center justify-center shadow-xl hover:bg-secondary-200 hover:-translate-y-1 transition-all duration-200 border-1 border-bg-main">
+                    
+                    <x-icons.add-default class="text-white w-4 h-4" />
+
                 </button>
             </div>
         </div>
     </div>
 
     <livewire:projects.relation-type-popup :project="$project" />
-    <livewire:projects.character-details-popup :project="$project" />
 </div>

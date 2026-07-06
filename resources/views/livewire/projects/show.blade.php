@@ -211,12 +211,6 @@ new #[Layout('layouts.app')] class extends Component {
 }; ?>
 
 <div>
-    <style>
-        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background-color: #D5C6A9; border-radius: 10px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background-color: #B69F78; }
-    </style>
 
     <div class="p-6 lg:p-10 max-w-7xl mx-auto">
         <x-breadcrumb :items="[
@@ -261,21 +255,7 @@ new #[Layout('layouts.app')] class extends Component {
                         </button>
                     @endif
 
-                    @once
-                        <script type="module" src="https://cdn.jsdelivr.net/npm/emoji-picker-element@1/index.js"></script>
-                        <style>
-                            emoji-picker {
-                                width: 100%;
-                                height: 300px;
-                                --background: #FDFBF7; /* Warna warm-white */
-                                --border-color: transparent;
-                                --indicator-color: #8B7355; /* Aksen warna tua/hangat */
-                                --font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
-                                --button-hover-background: #f0eadd;
-                                --search-background: #f0eadd;
-                            }
-                        </style>
-                    @endonce
+
                 </div>
 
                 <div wire:loading.flex wire:target="cover_image" class="absolute inset-y-0 left-0 right-4 w-[calc(100%-16px)] bg-[#F5EFE9]/70 backdrop-blur-md z-40 items-center justify-center rounded-l-md rounded-r-lg transition-all">
@@ -286,7 +266,76 @@ new #[Layout('layouts.app')] class extends Component {
             <div class="flex-1 min-w-0 relative">
                 <div class="static lg:absolute inset-0 bg-brand-50 border border-brand-150 p-8 pb-16 rounded-lg flex flex-col">
 
-                <div class="flex justify-between items-start mb-4" x-data="{ showIconPicker: false, tab: 'emoji' }">
+                <div class="flex justify-between items-start mb-4" x-data="{
+                    showIconPicker: false, 
+                    tab: 'emoji',
+                    async initPicmo() {
+                        if (!window.EmojiMart) {
+                            await new Promise(resolve => {
+                                const script = document.createElement('script');
+                                script.src = 'https://cdn.jsdelivr.net/npm/emoji-mart@latest/dist/browser.js';
+                                script.onload = resolve;
+                                document.head.appendChild(script);
+                            });
+                        }
+                        if (!window.emojiMartData) {
+                            const response = await fetch('https://cdn.jsdelivr.net/npm/@emoji-mart/data');
+                            window.emojiMartData = await response.json();
+                        }
+                        this.renderPicker();
+                    },
+                    renderPicker() {
+                        const pickerOptions = {
+                            data: window.emojiMartData,
+                            onEmojiSelect: (e) => {
+                                $wire.setEmoji(e.native);
+                                this.showIconPicker = false;
+                            },
+                            theme: 'light',
+                            set: 'native',
+                            previewPosition: 'none',
+                            skinTonePosition: 'search',
+                            navPosition: 'bottom',
+                            maxFrequentRows: 1
+                        };
+                        const picker = new window.EmojiMart.Picker(pickerOptions);
+                        
+                        // Prevent context menu directly on the picker element 
+                        // (Alpine's @contextmenu on wrapper fails over Shadow DOM boundaries in some browsers)
+                        picker.addEventListener('contextmenu', (e) => e.preventDefault());
+                        
+                        // EmojiMart v5 uses --rgb-accent for the active tab indicator and focus rings.
+                        // We set it to Spindle's brown (140, 117, 88 in RGB)
+                        picker.style.setProperty('--rgb-accent', '140, 117, 88');
+                        
+                        this.$refs.picmoContainer.innerHTML = '';
+                        this.$refs.picmoContainer.appendChild(picker);
+
+                        // Inject smooth scrolling CSS into the Shadow DOM
+                        setTimeout(() => {
+                            try {
+                                const style = document.createElement('style');
+                                style.textContent = `
+                                    .scroll {
+                                        scroll-behavior: smooth !important;
+                                    }
+                                `;
+                                picker.shadowRoot.appendChild(style);
+
+                                // Optimization: Block hover events inside the skin tone menu
+                                // EmojiMart v5 causes massive lag by re-rendering all emojis on hover to preview skin tones.
+                                // Stopping these events prevents the live preview, eliminating the lag entirely.
+                                ['mouseover', 'mouseout', 'mouseenter', 'mouseleave'].forEach(evt => {
+                                    picker.shadowRoot.addEventListener(evt, (e) => {
+                                        if (e.target.closest && e.target.closest('.menu')) {
+                                            e.stopPropagation();
+                                        }
+                                    }, true); // Use capture phase to intercept before Preact
+                                });
+                            } catch(e) {}
+                        }, 50);
+                    }
+                }" x-init="$watch('showIconPicker', value => { if(value && tab === 'emoji') initPicmo() }); $watch('tab', value => { if(value === 'emoji' && showIconPicker) initPicmo() })">
                     <div class="flex-1 min-w-0 mr-4">
                         
                         {{-- Ikon Dinamis --}}
@@ -310,8 +359,13 @@ new #[Layout('layouts.app')] class extends Component {
                         {{-- Pop-up Notion Style --}}
                         <div x-show="showIconPicker" 
                             @click.away="showIconPicker = false"
-                            x-transition.opacity.duration.200ms
-                            class="absolute left-10 top-12 z-50 w-80 rounded-lg border border-brand-200 bg-bg-main shadow-xl flex flex-col"
+                            x-transition:enter="transition ease-out duration-200"
+                            x-transition:enter-start="opacity-0 -translate-y-2 scale-95"
+                            x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+                            x-transition:leave="transition ease-in duration-150"
+                            x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+                            x-transition:leave-end="opacity-0 -translate-y-2 scale-95"
+                            class="absolute left-10 top-12 z-50 w-[352px] rounded-lg border border-brand-200 bg-bg-main shadow-xl flex flex-col origin-top-left"
                             style="display: none;">
                             
                             {{-- Header & Tabs --}}
@@ -338,14 +392,13 @@ new #[Layout('layouts.app')] class extends Component {
                                 </button>
                             </div>
 
-                            {{-- Tab Emoji (Web Component) --}}
-                            <div x-show="tab === 'emoji'">
-                                <emoji-picker class="border-0 shadow-none rounded-b-lg" 
-                                            @emoji-click="
-                                                $wire.setEmoji($event.detail.unicode); 
-                                                showIconPicker = false;
-                                            ">
-                                </emoji-picker>
+                            {{-- Tab Emoji (Web Component / EmojiMart) --}}
+                            <div x-show="tab === 'emoji'" wire:ignore @contextmenu.prevent>
+                                <div x-ref="picmoContainer" class="rounded-b-lg overflow-hidden flex items-center justify-center bg-bg-main min-h-[350px]">
+                                    <div class="py-12 flex justify-center w-full">
+                                        <svg class="animate-spin h-8 w-8 text-secondary-200" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                    </div>
+                                </div>
                             </div>
 
                             {{-- Tab Upload Image --}}
@@ -529,21 +582,23 @@ new #[Layout('layouts.app')] class extends Component {
                 <div x-data="{
                     editingSyn: false,
                     hoverSyn: false,
-                    showMore: false,
                     isOverflowing: false,
+                    isAtBottom: false,
                     localSyn: @entangle('synopsis'),
-                    checkOverflow() {
+                    checkScroll() {
                         if(this.$refs.synText) {
-                            this.isOverflowing = this.$refs.synText.scrollHeight > 140 && this.localSyn.trim() !== '';
+                            const el = this.$refs.synText;
+                            this.isOverflowing = el.scrollHeight > el.clientHeight;
+                            this.isAtBottom = el.scrollHeight - el.scrollTop <= el.clientHeight + 2;
                         }
                     },
                     init() {
-                        setInterval(() => this.checkOverflow(), 1000);
-                        this.$watch('localSyn', () => this.$nextTick(() => this.checkOverflow()));
-                        setTimeout(() => this.checkOverflow(), 200);
+                        setInterval(() => this.checkScroll(), 1000);
+                        this.$watch('localSyn', () => this.$nextTick(() => this.checkScroll()));
+                        setTimeout(() => this.checkScroll(), 200);
                     }
                 }"
-                @resize.window="checkOverflow()"
+                @resize.window="checkScroll()"
                 class="w-full lg:flex-1 lg:min-h-0 flex flex-col">
                     <div @mouseover="hoverSyn = true" @mouseleave="hoverSyn = false" class="flex items-center gap-3 mb-2 shrink-0">
                         <span class="text-app-heading-2 text-text-80">Synopsis</span>
@@ -554,39 +609,28 @@ new #[Layout('layouts.app')] class extends Component {
                         </button>
                     </div>
 
-                    <div x-show="!editingSyn" class="lg:flex-1 lg:min-h-0 flex flex-col relative pb-16">
+                    <div x-show="!editingSyn" class="lg:flex-1 lg:min-h-0 flex flex-col relative pb-4">
                         <div class="relative group w-full lg:flex-1 lg:min-h-0 shrink flex flex-col">
                             <div
                                 x-ref="synText"
+                                @scroll="checkScroll()"
                                 @dblclick="editingSyn = true; setTimeout(() => $refs.synInput.focus(), 50)"
-                                class="text-app-body-medium text-text-80 leading-[1.6] select-none cursor-pointer w-full shrink min-h-0"
-                                :class="showMore ? 'lg:overflow-y-auto pr-3 custom-scrollbar lg:flex-1' : 'max-h-[140px] overflow-hidden'"
+                                class="text-app-body-medium text-text-80 leading-[1.6] select-none cursor-pointer w-full shrink min-h-0 max-h-[140px] lg:max-h-none lg:flex-1 overflow-y-auto pr-3 custom-scrollbar"
                             >
                                 <div x-show="localSyn.trim() !== ''" class="whitespace-pre-wrap" x-text="localSyn.trim()"></div>
                                 <div x-show="localSyn.trim() === ''" class="text-app-desc-feature text-text-60">Write your synopsis here!</div>
                             </div>
-                            <div x-show="isOverflowing && !showMore" class="absolute bottom-0 left-0 w-full h-16 bg-gradient-to-t from-[#F5EFE9] via-[#F5EFE9]/90 to-transparent pointer-events-none"></div>
-                        </div>
-
-                        <div x-show="isOverflowing && localSyn.trim() !== '' && !editingSyn" class="absolute bottom-6 left-0 w-full flex justify-center">
-                            <button
-                                @click="showMore = !showMore; if(!showMore) { $nextTick(() => checkOverflow()); $refs.synText.scrollTop = 0; }"
-                                class="text-app-feature text-text-70 hover:text-secondary-200 cursor-pointer flex items-center gap-1 z-10 px-4 py-1 rounded-full transition-colors"
-                            >
-                                <svg class="w-4 h-4 transition-transform" :class="showMore ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
-                                <span x-text="showMore ? 'Show Less' : 'Show More'"></span>
-                            </button>
+                            <div x-show="isOverflowing && !isAtBottom" class="absolute bottom-0 left-0 w-full h-12 bg-gradient-to-t from-[#F5EFE9] via-[#F5EFE9]/80 to-transparent pointer-events-none transition-opacity duration-300"></div>
                         </div>
                     </div>
 
                     <textarea
                         x-show="editingSyn"
                         x-model="localSyn"
-                                class="text-app-feature text-text-70 hover:text-secondary-200 cursor-pointer flex items-center gap-1 z-10 px-4 py-1 rounded-full transition-colors"
                         x-ref="synInput"
-                        @click.outside="if(editingSyn) { $wire.saveSynopsis(); editingSyn = false; showMore = false; $nextTick(() => checkOverflow()); }"
-                        @keydown.ctrl.enter="$wire.saveSynopsis(); editingSyn = false; showMore = false; $nextTick(() => checkOverflow())"
-                        @keydown.escape="editingSyn = false; showMore = false; localSyn = `{{ addslashes($project->synopsis ?? '') }}`; $nextTick(() => checkOverflow())"
+                        @click.outside="if(editingSyn) { $wire.saveSynopsis(); editingSyn = false; $nextTick(() => checkScroll()); }"
+                        @keydown.ctrl.enter="$wire.saveSynopsis(); editingSyn = false; $nextTick(() => checkScroll())"
+                        @keydown.escape="editingSyn = false; localSyn = `{{ addslashes($project->synopsis ?? '') }}`; $nextTick(() => checkScroll())"
                         class="w-full mt-2 lg:flex-1 lg:min-h-0 min-h-[150px] text-app-body-medium text-text-60 bg-transparent border-2 border-[#D5C6A9] rounded-md outline-none resize-none p-4 focus:border-[#A08866] transition-colors custom-scrollbar"
                     ></textarea>
                 </div>
@@ -715,15 +759,14 @@ new #[Layout('layouts.app')] class extends Component {
                                     <div class="min-w-0 flex-1 gap-1 py-1">
                                         <p class="text-app-title-1 leading-none text-[18px] text-text-80 truncate group-hover:text-secondary-200 transition-colors">{{ $character->nick_name }}</p>
                                             <div class="mt-1.5">
+                                                @php
+                                                    $visibleTags = $character->hashtags->take(1);
+                                                    $remainingTagCount = $character->hashtags->count() - $visibleTags->count();
+                                                @endphp
                                                 <div class="flex items-center gap-1 flex-nowrap overflow-hidden">
                                                     <span class="text-app-body-small text-subtext-90 shrink-0">Tags :</span>
                                                     
                                                     @if($character->hashtags->isNotEmpty())
-                                                        @php
-                                                            $visibleTags = $character->hashtags->take(1);
-                                                            $remainingTagCount = $character->hashtags->count() - $visibleTags->count();
-                                                        @endphp
-                                                        
                                                         @foreach($visibleTags as $tag)
                                                             <span class="px-2 py-0.5 rounded-full bg-brand-100 text-app-caption text-text-70 shrink-0 truncate max-w-[80px]">
                                                                 {{ $tag->name }}
@@ -738,7 +781,7 @@ new #[Layout('layouts.app')] class extends Component {
                                                 </div>
 
                                                 {{-- Remaining Tags Badge --}}
-                                                @if(!empty($remainingTagCount) && $remainingTagCount > 0)
+                                                @if($remainingTagCount > 0)
                                                     <span class="inline-block mt-1 px-2 py-0.5 rounded-full bg-brand-150 text-app-caption text-text-70">
                                                         +{{ $remainingTagCount }} tags
                                                     </span>

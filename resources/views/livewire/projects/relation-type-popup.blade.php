@@ -53,9 +53,27 @@ new class extends Component {
     #[Renderless]
     public function updateRelationship(string $relationshipId, string $typeId): void {
         $characterIds = $this->project->characters()->pluck('character_id');
-        Relationship::where('relationship_id', $relationshipId)
+        $relationship = Relationship::where('relationship_id', $relationshipId)
             ->where(fn ($q) => $q->whereIn('from_id', $characterIds)->orWhereIn('to_id', $characterIds))
-            ->update(['relationship_type_id' => $typeId]);
+            ->first();
+
+        if (! $relationship) {
+            return;
+        }
+
+        $duplicate = Relationship::where('relationship_id', '!=', $relationshipId)
+            ->where('relationship_type_id', $typeId)
+            ->where(function ($query) use ($relationship) {
+                $query->where(fn ($q) => $q->where('from_id', $relationship->from_id)->where('to_id', $relationship->to_id))
+                    ->orWhere(fn ($q) => $q->where('from_id', $relationship->to_id)->where('to_id', $relationship->from_id));
+            })
+            ->exists();
+
+        if ($duplicate) {
+            return;
+        }
+
+        $relationship->update(['relationship_type_id' => $typeId]);
     }
 
     #[Renderless]
@@ -71,6 +89,7 @@ new class extends Component {
     x-data="{
         showPopup: false,
         editingRelationId: null,
+        editingRelationSavedTypeId: null,
         selectedTypeId: null,
         newTypeName: '',
         newTypePalette: { textColor: '#8C7558', bgColor: '#EAE1D5' },
@@ -80,24 +99,36 @@ new class extends Component {
         confirmingDeleteType: false,
         charFromName: null,
         charToName: null,
+        usedTypeIds: [],
         types: @js($relationshipTypes),
         palette: [
-            { textColor: '#2E7D32', bgColor: '#C8E6C9' },
-            { textColor: '#1565C0', bgColor: '#BBDEFB' },
-            { textColor: '#AD1457', bgColor: '#F8BBD0' },
-            { textColor: '#6A1B9A', bgColor: '#E1BEE7' },
-            { textColor: '#E65100', bgColor: '#FFE0B2' },
-            { textColor: '#C62828', bgColor: '#FFCDD2' },
-            { textColor: '#00695C', bgColor: '#B2DFDB' },
-            { textColor: '#8C7558', bgColor: '#EAE1D5' },
-            { textColor: '#283593', bgColor: '#C5CAE9' },
-            { textColor: '#5D4037', bgColor: '#D7CCC8' },
-            { textColor: '#37474F', bgColor: '#CFD8DC' },
+            { textColor: '#43A047', bgColor: '#C8E6C9' },
+            { textColor: '#1E88E5', bgColor: '#BBDEFB' },
+            { textColor: '#D81B60', bgColor: '#F8BBD0' },
+            { textColor: '#8E24AA', bgColor: '#E1BEE7' },
+            { textColor: '#FB8C00', bgColor: '#FFE0B2' },
+            { textColor: '#E53935', bgColor: '#FFCDD2' },
+            { textColor: '#00897B', bgColor: '#B2DFDB' },
+            { textColor: '#F9A825', bgColor: '#FFF9C4' },
+            { textColor: '#3949AB', bgColor: '#C5CAE9' },
+            { textColor: '#00ACC1', bgColor: '#B2EBF2' },
+            { textColor: '#C0CA33', bgColor: '#F0F4C3' },
+            { textColor: '#F4511E', bgColor: '#FFCCBC' },
         ],
         isDuplicateTypeName() {
             const name = this.newTypeName.trim().toLowerCase();
             if (name === '') return false;
             return this.types.some(t => t.name.trim().toLowerCase() === name);
+        },
+        isTypeDisabled(typeId) {
+            return this.usedTypeIds.includes(typeId) && typeId !== this.editingRelationSavedTypeId;
+        },
+        selectType(typeId) {
+            if (this.isTypeDisabled(typeId)) return;
+            this.selectedTypeId = typeId;
+            this.newTypeName = '';
+            this.newTypePalette = { textColor: '#8C7558', bgColor: '#EAE1D5' };
+            this.showColorPicker = false;
         },
         async saveRelation() {
             let type = null;
@@ -123,13 +154,14 @@ new class extends Component {
             this.close();
         },
         async deleteType(typeId) {
+            const shouldCloseForEdit = this.editingRelationId && this.editingRelationSavedTypeId === typeId;
             this.types = this.types.filter(t => t.id !== typeId);
             if (this.selectedTypeId === typeId) this.selectedTypeId = null;
             this.pendingDeleteTypeId = null;
             this.confirmingDeleteType = false;
             await this.$wire.call('deleteRelationshipType', typeId);
             window.dispatchEvent(new CustomEvent('relation-type-deleted', { detail: { typeId } }));
-            this.close()
+            if (shouldCloseForEdit) this.close();
         },
         async deleteRelation() {
             if (!this.editingRelationId) return;
@@ -141,6 +173,7 @@ new class extends Component {
         close() {
             this.showPopup = false;
             this.editingRelationId = null;
+            this.editingRelationSavedTypeId = null;
             this.selectedTypeId = null;
             this.newTypeName = '';
             this.newTypePalette = { textColor: '#8C7558', bgColor: '#EAE1D5' };
@@ -150,24 +183,31 @@ new class extends Component {
             this.confirmingDeleteType = false;
             this.charFromName = null;
             this.charToName = null;
+            this.usedTypeIds = [];
             window.dispatchEvent(new CustomEvent('relation-popup-closed'));
         },
     }"
     @open-relation-type-popup.window="
         editingRelationId = null;
+        editingRelationSavedTypeId = null;
         selectedTypeId = null;
         newTypeName = '';
         newTypePalette = { textColor: '#8C7558', bgColor: '#EAE1D5' };
         showColorPicker = false;
         confirmingDeleteRel = false;
         confirmingDeleteType = false;
+        charFromName = $event.detail.charFromName ?? null;
+        charToName = $event.detail.charToName ?? null;
+        usedTypeIds = $event.detail.usedTypeIds ?? [];
         showPopup = true;
     "
     @open-edit-relation-popup.window="
         editingRelationId = $event.detail.relationId;
+        editingRelationSavedTypeId = $event.detail.typeId ?? null;
         selectedTypeId = $event.detail.typeId ?? null;
         charFromName = $event.detail.charFromName ?? null;
         charToName = $event.detail.charToName ?? null;
+        usedTypeIds = $event.detail.usedTypeIds ?? [];
         newTypeName = '';
         newTypePalette = { textColor: '#8C7558', bgColor: '#EAE1D5' };
         showColorPicker = false;
@@ -198,21 +238,40 @@ new class extends Component {
 
                 <div class="flex flex-col gap-1 text-center">
                     <h3 class="text-app-title-1 text-[28px] text-text-80" x-text="editingRelationId ? 'Edit Relationship' : 'Choose Relationship Type'"></h3>
-                    <p x-show="editingRelationId && charFromName && charToName" style="display:none;"
-                        class="text-[12px] text-text-60 font-medium"
-                        x-text="charFromName + ' ↔ ' + charToName"
-                    ></p>
+                    <div x-show="charFromName && charToName" style="display:none;" 
+                        class="flex flex-row items-center justify-center gap-3">
+                        
+                        <!-- Nama Karakter Pertama -->
+                        <p class="text-app-desc-feature text-text-80 bg-brand-100 rounded-full px-4 py-1.5 border border-brand-150"
+                        x-text="charFromName">
+                        </p>
+
+                        <!-- Ikon Penghubung -->
+                        <div class="text-secondary-100 flex items-center justify-center">
+                            <x-icons.relationship class="w-5 h-5"/>
+                        </div>
+
+                        <!-- Nama Karakter Kedua -->
+                        <p class="text-app-desc-feature text-text-80 bg-brand-100 rounded-full px-4 py-1.5 border border-brand-150"
+                        x-text="charToName">
+                        </p>
+                        
+                    </div>
                 </div>
+
                 <div class="flex flex-col gap-3">
-                    <div class="flex flex-wrap gap-2 max-h-40 overflow-y-auto">
+                    <div class="flex flex-wrap gap-2 max-h-40 overflow-y-auto custom-scrollbar">
                         <template x-for="rt in types" :key="rt.id">
                             <div
                                 class="flex items-center gap-1 rounded-full pl-3 pr-1.5 py-1.5 border-2 transition-all"
+                                :class="isTypeDisabled(rt.id) ? 'opacity-40' : ''"
                                 :style="`background-color: ${rt.bgColor}; border-color: ${selectedTypeId === rt.id ? rt.textColor : 'transparent'};`"
                             >
                                 <button
-                                    @click="selectedTypeId = rt.id; newTypeName = ''; newTypePalette = { textColor: '#8C7558', bgColor: '#EAE1D5' }; showColorPicker = false"
+                                    @click="selectType(rt.id)"
+                                    :disabled="isTypeDisabled(rt.id)"
                                     class="text-app-body-medium"
+                                    :class="isTypeDisabled(rt.id) ? 'cursor-not-allowed' : ''"
                                     :style="`color: ${rt.textColor}`"
                                     x-text="rt.name"
                                 ></button>
@@ -228,15 +287,21 @@ new class extends Component {
                     </div>
 
                     <div class="flex items-center gap-2">
-                        <input
-                            type="text"
-                            x-model="newTypeName"
-                            @input="selectedTypeId = null"
-                            maxlength="20"
-                            placeholder="New type..."
-                            :class="isDuplicateTypeName() ? 'border-danger-100' : 'border-brand-200'"
-                            class="flex-1 min-w-0 px-3 py-2 bg-bg-main border rounded-md outline-none text-app-body-small text-text-80 focus:border-secondary-150 focus:border-2 transition-colors"
-                        >
+                        <div class="relative flex-1 min-w-0">
+                            <input
+                                type="text"
+                                x-model="newTypeName"
+                                @input="selectedTypeId = null"
+                                @keydown.enter="if (!((!selectedTypeId && newTypeName.trim() === '') || isDuplicateTypeName())) saveRelation()"
+                                maxlength="20"
+                                placeholder="New type..."
+                                :class="isDuplicateTypeName() ? 'border-danger-100' : 'border-brand-200'"
+                                class="w-full px-3 py-2 pr-10 bg-bg-main border rounded-md outline-none text-app-body-small text-text-80 focus:border-secondary-150 focus:border-2 transition-colors"
+                            >
+                            <span class="absolute right-3 top-1/2 -translate-y-1/2 text-app-desc-feature text-subtext-90 pointer-events-none">
+                                <span x-text="newTypeName.length"></span>/20
+                            </span>
+                        </div>
                         <div class="relative shrink-0">
                             <button
                                 type="button"
@@ -248,7 +313,7 @@ new class extends Component {
                                 x-show="showColorPicker"
                                 @click.away="showColorPicker = false"
                                 style="display: none;"
-                                class="absolute bottom-full right-0 mb-2 z-10 flex flex-wrap gap-2 bg-bg-main border border-brand-150 rounded-lg p-2 w-36"
+                                class="absolute bottom-full right-0 mb-2 z-10 grid grid-cols-3 gap-2 bg-bg-main border border-brand-150 rounded-lg p-2 w-[calc(3*1.75rem+2*0.5rem+2*0.5rem)]"
                             >
                                 <template x-for="(p, pIdx) in palette" :key="pIdx">
                                     <button
@@ -268,7 +333,7 @@ new class extends Component {
                                x-show="editingRelationId" 
                                style="display:none;" 
                                @click="confirmingDeleteRel = true" 
-                               class="flex-1 py-3 rounded-lg border border-danger-100 text-app-feature text-danger-100 hover:bg-danger-100/10 transition-colors"
+                               class="cursor-pointer flex-1 py-3 rounded-lg border border-danger-100 text-app-feature text-danger-100 hover:bg-danger-100/10 transition-colors"
                             >Delete
                         </button>
 
@@ -276,7 +341,7 @@ new class extends Component {
                             @click="saveRelation()"
                             :disabled="(!selectedTypeId && newTypeName.trim() === '') || isDuplicateTypeName()"
                             :class="((!selectedTypeId && newTypeName.trim() === '') || isDuplicateTypeName()) ? 'opacity-40 cursor-not-allowed' : ''"
-                            class="flex-1 py-3 rounded-lg bg-brand-150 text-app-feature text-text-80 hover:bg-brand-200 transition-colors"
+                            class="cursor-pointer flex-1 py-3 rounded-lg bg-secondary-100 text-app-feature text-bg-main hover:bg-secondary-150 transition-colors"
                         >Save</button>
                     </div>
                 </div>
