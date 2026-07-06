@@ -208,7 +208,7 @@ new class extends Component {
                                 <button @click="editing = true; menuOpen = false; setTimeout(() => $refs.nameInput.focus(), 50)" class="w-full text-left px-4 py-2 text-app-body-medium text-text-80 hover:bg-brand-10 flex items-center gap-3">
                                     <x-icons.rename class="w-4 h-4" /> Rename
                                 </button>
-                                <button wire:click="archiveSection('{{ $section->section_id }}')" wire:confirm="Are you sure you want to archive this section? You can restore it from the Archive page." @click="menuOpen = false" class="w-full text-left px-4 py-2 text-app-body-medium text-text-80 hover:bg-brand-10 flex items-center gap-3">
+                                <button @click="$dispatch('open-archive-section-dialog', { id: '{{ $section->section_id }}' }); menuOpen = false" class="w-full text-left px-4 py-2 text-app-body-medium text-text-80 hover:bg-brand-10 flex items-center gap-3">
                                     <x-icons.archive class="w-4 h-4" /> Archive
                                 </button>
                             </div>
@@ -288,7 +288,13 @@ new class extends Component {
                                 </div>
 
                                 <div class="flex items-center gap-2 mb-1">
-                                    <x-icons.sidebar-book class="w-4 h-4 text-text-80 shrink-0 group-hover:text-secondary-200 transition-colors" />
+                                    @if($project->icon_type === 'emoji')
+                                        <span class="text-[16px] leading-none shrink-0">{{ $project->icon }}</span>
+                                    @elseif($project->icon_type === 'image' && $project->icon)
+                                        <img src="{{ asset('storage/' . $project->icon) }}" alt="" class="w-4 h-4 object-cover rounded shrink-0">
+                                    @else
+                                        <x-icons.sidebar-book class="w-4 h-4 text-text-80 shrink-0 group-hover:text-secondary-200 transition-colors" />
+                                    @endif
                                     <h3 class="text-app-body-medium text-text-100 truncate group-hover:text-secondary-200 transition-colors">{{ $project->title }}</h3>
                                 </div>
                                 <p class="text-[11px] font-medium text-subtext-90">{{ $project->created_at->format('d F Y') }}</p>
@@ -319,4 +325,20 @@ new class extends Component {
             Add Section
         </span>
     </button>
+
+    <x-confirm-dialog
+        eventName="open-archive-section-dialog"
+        title="Archive this Section?"
+        description="Are you sure you want to archive this section? You can restore it from the Archive page."
+        confirmText="Yes, Archive"
+        cancelText="Cancel"
+        submitAction="archiveSection"
+        iconColor="text-warning-100"
+        iconBg="bg-warning-100/10"
+        btnColor="bg-warning-100 hover:bg-warning-100/90 text-white"
+    >
+        <x-slot:icon>
+            <x-icons.archive class="w-12 h-12" />
+        </x-slot:icon>
+    </x-confirm-dialog>
 </div>

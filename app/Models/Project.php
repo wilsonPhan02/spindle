@@ -16,7 +16,8 @@ class Project extends Model
     protected $fillable = [
         'user_id', 'template_id', 'section_id',
         'title', 'synopsis', 'cover_image_path',
-        'is_pinned', 'archived_at',
+        'is_pinned', 'archived_at', 'icon_type', 
+        'icon',
     ];
 
     public function section()
