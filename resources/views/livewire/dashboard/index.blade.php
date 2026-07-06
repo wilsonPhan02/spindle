@@ -91,7 +91,7 @@ new class extends Component {
     @endphp
 
     <div class="bg-[#F5EFE9] rounded-xl overflow-hidden mb-8 shadow-sm h-[200px] flex justify-between items-end">
-        <div class="w-48 md:w-56 lg:w-60 mb-2 shrink-0 pointer-events-none">
+        <div class="w-36 md:w-44 lg:w-48 mb-10 shrink-0 pointer-events-none">
             <x-left-dashboard class="w-full h-auto block" />
         </div>
         <div class="flex-1 self-center px-4 md:px-8 z-10 min-w-0 flex flex-col items-center"
@@ -150,19 +150,14 @@ new class extends Component {
             
             <p class="text-app-body-large text-text-80 truncate w-full text-center">Are u ready to spin the <span class="italic">yarn</span>?</p>
         </div>
-        <div class="w-48 md:w-56 lg:w-60 shrink-0 pointer-events-none flex justify-end">
+        <div class="w-36 md:w-44 lg:w-48 mb-8 shrink-0 pointer-events-none flex justify-end">
             <x-right-dashboard class="w-full h-auto block" />
         </div>
     </div>
 
     @if(count($sections) === 0)
-        <button wire:click="addSection" class="w-full py-3 mb-16 border border-brand-200 rounded-lg text-subtext-80 hover:bg-[#F5EFE9] transition-colors flex items-center justify-center gap-2">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
-            Add New Section
-        </button>
-
         <div class="flex flex-col items-center justify-center mt-12">
-            <x-empty-dashboard class="w-64 h-64 mb-6 opacity-80" />
+            <x-empty-dashboard class="w-48 h-48 mb-6 opacity-80" />
             <h2 class="text-app-heading-1 text-subtext-80 mb-2">Looks like it's a bit quiet in here...</h2>
             <p class="text-app-body-large text-subtext-70">Ready to create a new one?</p>
         </div>
@@ -176,7 +171,7 @@ new class extends Component {
                             <h2
                                 x-show="!editing"
                                 @dblclick="editing = true; setTimeout(() => $refs.nameInput.focus(), 50)"
-                                class="text-2xl font-merriweather text-text-100 cursor-pointer select-none hover:text-secondary-200 transition-colors truncate"
+                                class="inline-block max-w-full text-2xl font-merriweather text-text-100 cursor-pointer select-none hover:text-secondary-200 transition-colors truncate align-middle"
                                 title="{{ $section->title }}"
                             >
                                 {{ \Illuminate\Support\Str::limit($section->title, 30) }}
@@ -197,7 +192,7 @@ new class extends Component {
                         </div>
 
                         <div class="relative shrink-0">
-                            <button @click="menuOpen = !menuOpen" @click.away="menuOpen = false" class="p-1 hover:bg-brand-150 rounded-md transition-colors">
+                            <button @click="menuOpen = !menuOpen" @click.away="menuOpen = false" class="p-1 hover:bg-brand-150 rounded-md transition-colors cursor-pointer">
                                 <svg class="w-6 h-6 text-text-80" fill="currentColor" viewBox="0 0 24 24"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
                             </button>
 
@@ -319,7 +314,7 @@ new class extends Component {
     @endif
 
     <!-- Floating Action Button for Add Section -->
-    <button wire:click="addSection" class="group fixed bottom-10 right-10 flex flex-row-reverse items-center bg-secondary-200 text-brand-10 rounded-full h-14 w-14 hover:w-44 transition-all duration-300 ease-out shadow-xl hover:bg-secondary-250 overflow-hidden z-50 focus:outline-none">
+    <button wire:click="addSection" class="group fixed bottom-10 right-10 flex flex-row-reverse items-center bg-secondary-200 text-brand-10 rounded-full h-14 w-14 hover:w-44 transition-all duration-300 ease-out shadow-xl hover:bg-secondary-250 overflow-hidden z-50 focus:outline-none cursor-pointer">
         <div class="flex items-center justify-center shrink-0 w-14 h-14">
             <svg class="w-6 h-6 transition-transform duration-300 group-hover:rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
