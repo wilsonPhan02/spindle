@@ -1702,9 +1702,7 @@ new #[Layout('layouts.app')] class extends Component {
                         class="context-menu-item w-full flex items-center gap-2.5 px-3 py-2 text-left text-[#E64C4C]"
                         @click="
                             closeMenu();
-                            if(confirm('Delete \'' + menuNoteTitle + '\'? All sub-tabs will also be deleted.')) {
-                                $wire.deleteNote(menuNoteId);
-                            }
+                            $dispatch('open-delete-note-dialog', { id: menuNoteId });
                         "
                     >
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1718,6 +1716,20 @@ new #[Layout('layouts.app')] class extends Component {
 
         </div>
     </div>
+
+    <x-confirm-dialog
+        eventName="open-delete-note-dialog"
+        title="Delete Note?"
+        description="Are you sure you want to permanently delete this note? All sub-tabs will also be deleted. This action cannot be undone."
+        confirmText="Yes, Delete"
+        cancelText="Cancel"
+        submitAction="deleteNote"
+        btnColor="bg-danger-100 hover:bg-danger-100/90 text-white"
+    >
+        <x-slot:icon>
+            <x-icons.delete-default size="w-15 h-15" color="currentColor" />
+        </x-slot:icon>
+    </x-confirm-dialog>
 </div>
 
 <script>
