@@ -171,7 +171,7 @@ new class extends Component {
                             <h2
                                 x-show="!editing"
                                 @dblclick="editing = true; setTimeout(() => $refs.nameInput.focus(), 50)"
-                                class="text-2xl font-merriweather text-text-100 cursor-pointer select-none hover:text-secondary-200 transition-colors truncate"
+                                class="inline-block max-w-full text-2xl font-merriweather text-text-100 cursor-pointer select-none hover:text-secondary-200 transition-colors truncate align-middle"
                                 title="{{ $section->title }}"
                             >
                                 {{ \Illuminate\Support\Str::limit($section->title, 30) }}
@@ -192,7 +192,7 @@ new class extends Component {
                         </div>
 
                         <div class="relative shrink-0">
-                            <button @click="menuOpen = !menuOpen" @click.away="menuOpen = false" class="p-1 hover:bg-brand-150 rounded-md transition-colors">
+                            <button @click="menuOpen = !menuOpen" @click.away="menuOpen = false" class="p-1 hover:bg-brand-150 rounded-md transition-colors cursor-pointer">
                                 <svg class="w-6 h-6 text-text-80" fill="currentColor" viewBox="0 0 24 24"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
                             </button>
 
@@ -234,7 +234,7 @@ new class extends Component {
                             </a>
                         @endforeach
 
-                        <button wire:click="addProject('{{ $section->section_id }}')" class="w-44 shrink-0 aspect-[2/3] border-2 border-dashed border-brand-200 rounded-xl flex flex-col items-center justify-center text-subtext-80 hover:border-secondary-200 hover:text-secondary-200 hover:bg-[#F5EFE9] transition-all group mb-3">
+                        <button wire:click="addProject('{{ $section->section_id }}')" class="w-44 shrink-0 aspect-[2/3] border-2 border-dashed border-brand-200 rounded-xl flex flex-col items-center justify-center text-subtext-80 hover:border-secondary-200 hover:text-secondary-200 hover:bg-[#F5EFE9] transition-all group mb-3 cursor-pointer">
                             <svg class="w-8 h-8 mb-2 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                             <span class="text-sm font-medium">New Project</span>
                         </button>
@@ -248,7 +248,7 @@ new class extends Component {
     @endif
 
     <!-- Floating Action Button for Add Section -->
-    <button wire:click="addSection" class="group fixed bottom-10 right-10 flex flex-row-reverse items-center bg-secondary-200 text-brand-10 rounded-full h-14 w-14 hover:w-44 transition-all duration-300 ease-out shadow-xl hover:bg-secondary-250 overflow-hidden z-50 focus:outline-none">
+    <button wire:click="addSection" class="group fixed bottom-10 right-10 flex flex-row-reverse items-center bg-secondary-200 text-brand-10 rounded-full h-14 w-14 hover:w-44 transition-all duration-300 ease-out shadow-xl hover:bg-secondary-250 overflow-hidden z-50 focus:outline-none cursor-pointer">
         <div class="flex items-center justify-center shrink-0 w-14 h-14">
             <svg class="w-6 h-6 transition-transform duration-300 group-hover:rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
