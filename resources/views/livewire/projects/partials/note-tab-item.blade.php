@@ -85,18 +85,23 @@
             <span
                 x-show="renamingId !== '{{ $note->note_id }}'"
                 class="text-[12.5px] {{ $isActive ? 'text-[#2C2C2C] font-semibold' : 'text-[#4A4A4A]' }} truncate block"
+                title="{{ $note->title }}"
             >{{ $note->title }}</span>
-            <input
-                x-show="renamingId === '{{ $note->note_id }}'"
-                id="rename_{{ $note->note_id }}"
-                x-ref="rename_{{ $note->note_id }}"
-                x-model="renameValue"
-                @keydown.enter="commitRename('{{ $note->note_id }}')"
-                @keydown.escape="renamingId = null"
-                @blur="commitRename('{{ $note->note_id }}')"
-                @click.stop
-                class="w-full text-[12.5px] text-[#2C2C2C] bg-white border border-[#D5C6A9] rounded px-1 py-0.5 outline-none focus:border-[#A08866]"
-            />
+            <div x-show="renamingId === '{{ $note->note_id }}'" class="relative" x-cloak>
+                <input
+                    id="rename_{{ $note->note_id }}"
+                    x-ref="rename_{{ $note->note_id }}"
+                    x-model="renameValue"
+                    maxlength="25"
+                    @keydown.enter="commitRename('{{ $note->note_id }}')"
+                    @keydown.escape="renamingId = null"
+                    @blur="commitRename('{{ $note->note_id }}')"
+                    @click.stop
+                    @mousedown.stop
+                    class="w-full text-[12.5px] text-[#2C2C2C] bg-white border border-[#D5C6A9] rounded px-1 py-0.5 outline-none focus:border-[#A08866] pr-8"
+                />
+                <span class="absolute right-1 top-1/2 -translate-y-1/2 text-[9px] text-[#9A8E80]" x-text="(renameValue || '').length + '/25'"></span>
+            </div>
         </div>
 
         {{-- PERBAIKAN: Three-dot menu trigger menyalurkan data ke menu Global --}}
