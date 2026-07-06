@@ -201,15 +201,15 @@ new class extends Component {
                                 <svg class="w-6 h-6 text-text-80" fill="currentColor" viewBox="0 0 24 24"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
                             </button>
 
-                            <div x-show="menuOpen" style="display: none;" class="absolute right-0 mt-2 w-48 bg-white border border-brand-150 rounded-lg shadow-lg z-50 py-1">
-                                <button wire:click="addProject('{{ $section->section_id }}')" @click="menuOpen = false" class="w-full text-left px-4 py-2 text-app-body-medium text-text-80 hover:bg-brand-10 flex items-center gap-3">
-                                    <x-icons.add class="w-4 h-4" /> Add Project
+                            <div x-show="menuOpen" style="display: none;" class="absolute right-0 mt-2 w-48 bg-white border border-brand-150 rounded-lg shadow-lg z-50 py-1 overflow-hidden">
+                                <button wire:click="addProject('{{ $section->section_id }}')" @click="menuOpen = false" class="w-full text-left px-4 py-2 text-app-body-medium text-text-80 hover:bg-brand-10 flex items-center gap-3 transition-colors">
+                                    <x-icons.add class="w-4 h-4 shrink-0 text-text-80" /> Add Project
                                 </button>
-                                <button @click="editing = true; menuOpen = false; setTimeout(() => $refs.nameInput.focus(), 50)" class="w-full text-left px-4 py-2 text-app-body-medium text-text-80 hover:bg-brand-10 flex items-center gap-3">
-                                    <x-icons.rename class="w-4 h-4" /> Rename
+                                <button @click="editing = true; menuOpen = false; setTimeout(() => $refs.nameInput.focus(), 50)" class="w-full text-left px-4 py-2 text-app-body-medium text-text-80 hover:bg-brand-10 flex items-center gap-3 transition-colors">
+                                    <x-icons.rename class="w-4 h-4 shrink-0 text-text-80" /> Rename
                                 </button>
-                                <button @click="$dispatch('open-archive-section-dialog', { id: '{{ $section->section_id }}' }); menuOpen = false" class="w-full text-left px-4 py-2 text-app-body-medium text-text-80 hover:bg-brand-10 flex items-center gap-3">
-                                    <x-icons.archive class="w-4 h-4" /> Archive
+                                <button @click="$dispatch('open-archive-section-dialog', { id: '{{ $section->section_id }}' }); menuOpen = false" class="w-full text-left px-4 py-2 text-app-body-medium text-text-80 hover:bg-brand-10 flex items-center gap-3 transition-colors">
+                                    <x-icons.archive class="w-4 h-4 shrink-0 text-text-80" /> Archive
                                 </button>
                             </div>
                         </div>
@@ -277,7 +277,11 @@ new class extends Component {
                             <a href="{{ route('projects.show', $project->project_id) }}" draggable="false" @dragstart.prevent wire:navigate class="w-44 shrink-0 group cursor-pointer block select-none">
                                 <div class="w-full aspect-[1/1.6] relative mb-3">
                                     @if($project->cover_image_path)
-                                        <img src="{{ Storage::url($project->cover_image_path) }}" class="absolute inset-y-0 left-0 right-3 w-[calc(100%-12px)] h-full object-cover rounded-l-sm rounded-r-md shadow-md z-20 border-r border-black/10 transition-shadow duration-300 group-hover:shadow-xl" />
+                                        <div class="absolute inset-y-0 left-0 right-3 w-[calc(100%-12px)] h-full z-20 rounded-l-sm rounded-r-md overflow-hidden shadow-md bg-gradient-to-br from-[#C1AE8E] to-[#977E5C] p-[8px] border-r border-black/10 transition-shadow duration-300 group-hover:shadow-xl">
+                                            <div class="w-full h-full overflow-hidden rounded-sm bg-brand-100">
+                                                <img src="{{ Storage::url($project->cover_image_path) }}" class="w-full h-full object-cover" />
+                                            </div>
+                                        </div>
                                         <div class="absolute top-2 bottom-2 right-1.5 w-3 bg-gradient-to-r from-[#E8E3D9] to-[#D5C6A9] border-y border-r border-[#C4B7A3] rounded-r-[2px] z-10 shadow-inner"></div>
                                         <div class="absolute inset-y-0 right-0 w-6 bg-[#8C7558] rounded-r-md z-0 shadow-sm border-l border-black/20 transition-shadow duration-300 group-hover:shadow-lg"></div>
                                     @else

@@ -7,9 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+use Illuminate\Database\Eloquent\SoftDeletes;
+
 class Note extends Model
 {
-    use HasUuids;
+    use HasUuids, SoftDeletes;
 
     protected $primaryKey = 'note_id';
     protected $touches = ['project'];

@@ -191,7 +191,7 @@ new #[Layout('layouts.app')] class extends Component {
     }
 
     public function updatedNewImage() {
-        $this->validate(['newImage' => 'image|max:2048']);
+        $this->validate(['newImage' => 'image|max:5120']);
 
         if ($this->character->image_path) {
             Storage::disk('public')->delete($this->character->image_path);
@@ -301,8 +301,7 @@ new #[Layout('layouts.app')] class extends Component {
                 </a>
 
                 <!-- Tombol Kanan (Trash / Delete) -->
-                <button type="button" 
-                        @click="confirmingDelete = true" 
+                <button type="button" @click="$dispatch('open-delete-character-confirm')" 
                         class="p-1.5 text-danger-100/80 border hover:text-danger-100 hover:bg-danger-100/10 rounded-md transition-colors" 
                         title="Delete Character">
                     <!-- Menggunakan komponen ikon delete milikmu, ukurannya diperkecil agar proporsional untuk header -->
@@ -444,7 +443,49 @@ new #[Layout('layouts.app')] class extends Component {
         <div class="bg-brand-10 border border-brand-150 rounded-2xl p-6 flex flex-col gap-6 h-full">
             <div class="flex flex-col gap-3">
                 <h3 class="text-app-feature text-text-100">Character Image</h3>
-                <div x-data="{ hoverCover: false }"
+                <div x-data="{ 
+                        hoverCover: false,
+                        isUploading: false,
+                        progress: 0,
+                        showCropper: false,
+                        cropImageUrl: null,
+                        cropperInstance: null,
+                        clientError: null,
+                        
+                        cancelCrop() {
+                            this.showCropper = false;
+                            if (this.cropperInstance) {
+                                this.cropperInstance.destroy();
+                                this.cropperInstance = null;
+                            }
+                            this.cropImageUrl = null;
+                            if(this.$refs.characterImageInput) this.$refs.characterImageInput.value = null;
+                        },
+                        
+                        applyCrop() {
+                            if (!this.cropperInstance) return;
+                            
+                            const canvas = this.cropperInstance.getCroppedCanvas({
+                                width: 600,
+                                height: 800
+                            });
+                            
+                            canvas.toBlob((blob) => {
+                                const file = new File([blob], 'character.jpg', { type: 'image/jpeg', lastModified: Date.now() });
+                                
+                                this.cancelCrop();
+                                
+                                this.isUploading = true;
+                                this.progress = 0;
+                                
+                                @this.upload('newImage', file,
+                                    (uploadedFilename) => { this.isUploading = false; },
+                                    () => { this.isUploading = false; },
+                                    (e) => { this.progress = e.detail.progress; }
+                                );
+                            }, 'image/jpeg', 0.9);
+                        }
+                     }"
                      @mouseover="hoverCover = true"
                      @mouseleave="hoverCover = false"
                      class="relative aspect-[3/4] w-full rounded-lg bg-brand-100 overflow-hidden z-10">
@@ -457,11 +498,57 @@ new #[Layout('layouts.app')] class extends Component {
                         </div>
                     @endif
 
-                    <div x-show="hoverCover" x-transition class="absolute bottom-4 left-4 z-30 flex flex-wrap gap-2">
+                    {{-- Cropper Modal Overlay --}}
+                    <div x-show="showCropper" x-cloak class="absolute inset-0 z-50 bg-bg-main flex flex-col rounded-lg overflow-hidden border border-black/10">
+                        <div class="flex-1 w-full relative">
+                            <img x-ref="cropperImg" :src="cropImageUrl" class="block max-w-full" alt="Crop Preview">
+                        </div>
+                        <div class="absolute bottom-4 left-0 right-0 flex justify-center gap-2 z-50">
+                            <button @click="cancelCrop()" type="button" class="px-4 py-1.5 bg-bg-main/90 backdrop-blur text-text-70 text-[11px] font-bold uppercase tracking-wider rounded-md border border-text-60 hover:bg-bg-main shadow-lg transition-colors">Cancel</button>
+                            <button @click="applyCrop()" type="button" class="px-4 py-1.5 bg-secondary-100/95 backdrop-blur text-bg-main text-[11px] font-bold uppercase tracking-wider rounded-md shadow-lg border border-secondary-200 hover:bg-secondary-200 transition-colors">Save</button>
+                        </div>
+                    </div>
+
+                    <div x-show="hoverCover && !showCropper" x-transition class="absolute bottom-4 left-4 z-30 flex flex-wrap gap-2">
                         <label class="flex items-center gap-1.5 px-2.5 py-1.5 bg-text-80/95 border border-text-60 rounded-md cursor-pointer hover:bg-text-80 transition-colors shadow-lg">
                             <x-icons.upload class="w-3.5 h-3.5 text-bg-main" />
                             <span class="text-bg-main text-app-desc-feature">Upload</span>
-                            <input type="file" wire:model.live="newImage" accept="image/*" class="hidden">
+                            <input type="file" x-ref="characterImageInput" class="hidden" accept="image/*"
+                                @change="
+                                    const file = $event.target.files[0];
+                                    if (file) {
+                                        if (file.size > 5 * 1024 * 1024) {
+                                            clientError = 'The selected image is too large. The maximum allowed file size is 5MB.';
+                                            $event.target.value = '';
+                                        } else {
+                                            clientError = null;
+                                            
+                                            const reader = new FileReader();
+                                            reader.onload = (e) => { 
+                                                cropImageUrl = e.target.result;
+                                                showCropper = true;
+                                                
+                                                $nextTick(() => {
+                                                    if (cropperInstance) cropperInstance.destroy();
+                                                    cropperInstance = new Cropper($refs.cropperImg, {
+                                                        aspectRatio: 3 / 4,
+                                                        viewMode: 1,
+                                                        dragMode: 'move',
+                                                        background: false,
+                                                        guides: false,
+                                                        center: true,
+                                                        highlight: false,
+                                                        cropBoxMovable: false,
+                                                        cropBoxResizable: false,
+                                                        minCropBoxWidth: 150,
+                                                        minCropBoxHeight: 200,
+                                                    });
+                                                });
+                                            };
+                                            reader.readAsDataURL(file);
+                                        }
+                                    }
+                                ">
                         </label>
 
                         @if($character->image_path)
@@ -472,11 +559,30 @@ new #[Layout('layouts.app')] class extends Component {
                         @endif
                     </div>
 
-                    <div wire:loading.flex wire:target="newImage" class="absolute inset-0 bg-[#F5EFE9]/70 backdrop-blur-md z-40 items-center justify-center transition-all">
-                        <svg class="animate-spin h-8 w-8 text-secondary-200" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                    {{-- Client-side Error --}}
+                    <template x-if="clientError">
+                        <div class="absolute inset-x-2 top-2 bg-danger-100/95 text-bg-main text-[11px] font-medium px-2 py-2 rounded shadow-xl z-50 flex items-start gap-1">
+                            <svg class="w-3.5 h-3.5 shrink-0 text-bg-main" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                            <span x-text="clientError" class="flex-1 leading-tight"></span>
+                            <button @click="clientError = null" class="shrink-0 p-0.5 hover:bg-black/20 rounded transition-colors" title="Dismiss"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+                        </div> 
+                    </template>
+
+                    {{-- Server-side Error --}}
+                    @error('newImage') 
+                        <div x-data="{ show: true }" x-show="show" class="absolute inset-x-2 top-2 bg-danger-100/95 text-bg-main text-[11px] font-medium px-2 py-2 rounded shadow-xl z-50 flex items-start gap-1">
+                            <svg class="w-3.5 h-3.5 shrink-0 text-bg-main" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                            <span class="flex-1 leading-tight">{{ $message }}</span>
+                            <button @click="show = false" class="shrink-0 p-0.5 hover:bg-black/20 rounded transition-colors" title="Dismiss"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+                        </div> 
+                    @enderror
+
+                    {{-- Progress Overlay --}}
+                    <div x-show="isUploading" x-transition class="absolute inset-0 bg-[#F5EFE9]/80 backdrop-blur-md z-40 flex flex-col items-center justify-center rounded-lg">
+                        <svg class="animate-spin h-8 w-8 text-secondary-200 mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                        <div class="text-secondary-200 font-semibold text-sm">Uploading... <span x-text="progress + '%'"></span></div>
                     </div>
                 </div>
-                @error('newImage') <span class="text-app-desc-feature text-danger-100">{{ $message }}</span> @enderror
             </div>
 
             <div class="flex flex-col gap-4 mb-4">
@@ -719,18 +825,17 @@ new #[Layout('layouts.app')] class extends Component {
         </div>
     </div>
 
-    <div x-show="confirmingDelete" style="display:none;" class="fixed inset-0 z-50 flex items-center justify-center bg-text-80/50 backdrop-blur-[1.5px]">
-        <div @click.away="confirmingDelete = false" class="bg-bg-main border border-brand-100 rounded-xl shadow-xl p-6 w-full max-w-sm flex flex-col gap-5">
-            <div class="text-center">
-                <h3 class="text-app-heading-2 text-text-80">Delete Character?</h3>
-                <p class="text-app-desc-feature text-text-70 mt-2">"{{ $nickName }}" and every relationship involving them will be permanently removed.</p>
-            </div>
-            <div class="flex gap-3">
-                <button @click="confirmingDelete = false" class="flex-1 py-2.5 rounded-lg border border-brand-200 text-app-feature text-text-80 hover:bg-brand-100 transition-colors">Cancel</button>
-                <button wire:click="deleteCharacter" class="flex-1 py-2.5 rounded-lg bg-danger-100 text-app-feature text-bg-main hover:bg-danger-100/90 transition-colors">Confirm Delete</button>
-            </div>
-        </div>
-    </div>
+    <x-confirm-dialog
+        eventName="open-delete-character-confirm"
+        title="Delete Character?"
+        description='"{{ $nickName }}" and every relationship involving them will be permanently removed.'
+        confirmText="Confirm Delete"
+        submitAction="deleteCharacter"
+    >
+        <x-slot:icon>
+            <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" /></svg>
+        </x-slot:icon>
+    </x-confirm-dialog>
 
     <livewire:projects.relation-type-popup :project="$project" wire:key="rel-type-popup" />
     <livewire:projects.character-details-popup :project="$project" wire:key="char-details-popup" />
