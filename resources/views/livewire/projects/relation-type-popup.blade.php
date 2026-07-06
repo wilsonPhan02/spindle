@@ -298,7 +298,7 @@ new class extends Component {
                                 :class="isDuplicateTypeName() ? 'border-danger-100' : 'border-brand-200'"
                                 class="w-full px-3 py-2 pr-10 bg-bg-main border rounded-md outline-none text-app-body-small text-text-80 focus:border-secondary-150 focus:border-2 transition-colors"
                             >
-                            <span class="absolute right-3 top-1/2 -translate-y-1/2 text-app-desc-feature text-subtext-70 pointer-events-none">
+                            <span class="absolute right-3 top-1/2 -translate-y-1/2 text-app-desc-feature text-subtext-90 pointer-events-none">
                                 <span x-text="newTypeName.length"></span>/20
                             </span>
                         </div>

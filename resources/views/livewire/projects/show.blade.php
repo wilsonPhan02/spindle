@@ -759,15 +759,14 @@ new #[Layout('layouts.app')] class extends Component {
                                     <div class="min-w-0 flex-1 gap-1 py-1">
                                         <p class="text-app-title-1 leading-none text-[18px] text-text-80 truncate group-hover:text-secondary-200 transition-colors">{{ $character->nick_name }}</p>
                                             <div class="mt-1.5">
+                                                @php
+                                                    $visibleTags = $character->hashtags->take(1);
+                                                    $remainingTagCount = $character->hashtags->count() - $visibleTags->count();
+                                                @endphp
                                                 <div class="flex items-center gap-1 flex-nowrap overflow-hidden">
                                                     <span class="text-app-body-small text-subtext-90 shrink-0">Tags :</span>
                                                     
                                                     @if($character->hashtags->isNotEmpty())
-                                                        @php
-                                                            $visibleTags = $character->hashtags->take(1);
-                                                            $remainingTagCount = $character->hashtags->count() - $visibleTags->count();
-                                                        @endphp
-                                                        
                                                         @foreach($visibleTags as $tag)
                                                             <span class="px-2 py-0.5 rounded-full bg-brand-100 text-app-caption text-text-70 shrink-0 truncate max-w-[80px]">
                                                                 {{ $tag->name }}
@@ -782,7 +781,7 @@ new #[Layout('layouts.app')] class extends Component {
                                                 </div>
 
                                                 {{-- Remaining Tags Badge --}}
-                                                @if(!empty($remainingTagCount) && $remainingTagCount > 0)
+                                                @if($remainingTagCount > 0)
                                                     <span class="inline-block mt-1 px-2 py-0.5 rounded-full bg-brand-150 text-app-caption text-text-70">
                                                         +{{ $remainingTagCount }} tags
                                                     </span>

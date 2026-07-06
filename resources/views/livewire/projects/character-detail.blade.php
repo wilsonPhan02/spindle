@@ -381,7 +381,7 @@ new #[Layout('layouts.app')] class extends Component {
                         </button>
                     </div>
                 </div>
-                <span x-show="editingNickName" x-cloak class="text-app-desc-feature text-subtext-70">
+                <span x-show="editingNickName" x-cloak class="text-app-desc-feature text-subtext-80">
                     <span x-text="nickNameCount"></span>/20
                 </span>
                 @if($nickNameError)
@@ -397,7 +397,7 @@ new #[Layout('layouts.app')] class extends Component {
                         @keydown.escape="$event.target.blur()"
                         maxlength="60" placeholder="Full Name"
                         class="bg-transparent text-text-60 outline-none border-b border-transparent focus:border-subtext-70 transition-colors">
-                    <span x-show="editingFullName" x-cloak class="text-app-desc-feature text-subtext-70"><span x-text="fullNameCount"></span>/60</span>
+                    <span x-show="editingFullName" x-cloak class="text-app-desc-feature text-subtext-80"><span x-text="fullNameCount"></span>/60</span>
                 </div>
             </div>
 
@@ -422,7 +422,11 @@ new #[Layout('layouts.app')] class extends Component {
                             @forelse($group['fields'] as $field)
                                 <div wire:key="field-{{ $field['id'] }}" class="flex flex-col gap-1 text-left">
                                     <label class="text-app-feature text-text-70 truncate">{{ $field['name'] }}</label>
-                                    <input type="text" wire:model.live.debounce.500ms="detailValues.{{ $field['id'] }}" @blur="$wire.$commit()" value="{{ $detailValues[$field['id']] ?? '' }}" placeholder="Enter value"
+                                    <input type="text" wire:model.live.debounce.500ms="detailValues.{{ $field['id'] }}" 
+                                        @blur="$wire.$commit()" 
+                                        @keydown.enter="$event.target.blur()" 
+                                        @keydown.escape="$event.target.blur()" 
+                                        value="{{ $detailValues[$field['id']] ?? '' }}" placeholder="Enter value"
                                         class="w-full px-4 py-2 bg-bg-main border-1 border-secondary-100 rounded-lg focus:border-secondary-250 focus:border-2 outline-none transition-all text-subtext-100 text-app-body-medium placeholder:text-subtext-80">
                                 </div>
                                  @empty
@@ -440,23 +444,37 @@ new #[Layout('layouts.app')] class extends Component {
         <div class="bg-brand-10 border border-brand-150 rounded-2xl p-6 flex flex-col gap-6 h-full">
             <div class="flex flex-col gap-3">
                 <h3 class="text-app-feature text-text-100">Character Image</h3>
-                <div x-data class="relative aspect-[3/4] w-full rounded-lg bg-brand-100 overflow-hidden group cursor-pointer" @click="$refs.characterImageInput.click()">
+                <div x-data="{ hoverCover: false }"
+                     @mouseover="hoverCover = true"
+                     @mouseleave="hoverCover = false"
+                     class="relative aspect-[3/4] w-full rounded-lg bg-brand-100 overflow-hidden z-10">
+                    
                     @if($character->image_path)
                         <img src="{{ Storage::url($character->image_path) }}" class="absolute inset-0 w-full h-full object-cover">
                     @else
                         <div class="absolute inset-0 flex items-center justify-center text-subtext-80 text-app-desc-feature text-center px-4 border border-dashed border-brand-200 rounded-lg">
-                            Click to upload (3:4)
+                            No Image (3:4)
                         </div>
                     @endif
 
-                    <div class="absolute inset-0 bg-brand-200/60 backdrop-blur-[1.5px] flex flex-col items-center justify-center gap-2 text-text-70 opacity-0 group-hover:opacity-100 transition-all duration-300">
-                        <span class="text-app-feature uppercase tracking-wider">Change Image</span>
+                    <div x-show="hoverCover" x-transition class="absolute bottom-4 left-4 z-30 flex flex-wrap gap-2">
+                        <label class="flex items-center gap-1.5 px-2.5 py-1.5 bg-text-80/95 border border-text-60 rounded-md cursor-pointer hover:bg-text-80 transition-colors shadow-lg">
+                            <x-icons.upload class="w-3.5 h-3.5 text-bg-main" />
+                            <span class="text-bg-main text-app-desc-feature">Upload</span>
+                            <input type="file" wire:model.live="newImage" accept="image/*" class="hidden">
+                        </label>
+
                         @if($character->image_path)
-                            <button type="button" wire:click.stop="removeImage" class="px-3 py-1 bg-text-70/70 hover:bg-text-70/90 text-subtext-60 text-app-desc-feature rounded-full transition-colors">Remove</button>
+                            <button type="button" wire:click="removeImage" class="flex items-center gap-1.5 px-2.5 py-1.5 bg-text-80/95 border border-text-60 rounded-md cursor-pointer hover:bg-text-80 transition-colors shadow-lg">
+                                <x-icons.delete class="w-3.5 h-3.5 text-danger-100" />
+                                <span class="text-app-desc-feature text-danger-100">Remove</span>
+                            </button>
                         @endif
                     </div>
 
-                    <input type="file" x-ref="characterImageInput" wire:model="newImage" accept="image/*" class="hidden">
+                    <div wire:loading.flex wire:target="newImage" class="absolute inset-0 bg-[#F5EFE9]/70 backdrop-blur-md z-40 items-center justify-center transition-all">
+                        <svg class="animate-spin h-8 w-8 text-secondary-200" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                    </div>
                 </div>
                 @error('newImage') <span class="text-app-desc-feature text-danger-100">{{ $message }}</span> @enderror
             </div>
@@ -486,15 +504,6 @@ new #[Layout('layouts.app')] class extends Component {
                     }"
                     class="flex flex-wrap items-center gap-2"
                 >
-                    <template x-for="tag in tags" :key="tag.id">
-                        <span class="flex items-center gap-2 pl-4 pr-2 py-1.5 rounded-full bg-brand-100 text-app-body-small text-text-80 max-w-full">
-                            <div class="truncate flex-1" x-text="tag.name"></div>
-                            <button type="button" @click="removeTag(tag.id)" class="shrink-0 w-4 h-4 rounded-full flex items-center justify-center text-text-60 hover:bg-black/10 hover:text-danger-100 transition-colors">
-                                <svg class="w-2 h-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3"><path stroke-linecap="round" d="M6 18L18 6M6 6l12 12"/></svg>
-                            </button>
-                        </span>
-                    </template>
-
                     <button
                         x-show="!showNewTagInput"
                         @click="showNewTagInput = true"
@@ -516,12 +525,20 @@ new #[Layout('layouts.app')] class extends Component {
                                 placeholder="New tag..."
                                 class="pl-3 pr-11 py-2 rounded-full bg-brand-100 border border-secondary-100 outline-none text-app-body-small text-text-70 w-36"
                             >
-                            <span class="absolute right-3 top-1/2 -translate-y-1/2 text-app-desc-feature text-subtext-70 pointer-events-none" x-text="newTagName.length + '/20'"></span>
+                            <span class="absolute right-3 top-1/2 -translate-y-1/2 text-app-desc-feature text-secondary-100 pointer-events-none" x-text="newTagName.length + '/20'"></span>
                         </div>
                         <button @click="showNewTagInput = false; newTagName = ''" type="button" class="w-5 h-5 rounded-full flex items-center justify-center text-text-60 hover:bg-black/10 hover:text-danger-100 transition-colors">
                             <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3"><path stroke-linecap="round" d="M6 18L18 6M6 6l12 12"/></svg>
                         </button>
                     </div>
+                    <template x-for="tag in tags" :key="tag.id">
+                        <span class="flex items-center gap-2 pl-4 pr-2 py-1.5 rounded-full bg-brand-100 text-app-body-small text-text-80 max-w-50">
+                            <div class="truncate flex-1" x-text="tag.name"></div>
+                            <button type="button" @click="removeTag(tag.id)" class="shrink-0 w-4 h-4 rounded-full flex items-center justify-center text-text-60 hover:bg-black/10 hover:text-danger-100 transition-colors">
+                                <svg class="w-2 h-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3"><path stroke-linecap="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                            </button>
+                        </span>
+                    </template>
                 </div>
             </div>
 

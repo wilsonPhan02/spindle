@@ -27,8 +27,8 @@
                     {{-- Right: content --}}
                     <div class="flex flex-col flex-1 min-w-0 sm:min-h-0 p-5 sm:p-7 sm:w-108 gap-4">
                         <div>
-                            <h3 class="text-app-title-1 text-text-80 truncate" :title="infoCharacter.fullName" x-text="infoCharacter.fullName"></h3>
-                            <p class="text-app-subtitle-1 text-text-60 truncate" >Nickname : <span x-text="infoCharacter.name" :title="infoCharacter.name"></span></p>
+                            <h3 class="text-app-title-1 text-text-80 truncate" :title="infoCharacter.name" x-text="infoCharacter.name"></h3>
+                            <p class="text-app-subtitle-1 text-text-60 truncate" >Fullname : <span x-text="infoCharacter.fullName" :title="infoCharacter.fullName"></span></p>
                         </div>
                         
                         <hr class="border-t border-1 border-brand-150 w-full" />
