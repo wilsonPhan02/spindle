@@ -219,6 +219,14 @@ new class extends Component {
             this.groupNameError = '';
             this.fieldNameError = '';
         },
+        openNewFieldInput(targetGroupId) {
+            for (const id in this.showNewFieldInput) {
+                if (this.showNewFieldInput[id] && id != targetGroupId) {
+                    this.addField(id);
+                }
+            }
+            this.showNewFieldInput[targetGroupId] = true;
+        },
         renameGroup(group) {
             const name = this.editGroupName.trim();
             if (name === '' || name === group.name) { this.editingGroupId = null; this.groupNameError = ''; return; }
@@ -251,7 +259,10 @@ new class extends Component {
         },
         async addField(groupId) {
             const name = (this.newFieldName[groupId] || '').trim();
-            if (name === '') return;
+            if (name === '') {
+                this.showNewFieldInput[groupId] = false;
+                return;
+            }
             const group = this.detailGroups.find(g => g.id === groupId);
             if (!group) return;
             if (group.fields.some(f => f.name.trim().toLowerCase() === name.toLowerCase())) {
@@ -340,7 +351,7 @@ new class extends Component {
                                 class="text-app-subheading-2 font-semibold text-secondary-200 bg-transparent border-b border-secondary-200 outline-none"
                             >
                         </template>
-                        <span x-show="editingGroupId === group.id" x-cloak class="text-app-desc-feature text-subtext-70 shrink-0" x-text="editGroupName.length + '/30'"></span>
+                        <span x-show="editingGroupId === group.id" x-cloak class="text-app-desc-feature text-subtext-90 shrink-0" x-text="editGroupName.length + '/30'"></span>
                         <button x-show="editingGroupId !== group.id" @click="editingGroupId = group.id; editGroupName = group.name" class="text-secondary-200 hover:text-secondary-300 hover:bg-brand-50 rounded p-1 transition-colors">
                             <x-icons.rename class="w-4 h-4 stroke-2" />
                         </button>
@@ -370,30 +381,30 @@ new class extends Component {
                                         class="text-app-body-medium text-text-90 min-w-[20px] [field-sizing:content] border-b border-secondary-200 outline-none"
                                     >
                                 </template>
-                                <span x-show="editingFieldId === field.id" x-cloak class="text-app-desc-feature text-subtext-70 shrink-0" x-text="editFieldName.length + '/30'"></span>
+                                <span x-show="editingFieldId === field.id" x-cloak class="text-app-desc-feature text-subtext-90 shrink-0" x-text="editFieldName.length + '/30'"></span>
                                 <button @click="confirmingDeleteFieldId = field.id" class="w-4 h-4 rounded-full flex items-center justify-center text-text-60 hover:bg-black/10 hover:text-danger-100 transition-colors">
                                     <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3"><path stroke-linecap="round" d="M6 18L18 6M6 6l12 12"/></svg>
                                 </button>
                             </div>
                         </template>
 
-                        <button x-show="!showNewFieldInput[group.id]" @click="showNewFieldInput[group.id] = true" type="button" class="w-7 h-7 cursor-pointer  rounded-full bg-brand-100 flex items-center justify-center text-text-70 hover:bg-brand-150 transition-colors">
+                        <button x-show="!showNewFieldInput[group.id]" @click="openNewFieldInput(group.id)" type="button" class="w-7 h-7 cursor-pointer  rounded-full bg-brand-100 flex items-center justify-center text-text-70 hover:bg-brand-150 transition-colors">
                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
                         </button>
-                        <div x-show="showNewFieldInput[group.id]" class="flex items-center gap-1">
+                        <div x-show="showNewFieldInput[group.id]" @click.away="addField(group.id)" class="flex items-center gap-1">
                             <div class="relative shrink-0">
                                 <input
                                     type="text"
                                     x-model="newFieldName[group.id]"
-                                    x-init="$nextTick(() => $el.focus())"
+                                    x-effect="if (showNewFieldInput[group.id]) $nextTick(() => $el.focus())"
                                     @keydown.enter="addField(group.id)"
-                                    @keydown.escape="showNewFieldInput[group.id] = false; newFieldName[group.id] = ''; fieldNameError = ''"
+                                    @keydown.escape="addField(group.id)"
                                     @input="fieldNameError = ''"
                                     maxlength="30"
                                     placeholder="New field..."
                                     class="pl-3 pr-11 py-1.5 rounded-full bg-brand-100 border border-secondary-200 outline-none text-app-body-medium text-text-90 w-36"
                                 >
-                                <span class="absolute right-3 top-1/2 -translate-y-1/2 text-app-desc-feature text-subtext-70 pointer-events-none" x-text="(newFieldName[group.id] || '').length + '/30'"></span>
+                                <span class="absolute right-3 top-1/2 -translate-y-1/2 text-app-desc-feature text-subtext-90 pointer-events-none" x-text="(newFieldName[group.id] || '').length + '/30'"></span>
                             </div>
                             <button @click="showNewFieldInput[group.id] = false; newFieldName[group.id] = ''; fieldNameError = ''" type="button" class="w-5 h-5 cursor-pointer rounded-full flex items-center justify-center text-text-60 hover:bg-black/10 hover:text-danger-100 transition-colors">
                                 <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3"><path stroke-linecap="round" d="M6 18L18 6M6 6l12 12"/></svg>
@@ -422,7 +433,7 @@ new class extends Component {
                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3"><path stroke-linecap="round" d="M6 18L18 6M6 6l12 12"/></svg>
                     </button>
                 </div>
-                <span class="text-app-desc-feature text-subtext-70 -mt-2" x-text="newGroupName.length + '/30'"></span>
+                <span class="text-app-desc-feature text-subtext-90 -mt-2" x-text="newGroupName.length + '/30'"></span>
                 <p x-show="groupNameError" style="display:none;" class="text-app-desc-feature text-danger-100 -mt-2" x-text="groupNameError"></p>
             </div>
 
@@ -440,25 +451,43 @@ new class extends Component {
             style="display: none;"
             class="fixed inset-0 z-[60] flex items-center justify-center bg-text-80/50 backdrop-blur-[1.5px]"
         >
-            <div @click.away="confirmingDeleteGroupId = null; confirmingDeleteFieldId = null" class="bg-bg-main border border-brand-100 rounded-xl shadow-xl p-6 w-full max-w-sm flex flex-col gap-4">
+            <div @click.away="confirmingDeleteGroupId = null; confirmingDeleteFieldId = null" class="flex flex-col bg-white rounded-2xl shadow-xl w-full max-w-md px-12 py-8 text-center gap-8">
                 <template x-if="confirmingDeleteGroupId">
-                    <div class="flex flex-col gap-4">
-                        <h3 class="text-app-heading-2 text-text-80 text-center">Delete Detail Group?</h3>
-                        <p class="text-app-desc-feature text-text-70 text-center">This group and every field & value inside it will be permanently removed for all characters.</p>
-                        <div class="flex gap-3 mt-2">
-                            <button @click="confirmingDeleteGroupId = null" class="flex-1 py-2.5 rounded-lg border border-brand-200 text-app-feature text-text-80 hover:bg-brand-100 transition-colors">Cancel</button>
-                            <button @click="deleteGroup(confirmingDeleteGroupId)" class="flex-1 py-2.5 rounded-lg bg-danger-100 text-app-feature text-bg-main hover:bg-danger-100/90 transition-colors">Delete</button>
+                    <div class="flex flex-col items-center w-full gap-8">
+                        <div class="mx-auto flex items-center justify-center h-24 w-24 rounded-full bg-danger-100/10">
+                            <div class="flex items-center justify-center text-danger-100">
+                                <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" /></svg>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col w-full gap-5">
+                            <h3 class="text-app-heading-1 text-text-80">Delete Detail Group?</h3>
+                            <p class="text-app-subfeature text-text-80 px-3">This group and every field & value inside it will be permanently removed for all characters.</p>
+                        </div>
+
+                        <div class="flex gap-4 w-full justify-center">
+                            <button @click="confirmingDeleteGroupId = null" class="flex-1 py-2 px-4 rounded-lg border border-card-border text-text-70 text-web-body-small font-semibold hover:bg-card-hover transition-colors">Cancel</button>
+                            <button @click="deleteGroup(confirmingDeleteGroupId)" class="flex-1 py-3 px-4 rounded-lg text-subtext-60 transition-colors text-web-body-small font-semibold bg-danger-100 hover:bg-red-600">Delete</button>
                         </div>
                     </div>
                 </template>
 
                 <template x-if="confirmingDeleteFieldId">
-                    <div class="flex flex-col gap-4">
-                        <h3 class="text-app-heading-2 text-text-80 text-center">Delete Field?</h3>
-                        <p class="text-app-desc-feature text-text-70 text-center">This field and its value for every character will be permanently removed.</p>
-                        <div class="flex gap-3 mt-2">
-                            <button @click="confirmingDeleteFieldId = null" class="flex-1 py-2.5 rounded-lg border border-brand-200 text-app-feature text-text-80 hover:bg-brand-100 transition-colors">Cancel</button>
-                            <button @click="deleteField(confirmingDeleteFieldId)" class="flex-1 py-2.5 rounded-lg bg-danger-100 text-app-feature text-bg-main hover:bg-danger-100/90 transition-colors">Delete</button>
+                    <div class="flex flex-col items-center w-full gap-8">
+                        <div class="mx-auto flex items-center justify-center h-24 w-24 rounded-full bg-danger-100/10">
+                            <div class="flex items-center justify-center text-danger-100">
+                                <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" /></svg>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col w-full gap-5">
+                            <h3 class="text-app-heading-1 text-text-80">Delete Field?</h3>
+                            <p class="text-app-subfeature text-text-80 px-3">This field and its value for every character will be permanently removed.</p>
+                        </div>
+
+                        <div class="flex gap-4 w-full justify-center">
+                            <button @click="confirmingDeleteFieldId = null" class="flex-1 py-2 px-4 rounded-lg border border-card-border text-text-70 text-web-body-small font-semibold hover:bg-card-hover transition-colors">Cancel</button>
+                            <button @click="deleteField(confirmingDeleteFieldId)" class="flex-1 py-3 px-4 rounded-lg text-subtext-60 transition-colors text-web-body-small font-semibold bg-danger-100 hover:bg-red-600">Delete</button>
                         </div>
                     </div>
                 </template>

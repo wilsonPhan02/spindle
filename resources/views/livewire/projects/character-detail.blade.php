@@ -301,8 +301,7 @@ new #[Layout('layouts.app')] class extends Component {
                 </a>
 
                 <!-- Tombol Kanan (Trash / Delete) -->
-                <button type="button" 
-                        @click="confirmingDelete = true" 
+                <button type="button" @click="$dispatch('open-delete-character-confirm')" 
                         class="p-1.5 text-danger-100/80 border hover:text-danger-100 hover:bg-danger-100/10 rounded-md transition-colors" 
                         title="Delete Character">
                     <!-- Menggunakan komponen ikon delete milikmu, ukurannya diperkecil agar proporsional untuk header -->
@@ -719,18 +718,17 @@ new #[Layout('layouts.app')] class extends Component {
         </div>
     </div>
 
-    <div x-show="confirmingDelete" style="display:none;" class="fixed inset-0 z-50 flex items-center justify-center bg-text-80/50 backdrop-blur-[1.5px]">
-        <div @click.away="confirmingDelete = false" class="bg-bg-main border border-brand-100 rounded-xl shadow-xl p-6 w-full max-w-sm flex flex-col gap-5">
-            <div class="text-center">
-                <h3 class="text-app-heading-2 text-text-80">Delete Character?</h3>
-                <p class="text-app-desc-feature text-text-70 mt-2">"{{ $nickName }}" and every relationship involving them will be permanently removed.</p>
-            </div>
-            <div class="flex gap-3">
-                <button @click="confirmingDelete = false" class="flex-1 py-2.5 rounded-lg border border-brand-200 text-app-feature text-text-80 hover:bg-brand-100 transition-colors">Cancel</button>
-                <button wire:click="deleteCharacter" class="flex-1 py-2.5 rounded-lg bg-danger-100 text-app-feature text-bg-main hover:bg-danger-100/90 transition-colors">Confirm Delete</button>
-            </div>
-        </div>
-    </div>
+    <x-confirm-dialog
+        eventName="open-delete-character-confirm"
+        title="Delete Character?"
+        description='"{{ $nickName }}" and every relationship involving them will be permanently removed.'
+        confirmText="Confirm Delete"
+        submitAction="deleteCharacter"
+    >
+        <x-slot:icon>
+            <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" /></svg>
+        </x-slot:icon>
+    </x-confirm-dialog>
 
     <livewire:projects.relation-type-popup :project="$project" wire:key="rel-type-popup" />
     <livewire:projects.character-details-popup :project="$project" wire:key="char-details-popup" />
