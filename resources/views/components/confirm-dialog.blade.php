@@ -5,6 +5,7 @@
     'confirmText',     
     'cancelText' => 'No, Stay here',    
     'submitAction' => null,    
+    'dispatchAction' => null,
     'iconColor' => 'text-danger-100', 
     'iconBg' => 'bg-danger-100/10',
     'btnColor' => 'bg-danger-100 hover:bg-red-600',
@@ -17,7 +18,7 @@
     x-on:{{ $eventName }}.window="show = true; itemId = $event.detail?.id || null"
     x-show="show" 
     style="display: none;"
-    class="fixed inset-0 z-1000 flex items-center justify-center bg-text-80/75 backdrop-blur-[1.5px]"
+    class="fixed inset-0 z-[100] flex items-center justify-center bg-text-80/75 backdrop-blur-[1.5px]"
     x-transition:enter="transition ease-out duration-300"
     x-transition:enter-start="opacity-0"
     x-transition:enter-end="opacity-100"
@@ -37,13 +38,13 @@
     >
         <div class="mx-auto flex items-center justify-center h-24 w-24 rounded-full {{ $iconBg }}">
             <div class="flex items-center justify-center {{ $iconColor }}">
-                {{ $icon }}
+                {{ $icon ?? '' }}
             </div>
         </div>
 
         <div class="flex flex-col w-full gap-5">
             <h3 class="text-app-heading-1 text-text-80">{{ $title }}</h3>
-            <p class="text-app-subfeature text-text-80 px-3">{{ $description }}</p>
+            <p class="text-app-subfeature text-text-80 px-3">{!! $description !!}</p>
         </div>
 
         <div class="flex gap-4 w-full justify-center">
@@ -58,8 +59,12 @@
             <button 
                 @click="
                     const action = '{{ $submitAction ?? '' }}';
+                    const dispatchEventName = '{{ $dispatchAction ?? '' }}';
                     if (action) {
                         itemId ? $wire.call(action, itemId) : $wire.call(action);
+                    }
+                    if (dispatchEventName) {
+                        $dispatch(dispatchEventName, { id: itemId });
                     }
                     show = false;
                 "

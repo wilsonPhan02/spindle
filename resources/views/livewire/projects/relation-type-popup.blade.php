@@ -92,7 +92,7 @@ new class extends Component {
         editingRelationSavedTypeId: null,
         selectedTypeId: null,
         newTypeName: '',
-        newTypePalette: { textColor: '#8C7558', bgColor: '#EAE1D5' },
+        newTypePalette: {textColor: 'var(--color-secondary-150)', bgColor: 'var(--color-brand-100)' },
         showColorPicker: false,
         pendingDeleteTypeId: null,
         confirmingDeleteRel: false,
@@ -101,20 +101,7 @@ new class extends Component {
         charToName: null,
         usedTypeIds: [],
         types: @js($relationshipTypes),
-        palette: [
-            { textColor: '#43A047', bgColor: '#C8E6C9' },
-            { textColor: '#1E88E5', bgColor: '#BBDEFB' },
-            { textColor: '#D81B60', bgColor: '#F8BBD0' },
-            { textColor: '#8E24AA', bgColor: '#E1BEE7' },
-            { textColor: '#FB8C00', bgColor: '#FFE0B2' },
-            { textColor: '#E53935', bgColor: '#FFCDD2' },
-            { textColor: '#00897B', bgColor: '#B2DFDB' },
-            { textColor: '#F9A825', bgColor: '#FFF9C4' },
-            { textColor: '#3949AB', bgColor: '#C5CAE9' },
-            { textColor: '#00ACC1', bgColor: '#B2EBF2' },
-            { textColor: '#C0CA33', bgColor: '#F0F4C3' },
-            { textColor: '#F4511E', bgColor: '#FFCCBC' },
-        ],
+        palette: @js(config('system_colors')),
         isDuplicateTypeName() {
             const name = this.newTypeName.trim().toLowerCase();
             if (name === '') return false;
@@ -127,7 +114,7 @@ new class extends Component {
             if (this.isTypeDisabled(typeId)) return;
             this.selectedTypeId = typeId;
             this.newTypeName = '';
-            this.newTypePalette = { textColor: '#8C7558', bgColor: '#EAE1D5' };
+            this.newTypePalette = {textColor: 'var(--color-secondary-150)', bgColor: 'var(--color-brand-100)' };
             this.showColorPicker = false;
         },
         async saveRelation() {
@@ -176,7 +163,7 @@ new class extends Component {
             this.editingRelationSavedTypeId = null;
             this.selectedTypeId = null;
             this.newTypeName = '';
-            this.newTypePalette = { textColor: '#8C7558', bgColor: '#EAE1D5' };
+            this.newTypePalette = {textColor: 'var(--color-secondary-150)', bgColor: 'var(--color-brand-100)' };
             this.showColorPicker = false;
             this.pendingDeleteTypeId = null;
             this.confirmingDeleteRel = false;
@@ -192,7 +179,7 @@ new class extends Component {
         editingRelationSavedTypeId = null;
         selectedTypeId = null;
         newTypeName = '';
-        newTypePalette = { textColor: '#8C7558', bgColor: '#EAE1D5' };
+        newTypePalette = {textColor: 'var(--color-secondary-150)', bgColor: 'var(--color-brand-100)' };
         showColorPicker = false;
         confirmingDeleteRel = false;
         confirmingDeleteType = false;
@@ -209,7 +196,7 @@ new class extends Component {
         charToName = $event.detail.charToName ?? null;
         usedTypeIds = $event.detail.usedTypeIds ?? [];
         newTypeName = '';
-        newTypePalette = { textColor: '#8C7558', bgColor: '#EAE1D5' };
+        newTypePalette = {textColor: 'var(--color-secondary-150)', bgColor: 'var(--color-brand-100)' };
         showColorPicker = false;
         confirmingDeleteRel = false;
         confirmingDeleteType = false;
@@ -298,7 +285,7 @@ new class extends Component {
                                 :class="isDuplicateTypeName() ? 'border-danger-100' : 'border-brand-200'"
                                 class="w-full px-3 py-2 pr-10 bg-bg-main border rounded-md outline-none text-app-body-small text-text-80 focus:border-secondary-150 focus:border-2 transition-colors"
                             >
-                            <span class="absolute right-3 top-1/2 -translate-y-1/2 text-app-desc-feature text-subtext-70 pointer-events-none">
+                            <span class="absolute right-3 top-1/2 -translate-y-1/2 text-app-desc-feature text-subtext-90 pointer-events-none">
                                 <span x-text="newTypeName.length"></span>/20
                             </span>
                         </div>
@@ -347,27 +334,41 @@ new class extends Component {
                 </div>
             </div>
 
-            {{-- Confirm delete relationship --}}
-            <div x-show="confirmingDeleteRel" style="display:none;" class="flex flex-col gap-5">
-                <div class="text-center">
-                    <h3 class="text-app-heading-2 text-text-80 text-center mb-4">Delete Relationship?</h3>
-                    <p class="text-app-desc-feature text-text-70 text-center">This relationship will be permanently removed.</p>
+            {{-- Confirm delete relationship (Custom with confirm-dialog style) --}}
+            <div x-show="confirmingDeleteRel" style="display:none;" class="flex flex-col text-center gap-8 py-2">
+                <div class="mx-auto flex items-center justify-center h-24 w-24 rounded-full bg-danger-100/10">
+                    <div class="flex items-center justify-center text-danger-100">
+                        <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" /></svg>
+                    </div>
                 </div>
-                <div class="flex gap-3">
-                    <button @click="confirmingDeleteRel = false" class="flex-1 py-2.5 rounded-lg border border-brand-200 text-app-feature text-text-80 hover:bg-brand-100 transition-colors">Cancel</button>
-                    <button @click="deleteRelation()" class="flex-1 py-2.5 rounded-lg bg-danger-100 text-app-feature text-bg-main hover:bg-danger-100/90 transition-colors">Confirm Delete</button>
+
+                <div class="flex flex-col w-full gap-5">
+                    <h3 class="text-app-heading-1 text-text-80">Delete Relationship?</h3>
+                    <p class="text-app-subfeature text-text-80 px-3">This relationship will be permanently removed.</p>
+                </div>
+
+                <div class="flex gap-4 w-full justify-center">
+                    <button @click="confirmingDeleteRel = false" class="flex-1 py-2 px-4 rounded-lg border border-card-border text-text-70 text-web-body-small font-semibold hover:bg-card-hover transition-colors">Cancel</button>
+                    <button @click="deleteRelation()" class="flex-1 py-3 px-4 rounded-lg text-subtext-60 transition-colors text-web-body-small font-semibold bg-danger-100 hover:bg-red-600">Confirm Delete</button>
                 </div>
             </div>
 
-            {{-- Confirm delete relationship type --}}
-            <div x-show="confirmingDeleteType" style="display:none;" class="flex flex-col gap-5">
-                <div class="text-center">
-                    <h3 class="text-app-heading-2 text-text-80 text-center mb-4">Delete Relationship Type?</h3>
-                    <p class="text-app-desc-feature text-text-70 text-center">"<span x-text="types.find(t => t.id === pendingDeleteTypeId)?.name"></span>" and every relationship using it will be permanently removed.</p>
+            {{-- Confirm delete relationship type (Custom with confirm-dialog style) --}}
+            <div x-show="confirmingDeleteType" style="display:none;" class="flex flex-col text-center gap-8 py-2">
+                <div class="mx-auto flex items-center justify-center h-24 w-24 rounded-full bg-danger-100/10">
+                    <div class="flex items-center justify-center text-danger-100">
+                        <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" /></svg>
+                    </div>
                 </div>
-                <div class="flex gap-3">
-                    <button @click="confirmingDeleteType = false; pendingDeleteTypeId = null" class="flex-1 py-2.5 rounded-lg border border-brand-200 text-app-feature text-text-80 hover:bg-brand-100 transition-colors">Cancel</button>
-                    <button @click="deleteType(pendingDeleteTypeId)" class="flex-1 py-2.5 rounded-lg bg-danger-100 text-app-feature text-bg-main hover:bg-danger-100/90 transition-colors">Confirm Delete</button>
+
+                <div class="flex flex-col w-full gap-5">
+                    <h3 class="text-app-heading-1 text-text-80">Delete Relationship Type?</h3>
+                    <p class="text-app-subfeature text-text-80 px-3">"<span x-text="types.find(t => t.id === pendingDeleteTypeId)?.name"></span>" and every relationship using it will be permanently removed.</p>
+                </div>
+
+                <div class="flex gap-4 w-full justify-center">
+                    <button @click="confirmingDeleteType = false; pendingDeleteTypeId = null" class="flex-1 py-2 px-4 rounded-lg border border-card-border text-text-70 text-web-body-small font-semibold hover:bg-card-hover transition-colors">Cancel</button>
+                    <button @click="deleteType(pendingDeleteTypeId)" class="flex-1 py-3 px-4 rounded-lg text-subtext-60 transition-colors text-web-body-small font-semibold bg-danger-100 hover:bg-red-600">Confirm Delete</button>
                 </div>
             </div>
         </div>
