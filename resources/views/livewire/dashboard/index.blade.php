@@ -215,23 +215,34 @@ new class extends Component {
                         </div>
                     </div>
 
-                    <div class="flex gap-6 overflow-x-auto pb-4 cursor-grab active:cursor-grabbing custom-scrollbar"
+                    <div class="flex gap-6 overflow-x-auto pb-4 custom-scrollbar"
                          x-data="{ 
                              isDown: false, 
                              isDragging: false,
+                             canScroll: false,
                              startX: 0, 
                              scrollLeft: 0,
+                             checkScrollable() {
+                                 this.canScroll = this.$el.scrollWidth > this.$el.clientWidth;
+                             },
                              handleWheel(e) {
-                                 if (e.deltaY !== 0) {
-                                     e.preventDefault();
-                                     $el.scrollBy({ left: e.deltaY * 1.5, behavior: 'smooth' });
+                                 if (this.canScroll && e.deltaY !== 0) {
+                                     const atLeft = this.$el.scrollLeft <= 0 && e.deltaY < 0;
+                                     const atRight = Math.ceil(this.$el.scrollLeft + this.$el.clientWidth) >= this.$el.scrollWidth && e.deltaY > 0;
+                                     
+                                     if (!atLeft && !atRight) {
+                                         e.preventDefault();
+                                         this.$el.scrollBy({ left: e.deltaY * 1.5, behavior: 'smooth' });
+                                     }
                                  }
                              },
                              startDrag(e) {
+                                 this.checkScrollable();
+                                 if (!this.canScroll) return;
                                  this.isDown = true;
                                  this.isDragging = false;
-                                 this.startX = e.pageX - $el.offsetLeft;
-                                 this.scrollLeft = $el.scrollLeft;
+                                 this.startX = e.pageX - this.$el.offsetLeft;
+                                 this.scrollLeft = this.$el.scrollLeft;
                              },
                              stopDrag() {
                                  this.isDown = false;
@@ -239,16 +250,21 @@ new class extends Component {
                              },
                              doDrag(e) {
                                  if (!this.isDown) return;
-                                 const x = e.pageX - $el.offsetLeft;
+                                 const x = e.pageX - this.$el.offsetLeft;
                                  const walk = (x - this.startX) * 1.5;
                                  if (Math.abs(walk) > 5) {
                                      this.isDragging = true;
                                      e.preventDefault();
                                  }
-                                 $el.scrollLeft = this.scrollLeft - walk;
+                                 this.$el.scrollLeft = this.scrollLeft - walk;
                              }
                          }"
-                         :class="{ '[&_a]:pointer-events-none [&_button]:pointer-events-none': isDragging }"
+                         :class="{ 
+                             'cursor-grab active:cursor-grabbing': canScroll, 
+                             '[&_a]:pointer-events-none [&_button]:pointer-events-none': isDragging 
+                         }"
+                         x-init="checkScrollable()"
+                         @mouseenter="checkScrollable()"
                          @wheel="handleWheel($event)"
                          @mousedown="startDrag($event)"
                          @mouseleave="stopDrag()"
