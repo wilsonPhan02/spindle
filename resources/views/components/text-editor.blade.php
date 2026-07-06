@@ -743,8 +743,48 @@
         .format-option.bg-\[\#EAE1D5\] { background-color: #EAE1D5; }
     </style>
 
-    {{-- Toolbar (bg-brand-200 with Notes button styling and logic!) --}}
-    <div class="flex items-center px-3 py-2 border-b border-[#B5AAA0] bg-brand-100 gap-1 toolbar-scroll overflow-x-auto shrink-0 select-none">
+    {{-- Toolbar Wrapper with Gradient Mask for Overflow --}}
+    <div class="relative shrink-0 border-b border-[#B5AAA0] bg-brand-100 select-none overflow-hidden"
+         x-data="{
+             showLeftFade: false,
+             showRightFade: false,
+             checkScroll() {
+                 const el = $refs.toolbarScroll;
+                 if (!el) return;
+                 this.showLeftFade = el.scrollLeft > 4;
+                 this.showRightFade = el.scrollWidth - (el.scrollLeft + el.clientWidth) > 4;
+             }
+         }"
+         x-init="$nextTick(() => { checkScroll(); if (window.ResizeObserver) { new ResizeObserver(() => checkScroll()).observe($refs.toolbarScroll); } });"
+    >
+        {{-- Left Gradient Mask + Clickable Arrow --}}
+        <div x-show="showLeftFade"
+             x-transition:enter="transition ease-out duration-200"
+             x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100"
+             x-transition:leave="transition ease-in duration-150"
+             x-transition:leave-start="opacity-100"
+             x-transition:leave-end="opacity-0"
+             class="absolute left-0 top-0 bottom-0 w-14 bg-gradient-to-r from-brand-100 via-brand-100/90 to-transparent pointer-events-none z-10 flex items-center justify-start pl-2"
+             style="display: none;"
+        >
+            <button
+                type="button"
+                @mousedown.prevent="saveSelection()"
+                @click="$refs.toolbarScroll.scrollBy({ left: -150, behavior: 'smooth' });"
+                class="p-1 text-[#6A5D4D] hover:text-[#1A1A1A] transition-colors duration-150 pointer-events-auto cursor-pointer outline-none"
+                title="Scroll Left"
+            >
+                <svg class="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><path d="M18 4L6 12l12 8V4z"/></svg>
+            </button>
+        </div>
+
+        {{-- Scrollable Toolbar Area --}}
+        <div x-ref="toolbarScroll"
+             @scroll.throttle.20ms="checkScroll()"
+             @wheel.prevent="$el.scrollLeft += ($event.deltaY || $event.deltaX); checkScroll();"
+             class="flex items-center px-3 py-2 gap-1 toolbar-scroll overflow-x-auto"
+        >
         
         {{-- Format Dropdown --}}
         <div class="relative shrink-0" x-data="{ pos: { top: 0, left: 0 } }" @mouseenter="onToolbarAreaEnter('format')" @mouseleave="onToolbarAreaLeave('format')">
@@ -963,6 +1003,29 @@
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19 13H5v-2h14v2z"/></svg>
             </button>
         @endif
+        </div>
+
+        {{-- Right Gradient Mask + Clickable Arrow --}}
+        <div x-show="showRightFade"
+             x-transition:enter="transition ease-out duration-200"
+             x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100"
+             x-transition:leave="transition ease-in duration-150"
+             x-transition:leave-start="opacity-100"
+             x-transition:leave-end="opacity-0"
+             class="absolute right-0 top-0 bottom-0 w-14 bg-gradient-to-l from-brand-100 via-brand-100/90 to-transparent pointer-events-none z-10 flex items-center justify-end pr-2"
+             style="display: none;"
+        >
+            <button
+                type="button"
+                @mousedown.prevent="saveSelection()"
+                @click="$refs.toolbarScroll.scrollBy({ left: 150, behavior: 'smooth' });"
+                class="p-1 text-[#6A5D4D] hover:text-[#1A1A1A] transition-colors duration-150 pointer-events-auto cursor-pointer outline-none"
+                title="Scroll Right"
+            >
+                <svg class="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><path d="M6 4l12 8-12 8V4z"/></svg>
+            </button>
+        </div>
     </div>
 
     {{-- Editor Content Area (bg-brand-50) --}}
