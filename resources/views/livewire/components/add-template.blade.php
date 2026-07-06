@@ -387,7 +387,7 @@ new class extends Component {
                         <div class="flex flex-col items-center max-w-4xl mx-auto w-full">
                             
                             <div class="text-center mb-10 w-full mt-4 max-w-xl mx-auto">
-                                <h1 class="block w-full truncate text-web-title text-text-100 mb-6" title="{{ $this->selectedTemplate->name }}">
+                                <h1 class="block w-full text-3xl font-bold text-text-100 mb-6 break-words" title="{{ $this->selectedTemplate->name }}">
                                     {{ $this->selectedTemplate->name }}
                                 </h1>
                                 <button wire:click="useTemplate" class="px-5 py-2 border border-brand-200 text-secondary-200 rounded-md hover:bg-brand-50 hover:text-secondary-300 transition-colors text-web-button">

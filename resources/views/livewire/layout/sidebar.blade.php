@@ -37,7 +37,7 @@ new class extends Component {
                     $query->whereNull('archived_at');
                 })
                 ->latest('updated_at')
-                ->take(15)
+                ->take(10)
                 ->get();
         }
     }
@@ -276,8 +276,7 @@ new class extends Component {
             try { recentSearches = JSON.parse(localStorage.getItem('recentSearches') || '[]'); }
             catch(e) { recentSearches = []; }
         "
-        "
-        class="flex flex-col flex-1 overflow-y-auto px-6 pb-6 custom-scrollbar"
+        class="flex flex-col flex-1 overflow-y-auto [scrollbar-gutter:stable] px-6 pb-6 custom-scrollbar"
     >
         @if($this->searchResultsData !== null)
             <div wire:key="search-results-block" wire:transition>
@@ -362,11 +361,11 @@ new class extends Component {
         @endif
 
         <div class="space-y-6 shrink-0">
-            <div x-data="{ open: true, viewAll: false }">
-            <button @click="open = !open" class="flex items-center justify-between w-full text-app-feature text-text-70 mb-2 focus:outline-none hover:text-text-80 transition-colors">
+            <div x-data="{ viewAll: false }">
+            <div class="flex items-center justify-between w-full text-app-feature text-text-70 mb-2">
                 <span>Marked</span>
-            </button>
-            <div x-show="open" x-collapse>
+            </div>
+            <div>
                 @if(count($pinnedProjects) > 0)
                     <div class="space-y-1 pb-2">
                         @foreach($pinnedProjects->take(3) as $pProject)
@@ -421,14 +420,14 @@ new class extends Component {
             </div>
         </div>
 
-        <div x-data="{ open: true, viewAll: false }">
-            <button @click="open = !open" class="flex items-center justify-between w-full text-app-feature text-text-70 mb-2 focus:outline-none hover:text-text-80 transition-colors">
+        <div x-data="{ viewAll: false }">
+            <div class="flex items-center justify-between w-full text-app-feature text-text-70 mb-2">
                 <span>Recent</span>
-            </button>
-            <div x-show="open" x-collapse>
+            </div>
+            <div>
                 @if(count($recentProjects) > 0)
                     <div class="space-y-1 pb-2">
-                        @foreach($recentProjects->take(8) as $rProject)
+                        @foreach($recentProjects->take(3) as $rProject)
                             <a href="{{ route('projects.show', $rProject->project_id) }}" wire:navigate class="flex items-center gap-2 px-2 py-1.5 -mx-2 rounded-lg hover:bg-brand-150 transition-colors group">
                                 @if($rProject->icon_type === 'emoji')
                                     <span class="text-[16px] leading-none shrink-0">{{ $rProject->icon }}</span>
@@ -441,9 +440,9 @@ new class extends Component {
                             </a>
                         @endforeach
                         
-                        @if(count($recentProjects) > 8)
+                        @if(count($recentProjects) > 3)
                             <div x-show="viewAll" x-collapse x-cloak class="space-y-1 mt-1">
-                                @foreach($recentProjects->skip(8) as $rProject)
+                                @foreach($recentProjects->skip(3) as $rProject)
                                     <a href="{{ route('projects.show', $rProject->project_id) }}" wire:navigate class="flex items-center gap-2 px-2 py-1.5 -mx-2 rounded-lg hover:bg-brand-150 transition-colors group">
                                         @if($rProject->icon_type === 'emoji')
                                             <span class="text-[16px] leading-none shrink-0">{{ $rProject->icon }}</span>
