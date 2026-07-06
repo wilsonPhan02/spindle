@@ -191,7 +191,7 @@ new #[Layout('layouts.app')] class extends Component {
     }
 
     public function updatedNewImage() {
-        $this->validate(['newImage' => 'image|max:2048']);
+        $this->validate(['newImage' => 'image|max:5120']);
 
         if ($this->character->image_path) {
             Storage::disk('public')->delete($this->character->image_path);
