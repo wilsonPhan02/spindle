@@ -211,12 +211,6 @@ new #[Layout('layouts.app')] class extends Component {
 }; ?>
 
 <div>
-    <style>
-        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background-color: #D5C6A9; border-radius: 10px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background-color: #B69F78; }
-    </style>
 
     <div class="p-6 lg:p-10 max-w-7xl mx-auto">
         <x-breadcrumb :items="[
@@ -267,9 +261,9 @@ new #[Layout('layouts.app')] class extends Component {
                             emoji-picker {
                                 width: 100%;
                                 height: 300px;
-                                --background: #FDFBF7; /* Warna warm-white */
+                                --background: #FDFBF7;
                                 --border-color: transparent;
-                                --indicator-color: #8B7355; /* Aksen warna tua/hangat */
+                                --indicator-color: #8B7355;
                                 --font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
                                 --button-hover-background: #f0eadd;
                                 --search-background: #f0eadd;
