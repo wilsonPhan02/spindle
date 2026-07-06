@@ -12,6 +12,17 @@
     'showHighlight' => true,
 ])
 
+@php
+    $customColorPath = resource_path('views/components/custom_color.blade.php');
+    if (!file_exists($customColorPath)) {
+        $customColorPath = resource_path('views/components/custom-color.blade.php');
+    }
+    $customColorsList = file_exists($customColorPath) ? json_decode(file_get_contents($customColorPath), true) : [];
+    $presetTextColors = !empty($customColorsList) ? array_merge(['#000000'], array_column($customColorsList, 'textColor')) : ['#000000', '#43A047', '#1E88E5', '#D81B60', '#8E24AA', '#FB8C00', '#E53935', '#00897B', '#F9A825', '#3949AB', '#00ACC1', '#C0CA33', '#F4511E'];
+    $presetBgColors = !empty($customColorsList) ? array_merge(['transparent'], array_column($customColorsList, 'bgColor')) : ['transparent', '#C8E6C9', '#BBDEFB', '#F8BBD0', '#E1BEE7', '#FFE0B2', '#FFCDD2', '#B2DFDB', '#FFF9C4', '#C5CAE9', '#B2EBF2', '#F0F4C3', '#FFCCBC'];
+    $textColorsJs = '[' . implode(', ', array_map(fn($c) => "'" . $c . "'", $presetTextColors)) . ']';
+    $bgColorsJs = '[' . implode(', ', array_map(fn($c) => "'" . $c . "'", $presetBgColors)) . ']';
+@endphp
 <div
     {{ $attributes->merge(['class' => 'flex-1 flex flex-col min-w-0 min-h-0 relative bg-brand-50']) }}
     x-data="{
@@ -23,10 +34,10 @@
             justifyLeft: true, justifyCenter: false, justifyRight: false, justifyFull: false,
         },
         activeDropdown: null,
-        currentTextColor: '#2c2c2c',
-        currentHighlightColor: '#ffeaa7',
-        textColors: ['#2c2c2c', '#8c7558', '#b23a3a', '#2563eb', '#15803d', '#9333ea', '#ea580c'],
-        highlightColors: ['#ffeaa7', '#ffd1dc', '#c7f0db', '#cde7ff', '#e8d9ff', '#ffe0b3', 'transparent'],
+        currentTextColor: null,
+        currentHighlightColor: null,
+        textColors: {!! $textColorsJs !!},
+        highlightColors: {!! $bgColorsJs !!},
         savedRange: null,
         wordCount: 0,
         charCount: 0,
@@ -278,9 +289,50 @@
                         this.activeStates.justifyCenter = align === 'center';
                         this.activeStates.justifyRight = align === 'right' || align === 'end';
                         this.activeStates.justifyFull = align === 'justify';
+
+                        // Detect text color and highlight color at cursor position
+                        let currEl = node.nodeType === 1 ? node : node.parentElement;
+                        let inlineFore = null;
+                        let inlineHilite = null;
+                        let searchEl = currEl;
+                        while (searchEl && searchEl !== editorEl && searchEl !== document.body) {
+                            if (searchEl.nodeType === 1) {
+                                if (!inlineFore && searchEl.style && searchEl.style.color) inlineFore = searchEl.style.color;
+                                if (!inlineFore && searchEl.getAttribute && searchEl.getAttribute('color')) inlineFore = searchEl.getAttribute('color');
+                                if (!inlineHilite && searchEl.style && searchEl.style.backgroundColor && searchEl.style.backgroundColor !== 'transparent' && searchEl.style.backgroundColor !== 'rgba(0, 0, 0, 0)') inlineHilite = searchEl.style.backgroundColor;
+                            }
+                            searchEl = searchEl.parentElement;
+                        }
+                        if (!inlineFore) {
+                            try { inlineFore = document.queryCommandValue('foreColor'); } catch(e) {}
+                        }
+                        if (!inlineHilite) {
+                            try {
+                                const val = document.queryCommandValue('hiliteColor') || document.queryCommandValue('backColor');
+                                if (val && val !== 'transparent' && val !== 'rgba(0, 0, 0, 0)' && val !== 'rgb(255, 255, 255)' && val !== '#ffffff' && val !== '#FFFFFF') inlineHilite = val;
+                            } catch(e) {}
+                        }
+                        const normFore = this.normalizeColor(inlineFore);
+                        const normHilite = this.normalizeColor(inlineHilite);
+                        this.currentTextColor = this.textColors.find(c => this.normalizeColor(c) === normFore) || null;
+                        this.currentHighlightColor = this.highlightColors.find(c => c !== 'transparent' && this.normalizeColor(c) === normHilite) || null;
                     }
                 }
             } catch (e) { /* ignore */ }
+        },
+
+        normalizeColor(c) {
+            if (!c || c === 'transparent' || c === 'rgba(0, 0, 0, 0)' || c === 'rgb(255, 255, 255)' || c === '#ffffff' || c === '#FFFFFF') return 'transparent';
+            if (typeof c !== 'string') return 'transparent';
+            if (c.startsWith('#')) return c.toUpperCase();
+            const match = c.match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)/i);
+            if (match) {
+                const r = parseInt(match[1]).toString(16).padStart(2, '0');
+                const g = parseInt(match[2]).toString(16).padStart(2, '0');
+                const b = parseInt(match[3]).toString(16).padStart(2, '0');
+                return (`#${r}${g}${b}`).toUpperCase();
+            }
+            return c.toUpperCase();
         },
 
         insertTodoBlock() {
@@ -688,9 +740,27 @@
             }, 120);
         },
 
-        adjustOverlayPosition(pos, width = 180, height = 220) {
-            pos.left = Math.min(Math.max(pos.left, 12), Math.max(window.innerWidth - width - 12, 12));
-            pos.top = Math.min(Math.max(pos.top, 12), Math.max(window.innerHeight - height - 12, 12));
+        adjustOverlayPosition(pos, width = 180, height = 220, targetEl = null) {
+            if (targetEl) {
+                const r = targetEl.getBoundingClientRect();
+                pos.left = r.left + (r.width / 2) - (width / 2);
+                pos.top = r.bottom + 6;
+            }
+            const editorEl = document.getElementById('{{ $editorId }}');
+            const rootBoxEl = editorEl ? (editorEl.closest('.flex-1.flex.flex-col') || editorEl.parentElement.parentElement) : (this.$el || document.body);
+            if (rootBoxEl) {
+                const box = rootBoxEl.getBoundingClientRect();
+                const minLeft = Math.max(box.left + 8, 8);
+                const maxLeft = Math.min(box.right - width - 8, window.innerWidth - width - 8);
+                if (maxLeft >= minLeft) {
+                    pos.left = Math.min(Math.max(pos.left, minLeft), maxLeft);
+                } else {
+                    pos.left = Math.max(pos.left, 8);
+                }
+            } else {
+                pos.left = Math.min(Math.max(pos.left, 12), Math.max(window.innerWidth - width - 12, 12));
+            }
+            pos.top = Math.min(Math.max(pos.top, 8), Math.max(window.innerHeight - height - 8, 8));
         }
     }"
 >
@@ -795,7 +865,7 @@
                     const r = $event.currentTarget.getBoundingClientRect();
                     pos = { top: r.bottom + 6, left: r.left };
                     activeDropdown = activeDropdown === 'format' ? null : 'format';
-                    if (activeDropdown === 'format') adjustOverlayPosition(pos, 180, 220);
+                    if (activeDropdown === 'format') adjustOverlayPosition(pos, 180, 220, $event.currentTarget);
                 "
                 class="h-7 px-2.5 flex items-center gap-1.5 text-[12px] text-[#4A4A4A] bg-card-bg border border-[#E0D5C5] rounded-md outline-none cursor-pointer hover:border-[#B69F78] transition-colors shadow-sm"
                 style="min-width: 118px;"
@@ -882,8 +952,8 @@
         @if($showColors)
             <div class="toolbar-divider"></div>
 
-            {{-- Text Color with Custom Color Picker --}}
-            <div class="relative" x-data="{ pos: { top: 0, left: 0 } }" @mouseenter="onToolbarAreaEnter('textColor')" @mouseleave="onToolbarAreaLeave('textColor')">
+            {{-- Text Color with Preset Color Picker --}}
+            <div class="relative" x-data="{ pos: { top: 0, left: 0 } }">
                 <button
                     type="button"
                     @mousedown.prevent="saveSelection()"
@@ -891,40 +961,30 @@
                         const r = $event.currentTarget.getBoundingClientRect();
                         pos = { top: r.bottom + 6, left: r.left };
                         activeDropdown = activeDropdown === 'textColor' ? null : 'textColor';
-                        if (activeDropdown === 'textColor') adjustOverlayPosition(pos, 190, 220);
+                        if (activeDropdown === 'textColor') adjustOverlayPosition(pos, 172, 140, $event.currentTarget);
                     "
                     class="toolbar-btn" title="Text Color"
                 >
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M11 3L5.5 17h2.25l1.12-3h6.25l1.12 3h2.25L13 3h-2zm-1.38 9L12 5.67 14.38 12H9.62z"/></svg>
-                    <span class="block h-[3px] w-3.5 rounded-sm -mt-0.5" x-bind:style="`background:${currentTextColor}`"></span>
+                    <span class="block h-[3px] w-3.5 rounded-sm -mt-0.5" x-bind:style="`background:${currentTextColor || '#2c2c2c'}`"></span>
                 </button>
                 <template x-teleport="body">
                     <div
-                        x-show="activeDropdown === 'textColor'" x-cloak x-transition @mouseenter="onToolbarAreaEnter('textColor')" @mouseleave="onToolbarAreaLeave('textColor')"
+                        x-show="activeDropdown === 'textColor'" x-cloak x-transition
                         @click.outside="activeDropdown = null"
                         x-bind:style="`position: fixed; top: ${pos.top}px; left: ${pos.left}px; z-index: 9999;`"
                         class="p-2.5 bg-white border border-[#E0D5C5] rounded-lg shadow-lg flex flex-col"
                         style="display: none; width: 172px;"
                     >
-                        <span class="text-[10px] font-semibold text-[#9A8E80] uppercase tracking-wider mb-2 block">Theme Colors</span>
-                        <div class="grid grid-cols-7 gap-1.5 mb-2.5">
+                        <span class="text-[10px] font-semibold text-[#9A8E80] uppercase tracking-wider mb-2 block">Text Color</span>
+                        <div class="grid grid-cols-6 gap-2">
                             <template x-for="c in textColors" :key="c">
-                                <button type="button" @mousedown.prevent="saveSelection()" @click="exec('foreColor', c); currentTextColor = c; activeDropdown = null" class="w-5 h-5 rounded-full border border-[#E0D5C5] hover:scale-110 transition-transform" x-bind:style="`background:${c}`" :title="c"></button>
+                                <button type="button" @mousedown.prevent="saveSelection()" @click="exec('foreColor', c); currentTextColor = c;" class="w-5 h-5 rounded-full transition-all duration-150 relative flex items-center justify-center shrink-0" x-bind:class="currentTextColor === c ? 'border border-[#5E4C38] bg-white p-[2px]' : 'border border-[#E0D5C5] hover:scale-110 hover:border-[#8C7558]'" x-bind:style="currentTextColor === c ? '' : `background:${c}`" :title="c">
+                                    <template x-if="currentTextColor === c">
+                                        <span class="w-full h-full rounded-full block" x-bind:style="`background:${c}`"></span>
+                                    </template>
+                                </button>
                             </template>
-                        </div>
-                        <div class="h-px bg-[#E8DED2] w-full mb-2.5"></div>
-                        <div class="flex items-center justify-between">
-                            <span class="text-[11.5px] text-[#5A5A5A] font-medium">Custom Color</span>
-                            <div class="relative w-5 h-5 rounded-full border border-[#E0D5C5] overflow-hidden cursor-pointer hover:scale-110 transition-transform shrink-0" title="Pick custom color">
-                                <input type="color"
-                                       :value="currentTextColor"
-                                       @click.stop="saveSelection()"
-                                       @change="currentTextColor = $event.target.value; exec('foreColor', $event.target.value); activeDropdown = null;"
-                                       class="absolute opacity-0 w-full h-full cursor-pointer z-10"
-                                       style="transform: scale(2);"
-                                >
-                                <div class="absolute inset-0 pointer-events-none" :style="`background-color: ${currentTextColor}`"></div>
-                            </div>
                         </div>
                     </div>
                 </template>
@@ -932,8 +992,8 @@
         @endif
 
         @if($showHighlight)
-            {{-- Highlight Color with Custom Color Picker --}}
-            <div class="relative" x-data="{ pos: { top: 0, left: 0 } }" @mouseenter="onToolbarAreaEnter('highlightColor')" @mouseleave="onToolbarAreaLeave('highlightColor')">
+            {{-- Highlight Color with Preset Color Picker --}}
+            <div class="relative" x-data="{ pos: { top: 0, left: 0 } }">
                 <button
                     type="button"
                     @mousedown.prevent="saveSelection()"
@@ -941,44 +1001,33 @@
                         const r = $event.currentTarget.getBoundingClientRect();
                         pos = { top: r.bottom + 6, left: r.left };
                         activeDropdown = activeDropdown === 'highlightColor' ? null : 'highlightColor';
-                        if (activeDropdown === 'highlightColor') adjustOverlayPosition(pos, 190, 220);
+                        if (activeDropdown === 'highlightColor') adjustOverlayPosition(pos, 184, 140, $event.currentTarget);
                     "
                     class="toolbar-btn" title="Highlight (==text==)"
                 >
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M7 22l4-4H3l4 4zm9.06-1.19l-7.87-7.87 1.41-1.41 7.87 7.87-1.41 1.41zM17.5 6c-.32 0-.64.12-.88.37l-4.25 4.25-1.06-1.06-1.41 1.41 1.06 1.06-3.66 3.66 7.06 7.06 6.63-6.63c.48-.48.48-1.27 0-1.76L18.38 6.37A1.24 1.24 0 0017.5 6z"/></svg>
-                    <span class="block h-[3px] w-3.5 rounded-sm -mt-0.5" x-bind:style="`background:${currentHighlightColor}`"></span>
+                    <span class="block h-[3px] w-3.5 rounded-sm -mt-0.5" x-bind:style="`background:${currentHighlightColor || 'transparent'}`"></span>
                 </button>
                 <template x-teleport="body">
                     <div
-                        x-show="activeDropdown === 'highlightColor'" x-cloak x-transition @mouseenter="onToolbarAreaEnter('highlightColor')" @mouseleave="onToolbarAreaLeave('highlightColor')"
+                        x-show="activeDropdown === 'highlightColor'" x-cloak x-transition
                         @click.outside="activeDropdown = null"
                         x-bind:style="`position: fixed; top: ${pos.top}px; left: ${pos.left}px; z-index: 9999;`"
                         class="p-2.5 bg-white border border-[#E0D5C5] rounded-lg shadow-lg flex flex-col"
-                        style="display: none; width: 172px;"
+                        style="display: none; width: 184px;"
                     >
-                        <span class="text-[10px] font-semibold text-[#9A8E80] uppercase tracking-wider mb-2 block">Theme Colors</span>
-                        <div class="grid grid-cols-7 gap-1.5 mb-2.5">
+                        <span class="text-[10px] font-semibold text-[#9A8E80] uppercase tracking-wider mb-2 block">Highlight Color</span>
+                        <div class="grid grid-cols-7 gap-1.5">
                             <template x-for="c in highlightColors" :key="c">
-                                <button type="button" @mousedown.prevent="saveSelection()" @click="exec('hiliteColor', c === 'transparent' ? 'transparent' : c); currentHighlightColor = c; activeDropdown = null" class="w-5 h-5 rounded-full border border-[#E0D5C5] hover:scale-110 transition-transform flex items-center justify-center" x-bind:style="`background:${c}`" :title="c === 'transparent' ? 'No Highlight' : c">
+                                <button type="button" @mousedown.prevent="saveSelection()" @click="exec('hiliteColor', c === 'transparent' ? 'transparent' : c); currentHighlightColor = c;" class="w-5 h-5 rounded-full transition-all duration-150 relative flex items-center justify-center shrink-0" x-bind:class="currentHighlightColor === c ? 'border border-[#5E4C38] bg-white p-[2px]' : 'border border-[#E0D5C5] hover:scale-110 hover:border-[#8C7558]'" x-bind:style="currentHighlightColor === c || c === 'transparent' ? '' : `background:${c}`" :title="c === 'transparent' ? 'No Highlight' : c">
                                     <template x-if="c === 'transparent'">
-                                        <svg class="w-3 h-3 text-[#E64C4C]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                        <svg class="w-full h-full text-[#E64C4C]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                    </template>
+                                    <template x-if="c !== 'transparent' && currentHighlightColor === c">
+                                        <span class="w-full h-full rounded-full block" x-bind:style="`background:${c}`"></span>
                                     </template>
                                 </button>
                             </template>
-                        </div>
-                        <div class="h-px bg-[#E8DED2] w-full mb-2.5"></div>
-                        <div class="flex items-center justify-between">
-                            <span class="text-[11.5px] text-[#5A5A5A] font-medium">Custom Color</span>
-                            <div class="relative w-5 h-5 rounded-full border border-[#E0D5C5] overflow-hidden cursor-pointer hover:scale-110 transition-transform shrink-0" title="Pick custom color">
-                                <input type="color"
-                                       :value="currentHighlightColor === 'transparent' ? '#ffffff' : currentHighlightColor"
-                                       @click.stop="saveSelection()"
-                                       @change="currentHighlightColor = $event.target.value; exec('hiliteColor', $event.target.value); activeDropdown = null;"
-                                       class="absolute opacity-0 w-full h-full cursor-pointer z-10"
-                                       style="transform: scale(2);"
-                                >
-                                <div class="absolute inset-0 pointer-events-none" :style="`background-color: ${currentHighlightColor === 'transparent' ? '#ffffff' : currentHighlightColor}`"></div>
-                            </div>
                         </div>
                     </div>
                 </template>
