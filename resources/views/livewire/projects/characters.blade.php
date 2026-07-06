@@ -20,7 +20,6 @@ new #[Layout('layouts.app')] class extends Component {
     public function mount(Project $project) {
         $this->project = $project;
         $this->project->seedDefaultRelationshipTypes();
-        $this->project->seedDefaultCharacterDetailGroups();
         $this->loadCharacters();
         $this->loadRelationshipTypes();
         $this->loadRelationships();
@@ -152,14 +151,6 @@ new #[Layout('layouts.app')] class extends Component {
 
         <div class="flex justify-between items-center">
             <h1 class="text-app-title-1 text-text-100">Characters Sheet</h1>
-
-            <button
-                @click="window.dispatchEvent(new CustomEvent('open-edit-characters'))"
-                class=" cursor-pointer flex items-center gap-4 text-web-button text-[var(--color-text-60)] p-2 rounded hover:bg-[var(--color-brand-50)] hover:text-[var(--color-secondary-200)] transition-colors"
-            >
-                Edit Character Details
-                <x-icons.rename class="w-4 h-4 stroke-2 group-hover:text-[var(--color-secondary-200)] transition-colors" />
-            </button>
         </div>
     </div>
 
@@ -317,5 +308,4 @@ new #[Layout('layouts.app')] class extends Component {
     </div>
 
     <livewire:projects.relation-type-popup :project="$project" />
-    <livewire:projects.character-details-popup :project="$project" />
 </div>

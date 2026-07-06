@@ -313,37 +313,37 @@ new #[Layout('layouts.app')] class extends Component {
             <div
                 class="flex flex-col gap-1"
                 x-data="{
-                    editingFullName: false,
                     editingNickName: false,
-                    fullNameDraft: @js($fullName),
-                    fullNameDisplay: @js($fullName),
-                    fullNameCount: {{ mb_strlen($fullName) }},
+                    editingFullName: false,
+                    nickNameDraft: @js($nickName),
+                    nickNameDisplay: @js($nickName),
                     nickNameCount: {{ mb_strlen($nickName) }},
+                    fullNameCount: {{ mb_strlen($fullName) }},
                     init() {
-                        this.$wire.$watch('fullName', (value) => {
-                            this.fullNameDisplay = value;
-                            this.fullNameCount = value.length;
+                        this.$wire.$watch('nickName', (value) => {
+                            this.nickNameDisplay = value;
+                            this.nickNameCount = value.length;
                         });
                     },
-                    startEditFullName() {
-                        this.fullNameDraft = this.fullNameDisplay;
-                        this.fullNameCount = this.fullNameDraft.length;
-                        this.editingFullName = true;
-                        this.$nextTick(() => this.$refs.fullNameInput.focus());
+                    startEditNickName() {
+                        this.nickNameDraft = this.nickNameDisplay;
+                        this.nickNameCount = this.nickNameDraft.length;
+                        this.editingNickName = true;
+                        this.$nextTick(() => this.$refs.nickNameInput.focus());
                     },
-                    cancelFullNameEdit() {
-                        this.fullNameDraft = this.fullNameDisplay;
-                        this.fullNameCount = this.fullNameDisplay.length;
-                        this.editingFullName = false;
+                    cancelNickNameEdit() {
+                        this.nickNameDraft = this.nickNameDisplay;
+                        this.nickNameCount = this.nickNameDisplay.length;
+                        this.editingNickName = false;
                     },
-                    commitFullNameEdit() {
-                        const typed = this.fullNameDraft.trim();
-                        const finalValue = typed === '' ? 'New Character' : this.fullNameDraft;
-                        this.fullNameDraft = finalValue;
-                        this.fullNameDisplay = finalValue;
-                        this.fullNameCount = finalValue.length;
-                        this.editingFullName = false;
-                        this.$wire.set('fullName', finalValue, true);
+                    commitNickNameEdit() {
+                        const typed = this.nickNameDraft.trim();
+                        const finalValue = typed === '' ? 'New Character' : this.nickNameDraft;
+                        this.nickNameDraft = finalValue;
+                        this.nickNameDisplay = finalValue;
+                        this.nickNameCount = finalValue.length;
+                        this.editingNickName = false;
+                        this.$wire.set('nickName', finalValue, true);
                     },
                     stripLeadingSpace(e, countProp) {
                         if (e.target.value.startsWith(' ')) {
@@ -355,48 +355,48 @@ new #[Layout('layouts.app')] class extends Component {
             >
                 <div class="flex items-end gap-2">
                     <h1
-                        x-show="!editingFullName"
-                        @click="startEditFullName()"
-                        x-text="fullNameDisplay"
+                        x-show="!editingNickName"
+                        @click="startEditNickName()"
+                        x-text="nickNameDisplay"
                         class="text-app-title-1 text-text-100 truncate cursor-text"
                     ></h1>
 
-                    <div x-show="editingFullName" x-cloak class="flex items-center gap-2 flex-1 min-w-0 border-b border-subtext-70">
+                    <div x-show="editingNickName" x-cloak class="flex items-center gap-2 flex-1 min-w-0 border-b {{ $nickNameError ? 'border-danger-100' : 'border-subtext-70' }}">
                         <input
                             type="text"
-                            x-ref="fullNameInput"
-                            x-model="fullNameDraft"
-                            x-init="$el.addEventListener('input', (e) => stripLeadingSpace(e, 'fullNameCount'), true)"
-                            @blur="commitFullNameEdit()"
+                            x-ref="nickNameInput"
+                            x-model="nickNameDraft"
+                            x-init="$el.addEventListener('input', (e) => stripLeadingSpace(e, 'nickNameCount'), true)"
+                            @blur="commitNickNameEdit()"
                             @keydown.enter="$event.target.blur()"
                             @keydown.escape="$event.target.blur()"
-                            maxlength="60"
-                            placeholder="Full Name"
+                            maxlength="20"
+                            placeholder="Nickname"
                             class="text-app-title-1 text-text-100 bg-transparent outline-none w-full truncate"
                         >
-                        <button type="button" @mousedown.prevent @click="cancelFullNameEdit()" class="shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-text-60 hover:bg-black/10 hover:text-danger-100 transition-colors">
+                        <button type="button" @mousedown.prevent @click="cancelNickNameEdit()" class="shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-text-60 hover:bg-black/10 hover:text-danger-100 transition-colors">
                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3"><path stroke-linecap="round" d="M6 18L18 6M6 6l12 12"/></svg>
                         </button>
                     </div>
                 </div>
-                <span x-show="editingFullName" x-cloak class="text-app-desc-feature text-subtext-70">
-                    <span x-text="fullNameCount"></span>/60
+                <span x-show="editingNickName" x-cloak class="text-app-desc-feature text-subtext-70">
+                    <span x-text="nickNameCount"></span>/20
                 </span>
-                <div class="flex items-center gap-2 text-app-body-medium text-subtext-90">
-                    <span>Nickname :</span>
-                    <input type="text" wire:model="nickName"
-                        x-init="$el.addEventListener('input', (e) => stripLeadingSpace(e, 'nickNameCount'), true)"
-                        @focus="editingNickName = true; nickNameCount = $event.target.value.length"
-                        @blur="editingNickName = false; $wire.$commit()"
-                        @keydown.enter="$event.target.blur()"
-                        @keydown.escape="$event.target.blur()"
-                        maxlength="20" placeholder="Nickname"
-                        class="bg-transparent text-text-60 outline-none border-b transition-colors {{ $nickNameError ? 'border-danger-100' : 'border-transparent focus:border-subtext-70' }}">
-                    <span x-show="editingNickName" x-cloak class="text-app-desc-feature text-subtext-70"><span x-text="nickNameCount"></span>/20</span>
-                </div>
                 @if($nickNameError)
                     <span class="text-app-desc-feature text-danger-100">{{ $nickNameError }}</span>
                 @endif
+                <div class="flex items-center gap-2 text-app-body-medium text-subtext-90">
+                    <span>Full Name :</span>
+                    <input type="text" wire:model="fullName"
+                        x-init="$el.addEventListener('input', (e) => stripLeadingSpace(e, 'fullNameCount'), true)"
+                        @focus="editingFullName = true; fullNameCount = $event.target.value.length"
+                        @blur="editingFullName = false; $wire.$commit()"
+                        @keydown.enter="$event.target.blur()"
+                        @keydown.escape="$event.target.blur()"
+                        maxlength="60" placeholder="Full Name"
+                        class="bg-transparent text-text-60 outline-none border-b border-transparent focus:border-subtext-70 transition-colors">
+                    <span x-show="editingFullName" x-cloak class="text-app-desc-feature text-subtext-70"><span x-text="fullNameCount"></span>/60</span>
+                </div>
             </div>
 
             <div class="flex flex-col gap-2">
@@ -419,7 +419,7 @@ new #[Layout('layouts.app')] class extends Component {
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                             @forelse($group['fields'] as $field)
                                 <div wire:key="field-{{ $field['id'] }}" class="flex flex-col gap-1 text-left">
-                                    <label class="text-app-feature text-text-70">{{ $field['name'] }}</label>
+                                    <label class="text-app-feature text-text-70 truncate">{{ $field['name'] }}</label>
                                     <input type="text" wire:model.live.debounce.500ms="detailValues.{{ $field['id'] }}" @blur="$wire.$commit()" value="{{ $detailValues[$field['id']] ?? '' }}" placeholder="Enter value"
                                         class="w-full px-4 py-2 bg-bg-main border-1 border-secondary-100 rounded-lg focus:border-secondary-250 focus:border-2 outline-none transition-all text-subtext-100 text-app-body-medium placeholder:text-subtext-80">
                                 </div>
@@ -501,8 +501,8 @@ new #[Layout('layouts.app')] class extends Component {
                     >
                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
                     </button>
-                    <div x-show="showNewTagInput" x-cloak class="flex flex-col gap-1">
-                        <div class="flex items-center gap-1">
+                    <div x-show="showNewTagInput" x-cloak class="flex items-center gap-1">
+                        <div class="relative shrink-0">
                             <input
                                 type="text"
                                 x-model="newTagName"
@@ -512,13 +512,13 @@ new #[Layout('layouts.app')] class extends Component {
                                 @keydown.escape="showNewTagInput = false; newTagName = ''"
                                 maxlength="20"
                                 placeholder="New tag..."
-                                class="px-3 py-2 rounded-full bg-brand-100 border border-secondary-100 outline-none text-app-body-small text-text-70 w-28 shrink-0"
+                                class="pl-3 pr-11 py-2 rounded-full bg-brand-100 border border-secondary-100 outline-none text-app-body-small text-text-70 w-36"
                             >
-                            <button @click="showNewTagInput = false; newTagName = ''" type="button" class="w-5 h-5 rounded-full flex items-center justify-center text-text-60 hover:bg-black/10 hover:text-danger-100 transition-colors">
-                                <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3"><path stroke-linecap="round" d="M6 18L18 6M6 6l12 12"/></svg>
-                            </button>
+                            <span class="absolute right-3 top-1/2 -translate-y-1/2 text-app-desc-feature text-subtext-70 pointer-events-none" x-text="newTagName.length + '/20'"></span>
                         </div>
-                        <span class="text-app-desc-feature text-subtext-70" x-text="newTagName.length + '/20'"></span>
+                        <button @click="showNewTagInput = false; newTagName = ''" type="button" class="w-5 h-5 rounded-full flex items-center justify-center text-text-60 hover:bg-black/10 hover:text-danger-100 transition-colors">
+                            <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3"><path stroke-linecap="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -704,7 +704,7 @@ new #[Layout('layouts.app')] class extends Component {
         <div @click.away="confirmingDelete = false" class="bg-bg-main border border-brand-100 rounded-xl shadow-xl p-6 w-full max-w-sm flex flex-col gap-5">
             <div class="text-center">
                 <h3 class="text-app-heading-2 text-text-80">Delete Character?</h3>
-                <p class="text-app-desc-feature text-text-70 mt-2">"{{ $fullName }}" and every relationship involving them will be permanently removed.</p>
+                <p class="text-app-desc-feature text-text-70 mt-2">"{{ $nickName }}" and every relationship involving them will be permanently removed.</p>
             </div>
             <div class="flex gap-3">
                 <button @click="confirmingDelete = false" class="flex-1 py-2.5 rounded-lg border border-brand-200 text-app-feature text-text-80 hover:bg-brand-100 transition-colors">Cancel</button>

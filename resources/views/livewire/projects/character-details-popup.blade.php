@@ -39,6 +39,11 @@ new class extends Component {
 
     #[Renderless]
     public function createDetailGroup($name) {
+        $name = mb_substr(trim($name), 0, 30);
+        if ($name === '') {
+            return null;
+        }
+
         $maxOrder = $this->project->characterDetailGroups()->max('order') ?? -1;
         $group = $this->project->characterDetailGroups()->create([
             'name' => $name,
@@ -62,12 +67,22 @@ new class extends Component {
 
     #[Renderless]
     public function renameDetailGroup($groupId, $name) {
+        $name = mb_substr(trim($name), 0, 30);
+        if ($name === '') {
+            return;
+        }
+
         $this->project->characterDetailGroups()->where('character_detail_group_id', $groupId)->update(['name' => $name]);
         $this->dispatch('detail-groups-changed');
     }
 
     #[Renderless]
     public function createDetailField($groupId, $name) {
+        $name = mb_substr(trim($name), 0, 30);
+        if ($name === '') {
+            return null;
+        }
+
         $group = $this->project->characterDetailGroups()->where('character_detail_group_id', $groupId)->first();
         if (! $group) {
             return null;
@@ -98,6 +113,11 @@ new class extends Component {
 
     #[Renderless]
     public function renameDetailField($fieldId, $name) {
+        $name = mb_substr(trim($name), 0, 30);
+        if ($name === '') {
+            return;
+        }
+
         CharacterDetailField::where('character_detail_field_id', $fieldId)
             ->whereHas('group', fn ($query) => $query->where('project_id', $this->project->project_id))
             ->update(['name' => $name]);
@@ -316,9 +336,11 @@ new class extends Component {
                                 @keydown.escape="editingGroupId = null; groupNameError = ''"
                                 @blur="renameGroup(group)"
                                 @input="groupNameError = ''"
+                                maxlength="30"
                                 class="text-app-subheading-2 font-semibold text-secondary-200 bg-transparent border-b border-secondary-200 outline-none"
                             >
                         </template>
+                        <span x-show="editingGroupId === group.id" x-cloak class="text-app-desc-feature text-subtext-70 shrink-0" x-text="editGroupName.length + '/30'"></span>
                         <button x-show="editingGroupId !== group.id" @click="editingGroupId = group.id; editGroupName = group.name" class="text-secondary-200 hover:text-secondary-300 hover:bg-brand-50 rounded p-1 transition-colors">
                             <x-icons.rename class="w-4 h-4 stroke-2" />
                         </button>
@@ -344,9 +366,11 @@ new class extends Component {
                                         @blur="renameField(field)"
                                         @input="fieldNameError = ''"
                                         @click.stop
+                                        maxlength="30"
                                         class="text-app-body-medium text-text-90 min-w-[20px] [field-sizing:content] border-b border-secondary-200 outline-none"
                                     >
                                 </template>
+                                <span x-show="editingFieldId === field.id" x-cloak class="text-app-desc-feature text-subtext-70 shrink-0" x-text="editFieldName.length + '/30'"></span>
                                 <button @click="confirmingDeleteFieldId = field.id" class="w-4 h-4 rounded-full flex items-center justify-center text-text-60 hover:bg-black/10 hover:text-danger-100 transition-colors">
                                     <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3"><path stroke-linecap="round" d="M6 18L18 6M6 6l12 12"/></svg>
                                 </button>
@@ -357,16 +381,20 @@ new class extends Component {
                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
                         </button>
                         <div x-show="showNewFieldInput[group.id]" class="flex items-center gap-1">
-                            <input
-                                type="text"
-                                x-model="newFieldName[group.id]"
-                                x-init="$nextTick(() => $el.focus())"
-                                @keydown.enter="addField(group.id)"
-                                @keydown.escape="showNewFieldInput[group.id] = false; newFieldName[group.id] = ''; fieldNameError = ''"
-                                @input="fieldNameError = ''"
-                                placeholder="New field..."
-                                class="px-3 py-1.5 rounded-full bg-brand-100 border border-secondary-200 outline-none text-app-body-medium text-text-90 w-28"
-                            >
+                            <div class="relative shrink-0">
+                                <input
+                                    type="text"
+                                    x-model="newFieldName[group.id]"
+                                    x-init="$nextTick(() => $el.focus())"
+                                    @keydown.enter="addField(group.id)"
+                                    @keydown.escape="showNewFieldInput[group.id] = false; newFieldName[group.id] = ''; fieldNameError = ''"
+                                    @input="fieldNameError = ''"
+                                    maxlength="30"
+                                    placeholder="New field..."
+                                    class="pl-3 pr-11 py-1.5 rounded-full bg-brand-100 border border-secondary-200 outline-none text-app-body-medium text-text-90 w-36"
+                                >
+                                <span class="absolute right-3 top-1/2 -translate-y-1/2 text-app-desc-feature text-subtext-70 pointer-events-none" x-text="(newFieldName[group.id] || '').length + '/30'"></span>
+                            </div>
                             <button @click="showNewFieldInput[group.id] = false; newFieldName[group.id] = ''; fieldNameError = ''" type="button" class="w-5 h-5 cursor-pointer rounded-full flex items-center justify-center text-text-60 hover:bg-black/10 hover:text-danger-100 transition-colors">
                                 <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3"><path stroke-linecap="round" d="M6 18L18 6M6 6l12 12"/></svg>
                             </button>
@@ -386,6 +414,7 @@ new class extends Component {
                         @keydown.enter="addGroup()"
                         @keydown.escape="showNewGroupInput = false; newGroupName = ''; groupNameError = ''"
                         @input="groupNameError = ''"
+                        maxlength="30"
                         placeholder="New group name..."
                         class="text-app-subheading-2 font-semibold text-secondary-200 bg-transparent border-b border-secondary-200 outline-none min-w-0 flex-1"
                     >
@@ -393,6 +422,7 @@ new class extends Component {
                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3"><path stroke-linecap="round" d="M6 18L18 6M6 6l12 12"/></svg>
                     </button>
                 </div>
+                <span class="text-app-desc-feature text-subtext-70 -mt-2" x-text="newGroupName.length + '/30'"></span>
                 <p x-show="groupNameError" style="display:none;" class="text-app-desc-feature text-danger-100 -mt-2" x-text="groupNameError"></p>
             </div>
 

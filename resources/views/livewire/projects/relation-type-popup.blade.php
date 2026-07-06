@@ -292,6 +292,7 @@ new class extends Component {
                                 type="text"
                                 x-model="newTypeName"
                                 @input="selectedTypeId = null"
+                                @keydown.enter="if (!((!selectedTypeId && newTypeName.trim() === '') || isDuplicateTypeName())) saveRelation()"
                                 maxlength="20"
                                 placeholder="New type..."
                                 :class="isDuplicateTypeName() ? 'border-danger-100' : 'border-brand-200'"
