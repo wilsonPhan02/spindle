@@ -201,15 +201,15 @@ new class extends Component {
                                 <svg class="w-6 h-6 text-text-80" fill="currentColor" viewBox="0 0 24 24"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
                             </button>
 
-                            <div x-show="menuOpen" style="display: none;" class="absolute right-0 mt-2 w-48 bg-white border border-brand-150 rounded-lg shadow-lg z-50 py-1">
-                                <button wire:click="addProject('{{ $section->section_id }}')" @click="menuOpen = false" class="w-full text-left px-4 py-2 text-app-body-medium text-text-80 hover:bg-brand-10 flex items-center gap-3">
-                                    <x-icons.add class="w-4 h-4" /> Add Project
+                            <div x-show="menuOpen" style="display: none;" class="absolute right-0 mt-2 w-48 bg-white border border-brand-150 rounded-lg shadow-lg z-50 py-1 overflow-hidden">
+                                <button wire:click="addProject('{{ $section->section_id }}')" @click="menuOpen = false" class="w-full text-left px-4 py-2 text-app-body-medium text-text-80 hover:bg-brand-10 flex items-center gap-3 transition-colors">
+                                    <x-icons.add class="w-4 h-4 shrink-0 text-text-80" /> Add Project
                                 </button>
-                                <button @click="editing = true; menuOpen = false; setTimeout(() => $refs.nameInput.focus(), 50)" class="w-full text-left px-4 py-2 text-app-body-medium text-text-80 hover:bg-brand-10 flex items-center gap-3">
-                                    <x-icons.rename class="w-4 h-4" /> Rename
+                                <button @click="editing = true; menuOpen = false; setTimeout(() => $refs.nameInput.focus(), 50)" class="w-full text-left px-4 py-2 text-app-body-medium text-text-80 hover:bg-brand-10 flex items-center gap-3 transition-colors">
+                                    <x-icons.rename class="w-4 h-4 shrink-0 text-text-80" /> Rename
                                 </button>
-                                <button @click="$dispatch('open-archive-section-dialog', { id: '{{ $section->section_id }}' }); menuOpen = false" class="w-full text-left px-4 py-2 text-app-body-medium text-text-80 hover:bg-brand-10 flex items-center gap-3">
-                                    <x-icons.archive class="w-4 h-4" /> Archive
+                                <button @click="$dispatch('open-archive-section-dialog', { id: '{{ $section->section_id }}' }); menuOpen = false" class="w-full text-left px-4 py-2 text-app-body-medium text-text-80 hover:bg-brand-10 flex items-center gap-3 transition-colors">
+                                    <x-icons.archive class="w-4 h-4 shrink-0 text-text-80" /> Archive
                                 </button>
                             </div>
                         </div>

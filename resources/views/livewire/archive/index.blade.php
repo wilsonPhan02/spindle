@@ -141,19 +141,17 @@ new #[Layout('layouts.app')] class extends Component {
                                 <button
                                     wire:click="restoreSection('{{ $section->section_id }}')"
                                     @click="menuOpen = false"
-                                    class="w-full text-left px-4 py-2 text-app-body-medium text-text-80 hover:bg-brand-10 flex items-center gap-3"
+                                    class="w-full text-left px-4 py-2 text-app-body-medium text-text-80 hover:bg-brand-10 flex items-center gap-3 transition-colors"
                                 >
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-                                    </svg>
+                                    <x-icons.restore class="w-4 h-4 shrink-0 text-text-80" />
                                     Restore All
                                 </button>
                                 <button
                                     @click="$dispatch('open-delete-section-dialog', { id: '{{ $section->section_id }}' }); menuOpen = false"
-                                    class="w-full text-left px-4 py-2 text-app-body-medium text-danger-100 hover:bg-danger-100/5 flex items-center gap-3"
+                                    class="w-full text-left px-4 py-2 text-app-body-medium text-danger-100 hover:bg-danger-100/5 flex items-center gap-3 transition-colors"
                                 >
-                                    <x-icons.delete class="w-4 h-4" />
-                                    Delete All
+                                    <x-icons.delete class="w-4 h-4 shrink-0 text-danger-100" />
+                                    Delete Section
                                 </button>
                             </div>
                         </div>
@@ -232,7 +230,7 @@ new #[Layout('layouts.app')] class extends Component {
         btnColor="bg-danger-100 hover:bg-danger-100/90 text-white"
     >
         <x-slot:icon>
-            <x-icons.delete-default size="w-15 h-15" color="currentColor"/>
+            <x-icons.delete class="w-15 h-15" />
         </x-slot:icon>
     </x-confirm-dialog>
 
@@ -246,8 +244,9 @@ new #[Layout('layouts.app')] class extends Component {
         btnColor="bg-danger-100 hover:bg-danger-100/90 text-white"
     >
         <x-slot:icon>
-            <x-icons.delete-default size="w-15 h-15" color="currentColor"/>
+            <x-icons.delete class="w-15 h-15" />
         </x-slot:icon>
     </x-confirm-dialog>
 
 </div>
+

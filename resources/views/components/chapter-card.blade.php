@@ -76,7 +76,7 @@
                 class="text-text-60 hover:text-danger-100 hover:bg-danger-100/10 px-1 pb-1 rounded transition-all focus:outline-none"
                 title="Delete Chapter"
             >
-                <x-icons.delete-default size="w-4 h-4" color="currentColor"/>            
+                <x-icons.delete class="w-4 h-4" />            
             </button>
             
         </div>

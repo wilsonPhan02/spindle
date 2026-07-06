@@ -301,7 +301,7 @@ new #[Layout('layouts.app')] class extends Component {
                     wire:click="addCharacter"
                     class="w-12 h-12 bg-secondary-100 rounded-full flex items-center justify-center shadow-xl hover:bg-secondary-200 hover:-translate-y-1 transition-all duration-200 border-1 border-bg-main">
                     
-                    <x-icons.add-default class="text-white w-4 h-4" />
+                    <x-icons.add class="text-white w-4 h-4" />
 
                 </button>
             </div>
@@ -310,3 +310,4 @@ new #[Layout('layouts.app')] class extends Component {
 
     <livewire:projects.relation-type-popup :project="$project" />
 </div>
+
