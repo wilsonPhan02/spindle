@@ -150,6 +150,17 @@ new #[Layout('layouts.app')] class extends Component {
             return;
         }
 
+        $duplicate = Relationship::where('relationship_type_id', $this->newRelationTypeId)
+            ->where(function ($query) {
+                $query->where(fn ($q) => $q->where('from_id', $this->character->character_id)->where('to_id', $this->newRelationTargetId))
+                    ->orWhere(fn ($q) => $q->where('from_id', $this->newRelationTargetId)->where('to_id', $this->character->character_id));
+            })
+            ->exists();
+
+        if ($duplicate) {
+            return;
+        }
+
         $relationship = Relationship::create([
             'from_id' => $this->character->character_id,
             'to_id' => $this->newRelationTargetId,
@@ -176,6 +187,7 @@ new #[Layout('layouts.app')] class extends Component {
 
     public function refreshRelationships(): void {
         $this->loadRelationships();
+        $this->loadRelationshipTypes();
     }
 
     public function updatedNewImage() {
@@ -199,7 +211,7 @@ new #[Layout('layouts.app')] class extends Component {
 
     #[Renderless]
     public function addTag(string $name) {
-        $name = trim($name);
+        $name = mb_substr(trim($name), 0, 20);
         if ($name === '') return null;
 
         $tag = Hashtag::firstOrCreate(['slug' => Str::slug($name)], ['name' => $name]);
@@ -215,15 +227,28 @@ new #[Layout('layouts.app')] class extends Component {
 
     public function updated($property) {
         if (in_array($property, ['fullName', 'nickName', 'bio'])) {
-            if ($property === 'nickName') {
-                $isDuplicate = $this->project->characters()
-                    ->where('nick_name', $this->nickName)
-                    ->where('character_id', '!=', $this->character->character_id)
-                    ->exists();
-                $isDuplicate
-                    ? ($this->nickNameError = 'Nickname already taken.')
-                    : ($this->nickNameError = '');
+            if ($property === 'fullName') {
+                $this->fullName = mb_substr(ltrim($this->fullName), 0, 60);
+                if (trim($this->fullName) === '') {
+                    $this->fullName = 'New Character';
+                }
             }
+
+            if ($property === 'nickName') {
+                $this->nickName = mb_substr(ltrim($this->nickName), 0, 20);
+
+                if (trim($this->nickName) === '') {
+                    $this->nickName = 'New Character';
+                    $this->nickNameError = '';
+                } else {
+                    $isDuplicate = $this->project->characters()
+                        ->where('nick_name', $this->nickName)
+                        ->where('character_id', '!=', $this->character->character_id)
+                        ->exists();
+                    $this->nickNameError = $isDuplicate ? 'Nickname already taken.' : '';
+                }
+            }
+
             $this->character->update([
                 'full_name' => $this->fullName,
                 'nick_name' => $this->nickNameError ? $this->character->nick_name : $this->nickName,
@@ -256,24 +281,124 @@ new #[Layout('layouts.app')] class extends Component {
             ['label' => 'Dashboard', 'url' => route('dashboard')],
             ['label' => $project->title, 'url' => route('projects.show', $project), 'truncate' => true],
             ['label' => 'Characters', 'url' => route('projects.characters', $project)],
-            ['label' => $nickName, 'truncate' => true]
+            ['label' => $character->nick_name, 'truncate' => true]
         ]" />
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-2 items-start">
-
+        
         {{-- KOLOM KIRI: nama, backstory, dan detail group/field --}}
         <div class="lg:col-span-2 bg-brand-10 border border-brand-150 rounded-2xl p-8 flex flex-col gap-6 h-full">
-            <div class="flex flex-col gap-1">
-                <input type="text" wire:model.live.debounce.500ms="fullName" @blur="$wire.$commit()" placeholder="Full Name"
-                    class="text-app-title-1 text-text-100 bg-transparent outline-none w-full">
-                <div class="flex items-center gap-2 text-app-body-medium text-subtext-90">
-                    <span>Nickname :</span>
-                    <input type="text" wire:model.live.debounce.500ms="nickName" @blur="$wire.$commit()" placeholder="Nickname"
-                        class="bg-transparent text-text-60 outline-none border-b transition-colors {{ $nickNameError ? 'border-danger-100' : 'border-transparent focus:border-subtext-70' }}">
+
+            <div class="flex justify-between items-center w-full">
+    
+                <!-- Tombol Kiri (< Back) -->
+                <a href="{{route('projects.characters', $project)}}"
+                        class="flex items-center gap-1.5 text-app-feature text-text-60 hover:text-text-90 transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                    </svg>
+                    Back
+                </a>
+
+                <!-- Tombol Kanan (Trash / Delete) -->
+                <button type="button" 
+                        @click="confirmingDelete = true" 
+                        class="p-1.5 text-danger-100/80 border hover:text-danger-100 hover:bg-danger-100/10 rounded-md transition-colors" 
+                        title="Delete Character">
+                    <!-- Menggunakan komponen ikon delete milikmu, ukurannya diperkecil agar proporsional untuk header -->
+                    <x-icons.delete class="w-3 h-3 border-none"/>
+                </button>
+
+            </div>
+            <div
+                class="flex flex-col gap-1"
+                x-data="{
+                    editingNickName: false,
+                    editingFullName: false,
+                    nickNameDraft: @js($nickName),
+                    nickNameDisplay: @js($nickName),
+                    nickNameCount: {{ mb_strlen($nickName) }},
+                    fullNameCount: {{ mb_strlen($fullName) }},
+                    init() {
+                        this.$wire.$watch('nickName', (value) => {
+                            const displayValue = value === '' ? 'New Character' : value;
+                            this.nickNameDisplay = displayValue;
+                            this.nickNameCount = displayValue.length;
+                        });
+                    },
+                    startEditNickName() {
+                        this.nickNameDraft = this.nickNameDisplay;
+                        this.nickNameCount = this.nickNameDraft.length;
+                        this.editingNickName = true;
+                        this.$nextTick(() => this.$refs.nickNameInput.focus());
+                    },
+                    cancelNickNameEdit() {
+                        this.nickNameDraft = this.nickNameDisplay;
+                        this.nickNameCount = this.nickNameDisplay.length;
+                        this.editingNickName = false;
+                    },
+                    commitNickNameEdit() {
+                        const typed = this.nickNameDraft.trim();
+                        this.$wire.set('nickName', typed, true);
+
+                        const displayValue = typed === '' ? 'New Character' : typed;
+                        this.nickNameDraft = displayValue;
+                        this.nickNameDisplay = displayValue;
+                        this.nickNameCount = displayValue.length;
+                        this.editingNickName = false;
+                    },
+                    stripLeadingSpace(e, countProp) {
+                        if (e.target.value.startsWith(' ')) {
+                            e.target.value = e.target.value.replace(/^\s+/, '');
+                        }
+                        this[countProp] = e.target.value.length;
+                    },
+                }"
+            >
+                <div class="flex items-end gap-2">
+                    <h1
+                        x-show="!editingNickName"
+                        @click="startEditNickName()"
+                        x-text="nickNameDisplay"
+                        class="text-app-title-1 text-text-100 truncate cursor-text"
+                    ></h1>
+
+                    <div x-show="editingNickName" x-cloak class="flex items-center gap-2 flex-1 min-w-0 border-b {{ $nickNameError ? 'border-danger-100' : 'border-subtext-70' }}">
+                        <input
+                            type="text"
+                            x-ref="nickNameInput"
+                            x-model="nickNameDraft"
+                            x-init="$el.addEventListener('input', (e) => stripLeadingSpace(e, 'nickNameCount'), true)"
+                            @blur="commitNickNameEdit()"
+                            @keydown.enter="$event.target.blur()"
+                            @keydown.escape="$event.target.blur()"
+                            maxlength="20"
+                            placeholder="Nickname"
+                            class="text-app-title-1 text-text-100 bg-transparent outline-none w-full truncate"
+                        >
+                        <button type="button" @mousedown.prevent @click="cancelNickNameEdit()" class="shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-text-60 hover:bg-black/10 hover:text-danger-100 transition-colors">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3"><path stroke-linecap="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                        </button>
+                    </div>
                 </div>
+                <span x-show="editingNickName" x-cloak class="text-app-desc-feature text-subtext-70">
+                    <span x-text="nickNameCount"></span>/20
+                </span>
                 @if($nickNameError)
                     <span class="text-app-desc-feature text-danger-100">{{ $nickNameError }}</span>
                 @endif
+                <div class="flex items-center gap-2 text-app-body-medium text-subtext-90">
+                    <span>Full Name :</span>
+                    <input type="text" wire:model="fullName"
+                        x-init="$el.addEventListener('input', (e) => stripLeadingSpace(e, 'fullNameCount'), true)"
+                        @focus="editingFullName = true; fullNameCount = $event.target.value.length"
+                        @blur="editingFullName = false; $wire.$commit()"
+                        @keydown.enter="$event.target.blur()"
+                        @keydown.escape="$event.target.blur()"
+                        maxlength="60" placeholder="Full Name"
+                        class="bg-transparent text-text-60 outline-none border-b border-transparent focus:border-subtext-70 transition-colors">
+                    <span x-show="editingFullName" x-cloak class="text-app-desc-feature text-subtext-70"><span x-text="fullNameCount"></span>/60</span>
+                </div>
             </div>
 
             <div class="flex flex-col gap-2">
@@ -291,12 +416,12 @@ new #[Layout('layouts.app')] class extends Component {
                 </h3>
 
                 @forelse($detailGroups as $group)
-                    <div class="flex flex-col gap-3 {{ $loop->first ? '' : 'border-t border-brand-150 pt-6' }}">
+                    <div wire:key="group-{{ $group['id'] }}" class="flex flex-col gap-3 {{ $loop->first ? '' : 'border-t border-brand-150 pt-6' }}">
                         <h4 class="text-app-heading-2 text-secondary-80 mb-2">{{ $group['name'] }}</h4>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                             @forelse($group['fields'] as $field)
-                                <div class="flex flex-col gap-1 text-left">
-                                    <label class="text-app-feature text-text-70">{{ $field['name'] }}</label>
+                                <div wire:key="field-{{ $field['id'] }}" class="flex flex-col gap-1 text-left">
+                                    <label class="text-app-feature text-text-70 truncate">{{ $field['name'] }}</label>
                                     <input type="text" wire:model.live.debounce.500ms="detailValues.{{ $field['id'] }}" @blur="$wire.$commit()" value="{{ $detailValues[$field['id']] ?? '' }}" placeholder="Enter value"
                                         class="w-full px-4 py-2 bg-bg-main border-1 border-secondary-100 rounded-lg focus:border-secondary-250 focus:border-2 outline-none transition-all text-subtext-100 text-app-body-medium placeholder:text-subtext-80">
                                 </div>
@@ -309,8 +434,6 @@ new #[Layout('layouts.app')] class extends Component {
                     <p class="text-subtext-90 font-medium text-app-feature">No detail groups yet.</p>
                 @endforelse
             </div>
-                <hr class="border-t border-brand-200 w-full" />
-                <button @click="confirmingDelete = true" class="w-full py-3 rounded-lg border border-danger-100 text-app-feature text-danger-100 hover:bg-danger-100/10 transition-colors">Delete Character</button>
         </div>
 
         {{-- KOLOM KANAN: foto, tag, relationship --}}
@@ -381,15 +504,20 @@ new #[Layout('layouts.app')] class extends Component {
                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
                     </button>
                     <div x-show="showNewTagInput" x-cloak class="flex items-center gap-1">
-                        <input
-                            type="text"
-                            x-model="newTagName"
-                            x-init="$watch('showNewTagInput', value => { if (value) $nextTick(() => $el.focus()) })"
-                            @keydown.enter="addTag()"
-                            @keydown.escape="showNewTagInput = false; newTagName = ''"
-                            placeholder="New tag..."
-                            class="px-3 py-2 rounded-full bg-brand-100 border border-secondary-100 outline-none text-app-body-small text-text-70 w-28 shrink-0"
-                        >
+                        <div class="relative shrink-0">
+                            <input
+                                type="text"
+                                x-model="newTagName"
+                                x-init="$watch('showNewTagInput', value => { if (value) $nextTick(() => $el.focus()) })"
+                                @input="if (newTagName.startsWith(' ')) newTagName = newTagName.replace(/^\s+/, '')"
+                                @keydown.enter="addTag()"
+                                @keydown.escape="showNewTagInput = false; newTagName = ''"
+                                maxlength="20"
+                                placeholder="New tag..."
+                                class="pl-3 pr-11 py-2 rounded-full bg-brand-100 border border-secondary-100 outline-none text-app-body-small text-text-70 w-36"
+                            >
+                            <span class="absolute right-3 top-1/2 -translate-y-1/2 text-app-desc-feature text-subtext-70 pointer-events-none" x-text="newTagName.length + '/20'"></span>
+                        </div>
                         <button @click="showNewTagInput = false; newTagName = ''" type="button" class="w-5 h-5 rounded-full flex items-center justify-center text-text-60 hover:bg-black/10 hover:text-danger-100 transition-colors">
                             <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3"><path stroke-linecap="round" d="M6 18L18 6M6 6l12 12"/></svg>
                         </button>
@@ -406,7 +534,13 @@ new #[Layout('layouts.app')] class extends Component {
                 </div>
 
                 @if($showAddRelation)
-                    @php $relatedIds = collect($relationships)->pluck('otherId')->filter()->values()->all(); @endphp
+                    @php
+                        $relatedTypesByChar = collect($relationships)
+                            ->filter(fn ($r) => $r['otherId'])
+                            ->groupBy('otherId')
+                            ->map(fn ($group) => $group->pluck('typeId')->values()->all())
+                            ->all();
+                    @endphp
                     <div
                         class="flex flex-col gap-2 p-3 rounded-lg bg-brand-100/60"
                         x-data="{
@@ -414,16 +548,25 @@ new #[Layout('layouts.app')] class extends Component {
                             typeOpen: false,
                             selectedChar: null,
                             selectedType: null,
-                            relatedIds: @js($relatedIds),
+                            relatedTypesByChar: @js($relatedTypesByChar),
                             characters: @js($otherCharacters),
                             types: @js($relationshipTypes),
                             selectChar(char) {
-                                if (this.relatedIds.includes(char.id)) return;
                                 this.selectedChar = char;
                                 this.charOpen = false;
                                 $wire.set('newRelationTargetId', char.id);
+                                const usedTypes = this.relatedTypesByChar[char.id] || [];
+                                if (this.selectedType && usedTypes.includes(this.selectedType.id)) {
+                                    this.selectedType = null;
+                                    $wire.set('newRelationTypeId', null);
+                                }
+                            },
+                            isTypeUsed(typeId) {
+                                if (!this.selectedChar) return false;
+                                return (this.relatedTypesByChar[this.selectedChar.id] || []).includes(typeId);
                             },
                             selectType(type) {
+                                if (this.isTypeUsed(type.id)) return;
                                 this.selectedType = type;
                                 this.typeOpen = false;
                                 $wire.set('newRelationTypeId', type.id);
@@ -453,14 +596,11 @@ new #[Layout('layouts.app')] class extends Component {
                                 <svg class="w-3 h-3 text-text-60 shrink-0 transition-transform duration-150" :class="charOpen ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
                             </button>
                             <div x-show="charOpen" x-cloak
-                                class="absolute z-20 w-full mt-1 bg-bg-main border border-brand-150 rounded-lg shadow-md overflow-hidden max-h-40 overflow-y-auto">
+                                class="absolute z-20 w-full mt-1 bg-bg-main border border-brand-150 rounded-lg shadow-md overflow-hidden max-h-40 overflow-y-auto custom-scrollbar">
                                 <template x-for="char in characters" :key="char.id">
                                     <div
                                         @click="selectChar(char)"
-                                        class="px-3 py-2 text-app-desc-feature text-text-80 flex items-center justify-between"
-                                        :class="relatedIds.includes(char.id)
-                                            ? 'opacity-40 cursor-not-allowed'
-                                            : 'hover:bg-brand-100 cursor-pointer'"
+                                        class="px-3 py-2 text-app-desc-feature text-text-80 flex items-center justify-between hover:bg-brand-100 cursor-pointer"
                                     >
                                         <span x-text="char.name"></span>
                                     </div>
@@ -483,9 +623,12 @@ new #[Layout('layouts.app')] class extends Component {
                                 <svg class="w-3 h-3 text-text-60 shrink-0 transition-transform duration-150 ml-auto" :class="typeOpen ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
                             </button>
                             <div x-show="typeOpen" x-cloak
-                                class="absolute z-20 w-full mt-1 bg-bg-main border border-brand-150 rounded-lg shadow-md overflow-hidden max-h-48 overflow-y-auto">
+                                class="absolute z-20 w-full mt-1 bg-bg-main border border-brand-150 rounded-lg shadow-md overflow-hidden max-h-48 overflow-y-auto custom-scrollbar">
                                 <template x-for="type in types" :key="type.id">
-                                    <div @click="selectType(type)" class="px-3 py-2 hover:bg-brand-100 cursor-pointer flex items-center">
+                                    <div @click="selectType(type)"
+                                        class="px-3 py-2 flex items-center"
+                                        :class="isTypeUsed(type.id) ? 'opacity-40 cursor-not-allowed' : 'hover:bg-brand-100 cursor-pointer'"
+                                    >
                                         <span
                                             class="px-2.5 py-1 rounded-full text-app-desc-feature font-semibold"
                                             :style="`background-color: ${type.bgColor}; color: ${type.textColor}`"
@@ -495,7 +638,7 @@ new #[Layout('layouts.app')] class extends Component {
                                 </template>
                                 <div x-show="types.length === 0" class="px-3 py-2 text-app-desc-feature text-subtext-70 italic">No types yet</div>
                                 <div class="border-t border-brand-150">
-                                    <div @click="typeOpen = false; window.dispatchEvent(new CustomEvent('open-relation-type-popup', { detail: { relationId: null } }))"
+                                    <div @click="typeOpen = false; window.dispatchEvent(new CustomEvent('open-relation-type-popup', { detail: { relationId: null, charFromName: '{{ $character->nick_name }}', charToName: selectedChar ? selectedChar.name : null, usedTypeIds: selectedChar ? (relatedTypesByChar[selectedChar.id] || []) : [] } }))"
                                         class="px-3 py-2 flex items-center gap-2 text-app-desc-feature font-semibold text-secondary-200 hover:bg-brand-100 cursor-pointer">
                                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
                                         Add New Relation
@@ -530,9 +673,12 @@ new #[Layout('layouts.app')] class extends Component {
                     @relation-type-deleted.window="$wire.call('refreshRelationships')"
                 >
                     @forelse($relationships as $relationship)
+                        @php
+                            $usedTypeIdsForOther = collect($relationships)->where('otherId', $relationship['otherId'])->pluck('typeId')->values()->all();
+                        @endphp
                         <div class="grid grid-cols-[1fr_auto_1fr_auto] items-center gap-x-2 text-text-80 text-app-body-small w-full">
                             <div class="bg-brand-100 px-3 py-1.5 rounded-md truncate cursor-pointer hover:bg-brand-150 transition-colors"
-                                @click="window.dispatchEvent(new CustomEvent('open-edit-relation-popup', { detail: { relationId: '{{ $relationship['id'] }}', typeId: '{{ $relationship['typeId'] }}', charFromName: '{{ $nickName }}', charToName: '{{ $relationship['otherName'] }}' } }))">
+                                @click="window.dispatchEvent(new CustomEvent('open-edit-relation-popup', { detail: { relationId: '{{ $relationship['id'] }}', typeId: '{{ $relationship['typeId'] }}', charFromName: '{{ $character->nick_name }}', charToName: '{{ $relationship['otherName'] }}', usedTypeIds: @js($usedTypeIdsForOther) } }))">
                                 {{ $relationship['otherName'] }}
                             </div>
 
@@ -540,7 +686,7 @@ new #[Layout('layouts.app')] class extends Component {
 
                             <div class="px-3 py-1.5 rounded-md text-center truncate cursor-pointer hover:opacity-80 transition-opacity"
                                 style="background-color: {{ $relationship['bgColor'] }}; color: {{ $relationship['textColor'] }};"
-                                @click="window.dispatchEvent(new CustomEvent('open-edit-relation-popup', { detail: { relationId: '{{ $relationship['id'] }}', typeId: '{{ $relationship['typeId'] }}', charFromName: '{{ $nickName }}', charToName: '{{ $relationship['otherName'] }}' } }))">
+                                @click="window.dispatchEvent(new CustomEvent('open-edit-relation-popup', { detail: { relationId: '{{ $relationship['id'] }}', typeId: '{{ $relationship['typeId'] }}', charFromName: '{{ $character->nick_name }}', charToName: '{{ $relationship['otherName'] }}', usedTypeIds: @js($usedTypeIdsForOther) } }))">
                                 {{ $relationship['typeName'] }}
                             </div>
 
@@ -560,7 +706,7 @@ new #[Layout('layouts.app')] class extends Component {
         <div @click.away="confirmingDelete = false" class="bg-bg-main border border-brand-100 rounded-xl shadow-xl p-6 w-full max-w-sm flex flex-col gap-5">
             <div class="text-center">
                 <h3 class="text-app-heading-2 text-text-80">Delete Character?</h3>
-                <p class="text-app-desc-feature text-text-70 mt-2">"{{ $fullName }}" and every relationship involving them will be permanently removed.</p>
+                <p class="text-app-desc-feature text-text-70 mt-2">"{{ $nickName }}" and every relationship involving them will be permanently removed.</p>
             </div>
             <div class="flex gap-3">
                 <button @click="confirmingDelete = false" class="flex-1 py-2.5 rounded-lg border border-brand-200 text-app-feature text-text-80 hover:bg-brand-100 transition-colors">Cancel</button>
