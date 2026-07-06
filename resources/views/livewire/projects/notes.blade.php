@@ -121,10 +121,12 @@ new #[Layout('layouts.app')] class extends Component {
         $note = Note::where('note_id', $noteId)
                     ->where('project_id', $this->project->project_id)
                     ->first();
-        if (!$note) return;
         $trimmed = trim($newTitle);
-        if ($trimmed === '') return;
-        $note->update(['title' => $trimmed]);
+        $hasCopy = str_ends_with($trimmed, ' (Copy)');
+        $base = $hasCopy ? substr($trimmed, 0, -7) : $trimmed;
+        $finalTitle = mb_substr($base, 0, 25) . ($hasCopy ? ' (Copy)' : '');
+        if ($finalTitle === '' || $finalTitle === ' (Copy)') return;
+        $note->update(['title' => $finalTitle]);
     }
 
     public function duplicateNote(string $noteId): void
@@ -137,12 +139,13 @@ new #[Layout('layouts.app')] class extends Component {
 
     private function cloneNoteRecursive(Note $source, ?string $newParentId, int $depth): Note
     {
+        $baseTitle = preg_replace('/ \(Copy\)$/', '', $source->title);
         $clone = Note::create([
             'project_id'     => $this->project->project_id,
             'parent_note_id' => $newParentId,
             'depth'          => $depth,
             'sort_order'     => $this->nextSortOrder($newParentId),
-            'title'          => $source->title . ' (Copy)',
+            'title'          => mb_substr($baseTitle . ' (Copy)', 0, 25),
             'body'           => $source->body,
         ]);
         foreach ($source->children as $child) {
@@ -325,6 +328,8 @@ new #[Layout('layouts.app')] class extends Component {
         menuPos: { top: 0, left: 0 },
         renamingId: null,
         renameValue: '',
+        originalBaseTitle: '',
+        hadCopySuffix: false,
         collapsed: {},
 
         toggleCollapse(id) {
@@ -360,7 +365,9 @@ new #[Layout('layouts.app')] class extends Component {
 
         startRename(id, currentTitle) {
             this.renamingId = id;
-            this.renameValue = currentTitle;
+            this.hadCopySuffix = currentTitle.endsWith(' (Copy)');
+            this.originalBaseTitle = currentTitle.replace(/ \(Copy\)$/, '');
+            this.renameValue = this.originalBaseTitle;
             this.openMenuId = null;
             this.$nextTick(() => {
                 const el = document.getElementById('rename_' + id);
@@ -368,8 +375,12 @@ new #[Layout('layouts.app')] class extends Component {
             });
         },
         commitRename(id) {
-            if (this.renameValue.trim() !== '') {
-                $wire.renameNote(id, this.renameValue);
+            let finalName = this.renameValue.trim();
+            if (finalName !== '') {
+                if (finalName === this.originalBaseTitle && this.hadCopySuffix) {
+                    finalName = finalName + ' (Copy)';
+                }
+                $wire.renameNote(id, finalName);
             }
             this.renamingId = null;
         },
