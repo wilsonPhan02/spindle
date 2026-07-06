@@ -14,6 +14,8 @@ new #[Layout('layouts.app')] class extends Component {
     public ?string $activeNoteId = null;
     public string $editorBody = '';
     public $uploadFile;
+    public array $undoStack = [];
+    public array $redoStack = [];
 
     public function mount(Project $project): void
     {
@@ -75,8 +77,98 @@ new #[Layout('layouts.app')] class extends Component {
     }
 
     // -----------------------------------------------------------------------
-    // Actions
+    // Actions & Undo System
     // -----------------------------------------------------------------------
+
+    public function pushUndo(string $action, array $data, string $message): void
+    {
+        $this->undoStack[] = [
+            'action' => $action,
+            'data'   => $data,
+        ];
+        $this->redoStack = [];
+        
+        $this->dispatch('show-undo-toast', message: $message);
+    }
+
+    public function undo(): void
+    {
+        if (empty($this->undoStack)) return;
+
+        $lastAction = array_pop($this->undoStack);
+        $action = $lastAction['action'];
+        $data   = $lastAction['data'];
+
+        if ($action === 'add') {
+            $note = Note::find($data['note_id']);
+            if ($note) $note->delete();
+            
+            if ($this->activeNoteId === $data['note_id']) {
+                $this->activeNoteId = null;
+                $this->editorBody = '';
+                $next = Note::where('project_id', $this->project->project_id)
+                            ->whereNull('parent_note_id')->orderBy('sort_order')->first();
+                if ($next) {
+                    $this->activeNoteId = $next->note_id;
+                    $this->editorBody = $next->body ?? '';
+                }
+            }
+        } elseif ($action === 'remove') {
+            $note = Note::withTrashed()->find($data['note_id']);
+            if ($note) {
+                $note->restore();
+                $this->selectNote($note->note_id);
+            }
+        } elseif ($action === 'rename') {
+            $note = Note::find($data['note_id']);
+            if ($note) {
+                $note->update(['title' => $data['old_title']]);
+            }
+        }
+        
+        $this->redoStack[] = $lastAction;
+        $this->dispatch('show-undo-toast', message: 'Action undone.');
+    }
+
+    public function redo(): void
+    {
+        if (empty($this->redoStack)) return;
+
+        $lastAction = array_pop($this->redoStack);
+        $action = $lastAction['action'];
+        $data   = $lastAction['data'];
+
+        if ($action === 'add') {
+            $note = Note::withTrashed()->find($data['note_id']);
+            if ($note) {
+                $note->restore();
+                $this->selectNote($note->note_id);
+            }
+        } elseif ($action === 'remove') {
+            $note = Note::find($data['note_id']);
+            if ($note) {
+                $note->delete();
+                if ($this->activeNoteId === $data['note_id']) {
+                    $this->activeNoteId = null;
+                    $this->editorBody = '';
+                    $next = Note::where('project_id', $this->project->project_id)
+                                ->whereNull('parent_note_id')->orderBy('sort_order')->first();
+                    if ($next) {
+                        $this->activeNoteId = $next->note_id;
+                        $this->editorBody = $next->body ?? '';
+                    }
+                }
+            }
+        } elseif ($action === 'rename') {
+            $note = Note::find($data['note_id']);
+            if ($note) {
+                $note->update(['title' => $data['new_title']]);
+            }
+        }
+        
+        $this->undoStack[] = $lastAction;
+        $this->dispatch('show-undo-toast', message: 'Action redone.');
+    }
 
     public function addNote(): void
     {
@@ -88,6 +180,7 @@ new #[Layout('layouts.app')] class extends Component {
             'title'          => $this->nextDefaultTitle(null),
             'body'           => '',
         ]);
+        $this->pushUndo('add', ['note_id' => $note->note_id], 'Note created.');
         $this->selectNote($note->note_id);
     }
 
@@ -104,6 +197,7 @@ new #[Layout('layouts.app')] class extends Component {
             'title'          => $this->nextDefaultTitle($parentId),
             'body'           => '',
         ]);
+        $this->pushUndo('add', ['note_id' => $note->note_id], 'Sub tab created.');
         $this->selectNote($note->note_id);
     }
 
@@ -126,6 +220,9 @@ new #[Layout('layouts.app')] class extends Component {
         $base = $hasCopy ? substr($trimmed, 0, -7) : $trimmed;
         $finalTitle = mb_substr($base, 0, 25) . ($hasCopy ? ' (Copy)' : '');
         if ($finalTitle === '' || $finalTitle === ' (Copy)') return;
+        
+        $this->pushUndo('rename', ['note_id' => $noteId, 'old_title' => $note->title, 'new_title' => $finalTitle], 'Note renamed.');
+        
         $note->update(['title' => $finalTitle]);
     }
 
@@ -134,6 +231,7 @@ new #[Layout('layouts.app')] class extends Component {
         $source = Note::with('childrenRecursive')->find($noteId);
         if (!$source) return;
         $duplicate = $this->cloneNoteRecursive($source, $source->parent_note_id, $source->depth);
+        $this->pushUndo('add', ['note_id' => $duplicate->note_id], 'Note duplicated.');
         $this->selectNote($duplicate->note_id);
     }
 
@@ -162,6 +260,9 @@ new #[Layout('layouts.app')] class extends Component {
         if (!$note) return;
 
         $wasActive = ($this->activeNoteId === $noteId);
+        
+        $this->pushUndo('remove', ['note_id' => $noteId], 'Note deleted.');
+        
         $note->delete();
 
         if ($wasActive) {
@@ -317,6 +418,22 @@ new #[Layout('layouts.app')] class extends Component {
 }; ?>
 
 <div
+    @keydown.window.ctrl.z="
+        const tag = document.activeElement ? document.activeElement.tagName.toLowerCase() : '';
+        const isEditable = document.activeElement ? document.activeElement.isContentEditable : false;
+        if(tag !== 'input' && tag !== 'textarea' && !isEditable && !$event.shiftKey) {
+            $event.preventDefault();
+            $wire.undo();
+        }
+    "
+    @keydown.window.ctrl.shift.z="
+        const tag = document.activeElement ? document.activeElement.tagName.toLowerCase() : '';
+        const isEditable = document.activeElement ? document.activeElement.isContentEditable : false;
+        if(tag !== 'input' && tag !== 'textarea' && !isEditable) {
+            $event.preventDefault();
+            $wire.redo();
+        }
+    "
     x-data="{
         // ========================
         // TAB STATE
@@ -331,6 +448,7 @@ new #[Layout('layouts.app')] class extends Component {
         originalBaseTitle: '',
         hadCopySuffix: false,
         collapsed: {},
+
 
         toggleCollapse(id) {
             this.collapsed[id] = !this.collapsed[id];
@@ -1730,6 +1848,33 @@ new #[Layout('layouts.app')] class extends Component {
             <x-icons.delete class="w-15 h-15" />
         </x-slot:icon>
     </x-confirm-dialog>
+
+    {{-- Undo Toast Notification --}}
+    <div x-data="{ show: false, message: '', timeout: null }"
+         @show-undo-toast.window="
+            message = $event.detail.message;
+            show = true;
+            clearTimeout(timeout);
+            timeout = setTimeout(() => show = false, 7000);
+         "
+         x-show="show"
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0 translate-y-4"
+         x-transition:enter-end="opacity-100 translate-y-0"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100 translate-y-0"
+         x-transition:leave-end="opacity-0 translate-y-4"
+         class="fixed bottom-6 right-6 bg-brand-10 border border-brand-150 text-text-80 p-4 rounded-xl shadow-xl flex items-center gap-4 z-50 max-w-sm"
+         style="display: none;"
+    >
+         <span x-text="message" class="text-app-body-medium font-medium flex-1"></span>
+         <button @click="$wire.undo(); show = false" class="text-app-feature text-secondary-200 font-semibold hover:text-secondary-100 hover:bg-secondary-200/10 px-3 py-1.5 rounded-lg transition-colors border border-secondary-200">
+             Undo
+         </button>
+         <button @click="show = false" class="text-text-60 hover:text-text-100 p-1 rounded-md hover:bg-black/5 transition-colors">
+             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+         </button>
+    </div>
 </div>
 
 <script>
