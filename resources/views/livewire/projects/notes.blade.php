@@ -1671,55 +1671,44 @@ new #[Layout('layouts.app')] class extends Component {
                     x-transition:leave-end="opacity-0 scale-95"
                     @click.outside="closeMenu()"
                     x-bind:style="`position: fixed; top: ${menuPos.top}px; left: ${menuPos.left}px; z-index: 9999;`"
-                    class="w-44 bg-white border border-[#E0D5C5] rounded-lg shadow-lg py-1 text-[13px] text-[#2C2C2C]"
+                    class="w-48 bg-white border border-brand-150 rounded-lg shadow-lg py-1 overflow-hidden z-50"
                     style="display: none;"
                 >
                     <button
                         x-show="!menuNoteIsLeaf"
-                        class="context-menu-item w-full flex items-center gap-2.5 px-3 py-2 text-left"
+                        class="w-full text-left px-4 py-2 text-app-body-medium text-text-80 hover:bg-brand-10 flex items-center gap-3 transition-colors"
                         @click="closeMenu(); $wire.addSubTab(menuNoteId)"
                     >
-                        <svg class="w-4 h-4 text-[#8C7558]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                        </svg>
+                        <x-icons.add class="w-4 h-4 shrink-0 text-text-80" />
                         Add Sub-Tab
                     </button>
 
                     <button
-                        class="context-menu-item w-full flex items-center gap-2.5 px-3 py-2 text-left"
+                        class="w-full text-left px-4 py-2 text-app-body-medium text-text-80 hover:bg-brand-10 flex items-center gap-3 transition-colors"
                         @click="closeMenu(); startRename(menuNoteId, menuNoteTitle)"
                     >
-                        <svg class="w-4 h-4 text-[#8C7558]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                        </svg>
+                        <x-icons.rename class="w-4 h-4 shrink-0 text-text-80" />
                         Rename
                     </button>
 
                     <button
-                        class="context-menu-item w-full flex items-center gap-2.5 px-3 py-2 text-left"
+                        class="w-full text-left px-4 py-2 text-app-body-medium text-text-80 hover:bg-brand-10 flex items-center gap-3 transition-colors"
                         @click="closeMenu(); $wire.duplicateNote(menuNoteId)"
                     >
-                        <svg class="w-4 h-4 text-[#8C7558]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                  d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
-                        </svg>
+                        <x-icons.duplicate class="w-4 h-4 shrink-0 text-text-80" />
                         Duplicate
                     </button>
 
-                    <div class="h-px bg-[#E8DED2] my-1"></div>
+                    <div class="h-px bg-brand-150 my-1"></div>
 
                     <button
-                        class="context-menu-item w-full flex items-center gap-2.5 px-3 py-2 text-left text-[#E64C4C]"
+                        class="w-full text-left px-4 py-2 text-app-body-medium text-danger-100 hover:bg-danger-100/5 flex items-center gap-3 transition-colors"
                         @click="
                             closeMenu();
                             $dispatch('open-delete-note-dialog', { id: menuNoteId });
                         "
                     >
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                        </svg>
+                        <x-icons.delete class="w-4 h-4 shrink-0 text-danger-100" />
                         Delete
                     </button>
                 </div>
@@ -1738,7 +1727,7 @@ new #[Layout('layouts.app')] class extends Component {
         btnColor="bg-danger-100 hover:bg-danger-100/90 text-white"
     >
         <x-slot:icon>
-            <x-icons.delete-default size="w-15 h-15" color="currentColor" />
+            <x-icons.delete class="w-15 h-15" />
         </x-slot:icon>
     </x-confirm-dialog>
 </div>
@@ -1779,3 +1768,4 @@ document.addEventListener('DOMContentLoaded', function() {
 
 });
 </script>
+

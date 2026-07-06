@@ -246,7 +246,7 @@ new class extends Component {
     <button wire:click="addChapter" wire:loading.attr="disabled" class="absolute bottom-8 right-10 z-10 w-12 h-12 bg-secondary-100 rounded-full flex items-center justify-center shadow-xl hover:bg-secondary-200 hover:-translate-y-1 transition-all duration-200 disabled:opacity-50 disabled:hover:translate-y-0 disabled:cursor-not-allowed border-1 border-bg-main">
         <div wire:loading wire:target="addChapter" class="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
         <div wire:loading.remove wire:target="addChapter">
-            <x-icons.add-default class="text-white w-4 h-4" />
+            <x-icons.add class="text-white w-4 h-4" />
         </div>
     </button>
 
@@ -259,7 +259,7 @@ new class extends Component {
         submitAction="deleteChapter"
     >
         <x-slot:icon>
-            <x-icons.delete-default size="w-10 h-10" color="currentColor"/>
+            <x-icons.delete class="w-10 h-10" />
         </x-slot:icon>
     </x-confirm-dialog>
 </div>

@@ -56,7 +56,7 @@ new #[Layout('layouts.app')] class extends Component {
                 <h2 class="text-app-heading-2 text-brand-200 mb-2">You Didn't Use Any Structure!</h2>
                 <p class="text-app-feature text-brand-200 mb-2">Choose your structure now and start writing</p>
                 <button wire:click="addTemplate" class="flex items-center gap-4 bg-secondary-100 hover:bg-secondary-150 text-bg-main px-6 py-2.5 rounded-md text-app-body-medium transition-colors mt-4 shadow-sm">
-                    <x-icons.add-default size="w-4 h-4"/> Add Structure
+                    <x-icons.add class="w-4 h-4" /> Add Structure
                 </button>
             </div>
         @else
