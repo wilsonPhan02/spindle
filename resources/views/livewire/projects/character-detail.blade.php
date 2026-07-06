@@ -176,6 +176,7 @@ new #[Layout('layouts.app')] class extends Component {
 
     public function refreshRelationships(): void {
         $this->loadRelationships();
+        $this->loadRelationshipTypes();
     }
 
     public function updatedNewImage() {
@@ -567,7 +568,7 @@ new #[Layout('layouts.app')] class extends Component {
                                 <svg class="w-3 h-3 text-text-60 shrink-0 transition-transform duration-150" :class="charOpen ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
                             </button>
                             <div x-show="charOpen" x-cloak
-                                class="absolute z-20 w-full mt-1 bg-bg-main border border-brand-150 rounded-lg shadow-md overflow-hidden max-h-40 overflow-y-auto">
+                                class="absolute z-20 w-full mt-1 bg-bg-main border border-brand-150 rounded-lg shadow-md overflow-hidden max-h-40 overflow-y-auto custom-scrollbar">
                                 <template x-for="char in characters" :key="char.id">
                                     <div
                                         @click="selectChar(char)"
@@ -597,7 +598,7 @@ new #[Layout('layouts.app')] class extends Component {
                                 <svg class="w-3 h-3 text-text-60 shrink-0 transition-transform duration-150 ml-auto" :class="typeOpen ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
                             </button>
                             <div x-show="typeOpen" x-cloak
-                                class="absolute z-20 w-full mt-1 bg-bg-main border border-brand-150 rounded-lg shadow-md overflow-hidden max-h-48 overflow-y-auto">
+                                class="absolute z-20 w-full mt-1 bg-bg-main border border-brand-150 rounded-lg shadow-md overflow-hidden max-h-48 overflow-y-auto custom-scrollbar">
                                 <template x-for="type in types" :key="type.id">
                                     <div @click="selectType(type)" class="px-3 py-2 hover:bg-brand-100 cursor-pointer flex items-center">
                                         <span
