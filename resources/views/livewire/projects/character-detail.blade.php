@@ -321,8 +321,9 @@ new #[Layout('layouts.app')] class extends Component {
                     fullNameCount: {{ mb_strlen($fullName) }},
                     init() {
                         this.$wire.$watch('nickName', (value) => {
-                            this.nickNameDisplay = value;
-                            this.nickNameCount = value.length;
+                            const displayValue = value === '' ? 'New Character' : value;
+                            this.nickNameDisplay = displayValue;
+                            this.nickNameCount = displayValue.length;
                         });
                     },
                     startEditNickName() {
@@ -338,12 +339,13 @@ new #[Layout('layouts.app')] class extends Component {
                     },
                     commitNickNameEdit() {
                         const typed = this.nickNameDraft.trim();
-                        const finalValue = typed === '' ? 'New Character' : this.nickNameDraft;
-                        this.nickNameDraft = finalValue;
-                        this.nickNameDisplay = finalValue;
-                        this.nickNameCount = finalValue.length;
+                        this.$wire.set('nickName', typed, true);
+
+                        const displayValue = typed === '' ? 'New Character' : typed;
+                        this.nickNameDraft = displayValue;
+                        this.nickNameDisplay = displayValue;
+                        this.nickNameCount = displayValue.length;
                         this.editingNickName = false;
-                        this.$wire.set('nickName', finalValue, true);
                     },
                     stripLeadingSpace(e, countProp) {
                         if (e.target.value.startsWith(' ')) {
