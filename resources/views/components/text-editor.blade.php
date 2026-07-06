@@ -259,7 +259,7 @@
                     if (node.nodeType === 3) node = node.parentElement;
                     const block = node ? node.closest('h1, h2, h3, blockquote, p, li, div') : null;
                     if (block && editorEl.contains(block)) {
-                        if (block.tagName.toLowerCase() === 'li' && block.classList.contains('todo-item')) {
+                        if (block.classList.contains('todo-item') || node.closest('.todo-item')) {
                             this.activeStates.todo = true;
                             this.activeStates.insertUnorderedList = false;
                         }
@@ -290,27 +290,54 @@
 
             let node = sel.anchorNode;
             if (node.nodeType === 3) node = node.parentElement;
-            const block = node.closest('p, h1, h2, h3');
+            const existingTodo = node.closest('.todo-item');
 
-            if (block && editorEl.contains(block)) {
-                const todoDiv = document.createElement('div');
-                todoDiv.className = 'todo-item flex items-start gap-2 my-1';
-                todoDiv.innerHTML = `
-                    <input type='checkbox' class='todo-checkbox mt-1 cursor-pointer w-4 h-4 rounded border-[#D5C6A9] text-[#8C7558] focus:ring-[#8C7558]' contenteditable='false' onclick='this.nextElementSibling.style.textDecoration = this.checked ? 'line-through' : 'none'; this.nextElementSibling.style.opacity = this.checked ? '0.5' : '1';'>
-                    <span class='todo-text flex-1 outline-none'>${block.innerHTML || '<br>'}</span>
-                `;
-                block.parentNode.replaceChild(todoDiv, block);
-
-                const textSpan = todoDiv.querySelector('.todo-text');
+            if (existingTodo && editorEl.contains(existingTodo)) {
+                const p = document.createElement('p');
+                const textSpan = existingTodo.querySelector('.todo-text');
+                p.innerHTML = textSpan ? textSpan.innerHTML : (existingTodo.textContent || '<br>');
+                existingTodo.parentNode.replaceChild(p, existingTodo);
                 const range = document.createRange();
-                range.selectNodeContents(textSpan);
+                range.selectNodeContents(p);
                 range.collapse(false);
                 sel.removeAllRanges();
                 sel.addRange(range);
                 this.scheduleSave();
-            } else {
-                this.exec('insertUnorderedList');
+                this.refreshToolbarState();
+                return;
             }
+
+            let block = node.closest('p, h1, h2, h3, div, blockquote, li');
+            if (!block || !editorEl.contains(block) || block === editorEl) {
+                if (editorEl.contains(node) && node !== editorEl && node.parentNode === editorEl) {
+                    block = node;
+                } else {
+                    block = document.createElement('p');
+                    block.innerHTML = '<br>';
+                    editorEl.appendChild(block);
+                }
+            }
+
+            let contentHtml = block.innerHTML || '<br>';
+            contentHtml = contentHtml.replace(/^(\s|&nbsp;)*\[\s*\](\s|&nbsp;)*/i, '');
+            if (!contentHtml.trim() || contentHtml.trim() === '<br>') contentHtml = '<br>';
+
+            const todoDiv = document.createElement('div');
+            todoDiv.className = 'todo-item flex items-start gap-2 my-1';
+            todoDiv.innerHTML = `
+                <input type='checkbox' class='todo-checkbox mt-1 cursor-pointer w-4 h-4 rounded border-[#D5C6A9] text-secondary-200 accent-secondary-200 focus:ring-secondary-200' contenteditable='false' onclick='this.nextElementSibling.style.textDecoration = this.checked ? 'line-through' : 'none'; this.nextElementSibling.style.opacity = this.checked ? '0.5' : '1';'>
+                <span class='todo-text flex-1 outline-none'>${contentHtml}</span>
+            `;
+            block.parentNode.replaceChild(todoDiv, block);
+
+            const textSpan = todoDiv.querySelector('.todo-text');
+            const range = document.createRange();
+            range.selectNodeContents(textSpan);
+            range.collapse(false);
+            sel.removeAllRanges();
+            sel.addRange(range);
+            this.scheduleSave();
+            this.refreshToolbarState();
         },
 
         handleMarkdownShortcuts() {
@@ -360,7 +387,7 @@
                         return;
                     }
 
-                    if (textBefore === '[] ' || textBefore === '[ ] ') {
+                    if (textBefore.trim() === '[]' || textBefore.trim() === '[ ]') {
                         const range = sel.getRangeAt(0);
                         range.setStart(node, 0);
                         range.setEnd(node, sel.anchorOffset);
@@ -450,7 +477,7 @@
                             const newTodo = document.createElement('div');
                             newTodo.className = 'todo-item flex items-start gap-2 my-1';
                             newTodo.innerHTML = `
-                                <input type='checkbox' class='todo-checkbox mt-1 cursor-pointer w-4 h-4 rounded border-[#D5C6A9] text-[#8C7558] focus:ring-[#8C7558]' contenteditable='false' onclick='this.nextElementSibling.style.textDecoration = this.checked ? 'line-through' : 'none'; this.nextElementSibling.style.opacity = this.checked ? '0.5' : '1';'>
+                                <input type='checkbox' class='todo-checkbox mt-1 cursor-pointer w-4 h-4 rounded border-[#D5C6A9] text-secondary-200 accent-secondary-200 focus:ring-secondary-200' contenteditable='false' onclick='this.nextElementSibling.style.textDecoration = this.checked ? 'line-through' : 'none'; this.nextElementSibling.style.opacity = this.checked ? '0.5' : '1';'>
                                 <span class='todo-text flex-1 outline-none'><br></span>
                             `;
                             if (todoItem.nextSibling) {

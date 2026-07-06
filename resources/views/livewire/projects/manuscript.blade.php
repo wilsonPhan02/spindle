@@ -878,7 +878,7 @@ new #[Layout('layouts.app')] class extends Component {
                             contentProp="editorBody"
                             counterType="word"
                             :showStrike="false"
-                            :showTodo="false"
+                            :showTodo="true"
                             wire:key="editor-{{ $activeDraft->manuscript_id }}"
                         />
                     @endif
@@ -985,7 +985,7 @@ new #[Layout('layouts.app')] class extends Component {
         submitAction="deleteDraft"
     >
         <x-slot:icon>
-            <x-icons.delete-default size="w-10 h-10" color="currentColor"/>
+            <x-icons.delete size="w-10 h-10" color="currentColor"/>
         </x-slot:icon>
     </x-confirm-dialog>
 </div>
