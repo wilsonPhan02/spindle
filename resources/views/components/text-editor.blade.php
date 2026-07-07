@@ -38,6 +38,13 @@
         currentHighlightColor: null,
         textColors: {!! $textColorsJs !!},
         highlightColors: {!! $bgColorsJs !!},
+        showLists: {{ $showLists ? 'true' : 'false' }},
+        showColors: {{ $showColors ? 'true' : 'false' }},
+        showIndent: {{ $showIndent ? 'true' : 'false' }},
+        showHr: {{ $showHr ? 'true' : 'false' }},
+        showStrike: {{ $showStrike ? 'true' : 'false' }},
+        showTodo: {{ $showTodo ? 'true' : 'false' }},
+        showHighlight: {{ $showHighlight ? 'true' : 'false' }},
         savedRange: null,
         wordCount: 0,
         charCount: 0,
@@ -336,6 +343,7 @@
         },
 
         insertTodoBlock() {
+            if (!this.showTodo) return;
             const editorEl = document.getElementById('{{ $editorId }}');
             const sel = window.getSelection();
             if (!sel || !sel.anchorNode) return;
@@ -421,7 +429,7 @@
                         return;
                     }
 
-                    if (textBefore === '- ' || textBefore === '* ') {
+                    if (this.showLists && (textBefore === '- ' || textBefore === '* ')) {
                         const range = sel.getRangeAt(0);
                         range.setStart(node, 0);
                         range.setEnd(node, sel.anchorOffset);
@@ -430,7 +438,7 @@
                         return;
                     }
 
-                    if (/^1\.\s$/.test(textBefore)) {
+                    if (this.showLists && /^1\.\s$/.test(textBefore)) {
                         const range = sel.getRangeAt(0);
                         range.setStart(node, 0);
                         range.setEnd(node, sel.anchorOffset);
@@ -439,7 +447,7 @@
                         return;
                     }
 
-                    if (textBefore.trim() === '[]' || textBefore.trim() === '[ ]') {
+                    if (this.showTodo && (textBefore.trim() === '[]' || textBefore.trim() === '[ ]')) {
                         const range = sel.getRangeAt(0);
                         range.setStart(node, 0);
                         range.setEnd(node, sel.anchorOffset);
@@ -448,7 +456,7 @@
                         return;
                     }
 
-                    if (textBefore === '--- ') {
+                    if (this.showHr && textBefore === '--- ') {
                         const range = sel.getRangeAt(0);
                         range.setStart(node, 0);
                         range.setEnd(node, sel.anchorOffset);
