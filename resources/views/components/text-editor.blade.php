@@ -377,7 +377,7 @@
             const todoDiv = document.createElement('div');
             todoDiv.className = 'todo-item flex items-start gap-2 my-1';
             todoDiv.innerHTML = `
-                <input type='checkbox' class='todo-checkbox mt-1 cursor-pointer w-4 h-4 rounded border-[#D5C6A9] text-secondary-200 accent-secondary-200 focus:ring-secondary-200' contenteditable='false' onclick='this.nextElementSibling.style.textDecoration = this.checked ? 'line-through' : 'none'; this.nextElementSibling.style.opacity = this.checked ? '0.5' : '1';'>
+                <input type='checkbox' class='todo-checkbox mt-1 cursor-pointer w-4 h-4 rounded border-secondary-100 text-secondary-200 accent-secondary-200 focus:ring-secondary-200' contenteditable='false' onclick='this.nextElementSibling.style.textDecoration = this.checked ? 'line-through' : 'none'; this.nextElementSibling.style.opacity = this.checked ? '0.5' : '1';'>
                 <span class='todo-text flex-1 outline-none'>${contentHtml}</span>
             `;
             block.parentNode.replaceChild(todoDiv, block);
@@ -529,7 +529,7 @@
                             const newTodo = document.createElement('div');
                             newTodo.className = 'todo-item flex items-start gap-2 my-1';
                             newTodo.innerHTML = `
-                                <input type='checkbox' class='todo-checkbox mt-1 cursor-pointer w-4 h-4 rounded border-[#D5C6A9] text-secondary-200 accent-secondary-200 focus:ring-secondary-200' contenteditable='false' onclick='this.nextElementSibling.style.textDecoration = this.checked ? 'line-through' : 'none'; this.nextElementSibling.style.opacity = this.checked ? '0.5' : '1';'>
+                                <input type='checkbox' class='todo-checkbox mt-1 cursor-pointer w-4 h-4 rounded border-secondary-100 text-secondary-200 accent-secondary-200 focus:ring-secondary-200' contenteditable='false' onclick='this.nextElementSibling.style.textDecoration = this.checked ? 'line-through' : 'none'; this.nextElementSibling.style.opacity = this.checked ? '0.5' : '1';'>
                                 <span class='todo-text flex-1 outline-none'><br></span>
                             `;
                             if (todoItem.nextSibling) {
@@ -768,8 +768,8 @@
         [x-cloak] { display: none !important; }
         .custom-scrollbar::-webkit-scrollbar { width: 5px; height: 5px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background-color: #D5C6A9; border-radius: 10px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background-color: #B69F78; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background-color: var(--color-secondary-100); border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background-color: var(--color-secondary-150); }
 
         #{{ $editorId }}:focus { outline: none; }
         #{{ $editorId }} p { margin-bottom: 1em; }
@@ -789,8 +789,8 @@
         #{{ $editorId }} ul ul ul ul ul ul { list-style-type: square; }
 
         #{{ $editorId }} ol { list-style: decimal; padding-left: 1.5em; }
-        #{{ $editorId }} hr { border: none; border-top: 1px solid #D5C6A9; margin: 1em 0; }
-        #{{ $editorId }} blockquote { border-left: 3px solid #D5C6A9; padding-left: 1em; color: #7A7A7A; }
+        #{{ $editorId }} hr { border: none; border-top: 1px solid var(--color-brand-200); margin: 1em 0; }
+        #{{ $editorId }} blockquote { border-left: 3px solid var(--color-brand-200); padding-left: 1em; color: var(--color-text-70); }
 
         .toolbar-scroll::-webkit-scrollbar { display: none; }
         .toolbar-scroll { -ms-overflow-style: none; scrollbar-width: none; cursor: default; }
@@ -799,22 +799,22 @@
         .toolbar-btn {
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             width: 28px; height: 28px; border-radius: 5px;
-            cursor: pointer; color: #5A5A5A; flex-shrink: 0;
+            cursor: pointer; color: var(--color-text-70); flex-shrink: 0;
             transition: background-color 0.1s, color 0.1s;
             border: 1px solid transparent;
         }
-        .toolbar-btn:hover { background-color: #EAE1D5; }
+        .toolbar-btn:hover { background-color: var(--color-brand-150); }
         .toolbar-btn.is-active {
-            background-color: #E0D0B0;
-            color: #5E4C38;
-            border-color: #C4A877;
+            background-color: var(--color-secondary-20);
+            color: var(--color-secondary-200);
+            border-color: var(--color-secondary-100);
         }
-        .toolbar-divider { width: 1px; height: 18px; background-color: #D5C6A9; flex-shrink: 0; margin: 0 2px; }
-        .format-option.bg-\[\#EAE1D5\] { background-color: #EAE1D5; }
+        .toolbar-divider { width: 1px; height: 18px; background-color: var(--color-brand-200); flex-shrink: 0; margin: 0 2px; }
+        .format-option.bg-brand-150 { background-color: var(--color-brand-150); }
     </style>
 
     {{-- Toolbar Wrapper with Gradient Mask for Overflow --}}
-    <div class="relative shrink-0 border-b border-[#B5AAA0] bg-brand-100 select-none overflow-hidden"
+    <div class="relative shrink-0 border-b border-brand-200 bg-brand-100 select-none overflow-hidden"
          x-data="{
              showLeftFade: false,
              showRightFade: false,
@@ -842,7 +842,7 @@
                 type="button"
                 @mousedown.prevent="saveSelection()"
                 @click="$refs.toolbarScroll.scrollBy({ left: -150, behavior: 'smooth' });"
-                class="p-1 text-[#6A5D4D] hover:text-[#1A1A1A] transition-colors duration-150 pointer-events-auto cursor-pointer outline-none"
+                class="p-1 text-secondary-200 hover:text-text-90 transition-colors duration-150 pointer-events-auto cursor-pointer outline-none"
                 title="Scroll Left"
             >
                 <svg class="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><path d="M18 4L6 12l12 8V4z"/></svg>
@@ -867,12 +867,12 @@
                     activeDropdown = activeDropdown === 'format' ? null : 'format';
                     if (activeDropdown === 'format') adjustOverlayPosition(pos, 180, 220, $event.currentTarget);
                 "
-                class="h-7 px-2.5 flex items-center gap-1.5 text-[12px] text-[#4A4A4A] bg-card-bg border border-[#E0D5C5] rounded-md outline-none cursor-pointer hover:border-[#B69F78] transition-colors shadow-sm"
+                class="h-7 px-2.5 flex items-center gap-1.5 text-[12px] text-text-80 bg-card-bg border border-brand-200 rounded-md outline-none cursor-pointer hover:border-secondary-100 transition-colors shadow-sm"
                 style="min-width: 118px;"
                 title="Text Format"
             >
                 <span x-text="formatLabel" class="flex-1 text-left"></span>
-                <svg class="w-3 h-3 text-[#9A8E80] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                <svg class="w-3 h-3 text-secondary-150 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
             </button>
             <template x-teleport="body">
                 <div
@@ -885,14 +885,14 @@
                     x-transition:enter-end="opacity-100 scale-100"
                     @click.outside="activeDropdown = null"
                     x-bind:style="`position: fixed; top: ${pos.top}px; left: ${pos.left}px; z-index: 9999;`"
-                    class="w-40 bg-white border border-[#E0D5C5] rounded-lg py-1"
+                    class="w-40 bg-white border border-brand-200 rounded-lg py-1"
                     style="display: none;"
                 >
-                    <button type="button" @mousedown.prevent="saveSelection()" @click="setFormat('p', 'Normal Text'); activeDropdown = null" class="format-option w-full text-left px-3 py-1.5 text-[13px] text-[#2C2C2C] hover:bg-[#F0E8DC]" x-bind:class="formatValue === 'p' ? 'bg-[#EAE1D5] font-semibold' : ''" title="Normal Text">Normal Text</button>
-                    <button type="button" @mousedown.prevent="saveSelection()" @click="setFormat('h1', 'Heading 1'); activeDropdown = null" class="format-option w-full text-left px-3 py-1.5 text-[18px] font-bold text-[#2C2C2C] hover:bg-[#F0E8DC]" x-bind:class="formatValue === 'h1' ? 'bg-[#EAE1D5]' : ''" title="Heading 1 (# + Space)">Heading 1</button>
-                    <button type="button" @mousedown.prevent="saveSelection()" @click="setFormat('h2', 'Heading 2'); activeDropdown = null" class="format-option w-full text-left px-3 py-1.5 text-[15px] font-bold text-[#2C2C2C] hover:bg-[#F0E8DC]" x-bind:class="formatValue === 'h2' ? 'bg-[#EAE1D5]' : ''" title="Heading 2 (## + Space)">Heading 2</button>
-                    <button type="button" @mousedown.prevent="saveSelection()" @click="setFormat('h3', 'Heading 3'); activeDropdown = null" class="format-option w-full text-left px-3 py-1.5 text-[13.5px] font-bold text-[#2C2C2C] hover:bg-[#F0E8DC]" x-bind:class="formatValue === 'h3' ? 'bg-[#EAE1D5]' : ''" title="Heading 3 (### + Space)">Heading 3</button>
-                    <button type="button" @mousedown.prevent="saveSelection()" @click="setFormat('blockquote', 'Quote'); activeDropdown = null" class="format-option w-full text-left px-3 py-1.5 text-[13px] italic text-[#6B6B6B] hover:bg-[#F0E8DC]" x-bind:class="formatValue === 'blockquote' ? 'bg-[#EAE1D5]' : ''" title="Quote (> + Space)">Quote</button>
+                    <button type="button" @mousedown.prevent="saveSelection()" @click="setFormat('p', 'Normal Text'); activeDropdown = null" class="format-option w-full text-left px-3 py-1.5 text-[13px] text-text-90 hover:bg-brand-50" x-bind:class="formatValue === 'p' ? 'bg-brand-150 font-semibold' : ''" title="Normal Text">Normal Text</button>
+                    <button type="button" @mousedown.prevent="saveSelection()" @click="setFormat('h1', 'Heading 1'); activeDropdown = null" class="format-option w-full text-left px-3 py-1.5 text-[18px] font-bold text-text-90 hover:bg-brand-50" x-bind:class="formatValue === 'h1' ? 'bg-brand-150' : ''" title="Heading 1 (# + Space)">Heading 1</button>
+                    <button type="button" @mousedown.prevent="saveSelection()" @click="setFormat('h2', 'Heading 2'); activeDropdown = null" class="format-option w-full text-left px-3 py-1.5 text-[15px] font-bold text-text-90 hover:bg-brand-50" x-bind:class="formatValue === 'h2' ? 'bg-brand-150' : ''" title="Heading 2 (## + Space)">Heading 2</button>
+                    <button type="button" @mousedown.prevent="saveSelection()" @click="setFormat('h3', 'Heading 3'); activeDropdown = null" class="format-option w-full text-left px-3 py-1.5 text-[13.5px] font-bold text-text-90 hover:bg-brand-50" x-bind:class="formatValue === 'h3' ? 'bg-brand-150' : ''" title="Heading 3 (### + Space)">Heading 3</button>
+                    <button type="button" @mousedown.prevent="saveSelection()" @click="setFormat('blockquote', 'Quote'); activeDropdown = null" class="format-option w-full text-left px-3 py-1.5 text-[13px] italic text-text-70 hover:bg-brand-50" x-bind:class="formatValue === 'blockquote' ? 'bg-brand-150' : ''" title="Quote (> + Space)">Quote</button>
                 </div>
             </template>
         </div>
@@ -966,20 +966,20 @@
                     class="toolbar-btn" title="Text Color"
                 >
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M11 3L5.5 17h2.25l1.12-3h6.25l1.12 3h2.25L13 3h-2zm-1.38 9L12 5.67 14.38 12H9.62z"/></svg>
-                    <span class="block h-[3px] w-3.5 rounded-sm -mt-0.5" x-bind:style="`background:${currentTextColor || '#2c2c2c'}`"></span>
+                    <span class="block h-[3px] w-3.5 rounded-sm -mt-0.5" x-bind:style="`background:${currentTextColor || 'var(--color-text-80)'}`"></span>
                 </button>
                 <template x-teleport="body">
                     <div
                         x-show="activeDropdown === 'textColor'" x-cloak x-transition
                         @click.outside="activeDropdown = null"
                         x-bind:style="`position: fixed; top: ${pos.top}px; left: ${pos.left}px; z-index: 9999;`"
-                        class="p-2.5 bg-white border border-[#E0D5C5] rounded-lg shadow-lg flex flex-col"
+                        class="p-2.5 bg-white border border-brand-200 rounded-lg shadow-lg flex flex-col"
                         style="display: none; width: 172px;"
                     >
-                        <span class="text-[10px] font-semibold text-[#9A8E80] uppercase tracking-wider mb-2 block">Text Color</span>
+                        <span class="text-[10px] font-semibold text-secondary-150 uppercase tracking-wider mb-2 block">Text Color</span>
                         <div class="grid grid-cols-6 gap-2">
                             <template x-for="c in textColors" :key="c">
-                                <button type="button" @mousedown.prevent="saveSelection()" @click="exec('foreColor', c); currentTextColor = c;" class="w-5 h-5 rounded-full transition-all duration-150 relative flex items-center justify-center shrink-0" x-bind:class="currentTextColor === c ? 'border border-[#5E4C38] bg-white p-[2px]' : 'border border-[#E0D5C5] hover:scale-110 hover:border-[#8C7558]'" x-bind:style="currentTextColor === c ? '' : `background:${c}`" :title="c">
+                                <button type="button" @mousedown.prevent="saveSelection()" @click="exec('foreColor', c); currentTextColor = c;" class="w-5 h-5 rounded-full transition-all duration-150 relative flex items-center justify-center shrink-0" x-bind:class="currentTextColor === c ? 'border border-secondary-200 bg-white p-[3px]' : 'border border-brand-200 hover:scale-110 hover:border-secondary-150'" x-bind:style="currentTextColor === c ? '' : `background:${c}`" :title="c">
                                     <template x-if="currentTextColor === c">
                                         <span class="w-full h-full rounded-full block" x-bind:style="`background:${c}`"></span>
                                     </template>
@@ -1013,15 +1013,15 @@
                         x-show="activeDropdown === 'highlightColor'" x-cloak x-transition
                         @click.outside="activeDropdown = null"
                         x-bind:style="`position: fixed; top: ${pos.top}px; left: ${pos.left}px; z-index: 9999;`"
-                        class="p-2.5 bg-white border border-[#E0D5C5] rounded-lg shadow-lg flex flex-col"
+                        class="p-2.5 bg-white border border-brand-200 rounded-lg shadow-lg flex flex-col"
                         style="display: none; width: 184px;"
                     >
-                        <span class="text-[10px] font-semibold text-[#9A8E80] uppercase tracking-wider mb-2 block">Highlight Color</span>
+                        <span class="text-[10px] font-semibold text-secondary-150 uppercase tracking-wider mb-2 block">Highlight Color</span>
                         <div class="grid grid-cols-7 gap-1.5">
                             <template x-for="c in highlightColors" :key="c">
-                                <button type="button" @mousedown.prevent="saveSelection()" @click="exec('hiliteColor', c === 'transparent' ? 'transparent' : c); currentHighlightColor = c;" class="w-5 h-5 rounded-full transition-all duration-150 relative flex items-center justify-center shrink-0" x-bind:class="currentHighlightColor === c ? 'border border-[#5E4C38] bg-white p-[2px]' : 'border border-[#E0D5C5] hover:scale-110 hover:border-[#8C7558]'" x-bind:style="currentHighlightColor === c || c === 'transparent' ? '' : `background:${c}`" :title="c === 'transparent' ? 'No Highlight' : c">
+                                <button type="button" @mousedown.prevent="saveSelection()" @click="exec('hiliteColor', c === 'transparent' ? 'transparent' : c); currentHighlightColor = c;" class="w-5 h-5 rounded-full transition-all duration-150 relative flex items-center justify-center shrink-0" x-bind:class="currentHighlightColor === c ? 'border border-secondary-200 bg-white p-[3px]' : 'border border-brand-200 hover:scale-110 hover:border-secondary-150'" x-bind:style="currentHighlightColor === c || c === 'transparent' ? '' : `background:${c}`" :title="c === 'transparent' ? 'No Highlight' : c">
                                     <template x-if="c === 'transparent'">
-                                        <svg class="w-full h-full text-[#E64C4C]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                        <svg class="w-full h-full text-danger-100" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                                     </template>
                                     <template x-if="c !== 'transparent' && currentHighlightColor === c">
                                         <span class="w-full h-full rounded-full block" x-bind:style="`background:${c}`"></span>
@@ -1069,7 +1069,7 @@
                 type="button"
                 @mousedown.prevent="saveSelection()"
                 @click="$refs.toolbarScroll.scrollBy({ left: 150, behavior: 'smooth' });"
-                class="p-1 text-[#6A5D4D] hover:text-[#1A1A1A] transition-colors duration-150 pointer-events-auto cursor-pointer outline-none"
+                class="p-1 text-secondary-200 hover:text-text-90 transition-colors duration-150 pointer-events-auto cursor-pointer outline-none"
                 title="Scroll Right"
             >
                 <svg class="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><path d="M6 4l12 8-12 8V4z"/></svg>
@@ -1089,12 +1089,12 @@
         <div
             id="{{ $editorId }}"
             contenteditable="true"
-            class="w-full h-full flex-1 p-8 lg:p-10 text-[15px] text-[#2C2C2C] leading-[1.65] font-['Georgia',serif] overflow-y-auto custom-scrollbar bg-brand-50"
+            class="w-full h-full flex-1 p-8 lg:p-10 text-app-body-small text-[15px] text-text-90 leading-[1.65] overflow-y-auto custom-scrollbar bg-brand-50"
         ></div>
 
         {{-- Floating Block Drag Handle --}}
         <div x-show="blockDragHandle.show"
-             class="absolute flex items-center justify-center cursor-grab text-[#B0A090] hover:text-[#5E4C38] transition-colors select-none"
+             class="absolute flex items-center justify-center cursor-grab text-secondary-100 hover:text-secondary-200 transition-colors select-none"
              :style="`top: ${blockDragHandle.top}px; left: ${blockDragHandle.left}px; width: 24px; height: 24px; z-index: 50;`"
              draggable="true"
              @dragstart="onBlockDragStart($event)"
@@ -1115,17 +1115,17 @@
 
         {{-- Drop Indicator Line --}}
         <div x-show="dragIndicator.show"
-             class="absolute left-8 right-8 h-[2px] bg-[#8C7558] pointer-events-none transition-all duration-75"
+             class="absolute left-8 right-8 h-[2px] bg-secondary-200 pointer-events-none transition-all duration-75"
              :style="`top: ${dragIndicator.top}px; z-index: 60;`"
              style="display: none;"
         >
-            <div class="absolute -left-1 -top-[3px] w-2 h-2 rounded-full bg-[#8C7558]"></div>
-            <div class="absolute -right-1 -top-[3px] w-2 h-2 rounded-full bg-[#8C7558]"></div>
+            <div class="absolute -left-1 -top-[3px] w-2 h-2 rounded-full bg-secondary-200"></div>
+            <div class="absolute -right-1 -top-[3px] w-2 h-2 rounded-full bg-secondary-200"></div>
         </div>
     </div>
 
     {{-- Word Count Footer inside Editor Sheet --}}
-    <div class="px-8 lg:px-10 py-2.5 text-[12px] text-[#8C7558] font-medium border-t border-transparent select-none shrink-0 bg-brand-50 right-8">
+    <div class="px-8 lg:px-10 py-2.5 text-[12px] text-secondary-150 font-medium border-t border-transparent select-none shrink-0 bg-brand-50 right-8">
         <span x-text="wordCount + ' words'"></span>
     </div>
 </div>
