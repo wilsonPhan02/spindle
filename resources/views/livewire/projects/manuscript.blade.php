@@ -136,6 +136,7 @@ new #[Layout('layouts.app')] class extends Component {
                 $this->editorBody = $next->content ?? '';
             }
         }
+        $this->refreshAutoSummary();
         $this->chapterCard->touch();
         $this->chapterCard->refresh();
     }
@@ -161,6 +162,8 @@ new #[Layout('layouts.app')] class extends Component {
                 Manuscript::where('manuscript_id', $id)
                     ->update(['created_at' => (clone $baseTime)->addSeconds($index * 10)]);
             }
+            $this->selectDraft($draggedId);
+            $this->refreshAutoSummary();
             $this->chapterCard->touch();
             $this->chapterCard->refresh();
         }
@@ -197,27 +200,7 @@ new #[Layout('layouts.app')] class extends Component {
             ->first();
 
         if ($firstDraft && $firstDraft->manuscript_id === $this->activeDraftId) {
-            $html = $this->editorBody ?? '';
-            $html = preg_replace('/<(br|\/p|\/div|\/h[1-6]|\/li|\/tr|\/blockquote|\/pre)[^>]*>/i', "\n", $html);
-            $cleanText = html_entity_decode(strip_tags($html), ENT_QUOTES, 'UTF-8');
-            $cleanText = preg_replace('/[ \t]+/', ' ', trim($cleanText));
-
-            if ($cleanText !== '') {
-                $extracted = $cleanText;
-                if (preg_match_all('/[^.!?\r\n]+[.!?]?/', $cleanText, $matches) && !empty($matches[0])) {
-                    $sents = [];
-                    foreach ($matches[0] as $m) {
-                        $c = trim($m);
-                        if ($c !== '') $sents[] = $c;
-                    }
-                    if (!empty($sents)) {
-                        $extracted = implode(' ', array_slice($sents, 0, 2));
-                    }
-                }
-                $this->chapterCard->update(['summary' => trim($extracted)]);
-            } elseif ($cleanText === '' && empty(trim($this->chapterCard->summary ?? ''))) {
-                $this->chapterCard->update(['summary' => null]);
-            }
+            $this->refreshAutoSummary();
         }
 
         $this->chapterCard->touch();
@@ -324,13 +307,72 @@ new #[Layout('layouts.app')] class extends Component {
 
     public function updateSummary(string $newSummary): void
     {
-        $this->chapterCard->update(['summary' => trim($newSummary)]);
+        $trimmed = trim($newSummary);
+        if ($trimmed === '') {
+            $this->chapterCard->update([
+                'summary' => null,
+                'is_custom_summary' => false,
+            ]);
+            $this->refreshAutoSummary();
+        } else {
+            $this->chapterCard->update([
+                'summary' => $trimmed,
+                'is_custom_summary' => true,
+            ]);
+        }
         $this->chapterCard->refresh();
+    }
+
+    public function refreshAutoSummary(): void
+    {
+        if ($this->chapterCard->is_custom_summary) {
+            return;
+        }
+
+        $firstDraft = Manuscript::where('chapter_card_id', $this->chapterCard->chapter_card_id)
+            ->orderBy('created_at')
+            ->first();
+
+        $autoSummary = null;
+        if ($firstDraft && !empty($firstDraft->content)) {
+            $autoSummary = $this->extractTwoSentences($firstDraft->content);
+        }
+
+        $this->chapterCard->update(['summary' => $autoSummary]);
+        $this->chapterCard->refresh();
+    }
+
+    protected function extractTwoSentences(?string $html): ?string
+    {
+        if (empty($html)) return null;
+        $html = preg_replace('/<(br|\/p|\/div|\/h[1-6]|\/li|\/tr|\/blockquote|\/pre)[^>]*>/i', "\n", $html);
+        $text = html_entity_decode(strip_tags($html), ENT_QUOTES, 'UTF-8');
+        $text = preg_replace('/[ \t]+/', ' ', trim($text));
+
+        if ($text === '') return null;
+
+        if (preg_match_all('/[^.!?\r\n]+[.!?]?/', $text, $matches) && !empty($matches[0])) {
+            $sentences = [];
+            foreach ($matches[0] as $match) {
+                $cleaned = trim($match);
+                if ($cleaned !== '') {
+                    $sentences[] = $cleaned;
+                }
+            }
+            if (!empty($sentences)) {
+                return implode(' ', array_slice($sentences, 0, 2));
+            }
+        }
+        return $text;
     }
 
     public function with(): array
     {
         $this->chapterCard->refresh();
+        if (!$this->chapterCard->is_custom_summary && empty(trim($this->chapterCard->summary ?? ''))) {
+            $this->refreshAutoSummary();
+        }
+
         $drafts = Manuscript::where('chapter_card_id', $this->chapterCard->chapter_card_id)
             ->orderBy('created_at')
             ->get();
@@ -345,40 +387,13 @@ new #[Layout('layouts.app')] class extends Component {
             ->orderBy('full_name')
             ->get();
 
-        $displaySummary = $this->chapterCard->summary;
-        if (empty(trim($displaySummary ?? '')) && $drafts->isNotEmpty()) {
-            $contentSource = $drafts->first()->content ?? '';
-            $html = $contentSource ?? '';
-            $html = preg_replace('/<(br|\/p|\/div|\/h[1-6]|\/li|\/tr|\/blockquote|\/pre)[^>]*>/i', "\n", $html);
-            $text = html_entity_decode(strip_tags($html), ENT_QUOTES, 'UTF-8');
-            $text = preg_replace('/[ \t]+/', ' ', trim($text));
-
-            if ($text !== '') {
-                if (preg_match_all('/[^.!?\r\n]+[.!?]?/', $text, $matches) && !empty($matches[0])) {
-                    $sentences = [];
-                    foreach ($matches[0] as $match) {
-                        $cleaned = trim($match);
-                        if ($cleaned !== '') {
-                            $sentences[] = $cleaned;
-                        }
-                    }
-                    if (!empty($sentences)) {
-                        $displaySummary = implode(' ', array_slice($sentences, 0, 2));
-                    } else {
-                        $displaySummary = $text;
-                    }
-                } else {
-                    $displaySummary = $text;
-                }
-                $this->chapterCard->update(['summary' => trim($displaySummary)]);
-            }
-        }
+        $displaySummary = trim($this->chapterCard->summary ?? '');
 
         return [
             'drafts' => $drafts,
             'activeDraft' => $activeDraft,
             'projectCharacters' => $projectCharacters,
-            'displaySummary' => $displaySummary ?: 'No summary available for this chapter yet.',
+            'displaySummary' => $displaySummary !== '' ? $displaySummary : 'No summary available for this chapter yet.',
         ];
     }
 }; ?>
