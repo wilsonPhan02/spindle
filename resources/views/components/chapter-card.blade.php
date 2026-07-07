@@ -3,7 +3,7 @@
 <div 
     x-data="{ open: false }" 
     @mouseleave="open = false"
-    class="flex flex-col w-full group cursor-pointer"
+    class="flex flex-col w-full group cursor-grab active:cursor-grabbing"
 >
     
     <div class="flex justify-between items-end mb-1.5 px-1">
@@ -83,7 +83,8 @@
         
     </div>
     
-    <a href="{{ route('projects.manuscript', ['project' => $chapter->project_id, 'chapterCard' => $chapter->chapter_card_id]) }}" wire:navigate class="bg-card-bg border border-card-border rounded-lg shadow-md flex flex-col flex-col-1 overflow-hidden transition-all group-hover:border-secondary-200 group-hover:shadow-lg group-hover:bg-card-hover min-h-[230px]">
+    <a href="{{ route('projects.manuscript', ['project' => $chapter->project_id, 'chapterCard' => $chapter->chapter_card_id]) }}" wire:navigate 
+        class="cursor-grab active:cursor-grabbing bg-card-bg border border-card-border rounded-lg shadow-md flex flex-col flex-col-1 overflow-hidden transition-all group-hover:border-secondary-200 group-hover:shadow-lg group-hover:bg-card-hover min-h-[230px]">
         
         <div class="p-5 flex-1 flex flex-col">
             
