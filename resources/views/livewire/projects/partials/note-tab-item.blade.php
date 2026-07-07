@@ -84,7 +84,7 @@
         <div class="flex-1 min-w-0">
             <span
                 x-show="renamingId !== '{{ $note->note_id }}'"
-                class="text-[12.5px] {{ $isActive ? 'text-text-100 font-semibold' : 'text-text-80' }} truncate block"
+                class="text-app-desc-feature {{ $isActive ? 'text-text-100 font-semibold' : 'text-text-80' }} truncate block"
                 title="{{ $note->title }}"
             >{{ $note->title }}</span>
             <div x-show="renamingId === '{{ $note->note_id }}'" class="relative" x-cloak>
@@ -98,9 +98,9 @@
                     @blur="commitRename('{{ $note->note_id }}')"
                     @click.stop
                     @mousedown.stop
-                    class="w-full text-[12.5px] text-text-100 bg-bg-main border border-brand-200 rounded px-1 py-0.5 outline-none focus:border-secondary-200 pr-8"
+                    class="w-full text-app-desc-feature text-text-100 bg-bg-main border border-brand-200 rounded px-1 py-0.5 outline-none focus:border-secondary-200 pr-8"
                 />
-                <span class="absolute right-1 top-1/2 -translate-y-1/2 text-[9px] text-text-60" x-text="(renameValue || '').length + '/25'"></span>
+                <span class="absolute right-1 top-1/2 -translate-y-1/2 text-app-caption text-text-60" x-text="(renameValue || '').length + '/25'"></span>
             </div>
         </div>
 

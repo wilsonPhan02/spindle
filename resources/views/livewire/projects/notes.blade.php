@@ -561,7 +561,7 @@ new #[Layout('layouts.app')] class extends Component {
         .drag-handle:active { cursor: grabbing; }
     </style>
 
-    <div class="p-6 lg:p-10 max-w-7xl mx-auto">
+    <div class="p-4 lg:p-6 max-w-7xl mx-auto">
 
         {{-- Breadcrumb --}}
         <x-breadcrumb :items="[
@@ -570,16 +570,16 @@ new #[Layout('layouts.app')] class extends Component {
             ['label' => 'Notes']
         ]" />
 
-        <h2 class="text-[28px] font-merriweather text-text-100 mb-6">Project Notes</h2>
+        <h2 class="text-web-heading-2 text-text-100 mb-6">Project Notes</h2>
 
         {{-- Main Container --}}
-        <div class="border border-brand-150 rounded-xl shadow-sm overflow-hidden flex flex-col" style="height: calc(100vh - 200px); min-height: 500px;">
+        <div class="border border-brand-150 rounded-xl shadow-sm overflow-hidden flex flex-col h-[calc(100vh-200px)]">
 
             @if($rootNotes->isEmpty())
                 <div class="flex flex-1 min-h-0">
                     <div class="w-[220px] shrink-0 border-r border-brand-150 flex flex-col bg-brand-50">
                         <div class="flex items-center justify-between px-4 py-3 border-b border-brand-150">
-                            <span class="text-[11px] font-semibold text-text-60 uppercase tracking-widest">Document Tabs</span>
+                            <span class="text-app-caption font-semibold text-text-60 uppercase tracking-widest">Document Tabs</span>
                             <button wire:click="addNote" class="w-5 h-5 flex items-center justify-center text-secondary-200 hover:text-secondary-100 transition-colors" title="Add new note">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                             </button>
@@ -588,7 +588,7 @@ new #[Layout('layouts.app')] class extends Component {
                     </div>
                     <div class="flex-1 flex flex-col items-center justify-center gap-4 bg-bg-main">
                         <x-icons.no-notes class="w-28 h-24" />
-                        <p class="text-[14px] text-text-60 font-medium">You Didn't Have Any Notes!</p>
+                        <p class="text-app-body-medium text-text-60">You Didn't Have Any Notes!</p>
                     </div>
                 </div>
             @else
@@ -598,7 +598,7 @@ new #[Layout('layouts.app')] class extends Component {
                     <div id="tab-panel" class="w-[220px] shrink-0 border-r border-brand-150 flex flex-col bg-brand-50 relative">
 
                         <div class="flex items-center justify-between px-4 py-3 border-b border-brand-150">
-                            <span class="text-[11px] font-semibold text-text-60 uppercase tracking-widest">Document Tabs</span>
+                            <span class="text-app-caption font-semibold text-text-60 uppercase tracking-widest">Document Tabs</span>
                             <button wire:click="addNote" class="w-5 h-5 flex items-center justify-center text-secondary-200 hover:text-secondary-100 transition-colors" title="Add new note">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                             </button>
@@ -633,11 +633,11 @@ new #[Layout('layouts.app')] class extends Component {
                                 editorId="note-editor"
                                 updateMethod="updateBody"
                                 contentProp="editorBody"
-                                counterType="word"
+                                counterType="notes"
                                 wire:key="editor-{{ $activeNote->note_id }}"
                             />
                         @else
-                            <div class="flex-1 flex items-center justify-center text-text-60 text-[14px]">
+                            <div class="flex-1 flex items-center justify-center text-text-60 text-app-body-medium">
                                 Select a note to start editing
                             </div>
                         @endif
@@ -696,9 +696,7 @@ new #[Layout('layouts.app')] class extends Component {
                         class="w-full text-left px-4 py-2 text-app-body-medium text-danger-100 hover:bg-danger-100/5 flex items-center gap-3 transition-colors"
                         @click="
                             closeMenu();
-                            if(confirm('Delete \'' + menuNoteTitle + '\'? All sub-tabs will also be deleted.')) {
-                                $wire.deleteNote(menuNoteId);
-                            }
+                            $dispatch('open-delete-note-dialog', { id: menuNoteId });
                         "
                     >
                         <x-icons.delete class="w-4 h-4 shrink-0 text-danger-100" />
@@ -713,7 +711,7 @@ new #[Layout('layouts.app')] class extends Component {
     <x-confirm-dialog
         eventName="open-delete-note-dialog"
         title="Delete Note?"
-        description="Are you sure you want to permanently delete this note? All sub-tabs will also be deleted. This action cannot be undone."
+        description="Are you sure you want to permanently delete this note? All sub-tabs will also be deleted."
         confirmText="Yes, Delete"
         cancelText="Cancel"
         submitAction="deleteNote"

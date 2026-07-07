@@ -1117,7 +1117,7 @@
                     activeDropdown = activeDropdown === 'format' ? null : 'format';
                     if (activeDropdown === 'format') adjustOverlayPosition(pos, 180, 220, $event.currentTarget);
                 "
-                class="h-7 px-2.5 flex items-center gap-1.5 text-[12px] text-text-80 bg-card-bg border border-brand-200 rounded-md outline-none cursor-pointer hover:border-secondary-100 transition-colors shadow-sm"
+                class="h-7 px-2.5 flex items-center gap-1.5 text-app-desc-feature text-text-80 bg-card-bg border border-brand-200 rounded-md outline-none cursor-pointer hover:border-secondary-100 transition-colors shadow-sm"
                 style="min-width: 118px;"
                 title="Text Format"
             >
@@ -1138,11 +1138,11 @@
                     class="w-40 bg-white border border-brand-200 rounded-lg py-1"
                     style="display: none;"
                 >
-                    <button type="button" @mousedown.prevent="saveSelection()" @click="setFormat('p', 'Normal Text'); activeDropdown = null" class="format-option w-full text-left px-3 py-1.5 text-[13px] text-text-90 hover:bg-brand-50" x-bind:class="formatValue === 'p' ? 'bg-brand-150 font-semibold' : ''" title="Normal Text">Normal Text</button>
-                    <button type="button" @mousedown.prevent="saveSelection()" @click="setFormat('h1', 'Heading 1'); activeDropdown = null" class="format-option w-full text-left px-3 py-1.5 text-[18px] font-bold text-text-90 hover:bg-brand-50" x-bind:class="formatValue === 'h1' ? 'bg-brand-150' : ''" title="Heading 1 (# + Space)">Heading 1</button>
-                    <button type="button" @mousedown.prevent="saveSelection()" @click="setFormat('h2', 'Heading 2'); activeDropdown = null" class="format-option w-full text-left px-3 py-1.5 text-[15px] font-bold text-text-90 hover:bg-brand-50" x-bind:class="formatValue === 'h2' ? 'bg-brand-150' : ''" title="Heading 2 (## + Space)">Heading 2</button>
-                    <button type="button" @mousedown.prevent="saveSelection()" @click="setFormat('h3', 'Heading 3'); activeDropdown = null" class="format-option w-full text-left px-3 py-1.5 text-[13.5px] font-bold text-text-90 hover:bg-brand-50" x-bind:class="formatValue === 'h3' ? 'bg-brand-150' : ''" title="Heading 3 (### + Space)">Heading 3</button>
-                    <button type="button" @mousedown.prevent="saveSelection()" @click="setFormat('blockquote', 'Quote'); activeDropdown = null" class="format-option w-full text-left px-3 py-1.5 text-[13px] italic text-text-70 hover:bg-brand-50" x-bind:class="formatValue === 'blockquote' ? 'bg-brand-150' : ''" title="Quote (> + Space)">Quote</button>
+                    <button type="button" @mousedown.prevent="saveSelection()" @click="setFormat('p', 'Normal Text'); activeDropdown = null" class="format-option w-full text-left px-3 py-1.5 text-app-body-medium text-text-90 hover:bg-brand-50" x-bind:class="formatValue === 'p' ? 'bg-brand-150 font-semibold' : ''" title="Normal Text">Normal Text</button>
+                    <button type="button" @mousedown.prevent="saveSelection()" @click="setFormat('h1', 'Heading 1'); activeDropdown = null" class="format-option w-full text-left px-3 py-1.5 text-app-subtitle-1 font-bold text-text-90 hover:bg-brand-50" x-bind:class="formatValue === 'h1' ? 'bg-brand-150' : ''" title="Heading 1 (# + Space)">Heading 1</button>
+                    <button type="button" @mousedown.prevent="saveSelection()" @click="setFormat('h2', 'Heading 2'); activeDropdown = null" class="format-option w-full text-left px-3 py-1.5 text-app-subfeature font-bold text-text-90 hover:bg-brand-50" x-bind:class="formatValue === 'h2' ? 'bg-brand-150' : ''" title="Heading 2 (## + Space)">Heading 2</button>
+                    <button type="button" @mousedown.prevent="saveSelection()" @click="setFormat('h3', 'Heading 3'); activeDropdown = null" class="format-option w-full text-left px-3 py-1.5 text-app-body-medium font-bold text-text-90 hover:bg-brand-50" x-bind:class="formatValue === 'h3' ? 'bg-brand-150' : ''" title="Heading 3 (### + Space)">Heading 3</button>
+                    <button type="button" @mousedown.prevent="saveSelection()" @click="setFormat('blockquote', 'Quote'); activeDropdown = null" class="format-option w-full text-left px-3 py-1.5 text-app-body-medium italic text-text-70 hover:bg-brand-50" x-bind:class="formatValue === 'blockquote' ? 'bg-brand-150' : ''" title="Quote (> + Space)">Quote</button>
                 </div>
             </template>
         </div>
@@ -1226,7 +1226,7 @@
                         class="p-2.5 bg-white border border-brand-200 rounded-lg shadow-lg flex flex-col"
                         style="display: none; width: 172px;"
                     >
-                        <span class="text-[10px] font-semibold text-secondary-150 uppercase tracking-wider mb-2 block">Text Color</span>
+                        <span class="text-app-caption font-semibold text-secondary-150 uppercase tracking-wider mb-2 block">Text Color</span>
                         <div class="grid grid-cols-6 gap-2">
                             <template x-for="c in textColors" :key="c">
                                 <button type="button" @mousedown.prevent="saveSelection()" @click="exec('foreColor', c); currentTextColor = c;" class="w-5 h-5 rounded-full transition-all duration-150 relative flex items-center justify-center shrink-0" x-bind:class="(currentTextColor || '#000000') === c ? 'border border-secondary-200 bg-white p-[3px]' : 'border border-brand-200 hover:scale-110 hover:border-secondary-150'" x-bind:style="(currentTextColor || '#000000') === c ? '' : `background:${c}`" :title="c === '#000000' ? 'Default / Black' : c">
@@ -1266,7 +1266,7 @@
                         class="p-2.5 bg-white border border-brand-200 rounded-lg shadow-lg flex flex-col"
                         style="display: none; width: 184px;"
                     >
-                        <span class="text-[10px] font-semibold text-secondary-150 uppercase tracking-wider mb-2 block">Highlight Color</span>
+                        <span class="text-app-caption font-semibold text-secondary-150 uppercase tracking-wider mb-2 block">Highlight Color</span>
                         <div class="grid grid-cols-7 gap-1.5">
                             <template x-for="c in highlightColors" :key="c">
                                 <button type="button" @mousedown.prevent="saveSelection()" @click="exec('hiliteColor', c === 'transparent' ? 'transparent' : c); currentHighlightColor = c;" class="w-5 h-5 rounded-full transition-all duration-150 relative flex items-center justify-center shrink-0" x-bind:class="(currentHighlightColor || 'transparent') === c ? 'border border-secondary-200 bg-white p-[3px]' : 'border border-brand-200 hover:scale-110 hover:border-secondary-150'" x-bind:style="(currentHighlightColor || 'transparent') === c || c === 'transparent' ? '' : `background:${c}`" :title="c === 'transparent' ? 'No Highlight' : c">
@@ -1339,7 +1339,7 @@
         <div
             id="{{ $editorId }}"
             contenteditable="true"
-            class="w-full h-full flex-1 p-8 lg:p-10 text-app-body-small text-[15px] text-text-90 leading-[1.65] overflow-y-auto custom-scrollbar bg-brand-50"
+            class="w-full h-full flex-1 p-8 lg:p-10 text-app-body-large text-text-90 leading-[1.65] overflow-y-auto custom-scrollbar bg-brand-50"
         ></div>
 
         {{-- Floating Block Drag Handle --}}
@@ -1374,8 +1374,16 @@
         </div>
     </div>
 
-    {{-- Word Count Footer inside Editor Sheet --}}
-    <div class="px-8 lg:px-10 py-2.5 text-[12px] text-secondary-150 font-medium border-t border-transparent select-none shrink-0 bg-brand-50 right-8">
-        <span x-text="wordCount + ' words'"></span>
+    {{-- Counter Footer inside Editor Sheet --}}
+    <div class="px-8 lg:px-10 py-2.5 text-app-desc-feature text-secondary-150 font-medium border-t border-transparent select-none shrink-0 bg-brand-50 right-8">
+        @if(in_array(strtolower($counterType), ['notes', 'limit', 'char-limit', 'char_limit', 'len']))
+            <span x-text="new Intl.NumberFormat().format(charCount) + ' / 65,535 • ' + new Intl.NumberFormat().format(wordCount) + ' words'"></span>
+        @elseif(in_array(strtolower($counterType), ['character', 'char', 'characters', 'karakter']))
+            <span x-text="charCount + ' characters'"></span>
+        @elseif(in_array(strtolower($counterType), ['both', 'all']))
+            <span x-text="wordCount + ' words · ' + charCount + ' characters'"></span>
+        @else
+            <span x-text="wordCount + ' words'"></span>
+        @endif
     </div>
 </div>
