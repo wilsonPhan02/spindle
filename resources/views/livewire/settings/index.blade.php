@@ -49,7 +49,7 @@ new #[Layout('layouts.app')] class extends Component {
 
             <!-- Profile Data Grid -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-y-8 gap-x-12 w-full pt-2 justify-between">
-                <x-settings-items variant="info" label="Your Preferred Name" :value="$profile->username ?? 'Sailor Shift'" ></x->
+                <x-settings-items variant="info" label="Username" :value="$profile->username ?? 'Sailor Shift'" ></x->
                 <x-settings-items variant="info" label="Occupation" :value="$profile->occupation ?? 'None'" ></x->
                 <x-settings-items variant="info" label="Gender" :value="$profile->gender ? ucfirst($profile->gender) : 'None'" ></x->
                 <x-settings-items variant="info" label="Email" :value="$user->email ?? 'None'" ></x->

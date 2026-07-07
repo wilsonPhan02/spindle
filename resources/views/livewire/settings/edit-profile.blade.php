@@ -106,8 +106,8 @@ new class extends Component {
                     <x-avatar :editable="true" model="new_photo" size="w-48 h-48"
                         :imageUrl="optional(auth()->user()->profile)->avatar_url ? Storage::url(auth()->user()->profile->avatar_url) : null" />
 
-                    <x-form-input label="What is your new preferred name?" 
-                        placeholder="Enter your preferred name" 
+                    <x-form-input label="What is your new username?" 
+                        placeholder="Enter your username" 
                         model="username" maxlength="60" />
                 </div>
 
