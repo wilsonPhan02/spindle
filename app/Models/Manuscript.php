@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Manuscript extends Model
 {
@@ -13,9 +14,18 @@ class Manuscript extends Model
     public $incrementing = false;
     protected $keyType = 'string';
 
-    protected $guarded = ['manuscript_id'];
+    protected $fillable = [
+        'chapter_card_id',
+        'title',
+        'content',
+        'word_count',
+    ];
 
-    public function chapter()
+    protected $casts = [
+        'word_count' => 'integer',
+    ];
+
+    public function chapter(): BelongsTo
     {
         return $this->belongsTo(ChapterCard::class, 'chapter_card_id', 'chapter_card_id');
     }

@@ -1032,7 +1032,7 @@ new #[Layout('layouts.app')] class extends Component {
                     @elseif($workspace['title'] === 'Structure' && $recentChapters->isNotEmpty())
                         <div class="flex-1 flex flex-col gap-3 overflow-y-auto pr-1.5 custom-scrollbar -mx-1.5 px-1.5 pb-2">
                             @foreach($recentChapters as $chapter)
-                                <a href="{{ route($workspace['route'], ['project' => $project->project_id]) }}" 
+                                <a href="{{ route('projects.manuscript', ['project' => $chapter->project_id, 'chapterCard' => $chapter->chapter_card_id]) }}" 
                                    wire:navigate 
                                    class="flex flex-col bg-card-bg border border-1 border-card-border p-4 rounded-xl group cursor-pointer hover:bg-card-hover hover:border-secondary-150 hover:shadow-sm transition-all duration-200 shrink-0">
                                     
@@ -1057,7 +1057,7 @@ new #[Layout('layouts.app')] class extends Component {
                                             @endforeach
                                             @if($chapter->tags->count() > 2)
                                                 <span class="px-1 text-app-caption text-secondary-100">
-                                                    +{{ $chapter->tags->count() - 2 }}
+                                                    +{{ $chapter->tags->count() - 2 }} more
                                                 </span>
                                             @endif
                                         @else
@@ -1067,8 +1067,34 @@ new #[Layout('layouts.app')] class extends Component {
                                         @endif
                                     </div>
 
+                                    @php
+                                        $summaryText = $chapter->summary;
+                                        if (empty(trim($summaryText ?? '')) && $chapter->manuscript && $chapter->manuscript->isNotEmpty()) {
+                                            $firstDraftContent = $chapter->manuscript->first()->content ?? '';
+                                            $html = preg_replace('/<(br|\/p|\/div|\/h[1-6]|\/li|\/tr|\/blockquote|\/pre)[^>]*>/i', "\n", $firstDraftContent);
+                                            $cleanText = html_entity_decode(strip_tags($html), ENT_QUOTES, 'UTF-8');
+                                            $cleanText = preg_replace('/[ \t]+/', ' ', trim($cleanText));
+                                            if ($cleanText !== '') {
+                                                if (preg_match_all('/[^.!?\r\n]+[.!?]?/', $cleanText, $matches) && !empty($matches[0])) {
+                                                    $sents = [];
+                                                    foreach ($matches[0] as $m) {
+                                                        $c = trim($m);
+                                                        if ($c !== '') $sents[] = $c;
+                                                    }
+                                                    if (!empty($sents)) {
+                                                        $summaryText = implode(' ', array_slice($sents, 0, 2));
+                                                    } else {
+                                                        $summaryText = $cleanText;
+                                                    }
+                                                } else {
+                                                    $summaryText = $cleanText;
+                                                }
+                                                $chapter->update(['summary' => trim($summaryText)]);
+                                            }
+                                        }
+                                    @endphp
                                     <p class="text-app-body-small text-subtext-100 mb-4 line-clamp-2">
-                                        {{ $chapter->summary ?? 'No summary available for this chapter yet.' }}
+                                        {{ !empty(trim($summaryText ?? '')) ? $summaryText : 'No summary available for this chapter yet.' }}
                                     </p>
 
                                     <div class="flex flex-wrap items-center justify-between gap-x-2 gap-y-2 mt-auto pt-3">

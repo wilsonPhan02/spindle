@@ -48,6 +48,8 @@ Route::middleware('auth')->group(function () {
         Volt::route('/projects/{project}/structure', 'projects.structure')->name('projects.structure')->missing($missingProject);
         // Rute untuk halaman notes project
         Volt::route('/projects/{project}/notes', 'projects.notes')->name('projects.notes')->missing($missingProject);
+        // Rute untuk halaman manuscript chapter
+        Volt::route('/projects/{project}/structure/{chapterCard}/manuscript', 'projects.manuscript')->name('projects.manuscript');
     });
     // Rute untuk halaman archive
     Volt::route('/archive', 'archive.index')->name('archive');
