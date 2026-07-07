@@ -137,9 +137,10 @@ new class extends Component {
                 $prevSections = $sections->take($targetIndex)->pluck('structure_section_id');
                 
                 $maxPrev = ChapterCard::where('project_id', $this->project->project_id)
-                    ->whereIn('structure_section_id', $prevSections)
-                    ->max('order_index');
-                    
+                                ->whereIn('structure_section_id', $prevSections)
+                                ->where('chapter_card_id', '!=', $chapterId)
+                                ->max('order_index');
+
                 $newOrder = $maxPrev ? $maxPrev + 1 : 1;
             }
 
@@ -209,7 +210,7 @@ new class extends Component {
                  style="transform: translateX(-{{ $activeSectionIndex * 100 }}%);"
                  wire:key="section-{{ $section->structure_section_id }}">
             
-                <div x-data="sortableList(@this)" 
+                <div x-data="sortableList(@this)" x-ref="list"
                      class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 justify-items-center">
                     
                     @php
@@ -217,7 +218,7 @@ new class extends Component {
                     @endphp
 
                     @forelse($chaptersForSection as $chapter)
-                        <div class="w-full flex justify-center sortable-item cursor-move"
+                        <div class="w-full flex justify-center sortable-item cursor-grab active:cursor-grabbing"
                              data-id="{{ $chapter->chapter_card_id }}"
                              wire:key="chapter-{{ $chapter->chapter_card_id }}">
                              
@@ -271,6 +272,8 @@ new class extends Component {
                 new Sortable(this.$refs.list, {
                     animation: 200,
                     ghostClass: 'opacity-50',
+                    dragClass: 'cursor-grabbing',
+                    chosenClass: 'cursor-grabbing',
                     draggable: '.sortable-item',
                     onEnd: (evt) => {
                         if (evt.oldIndex === evt.newIndex) return;
