@@ -80,14 +80,17 @@
             this.updateCounter();
             this.refreshToolbarState();
 
-            editorEl.addEventListener('input', () => {
+            editorEl.addEventListener('input', (e) => {
                 this.updateCounter();
                 this.scheduleSave();
                 this.refreshToolbarState();
+                if (e && (e.data === ' ' || e.data === '\u00A0' || e.inputType === 'insertText')) {
+                    this.handleMarkdownShortcuts();
+                }
             });
 
             editorEl.addEventListener('keyup', (e) => {
-                if (e.key === ' ') {
+                if (e.key === ' ' || e.key === 'Spacebar' || e.code === 'Space' || e.key === 'Unidentified') {
                     this.handleMarkdownShortcuts();
                 }
                 if (e.key !== 'Enter' && e.key !== 'Tab') {
@@ -202,51 +205,71 @@
             this.scheduleSave();
         },
 
-        setFormat(tag, label) {
+        setFormat(tag, label, targetBlock = null) {
             const editorEl = document.getElementById('{{ $editorId }}');
             if (document.activeElement !== editorEl) {
                 this.restoreSelection();
             }
 
             const sel = window.getSelection();
-            if (sel && sel.anchorNode) {
+            let block = targetBlock;
+            if (!block && sel && sel.anchorNode) {
                 let node = sel.anchorNode;
                 if (node.nodeType === 3) node = node.parentElement;
-                let block = node.closest('p, h1, h2, h3, blockquote');
+                block = node.closest('p, h1, h2, h3, blockquote, div');
+                if (block === editorEl) {
+                    block = node.closest('p, h1, h2, h3, blockquote');
+                }
+            }
 
-                if (block && editorEl && editorEl.contains(block)) {
+            if (block && block !== editorEl && editorEl && editorEl.contains(block)) {
+                let startNode = null, startOffset = 0, endNode = null, endOffset = 0;
+                if (sel && sel.rangeCount > 0) {
                     const range = sel.getRangeAt(0);
-                    const startOffset = range.startOffset;
-                    const endOffset = range.endOffset;
-                    const startNode = range.startContainer;
-                    const endNode = range.endContainer;
+                    startOffset = range.startOffset;
+                    endOffset = range.endOffset;
+                    startNode = range.startContainer;
+                    endNode = range.endContainer;
+                }
 
-                    const newBlock = document.createElement(tag === 'p' ? 'p' : tag);
-                    if (block.style.textAlign) newBlock.style.textAlign = block.style.textAlign;
+                const newBlock = document.createElement(tag === 'p' ? 'p' : tag);
+                if (block.style.textAlign) newBlock.style.textAlign = block.style.textAlign;
 
-                    while (block.firstChild) {
-                        newBlock.appendChild(block.firstChild);
-                    }
+                while (block.firstChild) {
+                    newBlock.appendChild(block.firstChild);
+                }
+                if (!newBlock.innerHTML.replace(/^[\s\u200B\uFEFF]+|[\s\u200B\uFEFF]+$/g, '') || newBlock.innerHTML === '') {
+                    newBlock.innerHTML = '<br>';
+                }
 
-                    block.parentNode.replaceChild(newBlock, block);
+                block.parentNode.replaceChild(newBlock, block);
 
-                    try {
-                        const newRange = document.createRange();
+                try {
+                    const newRange = document.createRange();
+                    if (startNode && newBlock.contains(startNode)) {
                         newRange.setStart(startNode, startOffset);
                         newRange.setEnd(endNode, endOffset);
+                    } else if (newBlock.firstChild && newBlock.firstChild.nodeType === 3) {
+                        newRange.setStart(newBlock.firstChild, 0);
+                        newRange.collapse(true);
+                    } else {
+                        newRange.selectNodeContents(newBlock);
+                        newRange.collapse(false);
+                    }
+                    if (sel) {
                         sel.removeAllRanges();
                         sel.addRange(newRange);
-                    } catch (e) {
-                        try {
-                            const fallbackRange = document.createRange();
-                            fallbackRange.selectNodeContents(newBlock);
-                            fallbackRange.collapse(false);
+                    }
+                } catch (e) {
+                    try {
+                        const fallbackRange = document.createRange();
+                        fallbackRange.selectNodeContents(newBlock);
+                        fallbackRange.collapse(false);
+                        if (sel) {
                             sel.removeAllRanges();
                             sel.addRange(fallbackRange);
-                        } catch (err) {}
-                    }
-                } else {
-                    document.execCommand('formatBlock', false, tag === 'p' ? 'p' : tag);
+                        }
+                    } catch (err) {}
                 }
             } else {
                 document.execCommand('formatBlock', false, tag === 'p' ? 'p' : tag);
@@ -342,7 +365,7 @@
             return c.toUpperCase();
         },
 
-        insertTodoBlock() {
+        insertTodoBlock(isChecked = false) {
             if (!this.showTodo) return;
             const editorEl = document.getElementById('{{ $editorId }}');
             const sel = window.getSelection();
@@ -379,15 +402,32 @@
             }
 
             let contentHtml = block.innerHTML || '<br>';
-            contentHtml = contentHtml.replace(/^(\s|&nbsp;)*\[\s*\](\s|&nbsp;)*/i, '');
+            contentHtml = contentHtml.replace(/^(\s|&nbsp;)*\[\s*[xX]?\s*\](\s|&nbsp;)*/i, '');
             if (!contentHtml.trim() || contentHtml.trim() === '<br>') contentHtml = '<br>';
 
             const todoDiv = document.createElement('div');
             todoDiv.className = 'todo-item flex items-start gap-2 my-1';
-            todoDiv.innerHTML = `
-                <input type='checkbox' class='todo-checkbox mt-1 cursor-pointer w-4 h-4 rounded border-secondary-100 text-secondary-200 accent-secondary-200 focus:ring-secondary-200' contenteditable='false' onclick='this.nextElementSibling.style.textDecoration = this.checked ? 'line-through' : 'none'; this.nextElementSibling.style.opacity = this.checked ? '0.5' : '1';'>
-                <span class='todo-text flex-1 outline-none'>${contentHtml}</span>
-            `;
+
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.className = 'todo-checkbox mt-1 cursor-pointer w-4 h-4 rounded border-secondary-100 text-secondary-200 accent-secondary-200 focus:ring-secondary-200';
+            checkbox.setAttribute('contenteditable', 'false');
+            if (isChecked) {
+                checkbox.setAttribute('checked', 'checked');
+            }
+            const onClickCode = 'this.nextElementSibling.style.textDecoration = this.checked ? \'line-through\' : \'none\'; this.nextElementSibling.style.opacity = this.checked ? \'0.5\' : \'1\';';
+            checkbox.setAttribute('onclick', onClickCode);
+
+            const span = document.createElement('span');
+            span.className = 'todo-text flex-1 outline-none';
+            if (isChecked) {
+                span.style.textDecoration = 'line-through';
+                span.style.opacity = '0.5';
+            }
+            span.innerHTML = contentHtml;
+
+            todoDiv.appendChild(checkbox);
+            todoDiv.appendChild(span);
             block.parentNode.replaceChild(todoDiv, block);
 
             const textSpan = todoDiv.querySelector('.todo-text');
@@ -406,66 +446,149 @@
             if (!sel || !sel.anchorNode) return;
 
             let node = sel.anchorNode;
+            if (node.nodeType !== 3 && node.childNodes && node.childNodes.length > 0) {
+                const idx = Math.max(0, sel.anchorOffset - 1);
+                if (node.childNodes[idx] && node.childNodes[idx].nodeType === 3) {
+                    node = node.childNodes[idx];
+                } else if (node.firstChild && node.firstChild.nodeType === 3) {
+                    node = node.firstChild;
+                }
+            }
+
             if (node.nodeType === 3) {
                 const textBefore = node.textContent.slice(0, sel.anchorOffset);
-                const block = node.parentElement.closest('p, h1, h2, h3, blockquote');
+                const block = node.parentElement.closest('p, h1, h2, h3, blockquote, div');
 
                 if (block && editorEl.contains(block)) {
-                    let matched = false;
-                    let tag = '';
-                    let label = '';
+                    const hasTrailingSpace = /[\s\u00A0]$/.test(textBefore);
+                    const trimmed = textBefore.replace(/^[\s\u200B\uFEFF]+|[\s\u200B\uFEFF]+$/g, '');
 
-                    if (textBefore === '# ') { matched = true; tag = 'h1'; label = 'Heading 1'; }
-                    else if (textBefore === '## ') { matched = true; tag = 'h2'; label = 'Heading 2'; }
-                    else if (textBefore === '### ') { matched = true; tag = 'h3'; label = 'Heading 3'; }
-                    else if (textBefore === '> ') { matched = true; tag = 'blockquote'; label = 'Quote'; }
-
-                    if (matched) {
-                        const range = sel.getRangeAt(0);
-                        range.setStart(node, 0);
-                        range.setEnd(node, sel.anchorOffset);
-                        range.deleteContents();
-                        this.setFormat(tag, label);
+                    if (hasTrailingSpace && trimmed === '#') {
+                        this.deleteShortcutPrefix(node, sel.anchorOffset);
+                        this.setFormat('h1', 'Heading 1', block);
+                        return;
+                    }
+                    if (hasTrailingSpace && trimmed === '##') {
+                        this.deleteShortcutPrefix(node, sel.anchorOffset);
+                        this.setFormat('h2', 'Heading 2', block);
+                        return;
+                    }
+                    if (hasTrailingSpace && trimmed === '###') {
+                        this.deleteShortcutPrefix(node, sel.anchorOffset);
+                        this.setFormat('h3', 'Heading 3', block);
+                        return;
+                    }
+                    if (hasTrailingSpace && (trimmed === '>' || trimmed === '{}' || trimmed === '&gt;')) {
+                        this.deleteShortcutPrefix(node, sel.anchorOffset);
+                        this.setFormat('blockquote', 'Quote', block);
                         return;
                     }
 
-                    if (this.showLists && (textBefore === '- ' || textBefore === '* ')) {
-                        const range = sel.getRangeAt(0);
-                        range.setStart(node, 0);
-                        range.setEnd(node, sel.anchorOffset);
-                        range.deleteContents();
+                    if (this.showLists && hasTrailingSpace && (trimmed === '-' || trimmed === '*' || trimmed === '+')) {
+                        this.deleteShortcutPrefix(node, sel.anchorOffset);
                         this.exec('insertUnorderedList');
                         return;
                     }
 
-                    if (this.showLists && /^1\.\s$/.test(textBefore)) {
-                        const range = sel.getRangeAt(0);
-                        range.setStart(node, 0);
-                        range.setEnd(node, sel.anchorOffset);
-                        range.deleteContents();
+                    if (this.showLists && hasTrailingSpace && /^[0-9]+\.$/.test(trimmed)) {
+                        this.deleteShortcutPrefix(node, sel.anchorOffset);
                         this.exec('insertOrderedList');
                         return;
                     }
 
-                    if (this.showTodo && (textBefore.trim() === '[]' || textBefore.trim() === '[ ]')) {
-                        const range = sel.getRangeAt(0);
-                        range.setStart(node, 0);
-                        range.setEnd(node, sel.anchorOffset);
-                        range.deleteContents();
-                        this.insertTodoBlock();
+                    if (this.showLists && hasTrailingSpace && /^[aA]\.$/.test(trimmed)) {
+                        const isUpper = /^[A]\.$/.test(trimmed);
+                        this.deleteShortcutPrefix(node, sel.anchorOffset);
+                        this.exec('insertOrderedList');
+                        setTimeout(() => {
+                            const currSel = window.getSelection();
+                            const currNode = currSel && currSel.anchorNode;
+                            const targetElem = currNode && currNode.nodeType === 3 ? currNode.parentElement : currNode;
+                            const ol = targetElem ? targetElem.closest('ol') : null;
+                            if (ol) {
+                                ol.setAttribute('type', isUpper ? 'A' : 'a');
+                                ol.style.listStyleType = isUpper ? 'upper-alpha' : 'lower-alpha';
+                                this.scheduleSave();
+                            }
+                        }, 10);
                         return;
                     }
 
-                    if (this.showHr && textBefore === '--- ') {
-                        const range = sel.getRangeAt(0);
-                        range.setStart(node, 0);
-                        range.setEnd(node, sel.anchorOffset);
-                        range.deleteContents();
+                    if (this.showTodo && hasTrailingSpace && /^\[[xX]?\]$/.test(trimmed)) {
+                        const isChecked = /^\[[xX]\]$/.test(trimmed);
+                        this.deleteShortcutPrefix(node, sel.anchorOffset);
+                        this.insertTodoBlock(isChecked);
+                        return;
+                    }
+
+                    if (this.showHr && hasTrailingSpace && trimmed === '---') {
+                        this.deleteShortcutPrefix(node, sel.anchorOffset);
                         this.exec('insertHorizontalRule');
                         return;
                     }
+
+                    const inlinePatterns = [
+                        { regex: /\*\*([^*]+)\*\*\s$/, tag: 'strong', prop: null, contentIdx: 1, offsetAdj: 0 },
+                        { regex: /(^|[^*])\*([^*]+)\*\s$/, tag: 'em', prop: null, contentIdx: 2, offsetAdj: 1 },
+                        { regex: /~~([^~]+)~~\s$/, tag: 's', prop: 'showStrike', contentIdx: 1, offsetAdj: 0 },
+                        { regex: /==([^=]+)==\s$/, tag: 'mark', prop: 'showHighlight', contentIdx: 1, offsetAdj: 0 }
+                    ];
+
+                    for (let pattern of inlinePatterns) {
+                        if (pattern.prop && !this[pattern.prop]) continue;
+                        const match = textBefore.match(pattern.regex);
+                        if (match) {
+                            const fullMatch = match[0];
+                            const content = match[pattern.contentIdx];
+                            const leadingLen = pattern.offsetAdj ? (match[1] ? match[1].length : 0) : 0;
+                            const startIdx = sel.anchorOffset - fullMatch.length + leadingLen;
+
+                            const range = document.createRange();
+                            range.setStart(node, startIdx);
+                            range.setEnd(node, sel.anchorOffset);
+                            range.deleteContents();
+
+                            let el;
+                            if (pattern.tag === 'mark') {
+                                el = document.createElement('span');
+                                const bg = (this.currentHighlightColor && this.currentHighlightColor !== 'transparent') ? this.currentHighlightColor : '#ffeaa7';
+                                el.style.backgroundColor = bg;
+                            } else {
+                                el = document.createElement(pattern.tag);
+                            }
+                            el.textContent = content;
+                            range.insertNode(el);
+
+                            const spaceNode = document.createTextNode(' ');
+                            if (el.nextSibling) {
+                                el.parentNode.insertBefore(spaceNode, el.nextSibling);
+                            } else {
+                                el.parentNode.appendChild(spaceNode);
+                            }
+
+                            const newSel = window.getSelection();
+                            const newRange = document.createRange();
+                            newRange.setStart(spaceNode, 1);
+                            newRange.collapse(true);
+                            newSel.removeAllRanges();
+                            newSel.addRange(newRange);
+
+                            this.refreshToolbarState();
+                            this.scheduleSave();
+                            return;
+                        }
+                    }
                 }
             }
+        },
+
+        deleteShortcutPrefix(node, endOffset) {
+            try {
+                const range = document.createRange();
+                range.setStart(node, 0);
+                range.setEnd(node, endOffset);
+                range.deleteContents();
+            } catch (e) {}
         },
 
         handleKeydown(e) {
@@ -493,18 +616,43 @@
                     }
 
                     const todoItem = node.closest('.todo-item');
-                    if (todoItem && todoItem.textContent.trim() === '' && editorEl.contains(todoItem)) {
-                        e.preventDefault();
-                        const p = document.createElement('p');
-                        p.innerHTML = '<br>';
-                        todoItem.parentNode.replaceChild(p, todoItem);
-                        const range = document.createRange();
-                        range.selectNodeContents(p);
-                        range.collapse(true);
-                        sel.removeAllRanges();
-                        sel.addRange(range);
-                        this.scheduleSave();
-                        return;
+                    if (todoItem && editorEl.contains(todoItem)) {
+                        const textSpan = todoItem.querySelector('.todo-text');
+                        const isAtStart = sel.isCollapsed && sel.anchorOffset === 0 && (sel.anchorNode === textSpan || sel.anchorNode === textSpan.firstChild || sel.anchorNode === todoItem);
+                        if (todoItem.textContent.trim() === '' || isAtStart) {
+                            e.preventDefault();
+                            const p = document.createElement('p');
+                            p.innerHTML = textSpan ? (textSpan.innerHTML || '<br>') : (todoItem.textContent || '<br>');
+                            if (!p.innerHTML.trim() || p.innerHTML.trim() === '') p.innerHTML = '<br>';
+                            todoItem.parentNode.replaceChild(p, todoItem);
+                            const range = document.createRange();
+                            range.selectNodeContents(p);
+                            range.collapse(true);
+                            sel.removeAllRanges();
+                            sel.addRange(range);
+                            this.scheduleSave();
+                            return;
+                        }
+                    }
+
+                    const formatBlock = node.closest('blockquote, h1, h2, h3');
+                    if (formatBlock && editorEl.contains(formatBlock)) {
+                        let isAtStart = false;
+                        if (sel.isCollapsed && sel.anchorOffset === 0) {
+                            try {
+                                const rangeBefore = document.createRange();
+                                rangeBefore.setStart(formatBlock, 0);
+                                rangeBefore.setEnd(sel.anchorNode, sel.anchorOffset);
+                                if (rangeBefore.toString().replace(/^[\s\u200B\uFEFF]+|[\s\u200B\uFEFF]+$/g, '') === '') {
+                                    isAtStart = true;
+                                }
+                            } catch (err) {}
+                        }
+                        if (formatBlock.textContent.replace(/^[\s\u200B\uFEFF]+|[\s\u200B\uFEFF]+$/g, '') === '' || isAtStart) {
+                            e.preventDefault();
+                            this.setFormat('p', 'Normal Text', formatBlock);
+                            return;
+                        }
                     }
                 }
             }
@@ -521,10 +669,21 @@
                 if (sel && sel.anchorNode) {
                     let node = sel.anchorNode;
                     if (node.nodeType === 3) node = node.parentElement;
+                    
                     const todoItem = node.closest('.todo-item');
                     if (todoItem && editorEl.contains(todoItem)) {
                         e.preventDefault();
-                        if (todoItem.textContent.trim() === '') {
+                        if (!this.showTodo) {
+                            const p = document.createElement('p');
+                            p.innerHTML = '<br>';
+                            if (todoItem.nextSibling) todoItem.parentNode.insertBefore(p, todoItem.nextSibling);
+                            else todoItem.parentNode.appendChild(p);
+                            const range = document.createRange();
+                            range.selectNodeContents(p);
+                            range.collapse(true);
+                            sel.removeAllRanges();
+                            sel.addRange(range);
+                        } else if (todoItem.textContent.trim() === '') {
                             const p = document.createElement('p');
                             p.innerHTML = '<br>';
                             todoItem.parentNode.replaceChild(p, todoItem);
@@ -536,10 +695,21 @@
                         } else {
                             const newTodo = document.createElement('div');
                             newTodo.className = 'todo-item flex items-start gap-2 my-1';
-                            newTodo.innerHTML = `
-                                <input type='checkbox' class='todo-checkbox mt-1 cursor-pointer w-4 h-4 rounded border-secondary-100 text-secondary-200 accent-secondary-200 focus:ring-secondary-200' contenteditable='false' onclick='this.nextElementSibling.style.textDecoration = this.checked ? 'line-through' : 'none'; this.nextElementSibling.style.opacity = this.checked ? '0.5' : '1';'>
-                                <span class='todo-text flex-1 outline-none'><br></span>
-                            `;
+
+                            const checkbox = document.createElement('input');
+                            checkbox.type = 'checkbox';
+                            checkbox.className = 'todo-checkbox mt-1 cursor-pointer w-4 h-4 rounded border-secondary-100 text-secondary-200 accent-secondary-200 focus:ring-secondary-200';
+                            checkbox.setAttribute('contenteditable', 'false');
+                            const onClickCode = 'this.nextElementSibling.style.textDecoration = this.checked ? \'line-through\' : \'none\'; this.nextElementSibling.style.opacity = this.checked ? \'0.5\' : \'1\';';
+                            checkbox.setAttribute('onclick', onClickCode);
+
+                            const span = document.createElement('span');
+                            span.className = 'todo-text flex-1 outline-none';
+                            span.innerHTML = '<br>';
+
+                            newTodo.appendChild(checkbox);
+                            newTodo.appendChild(span);
+
                             if (todoItem.nextSibling) {
                                 todoItem.parentNode.insertBefore(newTodo, todoItem.nextSibling);
                             } else {
@@ -555,6 +725,40 @@
                         this.scheduleSave();
                         return;
                     }
+
+                    const currentBlock = node.closest('h1, h2, h3, blockquote');
+                    if (currentBlock && editorEl.contains(currentBlock)) {
+                        setTimeout(() => {
+                            const newSel = window.getSelection();
+                            if (!newSel || !newSel.anchorNode) return;
+                            let newNode = newSel.anchorNode;
+                            if (newNode.nodeType === 3) newNode = newNode.parentElement;
+                            
+                            const newBlock = newNode.closest('h1, h2, h3, blockquote');
+                            if (newBlock && editorEl.contains(newBlock)) {
+                                if (newBlock !== currentBlock) {
+                                    this.setFormat('p', 'Normal Text');
+                                } else {
+                                    const p = document.createElement('p');
+                                    p.innerHTML = '<br>';
+                                    if (currentBlock.nextSibling) {
+                                        currentBlock.parentNode.insertBefore(p, currentBlock.nextSibling);
+                                    } else {
+                                        currentBlock.parentNode.appendChild(p);
+                                    }
+                                    const range = document.createRange();
+                                    range.selectNodeContents(p);
+                                    range.collapse(true);
+                                    newSel.removeAllRanges();
+                                    newSel.addRange(range);
+                                    this.formatValue = 'p';
+                                    this.formatLabel = 'Normal Text';
+                                    this.refreshToolbarState();
+                                    this.scheduleSave();
+                                }
+                            }
+                        }, 10);
+                    }
                 }
             }
 
@@ -564,13 +768,51 @@
                 if (sel && sel.anchorNode) {
                     let node = sel.anchorNode;
                     if (node.nodeType === 3) node = node.parentElement;
-                    const block = node.closest('p, h1, h2, h3, blockquote, li, .todo-item');
+                    let block = node.closest('p, h1, h2, h3, blockquote, li, .todo-item');
+                    if (!block && editorEl.contains(node) && node !== editorEl && node.parentNode === editorEl) {
+                        block = node;
+                    }
                     if (block && editorEl.contains(block) && block !== editorEl) {
+                        let startNode = null, startOffset = 0, endNode = null, endOffset = 0;
+                        if (sel.rangeCount > 0) {
+                            const range = sel.getRangeAt(0);
+                            startNode = range.startContainer;
+                            startOffset = range.startOffset;
+                            endNode = range.endContainer;
+                            endOffset = range.endOffset;
+                        }
+
+                        let moved = false;
                         if (e.key === 'ArrowUp' && block.previousElementSibling) {
                             block.parentNode.insertBefore(block, block.previousElementSibling);
-                            this.scheduleSave();
+                            moved = true;
                         } else if (e.key === 'ArrowDown' && block.nextElementSibling) {
                             block.parentNode.insertBefore(block.nextElementSibling, block);
+                            moved = true;
+                        }
+
+                        if (moved) {
+                            block.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+                            try {
+                                const newRange = document.createRange();
+                                if (startNode && block.contains(startNode)) {
+                                    newRange.setStart(startNode, startOffset);
+                                    newRange.setEnd(endNode, endOffset);
+                                } else {
+                                    newRange.selectNodeContents(block);
+                                    newRange.collapse(false);
+                                }
+                                sel.removeAllRanges();
+                                sel.addRange(newRange);
+                            } catch (err) {
+                                try {
+                                    const fallbackRange = document.createRange();
+                                    fallbackRange.selectNodeContents(block);
+                                    fallbackRange.collapse(false);
+                                    sel.removeAllRanges();
+                                    sel.addRange(fallbackRange);
+                                } catch (e2) {}
+                            }
                             this.scheduleSave();
                         }
                     }
