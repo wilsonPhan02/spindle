@@ -30,9 +30,35 @@
                 }
             });
         });
+
+        // Global SPA state freshness logic
+        function checkStaleData() {
+            const lastMutation = localStorage.getItem('spindle_last_mutation');
+            const pageLoadTime = parseFloat(document.body.getAttribute('data-load-time')) * 1000;
+            
+            if (lastMutation && pageLoadTime && parseInt(lastMutation) > pageLoadTime) {
+                window.location.reload();
+            }
+        }
+
+        document.addEventListener('livewire:initialized', () => {
+            Livewire.hook('commit', ({ succeed }) => {
+                succeed(() => {
+                    const now = Date.now();
+                    localStorage.setItem('spindle_last_mutation', now.toString());
+                    document.body.setAttribute('data-load-time', (now / 1000).toString());
+                });
+            });
+        });
+
+        document.addEventListener('livewire:navigated', checkStaleData);
+        window.addEventListener('pageshow', (e) => {
+            if (e.persisted) checkStaleData();
+        });
     </script>
 </head>
 <body
+    data-load-time="{{ microtime(true) }}"
     class="bg-bg-main antialiased min-h-screen flex overflow-hidden"
     x-data="{
         currentUsername: '{{ Auth::user()->profile?->username ?? explode('@', Auth::user()->email)[0] }}',

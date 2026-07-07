@@ -14,6 +14,7 @@ new #[Layout('layouts.guest')] #[Title('Sign Up - Spindle')] class extends Compo
     public $password = '';
     public $password_confirmation = '';
     public $terms = false;
+    public $isSuccess = false;
 
     public function register()
     {
@@ -48,8 +49,9 @@ new #[Layout('layouts.guest')] #[Title('Sign Up - Spindle')] class extends Compo
 
         // 3. Login & Redirect
         Auth::login($user);
-
-        return redirect()->to('/dashboard');
+        
+        $this->isSuccess = true;
+        $this->js("setTimeout(() => window.location.href = '/dashboard', 1200)");
     }
 };
 ?>
@@ -149,4 +151,16 @@ new #[Layout('layouts.guest')] #[Title('Sign Up - Spindle')] class extends Compo
             </p>
         </div>
     </div>
+
+    @if($isSuccess)
+    <div>
+        <div class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-bg-main/40 backdrop-blur-md transition-all duration-300">
+            <svg class="animate-spin mb-4 h-12 w-12 text-secondary-200" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <p class="text-xl font-merriweather font-semibold text-text-80 animate-pulse">Arriving at creative realm...</p>
+        </div>
+    </div>
+    @endif
 </div>
