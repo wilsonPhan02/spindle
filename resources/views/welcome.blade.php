@@ -63,7 +63,7 @@
                 <a href="{{ route('dashboard') }}"
                    class="inline-flex items-center rounded-full bg-secondary-150 px-9 py-3.5 text-web-body-small font-merriweather text-brand-10
                           transition-all duration-300 hover:bg-secondary-200 hover:-translate-y-0.5 hover:shadow-md">
-                    Join Us Now
+                    Enter the Realm
                 </a>
             </div>
         </div>
@@ -133,7 +133,7 @@
                 <a href="{{ route('dashboard') }}"
                    class="mt-8 inline-flex items-center rounded-[7px] bg-secondary-150 px-10 py-3.5 font-merriweather text-[16px] text-brand-10
                           shadow-md transition-all duration-700 hover:bg-secondary-200 hover:-translate-y-1 hover:shadow-lg">
-                    Get Started
+                    Enter the Realm
                 </a>
             </div>
         </div>
@@ -349,7 +349,7 @@
                 <a href="{{ route('dashboard') }}"
                    class="mt-6 inline-flex items-center rounded-[7px] bg-secondary-150 px-10 py-3.5 font-merriweather text-[16px] text-brand-10
                           shadow-md transition-all duration-700 hover:bg-secondary-200 hover:-translate-y-1 hover:shadow-lg">
-                    Join Us Now
+                    Enter the Realm
                 </a>
                 
                 <div class="mt-10 flex justify-center px-4 pb-10">
@@ -1269,6 +1269,16 @@
             observer.observe(canvas);
         };
     });
+    </script>
+
+    <script>
+        // Force animations to replay when navigating 'Back' to this page (BFCache fix)
+        window.addEventListener('pageshow', (event) => {
+            if (event.persisted) {
+                // If loaded from back/forward cache, force a fresh reload to replay all initial CSS/JS animations
+                window.location.reload();
+            }
+        });
     </script>
 </body>
 </html>
