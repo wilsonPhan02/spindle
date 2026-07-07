@@ -25,7 +25,7 @@
             @endif
         @endforeach
     </div>
-    <a href="{{ url('/') }}" wire:navigate class="shrink-0 transition-opacity hover:opacity-80">
+    <a href="{{ url('/') }}" class="shrink-0 transition-opacity hover:opacity-80">
         <x-logo class="h-8 w-auto text-[#2C2C2C]" />
     </a>
 </header>

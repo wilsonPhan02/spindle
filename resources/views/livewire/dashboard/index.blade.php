@@ -219,9 +219,10 @@ new class extends Component {
                              scrollLeft: 0,
                              checkScrollable() {
                                  this.canScroll = this.$el.scrollWidth > this.$el.clientWidth;
+                                 return this.canScroll;
                              },
                              handleWheel(e) {
-                                 if (this.canScroll && e.deltaY !== 0) {
+                                 if (this.checkScrollable() && e.deltaY !== 0) {
                                      const atLeft = this.$el.scrollLeft <= 0 && e.deltaY < 0;
                                      const atRight = Math.ceil(this.$el.scrollLeft + this.$el.clientWidth) >= this.$el.scrollWidth && e.deltaY > 0;
                                      
@@ -232,8 +233,7 @@ new class extends Component {
                                  }
                              },
                              startDrag(e) {
-                                 this.checkScrollable();
-                                 if (!this.canScroll) return;
+                                 if (!this.checkScrollable()) return;
                                  this.isDown = true;
                                  this.isDragging = false;
                                  this.startX = e.pageX - this.$el.offsetLeft;
