@@ -124,7 +124,7 @@ new class extends Component {
         $this->validate([
             'customTemplateName' => 'required|string|max:100',
             'customTemplateDescription' => 'nullable|string',
-            'customImagePreview' => 'nullable|image|max:2048',
+            'customImagePreview' => 'nullable|image|max:5120',
             'customSections' => 'required|array|min:1',
             'customSections.*.title' => 'required|string|max:40',
             'customSections.*.goal' => 'nullable|string',
@@ -340,11 +340,13 @@ new class extends Component {
                                 <div wire:click="viewDetail('{{ $template->template_id }}')" 
                                      class="group relative w-full max-w-lg aspect-[16/9] bg-[#212121] rounded-xl overflow-hidden cursor-pointer border border-transparent hover:border-brand-200 transition-all p-8 md:p-12 shadow-sm">
                                     
-                                    <div class="w-full max-w-2xl h-full flex items-center justify-center transition-all duration-300 group-hover:blur-[1px] group-hover:opacity-90">
+                                    @if($template->image_preview && $template->is_custom)
+                                        <img src="{{ Storage::url($template->image_preview) }}" alt="Preview" class="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:blur-[1px] transition-all duration-300 z-0" />
+                                    @endif
+
+                                    <div class="relative z-10 w-full max-w-2xl h-full flex items-center justify-center transition-all duration-300 group-hover:blur-[1px] group-hover:opacity-90 pointer-events-none">
                                         @if($template->image_preview)
-                                            @if($template->is_custom)
-                                                <img src="{{ Storage::url($template->image_preview) }}" alt="Preview" class="w-full h-full object-cover rounded-md opacity-80" />
-                                            @else
+                                            @if(!$template->is_custom)
                                                 <x-dynamic-component :component="$template->image_preview" class="w-full max-w-lg h-auto" />
                                             @endif
                                         @else
@@ -355,7 +357,7 @@ new class extends Component {
                                         @endif
                                     </div>
 
-                                    <div class="absolute bottom-8 left-0 bg-bg-main px-6 py-2.5 rounded-r-lg shadow-lg opacity-0 group-hover:opacity-100 transition-all transform -translate-x-2 group-hover:translate-x-0 duration-300 max-w-sm">
+                                    <div class="absolute z-20 bottom-8 left-0 bg-bg-main px-6 py-2.5 rounded-r-lg shadow-lg opacity-0 group-hover:opacity-100 transition-all transform -translate-x-2 group-hover:translate-x-0 duration-300 max-w-sm">
                                         <span class="block truncate w-full text-web-body-large text-text-60" title="{{ $template->name }}">
                                             {{ $template->name }}
                                         </span>
@@ -412,10 +414,10 @@ new class extends Component {
                                 </button>
                             </div>
 
-                            <div class="w-full max-w-xl h-[60vh] bg-text-100 rounded-xl p-8 flex items-center justify-center mb-8">
+                            <div class="relative overflow-hidden w-full max-w-xl h-[60vh] bg-text-100 rounded-xl p-8 flex items-center justify-center mb-8">
                                 @if($this->selectedTemplate->image_preview)
                                     @if($this->selectedTemplate->is_custom)
-                                        <img src="{{ Storage::url($this->selectedTemplate->image_preview) }}" alt="Preview" class="w-full h-full object-contain" />
+                                        <img src="{{ Storage::url($this->selectedTemplate->image_preview) }}" alt="Preview" class="absolute inset-0 w-full h-full object-cover" />
                                     @else
                                         <x-dynamic-component :component="$this->selectedTemplate->image_preview" class="w-full h-auto max-w-lg" />
                                     @endif
@@ -512,37 +514,158 @@ new class extends Component {
                                     <textarea wire:model="customTemplateDescription" rows="2" placeholder="Briefly explain what this structure is for..." class="w-full bg-card-bg border border-card-border rounded-lg px-4 py-3 text-text-90 placeholder-text-60/40 focus:outline-none focus:border-secondary-200 focus:ring-1 focus:ring-secondary-200 transition-all custom-scrollbar resize-none text-app-body-medium"></textarea>
                                 </div>
 
-                                <div>
+                                <div x-data="{ 
+                                        hoverCover: false,
+                                        isUploading: false, 
+                                        progress: 0, 
+                                        clientError: null,
+                                        showCropper: false,
+                                        cropImageUrl: null,
+                                        cropperInstance: null,
+                                        
+                                        cancelCrop() {
+                                            this.showCropper = false;
+                                            if (this.cropperInstance) {
+                                                this.cropperInstance.destroy();
+                                                this.cropperInstance = null;
+                                            }
+                                            this.cropImageUrl = null;
+                                            if(this.$refs.coverInput) this.$refs.coverInput.value = null;
+                                        },
+                                        
+                                        onFileChange(e) {
+                                            const file = e.target.files[0];
+                                            if (!file) return;
+                                            
+                                            if (file.size > 5 * 1024 * 1024) {
+                                                this.clientError = 'The selected image is too large. The maximum allowed file size is 5MB.';
+                                                this.$refs.coverInput.value = '';
+                                                return;
+                                            }
+                                            
+                                            this.clientError = null;
+                                            
+                                            const reader = new FileReader();
+                                            reader.onload = (event) => {
+                                                this.cropImageUrl = event.target.result;
+                                                this.showCropper = true;
+                                                
+                                                this.$nextTick(() => {
+                                                    const image = this.$refs.cropImage;
+                                                    this.cropperInstance = new Cropper(image, {
+                                                        aspectRatio: 16 / 9,
+                                                        viewMode: 3,
+                                                        autoCropArea: 1,
+                                                        dragMode: 'move',
+                                                        background: false,
+                                                        guides: false,
+                                                        center: true,
+                                                        highlight: false,
+                                                        cropBoxMovable: false,
+                                                        cropBoxResizable: false,
+                                                    });
+                                                });
+                                            };
+                                            reader.readAsDataURL(file);
+                                        },
+                                        
+                                        applyCrop() {
+                                            if (!this.cropperInstance) return;
+                                            
+                                            const canvas = this.cropperInstance.getCroppedCanvas({
+                                                width: 1280,
+                                                height: 720,
+                                                imageSmoothingEnabled: true,
+                                                imageSmoothingQuality: 'high',
+                                            });
+                                            
+                                            canvas.toBlob((blob) => {
+                                                const file = new File([blob], 'template-cover.jpg', { type: 'image/jpeg', lastModified: Date.now() });
+                                                
+                                                this.cancelCrop();
+                                                
+                                                this.isUploading = true;
+                                                this.progress = 0;
+                                                
+                                                @this.upload('customImagePreview', file,
+                                                    (uploadedFilename) => { this.isUploading = false; },
+                                                    () => { this.isUploading = false; },
+                                                    (e) => { this.progress = e.detail.progress; }
+                                                );
+                                            }, 'image/jpeg', 0.9);
+                                        }
+                                    }">
                                     <label class="block text-app-desc-feature font-bold text-text-70 uppercase tracking-wider mb-2">Cover Image</label>
-                                    <div class="relative group w-full h-45 border-2 border-dashed border-card-border rounded-lg bg-card-bg hover:bg-card-hover hover:border-brand-200 transition-colors flex flex-col items-center justify-center overflow-hidden cursor-pointer">
+                                    
+                                    <div @mouseover="hoverCover = true" @mouseleave="hoverCover = false" class="relative w-full max-w-lg aspect-[16/9] mx-auto border border-brand-100 rounded-lg bg-card-bg transition-colors flex flex-col items-center justify-center overflow-hidden">
+                                        
+                                        <!-- Progress Overlay -->
+                                        <div x-show="isUploading" x-transition class="absolute inset-0 bg-[#F5EFE9]/80 backdrop-blur-md z-40 flex flex-col items-center justify-center">
+                                            <svg class="animate-spin h-8 w-8 text-secondary-200 mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                            <div class="text-secondary-200 font-semibold text-sm">Uploading... <span x-text="progress + '%'"></span></div>
+                                            
+                                            <div class="w-3/4 bg-brand-150 rounded-full h-1.5 mt-3 overflow-hidden shadow-inner mx-auto">
+                                                <div class="bg-secondary-100 h-full rounded-full transition-all duration-200 ease-out" :style="`width: ${progress}%`"></div>
+                                            </div>
+                                        </div>
+
                                         @if ($customImagePreview || $existingImagePath)
-                                            <button type="button" 
-                                                wire:click.prevent="removeImage" 
-                                                class="absolute top-3 right-3 z-30 p-1.5 pt-0 bg-danger-100/90 text-white rounded-md hover:bg-danger-100 transition-all shadow-md opacity-0 group-hover:opacity-100" 
-                                                title="Remove Image">
-                                            <x-icons.delete class="w-4 h-4" />
-                                        </button>
-                                            <input type="file" wire:model="customImagePreview" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
-
                                             @if ($customImagePreview)
-                                                <img src="{{ $customImagePreview->temporaryUrl() }}" class="absolute inset-0 w-full h-full object-cover opacity-100">
-                                                <div class="absolute bottom-2 left-2 z-20 bg-bg-main/90 px-2 py-1 rounded text-app-caption text-text-90 font-medium pointer-events-none opacity-0 group-hover:opacity-100">
-                                                    New Image (Click to replace)
-                                                </div>
+                                                <img src="{{ $customImagePreview->temporaryUrl() }}" class="absolute inset-0 w-full h-full object-cover opacity-100 z-10">
                                             @elseif ($existingImagePath)
-                                                <img src="{{ Storage::url($existingImagePath) }}" class="absolute inset-0 w-full h-full object-cover opacity-100">
-                                                <div class="absolute bottom-2 left-2 z-20 bg-bg-main/90 px-2 py-1 rounded text-app-caption text-text-90 font-medium pointer-events-none opacity-0 group-hover:opacity-100">
-                                                    Current Image (Click to replace)
-                                                </div>
+                                                <img src="{{ Storage::url($existingImagePath) }}" class="absolute inset-0 w-full h-full object-cover opacity-100 z-10">
                                             @endif
-
                                         @else
-                                            <input type="file" wire:model="customImagePreview" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
-                                            <svg class="w-8 h-8 text-text-40 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                                            <span class="text-app-body-small text-text-60">Click or drag to upload an image</span>
+                                            <div class="absolute inset-0 z-10 flex flex-col items-center justify-center pointer-events-none opacity-50">
+                                                <svg class="w-8 h-8 text-text-40 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                                <span class="text-app-body-small text-text-60">Upload Cover Image</span>
+                                            </div>
                                         @endif
+
+                                        <div x-show="hoverCover && !showCropper" x-transition class="absolute bottom-5 left-5 z-30 flex gap-2">
+                                            <label class="flex items-center gap-2 px-3 py-1.5 bg-text-80/95 border border-text-60 rounded-md cursor-pointer hover:bg-text-80 transition-colors shadow-lg">
+                                                <x-icons.upload class="w-4 h-4 text-bg-main" />
+                                                <span class="text-bg-main text-app-desc-feature">Upload Cover</span>
+                                                <input type="file" x-ref="coverInput" @change="onFileChange" accept="image/*" class="hidden">
+                                            </label>
+
+                                            @if ($customImagePreview || $existingImagePath)
+                                                <button type="button" wire:click.prevent="removeImage" class="flex items-center gap-2 px-3 py-1.5 bg-text-80/95 border border-text-60 rounded-md cursor-pointer hover:bg-text-80 transition-colors shadow-lg">
+                                                    <x-icons.delete class="w-4 h-4 text-danger-100" />
+                                                    <span class="text-app-desc-feature text-danger-100">Remove</span>
+                                                </button>
+                                            @endif
+                                        </div>
+
+                                        {{-- Client-side Error --}}
+                                        <template x-if="clientError">
+                                            <div class="absolute inset-x-4 top-4 bg-danger-100/95 text-bg-main text-[12px] font-medium px-3 py-2.5 rounded shadow-xl z-50 flex items-start gap-2">
+                                                <svg class="w-4 h-4 mt-0.5 shrink-0 text-bg-main" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                                                <span x-text="clientError" class="flex-1 leading-relaxed"></span>
+                                                <button type="button" @click.stop="clientError = null" class="shrink-0 ml-2 p-0.5 hover:bg-black/20 rounded transition-colors" title="Dismiss"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+                                            </div> 
+                                        </template>
+
+                                        {{-- Server-side Error --}}
+                                        @error('customImagePreview') 
+                                            <div x-data="{ show: true }" x-show="show" class="absolute inset-x-4 top-4 bg-danger-100/95 text-bg-main text-[12px] font-medium px-3 py-2.5 rounded shadow-xl z-50 flex items-start gap-2">
+                                                <svg class="w-4 h-4 mt-0.5 shrink-0 text-bg-main" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                                                <span class="flex-1 leading-relaxed">{{ $message }}</span>
+                                                <button type="button" @click.stop="show = false" class="shrink-0 ml-2 p-0.5 hover:bg-black/20 rounded transition-colors" title="Dismiss"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+                                            </div> 
+                                        @enderror
+
+                                        {{-- Inline Cropper UI --}}
+                                        <div x-show="showCropper" style="display: none;" class="absolute inset-0 z-40 bg-brand-50 flex flex-col">
+                                            <div class="absolute inset-0 w-full h-full bg-black overflow-hidden">
+                                                <img x-ref="cropImage" :src="cropImageUrl" class="block w-full h-full" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+                                            </div>
+                                            <div class="absolute bottom-4 left-0 right-0 flex justify-center gap-2 z-50">
+                                                <button @click.stop="cancelCrop()" type="button" class="px-4 py-1.5 bg-bg-main/90 backdrop-blur text-text-70 text-[11px] font-bold uppercase tracking-wider rounded-md border border-text-60 hover:bg-bg-main shadow-lg transition-colors">Cancel</button>
+                                                <button @click.stop="applyCrop()" type="button" class="px-4 py-1.5 bg-secondary-100/95 backdrop-blur text-bg-main text-[11px] font-bold uppercase tracking-wider rounded-md shadow-lg border border-secondary-200 hover:bg-secondary-200 transition-colors">Save</button>
+                                            </div>
+                                        </div>
                                     </div>
-                                    @error('customImagePreview') <span class="text-danger-100 text-xs mt-1">{{ $message }}</span> @enderror
                                 </div>
                             </div>
 
