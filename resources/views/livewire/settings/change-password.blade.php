@@ -4,6 +4,7 @@ use Livewire\Volt\Component;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Validation\Rules\Password;
 
 new class extends Component {
     public $current_password = '';
@@ -14,19 +15,26 @@ new class extends Component {
     {
         $this->validate([
             'current_password' => ['required', 'string'],
-            'new_password' => ['required', 'string', 'min:8'],
+            'new_password' => [
+                'required',
+                Password::min(8)
+                    ->letters()
+                    ->mixedCase()
+                    ->numbers()
+                    ->symbols()
+            ],
             'new_password_confirmation' => ['required', 'same:new_password']
         ], [
             'current_password.required' => 'Please enter your current password.',
             'new_password.required' => 'Please enter a new password.',
-            'new_password.min' => 'The password must be at least 8 characters.',
+            'new_password.min' => 'Password must be at least 8 characters and contain at least one uppercase character, one lowercase character, one number, and one special character.',
             'new_password_confirmation.required' => 'Please confirm your new password.',
             'new_password_confirmation.same' => 'The password confirmation does not match.',
         ]);
 
         if (!Hash::check($this->current_password, Auth::user()->password)) {
             throw ValidationException::withMessages([
-                'current_password' => 'The password you entered doesn’t match.',
+                'current_password' => 'Invalid current password.',
             ]);
         }
 
@@ -55,10 +63,6 @@ new class extends Component {
     >
         <div class="flex flex-col gap-6">
             <h2 class="text-app-heading-1 text-text-100">Change Password</h2>
-            <p class="text-web-body-small font-italic text-text-100">
-                Email:<br>
-                <span class="italic text-text-70">{{ auth()->user()->email }}</span>
-            </p>
 
             <form wire:submit="updatePassword" class="flex flex-col gap-6">
                 <x-form-input 
