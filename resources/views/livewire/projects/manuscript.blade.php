@@ -376,10 +376,11 @@ new #[Layout('layouts.app')] class extends Component {
 
         startRenameDraft(id, currentTitle) {
             this.renamingDraftId = id;
-            this.renameValue = currentTitle;
+            const elInput = document.getElementById('draft-rename-' + id);
+            const spanEl = elInput ? elInput.previousElementSibling : null;
+            this.renameValue = (spanEl && spanEl.innerText.trim()) ? spanEl.innerText.trim() : currentTitle;
             this.$nextTick(() => {
-                const el = document.getElementById('draft-rename-' + id);
-                if (el) { el.focus(); el.select(); }
+                if (elInput) { elInput.focus(); elInput.select(); }
             });
         },
         commitRenameDraft(id) {
@@ -592,7 +593,9 @@ new #[Layout('layouts.app')] class extends Component {
                     titleVal: '{{ addslashes($chapterCard->title) }}',
                     startEdit() {
                         this.editingTitle = true;
-                        this.titleVal = '{{ addslashes($chapterCard->title) }}';
+                        if (this.$refs.titleDisplay) {
+                            this.titleVal = this.$refs.titleDisplay.innerText.trim();
+                        }
                         this.$nextTick(() => { $refs.titleInput.focus(); $refs.titleInput.select(); });
                     },
                     saveTitle() {
@@ -606,7 +609,7 @@ new #[Layout('layouts.app')] class extends Component {
 
                     {{-- Display Title --}}
                     <div x-show="!editingTitle" class="group flex items-start justify-between gap-2 mb-1.5">
-                        <h2 @dblclick="startEdit"
+                        <h2 x-ref="titleDisplay" @dblclick="startEdit"
                             class="text-web-heading-2 text-text-80 leading-snug line-clamp-2 cursor-pointer hover:text-secondary-200 transition-colors"
                             title="Double-click to rename chapter"
                         >
@@ -888,7 +891,7 @@ new #[Layout('layouts.app')] class extends Component {
                             {{-- Title / Rename --}}
                             <span
                                 x-show="renamingDraftId !== '{{ $draft->manuscript_id }}'"
-                                @dblclick.stop="startRenameDraft('{{ $draft->manuscript_id }}', '{{ addslashes($draft->title ?? 'Draft ' . $loop->iteration) }}')"
+                                @dblclick.stop="startRenameDraft('{{ $draft->manuscript_id }}', $el.innerText.trim())"
                                 class="truncate max-w-[120px]"
                                 title="Double-click to rename"
                             >{{ $draft->title ?? 'Draft ' . $loop->iteration }}</span>
