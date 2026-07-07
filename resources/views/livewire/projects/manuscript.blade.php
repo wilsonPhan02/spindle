@@ -946,7 +946,7 @@ new #[Layout('layouts.app')] class extends Component {
         submitAction="deleteDraft"
     >
         <x-slot:icon>
-            <x-icons.delete size="w-10 h-10" color="currentColor"/>
+            <x-icons.delete class="w-15 h-15"/>
         </x-slot:icon>
     </x-confirm-dialog>
 </div>
