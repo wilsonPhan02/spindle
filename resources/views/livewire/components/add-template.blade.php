@@ -160,23 +160,35 @@ new class extends Component {
                 ]);
 
                 $keptSectionIds = collect($this->customSections)->pluck('id')->filter()->toArray();
-                StructureSection::where('template_id', $template->template_id)
+                $sectionsToDelete = StructureSection::where('template_id', $template->template_id)
                     ->whereNotIn('structure_section_id', $keptSectionIds)
-                    ->delete();
+                    ->pluck('structure_section_id');
+
+                $lastValidSectionId = null;
 
                 foreach ($this->customSections as $index => $section) {
                     if (!empty($section['id'])) {
                         StructureSection::where('structure_section_id', $section['id'])
                             ->update(['order_index' => $index + 1, 'title' => $section['title'], 'goal' => $section['goal']]);
+                        $lastValidSectionId = $section['id'];
                     } else {
-                        StructureSection::create([
+                        $newSec = StructureSection::create([
                             'template_id' => $template->template_id,
                             'order_index' => $index + 1,
                             'title' => $section['title'],
                             'goal' => $section['goal']
                         ]);
+                        $lastValidSectionId = $newSec->structure_section_id;
                     }
                 }
+
+                if ($sectionsToDelete->isNotEmpty() && $lastValidSectionId) {
+                    ChapterCard::whereIn('structure_section_id', $sectionsToDelete)
+                        ->update(['structure_section_id' => $lastValidSectionId]);
+                        
+                    StructureSection::whereIn('structure_section_id', $sectionsToDelete)->delete();
+                }
+
                 $this->selectedTemplateId = $template->template_id;
 
             } else {
@@ -200,6 +212,11 @@ new class extends Component {
                 $this->selectedTemplateId = $template->template_id;
             }
         });
+
+        $project = Project::find($this->projectId);
+        if ($project && $project->template_id == $this->selectedTemplateId) {
+            $this->dispatch('template-applied');
+        }
 
         $this->step = 2; 
         $this->resetCustomForm();
@@ -306,7 +323,7 @@ new class extends Component {
             <div class="relative bg-bg-main w-full max-w-3xl h-[90vh] rounded-2xl shadow-2xl flex flex-col overflow-hidden mx-4 border border-bg-border">
                 
                 <button wire:click="closeModal" class="absolute top-6 right-6 w-10 h-10 rounded-full border border-brand-200 text-text-60 hover:bg-brand-50 hover:text-secondary-200 flex items-center justify-center transition-colors z-50 bg-bg-main">
-                    <x-icons.add class="rotate-45 transform" />
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" d="M6 18L18 6M6 6l12 12"/></svg>
                 </button>
 
                 @if($step === 1)
@@ -387,7 +404,7 @@ new class extends Component {
                         <div class="flex flex-col items-center max-w-4xl mx-auto w-full">
                             
                             <div class="text-center mb-10 w-full mt-4 max-w-xl mx-auto">
-                                <h1 class="block w-full text-3xl font-bold text-text-100 mb-6 break-words" title="{{ $this->selectedTemplate->name }}">
+                                <h1 class="block w-full text-app-title-1 text-text-100 mb-6 break-words" title="{{ $this->selectedTemplate->name }}">
                                     {{ $this->selectedTemplate->name }}
                                 </h1>
                                 <button wire:click="useTemplate" class="px-5 py-2 border border-brand-200 text-secondary-200 rounded-md hover:bg-brand-50 hover:text-secondary-300 transition-colors text-web-button">
@@ -395,7 +412,7 @@ new class extends Component {
                                 </button>
                             </div>
 
-                            <div class="w-full max-w-xl h-[60vh] bg-[#1C1C1C] rounded-xl p-8 flex items-center justify-center mb-8">
+                            <div class="w-full max-w-xl h-[60vh] bg-text-100 rounded-xl p-8 flex items-center justify-center mb-8">
                                 @if($this->selectedTemplate->image_preview)
                                     @if($this->selectedTemplate->is_custom)
                                         <img src="{{ Storage::url($this->selectedTemplate->image_preview) }}" alt="Preview" class="w-full h-full object-contain" />
@@ -425,7 +442,7 @@ new class extends Component {
                             <div class="w-full flex flex-col gap-10 px-3">
                                 @forelse($this->selectedTemplate->sections as $section)
                                     <div>
-                                        <h3 class="text-web-heading-1 text-text-90 mb-4">
+                                        <h3 class="text-app-title-1 font-semibold text-text-90 mb-4">
                                             {{ $section->title }}
                                         </h3>
                                         @if ($section->goal)
