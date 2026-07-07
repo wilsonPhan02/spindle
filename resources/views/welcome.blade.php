@@ -1270,5 +1270,15 @@
         };
     });
     </script>
+
+    <script>
+        // Force animations to replay when navigating 'Back' to this page (BFCache fix)
+        window.addEventListener('pageshow', (event) => {
+            if (event.persisted) {
+                // If loaded from back/forward cache, force a fresh reload to replay all initial CSS/JS animations
+                window.location.reload();
+            }
+        });
+    </script>
 </body>
 </html>
