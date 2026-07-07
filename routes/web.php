@@ -53,3 +53,8 @@ Route::middleware('auth')->group(function () {
     Volt::route('/archive', 'archive.index')->name('archive');
     
 });
+
+// Fallback route to ensure 404 pages have access to the web session
+Route::fallback(function () {
+    return response()->view('errors.404', [], 404);
+});
