@@ -533,9 +533,10 @@ new #[Layout('layouts.app')] class extends Component {
             <div class="overflow-hidden transition-all duration-300 ease-in-out shrink-0 flex flex-col"
                  :class="showDetailPanel ? 'w-[280px] opacity-100' : 'w-0 opacity-0 pointer-events-none'"
             >
-                <div class="w-[280px] h-full flex flex-col gap-5 overflow-y-auto custom-scrollbar p-5 bg-brand-50 border border-r-0 border-brand-150 rounded-l-xl shadow-sm z-10 shrink-0">
+                <div class="w-[280px] h-full flex flex-col py-3 pl-3 bg-brand-50 border border-r-0 border-brand-150 rounded-l-xl shadow-sm z-10 shrink-0">
+                    <div class="flex-1 flex flex-col gap-3 overflow-y-auto custom-scrollbar pr-3">
                 {{-- Top Row: Status Badge + Dropdown + Hide Details Button (Right) --}}
-                <div class="flex items-center justify-between relative" x-data="{ showStatusMenu: false }">
+                <div class="flex items-center justify-between relative pt-2" x-data="{ showStatusMenu: false }">
                     <div class="relative">
                         <button type="button" @click="showStatusMenu = !showStatusMenu" @class([
                             'w-full text-app-caption px-3 py-1.5 rounded-lg flex items-center justify-between gap-1.5 shadow-sm border border-brand-150 transition-all cursor-pointer hover:opacity-90',
@@ -641,7 +642,7 @@ new #[Layout('layouts.app')] class extends Component {
                     {{-- Display Title --}}
                     <div x-show="!editingTitle" class="group flex items-start justify-between gap-2 mb-1.5">
                         <h2 x-ref="titleDisplay" @dblclick="startEdit"
-                            class="text-web-heading-2 text-text-80 leading-snug line-clamp-2 cursor-pointer hover:text-secondary-200 transition-colors"
+                            class="text-web-heading-2 text-[24px] text-text-80 leading-snug line-clamp-2 cursor-pointer hover:text-secondary-200 transition-colors"
                             title="Double-click to rename chapter"
                         >
                             {{ $chapterCard->title }}
@@ -862,6 +863,7 @@ new #[Layout('layouts.app')] class extends Component {
                 </div>
             </div>
         </div>
+    </div>
 
         {{-- RIGHT: Editor Area + Tabs --}}
         <div class="min-w-0 flex-1 flex flex-col relative">
