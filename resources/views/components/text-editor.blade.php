@@ -34,10 +34,17 @@
             justifyLeft: true, justifyCenter: false, justifyRight: false, justifyFull: false,
         },
         activeDropdown: null,
-        currentTextColor: null,
-        currentHighlightColor: null,
+        currentTextColor: '#000000',
+        currentHighlightColor: 'transparent',
         textColors: {!! $textColorsJs !!},
         highlightColors: {!! $bgColorsJs !!},
+        showLists: {{ $showLists ? 'true' : 'false' }},
+        showColors: {{ $showColors ? 'true' : 'false' }},
+        showIndent: {{ $showIndent ? 'true' : 'false' }},
+        showHr: {{ $showHr ? 'true' : 'false' }},
+        showStrike: {{ $showStrike ? 'true' : 'false' }},
+        showTodo: {{ $showTodo ? 'true' : 'false' }},
+        showHighlight: {{ $showHighlight ? 'true' : 'false' }},
         savedRange: null,
         wordCount: 0,
         charCount: 0,
@@ -314,8 +321,8 @@
                         }
                         const normFore = this.normalizeColor(inlineFore);
                         const normHilite = this.normalizeColor(inlineHilite);
-                        this.currentTextColor = this.textColors.find(c => this.normalizeColor(c) === normFore) || null;
-                        this.currentHighlightColor = this.highlightColors.find(c => c !== 'transparent' && this.normalizeColor(c) === normHilite) || null;
+                        this.currentTextColor = this.textColors.find(c => this.normalizeColor(c) === normFore) || '#000000';
+                        this.currentHighlightColor = this.highlightColors.find(c => c !== 'transparent' && this.normalizeColor(c) === normHilite) || 'transparent';
                     }
                 }
             } catch (e) { /* ignore */ }
@@ -336,6 +343,7 @@
         },
 
         insertTodoBlock() {
+            if (!this.showTodo) return;
             const editorEl = document.getElementById('{{ $editorId }}');
             const sel = window.getSelection();
             if (!sel || !sel.anchorNode) return;
@@ -421,7 +429,7 @@
                         return;
                     }
 
-                    if (textBefore === '- ' || textBefore === '* ') {
+                    if (this.showLists && (textBefore === '- ' || textBefore === '* ')) {
                         const range = sel.getRangeAt(0);
                         range.setStart(node, 0);
                         range.setEnd(node, sel.anchorOffset);
@@ -430,7 +438,7 @@
                         return;
                     }
 
-                    if (/^1\.\s$/.test(textBefore)) {
+                    if (this.showLists && /^1\.\s$/.test(textBefore)) {
                         const range = sel.getRangeAt(0);
                         range.setStart(node, 0);
                         range.setEnd(node, sel.anchorOffset);
@@ -439,7 +447,7 @@
                         return;
                     }
 
-                    if (textBefore.trim() === '[]' || textBefore.trim() === '[ ]') {
+                    if (this.showTodo && (textBefore.trim() === '[]' || textBefore.trim() === '[ ]')) {
                         const range = sel.getRangeAt(0);
                         range.setStart(node, 0);
                         range.setEnd(node, sel.anchorOffset);
@@ -448,7 +456,7 @@
                         return;
                     }
 
-                    if (textBefore === '--- ') {
+                    if (this.showHr && textBefore === '--- ') {
                         const range = sel.getRangeAt(0);
                         range.setStart(node, 0);
                         range.setEnd(node, sel.anchorOffset);
@@ -979,8 +987,8 @@
                         <span class="text-[10px] font-semibold text-secondary-150 uppercase tracking-wider mb-2 block">Text Color</span>
                         <div class="grid grid-cols-6 gap-2">
                             <template x-for="c in textColors" :key="c">
-                                <button type="button" @mousedown.prevent="saveSelection()" @click="exec('foreColor', c); currentTextColor = c;" class="w-5 h-5 rounded-full transition-all duration-150 relative flex items-center justify-center shrink-0" x-bind:class="currentTextColor === c ? 'border border-secondary-200 bg-white p-[3px]' : 'border border-brand-200 hover:scale-110 hover:border-secondary-150'" x-bind:style="currentTextColor === c ? '' : `background:${c}`" :title="c">
-                                    <template x-if="currentTextColor === c">
+                                <button type="button" @mousedown.prevent="saveSelection()" @click="exec('foreColor', c); currentTextColor = c;" class="w-5 h-5 rounded-full transition-all duration-150 relative flex items-center justify-center shrink-0" x-bind:class="(currentTextColor || '#000000') === c ? 'border border-secondary-200 bg-white p-[3px]' : 'border border-brand-200 hover:scale-110 hover:border-secondary-150'" x-bind:style="(currentTextColor || '#000000') === c ? '' : `background:${c}`" :title="c === '#000000' ? 'Default / Black' : c">
+                                    <template x-if="(currentTextColor || '#000000') === c">
                                         <span class="w-full h-full rounded-full block" x-bind:style="`background:${c}`"></span>
                                     </template>
                                 </button>
@@ -1019,11 +1027,11 @@
                         <span class="text-[10px] font-semibold text-secondary-150 uppercase tracking-wider mb-2 block">Highlight Color</span>
                         <div class="grid grid-cols-7 gap-1.5">
                             <template x-for="c in highlightColors" :key="c">
-                                <button type="button" @mousedown.prevent="saveSelection()" @click="exec('hiliteColor', c === 'transparent' ? 'transparent' : c); currentHighlightColor = c;" class="w-5 h-5 rounded-full transition-all duration-150 relative flex items-center justify-center shrink-0" x-bind:class="currentHighlightColor === c ? 'border border-secondary-200 bg-white p-[3px]' : 'border border-brand-200 hover:scale-110 hover:border-secondary-150'" x-bind:style="currentHighlightColor === c || c === 'transparent' ? '' : `background:${c}`" :title="c === 'transparent' ? 'No Highlight' : c">
+                                <button type="button" @mousedown.prevent="saveSelection()" @click="exec('hiliteColor', c === 'transparent' ? 'transparent' : c); currentHighlightColor = c;" class="w-5 h-5 rounded-full transition-all duration-150 relative flex items-center justify-center shrink-0" x-bind:class="(currentHighlightColor || 'transparent') === c ? 'border border-secondary-200 bg-white p-[3px]' : 'border border-brand-200 hover:scale-110 hover:border-secondary-150'" x-bind:style="(currentHighlightColor || 'transparent') === c || c === 'transparent' ? '' : `background:${c}`" :title="c === 'transparent' ? 'No Highlight' : c">
                                     <template x-if="c === 'transparent'">
                                         <svg class="w-full h-full text-danger-100" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                                     </template>
-                                    <template x-if="c !== 'transparent' && currentHighlightColor === c">
+                                    <template x-if="c !== 'transparent' && (currentHighlightColor || 'transparent') === c">
                                         <span class="w-full h-full rounded-full block" x-bind:style="`background:${c}`"></span>
                                     </template>
                                 </button>

@@ -30,19 +30,27 @@ new #[Layout('layouts.app')] class extends Component {
         $this->chapterCard = $chapterCard;
 
         // Select the first draft, or create one if none exist
-        $draft = $chapterCard->manuscript()->orderBy('created_at')->first();
+        $allDrafts = $chapterCard->manuscript()->orderBy('created_at')->get();
 
-        if (!$draft) {
+        if ($allDrafts->isEmpty()) {
             $draft = Manuscript::create([
                 'chapter_card_id' => $chapterCard->chapter_card_id,
                 'title' => 'Draft 1',
                 'content' => '',
                 'word_count' => 0,
             ]);
+            $this->activeDraftId = $draft->manuscript_id;
+            $this->editorBody = '';
+        } else {
+            foreach ($allDrafts as $idx => $d) {
+                if (empty(trim($d->title ?? ''))) {
+                    $d->update(['title' => 'Draft ' . ($idx + 1)]);
+                }
+            }
+            $draft = $allDrafts->first();
+            $this->activeDraftId = $draft->manuscript_id;
+            $this->editorBody = $draft->content ?? '';
         }
-
-        $this->activeDraftId = $draft->manuscript_id;
-        $this->editorBody = $draft->content ?? '';
     }
 
     // ----------------
@@ -67,11 +75,19 @@ new #[Layout('layouts.app')] class extends Component {
     {
         $this->saveCurrentContent();
 
-        $count = Manuscript::where('chapter_card_id', $this->chapterCard->chapter_card_id)->count();
+        $existingTitles = Manuscript::where('chapter_card_id', $this->chapterCard->chapter_card_id)
+            ->pluck('title')
+            ->map(fn($t) => strtolower(trim($t ?? '')))
+            ->toArray();
+
+        $nextNum = count($existingTitles) + 1;
+        while (in_array(strtolower("draft {$nextNum}"), $existingTitles)) {
+            $nextNum++;
+        }
 
         $draft = Manuscript::create([
             'chapter_card_id' => $this->chapterCard->chapter_card_id,
-            'title' => 'Draft ' . ($count + 1),
+            'title' => "Draft {$nextNum}",
             'content' => '',
             'word_count' => 0,
         ]);
@@ -120,6 +136,7 @@ new #[Layout('layouts.app')] class extends Component {
                 $this->editorBody = $next->content ?? '';
             }
         }
+        $this->refreshAutoSummary();
         $this->chapterCard->touch();
         $this->chapterCard->refresh();
     }
@@ -145,6 +162,8 @@ new #[Layout('layouts.app')] class extends Component {
                 Manuscript::where('manuscript_id', $id)
                     ->update(['created_at' => (clone $baseTime)->addSeconds($index * 10)]);
             }
+            $this->selectDraft($draggedId);
+            $this->refreshAutoSummary();
             $this->chapterCard->touch();
             $this->chapterCard->refresh();
         }
@@ -181,27 +200,7 @@ new #[Layout('layouts.app')] class extends Component {
             ->first();
 
         if ($firstDraft && $firstDraft->manuscript_id === $this->activeDraftId) {
-            $html = $this->editorBody ?? '';
-            $html = preg_replace('/<(br|\/p|\/div|\/h[1-6]|\/li|\/tr|\/blockquote|\/pre)[^>]*>/i', "\n", $html);
-            $cleanText = html_entity_decode(strip_tags($html), ENT_QUOTES, 'UTF-8');
-            $cleanText = preg_replace('/[ \t]+/', ' ', trim($cleanText));
-
-            if ($cleanText !== '') {
-                $extracted = $cleanText;
-                if (preg_match_all('/[^.!?\r\n]+[.!?]?/', $cleanText, $matches) && !empty($matches[0])) {
-                    $sents = [];
-                    foreach ($matches[0] as $m) {
-                        $c = trim($m);
-                        if ($c !== '') $sents[] = $c;
-                    }
-                    if (!empty($sents)) {
-                        $extracted = implode(' ', array_slice($sents, 0, 2));
-                    }
-                }
-                $this->chapterCard->update(['summary' => trim($extracted)]);
-            } elseif ($cleanText === '' && empty(trim($this->chapterCard->summary ?? ''))) {
-                $this->chapterCard->update(['summary' => null]);
-            }
+            $this->refreshAutoSummary();
         }
 
         $this->chapterCard->touch();
@@ -308,13 +307,72 @@ new #[Layout('layouts.app')] class extends Component {
 
     public function updateSummary(string $newSummary): void
     {
-        $this->chapterCard->update(['summary' => trim($newSummary)]);
+        $trimmed = trim($newSummary);
+        if ($trimmed === '') {
+            $this->chapterCard->update([
+                'summary' => null,
+                'is_custom_summary' => false,
+            ]);
+            $this->refreshAutoSummary();
+        } else {
+            $this->chapterCard->update([
+                'summary' => $trimmed,
+                'is_custom_summary' => true,
+            ]);
+        }
         $this->chapterCard->refresh();
+    }
+
+    public function refreshAutoSummary(): void
+    {
+        if ($this->chapterCard->is_custom_summary) {
+            return;
+        }
+
+        $firstDraft = Manuscript::where('chapter_card_id', $this->chapterCard->chapter_card_id)
+            ->orderBy('created_at')
+            ->first();
+
+        $autoSummary = null;
+        if ($firstDraft && !empty($firstDraft->content)) {
+            $autoSummary = $this->extractTwoSentences($firstDraft->content);
+        }
+
+        $this->chapterCard->update(['summary' => $autoSummary]);
+        $this->chapterCard->refresh();
+    }
+
+    protected function extractTwoSentences(?string $html): ?string
+    {
+        if (empty($html)) return null;
+        $html = preg_replace('/<(br|\/p|\/div|\/h[1-6]|\/li|\/tr|\/blockquote|\/pre)[^>]*>/i', "\n", $html);
+        $text = html_entity_decode(strip_tags($html), ENT_QUOTES, 'UTF-8');
+        $text = preg_replace('/[ \t]+/', ' ', trim($text));
+
+        if ($text === '') return null;
+
+        if (preg_match_all('/[^.!?\r\n]+[.!?]?/', $text, $matches) && !empty($matches[0])) {
+            $sentences = [];
+            foreach ($matches[0] as $match) {
+                $cleaned = trim($match);
+                if ($cleaned !== '') {
+                    $sentences[] = $cleaned;
+                }
+            }
+            if (!empty($sentences)) {
+                return implode(' ', array_slice($sentences, 0, 2));
+            }
+        }
+        return $text;
     }
 
     public function with(): array
     {
         $this->chapterCard->refresh();
+        if (!$this->chapterCard->is_custom_summary && empty(trim($this->chapterCard->summary ?? ''))) {
+            $this->refreshAutoSummary();
+        }
+
         $drafts = Manuscript::where('chapter_card_id', $this->chapterCard->chapter_card_id)
             ->orderBy('created_at')
             ->get();
@@ -329,40 +387,13 @@ new #[Layout('layouts.app')] class extends Component {
             ->orderBy('full_name')
             ->get();
 
-        $displaySummary = $this->chapterCard->summary;
-        if (empty(trim($displaySummary ?? '')) && $drafts->isNotEmpty()) {
-            $contentSource = $drafts->first()->content ?? '';
-            $html = $contentSource ?? '';
-            $html = preg_replace('/<(br|\/p|\/div|\/h[1-6]|\/li|\/tr|\/blockquote|\/pre)[^>]*>/i', "\n", $html);
-            $text = html_entity_decode(strip_tags($html), ENT_QUOTES, 'UTF-8');
-            $text = preg_replace('/[ \t]+/', ' ', trim($text));
-
-            if ($text !== '') {
-                if (preg_match_all('/[^.!?\r\n]+[.!?]?/', $text, $matches) && !empty($matches[0])) {
-                    $sentences = [];
-                    foreach ($matches[0] as $match) {
-                        $cleaned = trim($match);
-                        if ($cleaned !== '') {
-                            $sentences[] = $cleaned;
-                        }
-                    }
-                    if (!empty($sentences)) {
-                        $displaySummary = implode(' ', array_slice($sentences, 0, 2));
-                    } else {
-                        $displaySummary = $text;
-                    }
-                } else {
-                    $displaySummary = $text;
-                }
-                $this->chapterCard->update(['summary' => trim($displaySummary)]);
-            }
-        }
+        $displaySummary = trim($this->chapterCard->summary ?? '');
 
         return [
             'drafts' => $drafts,
             'activeDraft' => $activeDraft,
             'projectCharacters' => $projectCharacters,
-            'displaySummary' => $displaySummary ?: 'No summary available for this chapter yet.',
+            'displaySummary' => $displaySummary !== '' ? $displaySummary : 'No summary available for this chapter yet.',
         ];
     }
 }; ?>
@@ -376,10 +407,11 @@ new #[Layout('layouts.app')] class extends Component {
 
         startRenameDraft(id, currentTitle) {
             this.renamingDraftId = id;
-            this.renameValue = currentTitle;
+            const elInput = document.getElementById('draft-rename-' + id);
+            const spanEl = elInput ? elInput.previousElementSibling : null;
+            this.renameValue = (spanEl && spanEl.innerText.trim()) ? spanEl.innerText.trim() : currentTitle;
             this.$nextTick(() => {
-                const el = document.getElementById('draft-rename-' + id);
-                if (el) { el.focus(); el.select(); }
+                if (elInput) { elInput.focus(); elInput.select(); }
             });
         },
         commitRenameDraft(id) {
@@ -501,9 +533,10 @@ new #[Layout('layouts.app')] class extends Component {
             <div class="overflow-hidden transition-all duration-300 ease-in-out shrink-0 flex flex-col"
                  :class="showDetailPanel ? 'w-[280px] opacity-100' : 'w-0 opacity-0 pointer-events-none'"
             >
-                <div class="w-[280px] h-full flex flex-col gap-5 overflow-y-auto custom-scrollbar p-5 bg-brand-50 border border-r-0 border-brand-150 rounded-l-xl shadow-sm z-10 shrink-0">
+                <div class="w-[280px] h-full flex flex-col py-3 pl-3 bg-brand-50 border border-r-0 border-brand-150 rounded-l-xl shadow-sm z-10 shrink-0">
+                    <div class="flex-1 flex flex-col gap-3 overflow-y-auto custom-scrollbar pr-3">
                 {{-- Top Row: Status Badge + Dropdown + Hide Details Button (Right) --}}
-                <div class="flex items-center justify-between relative" x-data="{ showStatusMenu: false }">
+                <div class="flex items-center justify-between relative pt-2" x-data="{ showStatusMenu: false }">
                     <div class="relative">
                         <button type="button" @click="showStatusMenu = !showStatusMenu" @class([
                             'w-full text-app-caption px-3 py-1.5 rounded-lg flex items-center justify-between gap-1.5 shadow-sm border border-brand-150 transition-all cursor-pointer hover:opacity-90',
@@ -592,7 +625,9 @@ new #[Layout('layouts.app')] class extends Component {
                     titleVal: '{{ addslashes($chapterCard->title) }}',
                     startEdit() {
                         this.editingTitle = true;
-                        this.titleVal = '{{ addslashes($chapterCard->title) }}';
+                        if (this.$refs.titleDisplay) {
+                            this.titleVal = this.$refs.titleDisplay.innerText.trim();
+                        }
                         this.$nextTick(() => { $refs.titleInput.focus(); $refs.titleInput.select(); });
                     },
                     saveTitle() {
@@ -606,8 +641,8 @@ new #[Layout('layouts.app')] class extends Component {
 
                     {{-- Display Title --}}
                     <div x-show="!editingTitle" class="group flex items-start justify-between gap-2 mb-1.5">
-                        <h2 @dblclick="startEdit"
-                            class="text-web-heading-2 text-text-80 leading-snug line-clamp-2 cursor-pointer hover:text-secondary-200 transition-colors"
+                        <h2 x-ref="titleDisplay" @dblclick="startEdit"
+                            class="text-web-heading-2 text-[24px] text-text-80 leading-snug line-clamp-2 cursor-pointer hover:text-secondary-200 transition-colors"
                             title="Double-click to rename chapter"
                         >
                             {{ $chapterCard->title }}
@@ -828,6 +863,7 @@ new #[Layout('layouts.app')] class extends Component {
                 </div>
             </div>
         </div>
+    </div>
 
         {{-- RIGHT: Editor Area + Tabs --}}
         <div class="min-w-0 flex-1 flex flex-col relative">
@@ -888,10 +924,10 @@ new #[Layout('layouts.app')] class extends Component {
                             {{-- Title / Rename --}}
                             <span
                                 x-show="renamingDraftId !== '{{ $draft->manuscript_id }}'"
-                                @dblclick.stop="startRenameDraft('{{ $draft->manuscript_id }}', '{{ addslashes($draft->title ?? 'Draft ' . $loop->iteration) }}')"
+                                @dblclick.stop="startRenameDraft('{{ $draft->manuscript_id }}', $el.innerText.trim())"
                                 class="truncate max-w-[120px]"
                                 title="Double-click to rename"
-                            >{{ $draft->title ?? 'Draft ' . $loop->iteration }}</span>
+                            >{{ !empty(trim($draft->title ?? '')) ? $draft->title : 'Draft' }}</span>
 
                             <input
                                 x-show="renamingDraftId === '{{ $draft->manuscript_id }}'"
@@ -946,7 +982,7 @@ new #[Layout('layouts.app')] class extends Component {
         submitAction="deleteDraft"
     >
         <x-slot:icon>
-            <x-icons.delete size="w-10 h-10" color="currentColor"/>
+            <x-icons.delete class="w-15 h-15"/>
         </x-slot:icon>
     </x-confirm-dialog>
 </div>

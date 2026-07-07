@@ -87,7 +87,8 @@ new class extends Component {
         ]);
 
         \App\Models\Manuscript::create([
-            'chapter_card_id' => $chapter->chapter_card_id, 
+            'chapter_card_id' => $chapter->chapter_card_id,
+            'title' => 'Draft 1',
             'content' => '',
             'word_count' => 0
         ]);
