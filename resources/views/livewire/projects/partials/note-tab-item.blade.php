@@ -47,7 +47,7 @@
         }"
     >
         {{-- Drag handle --}}
-        <span class="drag-handle shrink-0 text-[#B0A090]" title="Drag to move">
+        <span class="drag-handle shrink-0 text-text-60" title="Drag to move">
             <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor">
                 <circle cx="8" cy="6" r="1.5"/><circle cx="16" cy="6" r="1.5"/>
                 <circle cx="8" cy="12" r="1.5"/><circle cx="16" cy="12" r="1.5"/>
@@ -59,7 +59,7 @@
         @if($hasChildren)
             <button
                 @click.stop="toggleCollapse('{{ $note->note_id }}')"
-                class="w-3.5 h-3.5 flex items-center justify-center shrink-0 text-[#9A8E80] hover:text-[#5E4C38]"
+                class="w-3.5 h-3.5 flex items-center justify-center shrink-0 text-text-60 hover:text-text-90"
             >
                 <svg
                     class="collapse-caret"
@@ -74,7 +74,7 @@
         @endif
 
         {{-- File icon --}}
-        <svg class="w-3 h-3 shrink-0 {{ $isActive ? 'text-[#8C7558]' : 'text-[#B0A090]' }}"
+        <svg class="w-3 h-3 shrink-0 {{ $isActive ? 'text-secondary-200' : 'text-text-60' }}"
              fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                   d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
@@ -84,7 +84,7 @@
         <div class="flex-1 min-w-0">
             <span
                 x-show="renamingId !== '{{ $note->note_id }}'"
-                class="text-[12.5px] {{ $isActive ? 'text-[#2C2C2C] font-semibold' : 'text-[#4A4A4A]' }} truncate block"
+                class="text-[12.5px] {{ $isActive ? 'text-text-100 font-semibold' : 'text-text-80' }} truncate block"
                 title="{{ $note->title }}"
             >{{ $note->title }}</span>
             <div x-show="renamingId === '{{ $note->note_id }}'" class="relative" x-cloak>
@@ -98,9 +98,9 @@
                     @blur="commitRename('{{ $note->note_id }}')"
                     @click.stop
                     @mousedown.stop
-                    class="w-full text-[12.5px] text-[#2C2C2C] bg-white border border-[#D5C6A9] rounded px-1 py-0.5 outline-none focus:border-[#A08866] pr-8"
+                    class="w-full text-[12.5px] text-text-100 bg-bg-main border border-brand-200 rounded px-1 py-0.5 outline-none focus:border-secondary-200 pr-8"
                 />
-                <span class="absolute right-1 top-1/2 -translate-y-1/2 text-[9px] text-[#9A8E80]" x-text="(renameValue || '').length + '/25'"></span>
+                <span class="absolute right-1 top-1/2 -translate-y-1/2 text-[9px] text-text-60" x-text="(renameValue || '').length + '/25'"></span>
             </div>
         </div>
 
@@ -108,7 +108,7 @@
         <button
             data-menu-trigger
             data-title="{{ $note->title }}"
-            class="w-5 h-5 flex items-center justify-center text-[#B0A090] hover:text-[#4A4A4A] transition-colors opacity-0 group-hover:opacity-100 shrink-0 rounded hover:bg-[#E0D5C5]"
+            class="w-5 h-5 flex items-center justify-center text-text-60 hover:text-text-90 transition-colors opacity-0 group-hover:opacity-100 shrink-0 rounded hover:bg-brand-150"
             @click.stop="openMenuId === '{{ $note->note_id }}' ? closeMenu() : openMenu('{{ $note->note_id }}', $el.dataset.title, {{ $isLeaf ? 'true' : 'false' }}, $event.currentTarget)"
             title="Options"
         >
