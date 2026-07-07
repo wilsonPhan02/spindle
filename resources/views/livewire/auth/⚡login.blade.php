@@ -27,7 +27,7 @@ new #[Layout('layouts.guest')] #[Title('Sign In - Spindle')] class extends Compo
             session()->regenerate();
             $this->isSuccess = true;
             $url = session()->pull('url.intended', '/dashboard');
-            $this->js("setTimeout(() => Livewire.navigate('{$url}'), 1200)");
+            $this->js("setTimeout(() => window.location.href = '{$url}', 1200)");
             return;
         }
 
