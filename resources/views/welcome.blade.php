@@ -411,6 +411,13 @@
         </div>
     </footer>
 
+    <!-- Back to Top Button -->
+    <a href="#hero" id="back-to-top" aria-label="Back to top"
+       class="fixed bottom-8 right-8 z-50 flex h-12 w-12 translate-y-[150%] items-center justify-center rounded-full bg-secondary-150 text-brand-10 opacity-0 shadow-[0_8px_16px_rgba(43,31,23,0.2)] transition-all duration-500 hover:bg-secondary-200 hover:-translate-y-1 hover:shadow-[0_12px_24px_rgba(43,31,23,0.3)]">
+        <svg viewBox="0 0 24 24" fill="none" class="h-6 w-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 15l7-7 7 7"/>
+        </svg>
+    </a>
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
     <script>
         // Reveal on Scroll Effect
@@ -775,23 +782,48 @@
             observer.observe(track);
         });
 
-        // Smart Navbar (Hide on scroll down, show on scroll up)
+        // Smart Navbar & Back to Top Button
         document.addEventListener('DOMContentLoaded', () => {
             const nav = document.getElementById('main-nav');
-            if (!nav) return;
+            const backToTop = document.getElementById('back-to-top');
             
             let lastScrollY = window.scrollY;
+            let isScrollingDown = false;
             
             window.addEventListener('scroll', () => {
+                // Back to top visibility
+                if (window.scrollY > 500) {
+                    if (backToTop) {
+                        backToTop.classList.remove('translate-y-[150%]', 'opacity-0');
+                    }
+                } else {
+                    if (backToTop) {
+                        backToTop.classList.add('translate-y-[150%]', 'opacity-0');
+                    }
+                }
+
+                if (!nav) return;
+                
                 if (window.scrollY > lastScrollY && window.scrollY > 100) {
                     // Scrolling down: hide
+                    isScrollingDown = true;
                     nav.classList.add('-translate-y-[150%]');
                 } else {
                     // Scrolling up: show
+                    isScrollingDown = false;
                     nav.classList.remove('-translate-y-[150%]');
                 }
                 lastScrollY = window.scrollY;
             }, { passive: true });
+
+            // Show navbar when mouse hovers near the top of the screen, hide when leaves
+            window.addEventListener('mousemove', (e) => {
+                if (e.clientY <= 120) {
+                    nav.classList.remove('-translate-y-[150%]');
+                } else if (isScrollingDown && window.scrollY > 100) {
+                    nav.classList.add('-translate-y-[150%]');
+                }
+            });
         });
     </script>
 
@@ -983,6 +1015,32 @@
                     }
                 }
             }, { passive: false });
+
+            // Intercept anchor links to match scroll jack calculation exactly
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', (e) => {
+                    const targetId = anchor.getAttribute('href');
+                    if (targetId === '#') return;
+                    
+                    const targetSection = document.querySelector(targetId);
+                    if (targetSection) {
+                        e.preventDefault();
+                        if (isAnimating) return;
+                        
+                        isAnimating = true;
+                        const targetY = window.scrollY + targetSection.getBoundingClientRect().top;
+                        
+                        window.scrollTo({
+                            top: targetY,
+                            behavior: 'smooth'
+                        });
+                        
+                        setTimeout(() => {
+                            isAnimating = false;
+                        }, 900);
+                    }
+                });
+            });
             
             // Allow normal keyboard navigation (arrows/space) but with smooth scroll
             window.addEventListener('keydown', (e) => {
