@@ -30,19 +30,27 @@ new #[Layout('layouts.app')] class extends Component {
         $this->chapterCard = $chapterCard;
 
         // Select the first draft, or create one if none exist
-        $draft = $chapterCard->manuscript()->orderBy('created_at')->first();
+        $allDrafts = $chapterCard->manuscript()->orderBy('created_at')->get();
 
-        if (!$draft) {
+        if ($allDrafts->isEmpty()) {
             $draft = Manuscript::create([
                 'chapter_card_id' => $chapterCard->chapter_card_id,
                 'title' => 'Draft 1',
                 'content' => '',
                 'word_count' => 0,
             ]);
+            $this->activeDraftId = $draft->manuscript_id;
+            $this->editorBody = '';
+        } else {
+            foreach ($allDrafts as $idx => $d) {
+                if (empty(trim($d->title ?? ''))) {
+                    $d->update(['title' => 'Draft ' . ($idx + 1)]);
+                }
+            }
+            $draft = $allDrafts->first();
+            $this->activeDraftId = $draft->manuscript_id;
+            $this->editorBody = $draft->content ?? '';
         }
-
-        $this->activeDraftId = $draft->manuscript_id;
-        $this->editorBody = $draft->content ?? '';
     }
 
     // ----------------
@@ -67,11 +75,19 @@ new #[Layout('layouts.app')] class extends Component {
     {
         $this->saveCurrentContent();
 
-        $count = Manuscript::where('chapter_card_id', $this->chapterCard->chapter_card_id)->count();
+        $existingTitles = Manuscript::where('chapter_card_id', $this->chapterCard->chapter_card_id)
+            ->pluck('title')
+            ->map(fn($t) => strtolower(trim($t ?? '')))
+            ->toArray();
+
+        $nextNum = count($existingTitles) + 1;
+        while (in_array(strtolower("draft {$nextNum}"), $existingTitles)) {
+            $nextNum++;
+        }
 
         $draft = Manuscript::create([
             'chapter_card_id' => $this->chapterCard->chapter_card_id,
-            'title' => 'Draft ' . ($count + 1),
+            'title' => "Draft {$nextNum}",
             'content' => '',
             'word_count' => 0,
         ]);
@@ -894,7 +910,7 @@ new #[Layout('layouts.app')] class extends Component {
                                 @dblclick.stop="startRenameDraft('{{ $draft->manuscript_id }}', $el.innerText.trim())"
                                 class="truncate max-w-[120px]"
                                 title="Double-click to rename"
-                            >{{ $draft->title ?? 'Draft ' . $loop->iteration }}</span>
+                            >{{ !empty(trim($draft->title ?? '')) ? $draft->title : 'Draft' }}</span>
 
                             <input
                                 x-show="renamingDraftId === '{{ $draft->manuscript_id }}'"
