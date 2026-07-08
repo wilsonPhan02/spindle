@@ -71,12 +71,9 @@ class User extends Authenticatable
     protected static function booted()
     {
         static::created(function ($user) {
-            // Potong email sebelum '@'
-            $defaultName = explode('@', $user->email)[0];
-
             // Langsung buatin data di tabel profiles
             $user->profile()->create([
-                'username' => $defaultName,
+                'username' => null,
                 // kalau ada field lain kayak avatar_url, biarin default null dulu
             ]);
         });

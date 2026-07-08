@@ -51,7 +51,7 @@ new #[Layout('layouts.guest')] #[Title('Sign Up - Spindle')] class extends Compo
         Auth::login($user);
         
         $this->isSuccess = true;
-        $this->js("setTimeout(() => window.location.href = '/dashboard', 1200)");
+        $this->js("setTimeout(() => window.location.href = '/onboarding', 1200)");
     }
 };
 ?>

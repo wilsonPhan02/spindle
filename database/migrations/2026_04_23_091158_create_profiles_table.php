@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('profiles', function (Blueprint $table) {
             $table->uuid('profile_id')->primary();
             $table->foreignUuid('user_id')->references('user_id')->on('users')->cascadeOnDelete();
-            $table->string('username')->unique();
+            $table->string('username')->nullable()->unique();
             $table->string('avatar_url')->nullable();
             $table->string('occupation')->nullable();
             $table->enum('gender', ['male', 'female'])->nullable();

@@ -80,7 +80,7 @@ new class extends Component {
     ]" />
 
     @php
-        $displayName = Auth::user()->profile?->username ?? explode('@', Auth::user()->email)[0];
+        $displayName = Auth::user()->profile?->username ?? 'User';
         $nameLen = strlen($displayName);
         $titleSize = 'text-3xl lg:text-4xl';
         if ($nameLen >= 20) {
