@@ -47,4 +47,40 @@ return Application::configure(basePath: dirname(__DIR__))
                 // Suppress mail errors to avoid infinite loops if SMTP is not set up
             }
         });
+
+        $exceptions->render(function (\Throwable $e, \Illuminate\Http\Request $request) {
+            // Optional toggle to easily get Ignition back if needed
+            if (env('FORCE_CUSTOM_ERRORS', true) === false && config('app.debug')) {
+                return null;
+            }
+
+            // Biarkan Laravel menangani error validasi, auth, dan redirect
+            if ($e instanceof \Illuminate\Validation\ValidationException ||
+                $e instanceof \Illuminate\Auth\AuthenticationException ||
+                $e instanceof \Illuminate\Http\Exceptions\HttpResponseException) {
+                return null;
+            }
+
+            $status = 500;
+
+            if ($e instanceof \Symfony\Component\HttpKernel\Exception\HttpExceptionInterface) {
+                $status = $e->getStatusCode();
+            } elseif ($e instanceof \Illuminate\Database\QueryException || $e instanceof \PDOException) {
+                // Tangani khusus jika database terputus (connection refused)
+                if (str_contains($e->getMessage(), '2002')) {
+                    $status = 503;
+                }
+            }
+
+            $allowedStatuses = [403, 404, 419, 500, 503];
+            if (!in_array($status, $allowedStatuses)) {
+                $status = 500;
+            }
+
+            if (!$request->wantsJson() && !$request->is('api/*')) {
+                return response()->view("errors.{$status}", ['exception' => $e], $status);
+            }
+            
+            return null;
+        });
     })->create();
