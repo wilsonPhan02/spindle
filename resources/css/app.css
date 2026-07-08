@@ -79,6 +79,18 @@
     [role="button"] {
         cursor: pointer !important;
     }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    input[type="number"],
+    input[type="search"],
+    input[type="tel"],
+    input[type="url"],
+    textarea,
+    [contenteditable="true"] {
+        cursor: text !important;
+    }
 }
 
 /* --- Text Styles Library (Composite Properties) --- */
