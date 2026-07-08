@@ -8,15 +8,15 @@
 @if($variant === 'info')
     <!-- Untuk Data Profile -->
     <div class="min-w-0" title="{{ $value ?? 'None' }}">
-        <div class="text-web-body-small text-text-80 mb-1 truncate">{{ $label }}</div>
-        <div class="text-web-body-small text-subtext-90 truncate">{{ $value ?? 'None' }}</div>
+        <div class="text-web-body-small text-[14px] text-text-80 mb-1/2 truncate">{{ $label }}</div>
+        <div class="text-web-body-small text-[14px] text-subtext-90 truncate">{{ $value ?? 'None' }}</div>
     </div>
 @else
     <!-- Tampilan 2 & 3: Untuk Tombol Menu & Toggle -->
     @php
         $textColor = $danger ? 'text-red-500' : 'text-text-80';
         $iconColor = $danger ? 'text-red-500' : 'text-subtext-90';
-        $baseClass = 'w-full flex items-center justify-between py-3.5 px-4 -mx-4 transition-colors rounded-xl group hover:bg-black/5 focus:outline-none';
+        $baseClass = 'w-full flex items-center justify-between py-3 px-4 -mx-4 transition-colors rounded-xl group hover:bg-black/5 focus:outline-none';
         $chevron   = $danger ? 'text-red-400 group-hover:text-red-600' : 'text-subtext-90 group-hover:text-text-100';
     @endphp
 
@@ -28,7 +28,7 @@
         @endif
         {{ $attributes->merge(['class' => $baseClass]) }}
     >
-        <div class="flex items-center gap-4 text-web-body-small {{ $textColor }}">
+        <div class="flex items-center gap-4 text-web-body-small text-[14px] {{ $textColor }}">
             <!-- Slot untuk Ikon SVG -->
             @if(isset($icon))
                 <div class="{{ $iconColor }}">

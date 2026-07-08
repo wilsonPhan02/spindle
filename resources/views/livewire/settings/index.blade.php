@@ -25,18 +25,18 @@ new #[Layout('layouts.app')] class extends Component {
 
 }; ?>
 
-<div class="p-10 w-full max-w-8xl mx-auto">
+<div class="p-10 pb-7 w-full max-w-8xl mx-auto">
     <!-- Header -->
     <header class="flex justify-between items-center mb-12">
-        <a href="{{ route('dashboard') ?? '#' }}" wire:navigate class="flex items-center gap-3 text-[18px] text-[#7A7A7A] hover:text-[#8C7558] transition-colors">
-            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+        <a href="{{ route('dashboard') }}" wire:navigate class="flex items-center gap-3 text-[18px] text-[#7A7A7A] hover:text-[#8C7558] transition-colors">
+            <x-icons.chevron rotate="180" size="w-3.5 h-3.5" color="currentColor"/>
             <span class="text-[#2C2C2C] font-semibold">Settings</span>
         </a>
     </header>
     <!-- Profile Section-->
-    <section class="mb-14 w-full max-w-4xl mx-auto">
-        <div class="items-center gap-4 mb-8">
-            <h2 class="text-web-body-small text-subtext-100 whitespace-nowrap mb-2">Your Profile</h2>
+    <section class="mb-10 w-full max-w-4xl mx-auto">
+        <div class="items-center gap-4 mb-6">
+            <h2 class="text-web-body-small text-[14px] text-subtext-100 whitespace-nowrap mb-2">Your Profile</h2>
             <hr class="w-full border-subtext-80">
         </div>
 
@@ -48,7 +48,7 @@ new #[Layout('layouts.app')] class extends Component {
             />
 
             <!-- Profile Data Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-y-8 gap-x-12 w-full pt-2 justify-between">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-y-5 gap-x-12 w-full pt-1 justify-between">
                 <x-settings-items variant="info" label="Username" :value="$profile->username ?? 'Sailor Shift'" ></x->
                 <x-settings-items variant="info" label="Occupation" :value="$profile->occupation ?? 'None'" ></x->
                 <x-settings-items variant="info" label="Gender" :value="$profile->gender ? ucfirst($profile->gender) : 'None'" ></x->
@@ -59,9 +59,9 @@ new #[Layout('layouts.app')] class extends Component {
     </section>
 
     <!-- Account & Preference Section -->
-    <section class="mb-14 w-full max-w-4xl mx-auto">
-        <div class="items-center gap-4 mb-6">
-            <h2 class="text-web-body-small text-subtext-100 whitespace-nowrap mb-2">Account & Preference</h2>
+    <section class="mb-1 w-full max-w-4xl mx-auto">
+        <div class="items-center gap-4 mb-2">
+            <h2 class="text-web-body-small text-[14px] text-subtext-100 whitespace-nowrap mb-2">Account & Preference</h2>
             <hr class="w-full border-subtext-80">
         </div>
 
