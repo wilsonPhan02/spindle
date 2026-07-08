@@ -142,8 +142,11 @@ new #[Layout('layouts.app')] class extends Component {
         } elseif ($action === 'edit') {
             $note = Note::find($data['note_id']);
             if ($note) {
+                if ($this->activeNoteId !== $data['note_id']) {
+                    $this->saveCurrentBody();
+                    $this->activeNoteId = $data['note_id'];
+                }
                 $note->update(['body' => $data['old_body']]);
-                $this->selectNote($data['note_id'], false);
                 $this->editorBody = $data['old_body'];
                 $this->lastCursorOffset = $data['old_cursor'] ?? null;
                 $this->dispatch('refresh-editor-content', cursor: $data['old_cursor'] ?? $data['new_cursor'] ?? null);
@@ -204,8 +207,11 @@ new #[Layout('layouts.app')] class extends Component {
         } elseif ($action === 'edit') {
             $note = Note::find($data['note_id']);
             if ($note) {
+                if ($this->activeNoteId !== $data['note_id']) {
+                    $this->saveCurrentBody();
+                    $this->activeNoteId = $data['note_id'];
+                }
                 $note->update(['body' => $data['new_body']]);
-                $this->selectNote($data['note_id'], false);
                 $this->editorBody = $data['new_body'];
                 $this->lastCursorOffset = $data['new_cursor'] ?? null;
                 $this->dispatch('refresh-editor-content', cursor: $data['new_cursor'] ?? null);

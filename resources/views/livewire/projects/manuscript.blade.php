@@ -184,9 +184,10 @@ new #[Layout('layouts.app')] class extends Component {
         if (!$this->activeDraftId) return;
 
         $text = strip_tags($this->editorBody);
-        $text = html_entity_decode($text, ENT_QUOTES, 'UTF-8');
-        $text = preg_replace('/\s+/', ' ', trim($text));
-        $wordCount = $text === '' ? 0 : count(preg_split('/\s+/', $text));
+        $text = html_entity_decode($text, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $text = str_replace(["\xC2\xA0", '&nbsp;', '&#160;', '&amp;nbsp;'], ' ', $text);
+        $text = preg_replace('/\s+/u', ' ', trim($text));
+        $wordCount = $text === '' ? 0 : count(preg_split('/\s+/u', $text));
 
         Manuscript::where('manuscript_id', $this->activeDraftId)
             ->where('chapter_card_id', $this->chapterCard->chapter_card_id)
@@ -346,8 +347,9 @@ new #[Layout('layouts.app')] class extends Component {
     {
         if (empty($html)) return null;
         $html = preg_replace('/<(br|\/p|\/div|\/h[1-6]|\/li|\/tr|\/blockquote|\/pre)[^>]*>/i', "\n", $html);
-        $text = html_entity_decode(strip_tags($html), ENT_QUOTES, 'UTF-8');
-        $text = preg_replace('/[ \t]+/', ' ', trim($text));
+        $text = html_entity_decode(strip_tags($html), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $text = str_replace(["\xC2\xA0", '&nbsp;', '&#160;', '&amp;nbsp;'], ' ', $text);
+        $text = preg_replace('/[ \t]+/u', ' ', trim($text));
 
         if ($text === '') return null;
 

@@ -58,22 +58,26 @@
         draggedBlock: null,
         dropTargetBlock: null,
         dropPosition: null,
+        lastSaveTime: 0,
 
         init() {
             this.$nextTick(() => {
                 this.initEditorElement();
             });
             window.addEventListener('refresh-editor-content', (e) => {
+                if (this.saveTimeout) clearTimeout(this.saveTimeout);
                 const cursor = e.detail ? (e.detail.cursor !== undefined ? e.detail.cursor : (Array.isArray(e.detail) && e.detail[0] && e.detail[0].cursor !== undefined ? e.detail[0].cursor : null)) : null;
                 this.initEditorElement(cursor);
             });
             window.addEventListener('request-undo', () => {
+                if (this.saveTimeout) clearTimeout(this.saveTimeout);
                 const editorEl = document.getElementById('{{ $editorId }}');
                 const html = editorEl ? editorEl.innerHTML : null;
                 const offset = editorEl ? this.getCursorCharacterOffset(editorEl) : null;
                 $wire.undoWithCurrentBody(html, offset);
             });
             window.addEventListener('request-redo', () => {
+                if (this.saveTimeout) clearTimeout(this.saveTimeout);
                 const editorEl = document.getElementById('{{ $editorId }}');
                 const html = editorEl ? editorEl.innerHTML : null;
                 const offset = editorEl ? this.getCursorCharacterOffset(editorEl) : null;
@@ -82,6 +86,7 @@
         },
 
         initEditorElement(targetCursor = null) {
+            if (this.saveTimeout) clearTimeout(this.saveTimeout);
             const editorEl = document.getElementById('{{ $editorId }}');
             if (!editorEl) return;
 
@@ -95,6 +100,7 @@
             editorEl.innerHTML = initialBody;
             this.updateCounter();
             this.refreshToolbarState();
+            this.lastSaveTime = Date.now();
 
             if (targetCursor !== null && targetCursor !== undefined) {
                 this.$nextTick(() => {
@@ -844,13 +850,27 @@
         },
 
         scheduleSave() {
+            const now = Date.now();
+            if (!this.lastSaveTime) {
+                this.lastSaveTime = now;
+            }
+            if (now - this.lastSaveTime >= 1500) {
+                if (this.saveTimeout) clearTimeout(this.saveTimeout);
+                this.executeSave();
+                return;
+            }
             if (this.saveTimeout) clearTimeout(this.saveTimeout);
             this.saveTimeout = setTimeout(() => {
-                const editorEl = document.getElementById('{{ $editorId }}');
-                if (editorEl && typeof $wire.{{ $updateMethod }} === 'function') {
-                    $wire.{{ $updateMethod }}(editorEl.innerHTML, this.getCursorCharacterOffset(editorEl));
-                }
-            }, 600);
+                this.executeSave();
+            }, 500);
+        },
+
+        executeSave() {
+            this.lastSaveTime = Date.now();
+            const editorEl = document.getElementById('{{ $editorId }}');
+            if (editorEl && typeof $wire.{{ $updateMethod }} === 'function') {
+                $wire.{{ $updateMethod }}(editorEl.innerHTML, this.getCursorCharacterOffset(editorEl));
+            }
         },
 
         getCursorCharacterOffset(element) {
@@ -919,7 +939,7 @@
         updateCounter() {
             const editorEl = document.getElementById('{{ $editorId }}');
             if (!editorEl) return;
-            const text = (editorEl.innerText || '').replace(/\u200B/g, '').trim();
+            const text = (editorEl.innerText || '').replace(/[\u200B\u00A0]/g, ' ').replace(/\s+/g, ' ').trim();
             this.wordCount = text === '' ? 0 : text.split(/\s+/).filter(Boolean).length;
             this.charCount = text.length;
         },
