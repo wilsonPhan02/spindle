@@ -58,14 +58,35 @@
         draggedBlock: null,
         dropTargetBlock: null,
         dropPosition: null,
+        lastSaveTime: 0,
 
         init() {
             this.$nextTick(() => {
                 this.initEditorElement();
             });
+            window.addEventListener('refresh-editor-content', (e) => {
+                if (this.saveTimeout) clearTimeout(this.saveTimeout);
+                const cursor = e.detail ? (e.detail.cursor !== undefined ? e.detail.cursor : (Array.isArray(e.detail) && e.detail[0] && e.detail[0].cursor !== undefined ? e.detail[0].cursor : null)) : null;
+                this.initEditorElement(cursor);
+            });
+            window.addEventListener('request-undo', () => {
+                if (this.saveTimeout) clearTimeout(this.saveTimeout);
+                const editorEl = document.getElementById('{{ $editorId }}');
+                const html = editorEl ? editorEl.innerHTML : null;
+                const offset = editorEl ? this.getCursorCharacterOffset(editorEl) : null;
+                $wire.undoWithCurrentBody(html, offset);
+            });
+            window.addEventListener('request-redo', () => {
+                if (this.saveTimeout) clearTimeout(this.saveTimeout);
+                const editorEl = document.getElementById('{{ $editorId }}');
+                const html = editorEl ? editorEl.innerHTML : null;
+                const offset = editorEl ? this.getCursorCharacterOffset(editorEl) : null;
+                $wire.redoWithCurrentBody(html, offset);
+            });
         },
 
-        initEditorElement() {
+        initEditorElement(targetCursor = null) {
+            if (this.saveTimeout) clearTimeout(this.saveTimeout);
             const editorEl = document.getElementById('{{ $editorId }}');
             if (!editorEl) return;
 
@@ -79,6 +100,14 @@
             editorEl.innerHTML = initialBody;
             this.updateCounter();
             this.refreshToolbarState();
+            this.lastSaveTime = Date.now();
+
+            if (targetCursor !== null && targetCursor !== undefined) {
+                this.$nextTick(() => {
+                    editorEl.focus();
+                    this.restoreCursorToOffset(editorEl, targetCursor);
+                });
+            }
 
             editorEl.addEventListener('input', (e) => {
                 this.updateCounter();
@@ -821,19 +850,96 @@
         },
 
         scheduleSave() {
+            const now = Date.now();
+            if (!this.lastSaveTime) {
+                this.lastSaveTime = now;
+            }
+            if (now - this.lastSaveTime >= 1500) {
+                if (this.saveTimeout) clearTimeout(this.saveTimeout);
+                this.executeSave();
+                return;
+            }
             if (this.saveTimeout) clearTimeout(this.saveTimeout);
             this.saveTimeout = setTimeout(() => {
-                const editorEl = document.getElementById('{{ $editorId }}');
-                if (editorEl && typeof $wire.{{ $updateMethod }} === 'function') {
-                    $wire.{{ $updateMethod }}(editorEl.innerHTML);
+                this.executeSave();
+            }, 500);
+        },
+
+        executeSave() {
+            this.lastSaveTime = Date.now();
+            const editorEl = document.getElementById('{{ $editorId }}');
+            if (editorEl && typeof $wire.{{ $updateMethod }} === 'function') {
+                $wire.{{ $updateMethod }}(editorEl.innerHTML, this.getCursorCharacterOffset(editorEl));
+            }
+        },
+
+        getCursorCharacterOffset(element) {
+            if (!element) return null;
+            const selection = window.getSelection();
+            if (!selection || !selection.rangeCount) return null;
+            const range = selection.getRangeAt(0);
+            if (!element.contains(range.startContainer)) return null;
+
+            try {
+                const preCaretRange = range.cloneRange();
+                preCaretRange.selectNodeContents(element);
+                preCaretRange.setEnd(range.startContainer, range.startOffset);
+                return preCaretRange.toString().length;
+            } catch(e) {
+                return null;
+            }
+        },
+
+        restoreCursorToOffset(element, offset) {
+            if (!element || offset === null || offset === undefined) return;
+            const selection = window.getSelection();
+            if (!selection) return;
+
+            let charCount = 0;
+            let nodeToSelect = null;
+            let offsetInNode = 0;
+
+            function traverse(node) {
+                if (node.nodeType === Node.TEXT_NODE) {
+                    const nextCharCount = charCount + node.length;
+                    if (!nodeToSelect && offset <= nextCharCount) {
+                        nodeToSelect = node;
+                        offsetInNode = offset - charCount;
+                    }
+                    charCount = nextCharCount;
+                } else {
+                    for (let i = 0; i < node.childNodes.length; i++) {
+                        traverse(node.childNodes[i]);
+                        if (nodeToSelect) break;
+                    }
                 }
-            }, 600);
+            }
+
+            traverse(element);
+
+            if (nodeToSelect) {
+                try {
+                    const range = document.createRange();
+                    range.setStart(nodeToSelect, Math.max(0, Math.min(offsetInNode, nodeToSelect.length)));
+                    range.collapse(true);
+                    selection.removeAllRanges();
+                    selection.addRange(range);
+                } catch (e) {}
+            } else if (element.childNodes.length > 0) {
+                try {
+                    const range = document.createRange();
+                    range.selectNodeContents(element);
+                    range.collapse(false);
+                    selection.removeAllRanges();
+                    selection.addRange(range);
+                } catch (e) {}
+            }
         },
 
         updateCounter() {
             const editorEl = document.getElementById('{{ $editorId }}');
             if (!editorEl) return;
-            const text = (editorEl.innerText || '').replace(/\u200B/g, '').trim();
+            const text = (editorEl.innerText || '').replace(/[\u200B\u00A0]/g, ' ').replace(/\s+/g, ' ').trim();
             this.wordCount = text === '' ? 0 : text.split(/\s+/).filter(Boolean).length;
             this.charCount = text.length;
         },
