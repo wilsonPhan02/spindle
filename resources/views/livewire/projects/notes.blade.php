@@ -13,6 +13,7 @@ new #[Layout('layouts.app')] class extends Component {
     public Project $project;
     public ?string $activeNoteId = null;
     public string $editorBody = '';
+    public ?int $lastCursorOffset = null;
     public $uploadFile;
     public array $undoStack = [];
     public array $redoStack = [];
@@ -83,8 +84,9 @@ new #[Layout('layouts.app')] class extends Component {
     public function pushUndo(string $action, array $data, string $message): void
     {
         $this->undoStack[] = [
-            'action' => $action,
-            'data'   => $data,
+            'action'    => $action,
+            'data'      => $data,
+            'timestamp' => time(),
         ];
         $this->redoStack = [];
         
@@ -109,20 +111,45 @@ new #[Layout('layouts.app')] class extends Component {
                 $next = Note::where('project_id', $this->project->project_id)
                             ->whereNull('parent_note_id')->orderBy('sort_order')->first();
                 if ($next) {
-                    $this->activeNoteId = $next->note_id;
-                    $this->editorBody = $next->body ?? '';
+                    $this->selectNote($next->note_id, false);
+                } else {
+                    $this->dispatch('refresh-editor-content');
                 }
             }
         } elseif ($action === 'remove') {
             $note = Note::withTrashed()->find($data['note_id']);
             if ($note) {
                 $note->restore();
-                $this->selectNote($note->note_id);
+                $this->selectNote($note->note_id, false);
             }
         } elseif ($action === 'rename') {
             $note = Note::find($data['note_id']);
             if ($note) {
                 $note->update(['title' => $data['old_title']]);
+                $this->selectNote($data['note_id'], false);
+            }
+        } elseif ($action === 'move') {
+            foreach ($data['old_positions'] as $id => $pos) {
+                Note::where('note_id', $id)->update([
+                    'parent_note_id' => $pos['parent_note_id'],
+                    'depth'          => $pos['depth'],
+                    'sort_order'     => $pos['sort_order'],
+                ]);
+            }
+            if (!empty($data['moved_id'])) {
+                $this->selectNote($data['moved_id'], false);
+            }
+        } elseif ($action === 'edit') {
+            $note = Note::find($data['note_id']);
+            if ($note) {
+                if ($this->activeNoteId !== $data['note_id']) {
+                    $this->saveCurrentBody();
+                    $this->activeNoteId = $data['note_id'];
+                }
+                $note->update(['body' => $data['old_body']]);
+                $this->editorBody = $data['old_body'];
+                $this->lastCursorOffset = $data['old_cursor'] ?? null;
+                $this->dispatch('refresh-editor-content', cursor: $data['old_cursor'] ?? $data['new_cursor'] ?? null);
             }
         }
         
@@ -142,7 +169,7 @@ new #[Layout('layouts.app')] class extends Component {
             $note = Note::withTrashed()->find($data['note_id']);
             if ($note) {
                 $note->restore();
-                $this->selectNote($note->note_id);
+                $this->selectNote($note->note_id, false);
             }
         } elseif ($action === 'remove') {
             $note = Note::find($data['note_id']);
@@ -154,8 +181,9 @@ new #[Layout('layouts.app')] class extends Component {
                     $next = Note::where('project_id', $this->project->project_id)
                                 ->whereNull('parent_note_id')->orderBy('sort_order')->first();
                     if ($next) {
-                        $this->activeNoteId = $next->note_id;
-                        $this->editorBody = $next->body ?? '';
+                        $this->selectNote($next->note_id, false);
+                    } else {
+                        $this->dispatch('refresh-editor-content');
                     }
                 }
             }
@@ -163,11 +191,51 @@ new #[Layout('layouts.app')] class extends Component {
             $note = Note::find($data['note_id']);
             if ($note) {
                 $note->update(['title' => $data['new_title']]);
+                $this->selectNote($data['note_id'], false);
+            }
+        } elseif ($action === 'move') {
+            foreach ($data['new_positions'] as $id => $pos) {
+                Note::where('note_id', $id)->update([
+                    'parent_note_id' => $pos['parent_note_id'],
+                    'depth'          => $pos['depth'],
+                    'sort_order'     => $pos['sort_order'],
+                ]);
+            }
+            if (!empty($data['moved_id'])) {
+                $this->selectNote($data['moved_id'], false);
+            }
+        } elseif ($action === 'edit') {
+            $note = Note::find($data['note_id']);
+            if ($note) {
+                if ($this->activeNoteId !== $data['note_id']) {
+                    $this->saveCurrentBody();
+                    $this->activeNoteId = $data['note_id'];
+                }
+                $note->update(['body' => $data['new_body']]);
+                $this->editorBody = $data['new_body'];
+                $this->lastCursorOffset = $data['new_cursor'] ?? null;
+                $this->dispatch('refresh-editor-content', cursor: $data['new_cursor'] ?? null);
             }
         }
         
         $this->undoStack[] = $lastAction;
         $this->dispatch('show-undo-toast', message: 'Action redone.');
+    }
+
+    public function undoWithCurrentBody(?string $currentHtml = null, ?int $cursorOffset = null): void
+    {
+        if ($currentHtml !== null && $this->activeNoteId && $this->editorBody !== $currentHtml) {
+            $this->updateBody($currentHtml, $cursorOffset);
+        }
+        $this->undo();
+    }
+
+    public function redoWithCurrentBody(?string $currentHtml = null, ?int $cursorOffset = null): void
+    {
+        if ($currentHtml !== null && $this->activeNoteId && $this->editorBody !== $currentHtml) {
+            $this->updateBody($currentHtml, $cursorOffset);
+        }
+        $this->redo();
     }
 
     public function addNote(): void
@@ -181,7 +249,7 @@ new #[Layout('layouts.app')] class extends Component {
             'body'           => '',
         ]);
         $this->pushUndo('add', ['note_id' => $note->note_id], 'Note created.');
-        $this->selectNote($note->note_id);
+        $this->selectNote($note->note_id, false);
     }
 
     public function addSubTab(string $parentId): void
@@ -198,16 +266,19 @@ new #[Layout('layouts.app')] class extends Component {
             'body'           => '',
         ]);
         $this->pushUndo('add', ['note_id' => $note->note_id], 'Sub tab created.');
-        $this->selectNote($note->note_id);
+        $this->selectNote($note->note_id, false);
     }
 
-    public function selectNote(string $noteId): void
+    public function selectNote(string $noteId, bool $recordUndo = false): void
     {
         $this->saveCurrentBody();
         $note = Note::find($noteId);
         if (!$note) return;
+
         $this->activeNoteId = $noteId;
         $this->editorBody   = $note->body ?? '';
+        $this->lastCursorOffset = null;
+        $this->dispatch('refresh-editor-content');
     }
 
     public function renameNote(string $noteId, string $newTitle): void
@@ -235,7 +306,7 @@ new #[Layout('layouts.app')] class extends Component {
         if (!$source) return;
         $duplicate = $this->cloneNoteRecursive($source, $source->parent_note_id, $source->depth);
         $this->pushUndo('add', ['note_id' => $duplicate->note_id], 'Note duplicated.');
-        $this->selectNote($duplicate->note_id);
+        $this->selectNote($duplicate->note_id, false);
     }
 
     private function cloneNoteRecursive(Note $source, ?string $newParentId, int $depth): Note
@@ -275,8 +346,9 @@ new #[Layout('layouts.app')] class extends Component {
                         ->orderBy('sort_order')
                         ->first();
             if ($next) {
-                $this->activeNoteId = $next->note_id;
-                $this->editorBody   = $next->body ?? '';
+                $this->selectNote($next->note_id, false);
+            } else {
+                $this->dispatch('refresh-editor-content');
             }
         }
     }
@@ -289,9 +361,28 @@ new #[Layout('layouts.app')] class extends Component {
             ->update(['body' => $this->editorBody]);
     }
 
-    public function updateBody(string $html): void
+    public function updateBody(string $html, ?int $cursorOffset = null): void
     {
+        $normOld = trim(str_replace(['<p><br></p>', '<p></p>', '<br>', "\r", "\n", "\t"], '', $this->editorBody));
+        $normNew = trim(str_replace(['<p><br></p>', '<p></p>', '<br>', "\r", "\n", "\t"], '', $html));
+
+        if ($this->activeNoteId && $this->editorBody !== $html && $normOld !== $normNew) {
+            $this->undoStack[] = [
+                'action'    => 'edit',
+                'data'      => [
+                    'note_id'     => $this->activeNoteId,
+                    'old_body'    => $this->editorBody,
+                    'new_body'    => $html,
+                    'old_cursor'  => $this->lastCursorOffset,
+                    'new_cursor'  => $cursorOffset,
+                ],
+                'timestamp' => time(),
+            ];
+            $this->redoStack = [];
+            $this->dispatch('show-undo-toast', message: 'Text edited.');
+        }
         $this->editorBody = $html;
+        $this->lastCursorOffset = $cursorOffset;
         $this->saveCurrentBody();
     }
 
@@ -313,6 +404,14 @@ new #[Layout('layouts.app')] class extends Component {
         if (!$dragged) return;
 
         if ($targetId && ($targetId === $draggedId || $this->isDescendant($draggedId, $targetId))) return;
+
+        $oldPositions = Note::where('project_id', $this->project->project_id)
+                            ->get(['note_id', 'parent_note_id', 'depth', 'sort_order'])
+                            ->mapWithKeys(fn ($n) => [$n->note_id => [
+                                'parent_note_id' => $n->parent_note_id,
+                                'depth'          => $n->depth,
+                                'sort_order'     => $n->sort_order,
+                            ]])->toArray();
 
         $subtreeHeight = $this->subtreeHeight($dragged);
 
@@ -369,6 +468,23 @@ new #[Layout('layouts.app')] class extends Component {
                 }
             }
         }
+
+        $newPositions = Note::where('project_id', $this->project->project_id)
+                            ->get(['note_id', 'parent_note_id', 'depth', 'sort_order'])
+                            ->mapWithKeys(fn ($n) => [$n->note_id => [
+                                'parent_note_id' => $n->parent_note_id,
+                                'depth'          => $n->depth,
+                                'sort_order'     => $n->sort_order,
+                            ]])->toArray();
+
+        if ($oldPositions !== $newPositions) {
+            $this->pushUndo('move', [
+                'moved_id'      => $draggedId,
+                'old_positions' => $oldPositions,
+                'new_positions' => $newPositions,
+            ], 'Note moved.');
+            $this->selectNote($draggedId);
+        }
     }
 
     private function subtreeHeight(Note $note): int
@@ -422,18 +538,16 @@ new #[Layout('layouts.app')] class extends Component {
 <div
     @keydown.window.ctrl.z="
         const tag = document.activeElement ? document.activeElement.tagName.toLowerCase() : '';
-        const isEditable = document.activeElement ? document.activeElement.isContentEditable : false;
-        if(tag !== 'input' && tag !== 'textarea' && !isEditable && !$event.shiftKey) {
+        if(tag !== 'input' && tag !== 'textarea' && !$event.shiftKey) {
             $event.preventDefault();
-            $wire.undo();
+            $dispatch('request-undo');
         }
     "
     @keydown.window.ctrl.shift.z="
         const tag = document.activeElement ? document.activeElement.tagName.toLowerCase() : '';
-        const isEditable = document.activeElement ? document.activeElement.isContentEditable : false;
-        if(tag !== 'input' && tag !== 'textarea' && !isEditable) {
+        if(tag !== 'input' && tag !== 'textarea') {
             $event.preventDefault();
-            $wire.redo();
+            $dispatch('request-redo');
         }
     "
     x-data="{
@@ -508,12 +622,18 @@ new #[Layout('layouts.app')] class extends Component {
             this.draggedId = id;
             event.dataTransfer.effectAllowed = 'move';
         },
-        onDragOver(id, position, event) {
+        onDragOver(id, isLeaf, event) {
             if (this.draggedId === id) return;
             event.preventDefault();
             event.dataTransfer.dropEffect = 'move';
             this.dragOverId = id;
-            this.dragPos = position;
+            const rect = event.currentTarget.getBoundingClientRect();
+            const y = event.clientY - rect.top;
+            if (isLeaf) {
+                this.dragPos = y < rect.height * 0.5 ? 'before' : 'after';
+            } else {
+                this.dragPos = y < rect.height * 0.25 ? 'before' : (y > rect.height * 0.75 ? 'after' : 'inside');
+            }
         },
         onDrop(targetId, position, event) {
             event.preventDefault();
@@ -617,9 +737,9 @@ new #[Layout('layouts.app')] class extends Component {
                             <div
                                 class="h-10"
                                 x-bind:class="dragOverId === '__root__' ? 'drag-over-after' : ''"
-                                @dragover.prevent="if (draggedId) { dragOverId = '__root__'; dragPos = 'after'; }"
-                                @dragleave="if (dragOverId === '__root__') dragOverId = null"
-                                @drop.prevent="if (draggedId) { $wire.moveNote(draggedId, null, 'after'); draggedId = null; dragOverId = null; }"
+                                @dragover.stop.prevent="if (draggedId) { dragOverId = '__root__'; dragPos = 'after'; }"
+                                @dragleave.stop="if (dragOverId === '__root__') dragOverId = null"
+                                @drop.stop.prevent="if (draggedId) { $wire.moveNote(draggedId, null, 'after'); draggedId = null; dragOverId = null; }"
                             ></div>
                         </div>
 
@@ -741,7 +861,7 @@ new #[Layout('layouts.app')] class extends Component {
          style="display: none;"
     >
          <span x-text="message" class="text-app-body-medium font-medium flex-1"></span>
-         <button @click="$wire.undo(); show = false" class="text-app-feature text-secondary-200 font-semibold hover:text-secondary-100 hover:bg-secondary-200/10 px-3 py-1.5 rounded-lg transition-colors border border-secondary-200">
+         <button @click="$dispatch('request-undo'); show = false" class="text-app-feature text-secondary-200 font-semibold hover:text-secondary-100 hover:bg-secondary-200/10 px-3 py-1.5 rounded-lg transition-colors border border-secondary-200">
              Undo
          </button>
          <button @click="show = false" class="text-text-60 hover:text-text-100 p-1 rounded-md hover:bg-black/5 transition-colors">

@@ -969,8 +969,10 @@ new #[Layout('layouts.app')] class extends Component {
                                         // 2. Hapus semua tag HTML yang tersisa
                                         $cleanBody = strip_tags($cleanBody);
 
-                                        // 3. Bersihkan spasi ganda yang berlebihan akibat proses sebelumnya
-                                        $cleanBody = trim(preg_replace('/\s+/', ' ', $cleanBody));
+                                        // 3. Bersihkan entitas HTML dan spasi ganda yang berlebihan
+                                        $cleanBody = html_entity_decode($cleanBody, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+                                        $cleanBody = str_replace(["\xC2\xA0", '&nbsp;', '&#160;', '&amp;nbsp;'], ' ', $cleanBody);
+                                        $cleanBody = trim(preg_replace('/\s+/u', ' ', $cleanBody));
                                     @endphp
 
                                     <p class="text-app-body-small text-subtext-100 line-clamp-3" style="display:-webkit-box; -webkit-box-orient:vertical; overflow:hidden;">
@@ -1072,8 +1074,9 @@ new #[Layout('layouts.app')] class extends Component {
                                         if (empty(trim($summaryText ?? '')) && $chapter->manuscript && $chapter->manuscript->isNotEmpty()) {
                                             $firstDraftContent = $chapter->manuscript->first()->content ?? '';
                                             $html = preg_replace('/<(br|\/p|\/div|\/h[1-6]|\/li|\/tr|\/blockquote|\/pre)[^>]*>/i', "\n", $firstDraftContent);
-                                            $cleanText = html_entity_decode(strip_tags($html), ENT_QUOTES, 'UTF-8');
-                                            $cleanText = preg_replace('/[ \t]+/', ' ', trim($cleanText));
+                                            $cleanText = html_entity_decode(strip_tags($html), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+                                            $cleanText = str_replace(["\xC2\xA0", '&nbsp;', '&#160;', '&amp;nbsp;'], ' ', $cleanText);
+                                            $cleanText = preg_replace('/[ \t]+/u', ' ', trim($cleanText));
                                             if ($cleanText !== '') {
                                                 if (preg_match_all('/[^.!?\r\n]+[.!?]?/', $cleanText, $matches) && !empty($matches[0])) {
                                                     $sents = [];
