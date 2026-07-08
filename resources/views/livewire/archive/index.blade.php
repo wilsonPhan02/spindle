@@ -99,7 +99,7 @@ new #[Layout('layouts.app')] class extends Component {
     <!-- Header -->
     <header class="flex justify-between items-center mb-12">
         <a href="{{ route('dashboard') }}" wire:navigate class="flex items-center gap-3 text-[18px] text-[#7A7A7A] hover:text-[#8C7558] transition-colors">
-            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+            <x-icons.chevron rotate="180" size="w-3.5 h-3.5" color="currentColor"/>
             <span class="text-[#2C2C2C] font-semibold">Archive</span>
         </a>
     </header>
