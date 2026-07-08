@@ -235,6 +235,9 @@ new #[Layout('layouts.app')] class extends Component {
     {
         $this->validate([
             'coverUpload' => 'image|max:5120',
+        ], [
+            'coverUpload.max' => 'The selected image is too large. The maximum allowed file size is 5MB.',
+            'coverUpload.image' => 'The selected file type is not supported. Please upload an image.',
         ]);
 
         if ($this->coverUpload) {
@@ -588,9 +591,105 @@ new #[Layout('layouts.app')] class extends Component {
 
                 {{-- Cover Image --}}
                 <div class="pb-1">
-                    <div class="relative w-full aspect-[16/8] rounded-xl overflow-hidden bg-brand-50 border border-brand-150 shadow-inner group shrink-0 flex items-center justify-center">
+                    <div x-data="{ 
+                            hoverCover: false,
+                            isUploading: false, 
+                            progress: 0, 
+                            clientError: null,
+                            showCropper: false,
+                            cropImageUrl: null,
+                            cropperInstance: null,
+                            
+                            cancelCrop() {
+                                this.showCropper = false;
+                                if (this.cropperInstance) {
+                                    this.cropperInstance.destroy();
+                                    this.cropperInstance = null;
+                                }
+                                this.cropImageUrl = null;
+                                if(this.$refs.coverInput) this.$refs.coverInput.value = null;
+                            },
+                            
+                            onFileChange(e) {
+                                const file = e.target.files[0];
+                                if (!file) return;
+                                
+                                if (file.size > 5 * 1024 * 1024) {
+                                    this.clientError = 'The selected image is too large. The maximum allowed file size is 5MB.';
+                                    if(this.$refs.coverInput) this.$refs.coverInput.value = '';
+                                    return;
+                                }
+                                
+                                this.clientError = null;
+                                
+                                const reader = new FileReader();
+                                reader.onload = (event) => {
+                                    this.cropImageUrl = event.target.result;
+                                    this.showCropper = true;
+                                    
+                                    this.$nextTick(() => {
+                                        const image = this.$refs.cropImage;
+                                        this.cropperInstance = new Cropper(image, {
+                                            aspectRatio: 16 / 8,
+                                            viewMode: 3,
+                                            autoCropArea: 1,
+                                            dragMode: 'move',
+                                            modal: false,
+                                            background: false,
+                                            guides: false,
+                                            center: true,
+                                            highlight: false,
+                                            cropBoxMovable: false,
+                                            cropBoxResizable: false,
+                                        });
+                                    });
+                                };
+                                reader.readAsDataURL(file);
+                            },
+                            
+                            applyCrop() {
+                                if (!this.cropperInstance) return;
+                                
+                                const canvas = this.cropperInstance.getCroppedCanvas({
+                                    width: 1280,
+                                    height: 640,
+                                    imageSmoothingEnabled: true,
+                                    imageSmoothingQuality: 'high',
+                                });
+                                
+                                canvas.toBlob((blob) => {
+                                    const file = new File([blob], 'chapter-cover.jpg', { type: 'image/jpeg', lastModified: Date.now() });
+                                    
+                                    this.cancelCrop();
+                                    
+                                    this.isUploading = true;
+                                    this.progress = 0;
+                                    
+                                    @this.upload('coverUpload', file,
+                                        (uploadedFilename) => { this.isUploading = false; },
+                                        () => { this.isUploading = false; },
+                                        (e) => { this.progress = e.detail.progress; }
+                                    );
+                                }, 'image/jpeg', 0.9);
+                            }
+                        }"
+                        @mouseover="hoverCover = true" @mouseleave="hoverCover = false"
+                        class="relative w-full aspect-[16/8] rounded-xl overflow-hidden bg-brand-50 border border-brand-150 shadow-inner group shrink-0 flex items-center justify-center">
+
+                        <!-- Progress Overlay -->
+                        <div x-show="isUploading" x-transition class="absolute inset-0 bg-[#F5EFE9]/80 backdrop-blur-md z-40 flex flex-col items-center justify-center">
+                            <svg class="animate-spin h-6 w-6 text-secondary-200 mb-1.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                            <div class="text-secondary-200 font-semibold text-xs">Uploading... <span x-text="progress + '%'"></span></div>
+                            
+                            <div class="w-1/2 bg-brand-150 rounded-full h-1.5 mt-2 overflow-hidden shadow-inner mx-auto">
+                                <div class="bg-secondary-100 h-full rounded-full transition-all duration-200 ease-out" :style="`width: ${progress}%`"></div>
+                            </div>
+                        </div>
+
                         @if($chapterCard->cover_image_path)
                             <img src="{{ Storage::url($chapterCard->cover_image_path) }}" class="w-full h-full object-cover transition-transform duration-300" alt="Chapter Cover">
+                        @elseif($project->cover_image_path)
+                            <img src="{{ Storage::url($project->cover_image_path) }}" class="w-full h-full object-cover transition-transform duration-300" alt="Project Cover">
                         @else
                             <div class="flex flex-col items-center justify-center gap-1 p-4 text-center">
                                 <x-icons.no-structure class="w-8 h-8 text-secondary-150 opacity-60" />
@@ -599,11 +698,11 @@ new #[Layout('layouts.app')] class extends Component {
                         @endif
 
                         {{-- Hover Action Buttons for Chapter Cover--}}
-                        <div class="absolute bottom-2.5 left-2.5 z-30 flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div x-show="hoverCover && !showCropper" x-transition class="absolute bottom-2.5 left-2.5 z-30 flex items-center gap-1.5">
                             <label class="flex items-center gap-1.5 px-2.5 py-1.5 bg-text-80/95 border border-text-60 hover:bg-text-80 text-bg-main text-app-caption text-[9px] rounded-md shadow-lg cursor-pointer transition-transform active:scale-95">
                                 <x-icons.upload class="w-3 h-3 text-bg-main" />
                                 <span>{{ $chapterCard->cover_image_path || $project->cover_image_path ? 'Change Cover' : 'Upload Cover' }}</span>
-                                <input type="file" wire:model="coverUpload" accept="image/*" class="hidden">
+                                <input type="file" x-ref="coverInput" @change="onFileChange" accept="image/*" class="hidden">
                             </label>
 
                             @if($chapterCard->cover_image_path || $project->cover_image_path)
@@ -612,6 +711,39 @@ new #[Layout('layouts.app')] class extends Component {
                                     <span>Remove</span>
                                 </button>
                             @endif
+                        </div>
+
+                        {{-- Client-side Error --}}
+                        <template x-if="clientError">
+                            <div class="absolute inset-x-2 top-2 bg-danger-100/95 text-bg-main text-[11px] font-medium px-2.5 py-2 rounded shadow-xl z-50 flex items-start gap-1.5">
+                                <svg class="w-3.5 h-3.5 mt-0.5 shrink-0 text-bg-main" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                                <span x-text="clientError" class="flex-1 leading-relaxed"></span>
+                                <button type="button" @click.stop="clientError = null" class="shrink-0 ml-1 p-0.5 hover:bg-black/20 rounded transition-colors" title="Dismiss"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+                            </div> 
+                        </template>
+
+                        {{-- Server-side Error --}}
+                        @error('coverUpload') 
+                            <div x-data="{ show: true }" x-show="show" class="absolute inset-x-2 top-2 bg-danger-100/95 text-bg-main text-[11px] font-medium px-2.5 py-2 rounded shadow-xl z-50 flex items-start gap-1.5">
+                                <svg class="w-3.5 h-3.5 mt-0.5 shrink-0 text-bg-main" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                                <span class="flex-1 leading-relaxed">{{ $message }}</span>
+                                <button type="button" @click.stop="show = false" class="shrink-0 ml-1 p-0.5 hover:bg-black/20 rounded transition-colors" title="Dismiss"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+                            </div> 
+                        @enderror
+
+                        {{-- Inline Cropper UI --}}
+                        <div x-show="showCropper" style="display: none;" class="absolute inset-0 z-40 bg-brand-50 flex flex-col" wire:ignore @dragstart.prevent @drop.prevent>
+                            <style>
+                                .cropper-view-box { outline: none !important; }
+                                .cropper-modal { background: none !important; opacity: 0 !important; }
+                            </style>
+                            <div class="absolute inset-0 w-full h-full bg-black overflow-hidden">
+                                <img x-ref="cropImage" :src="cropImageUrl" draggable="false" class="block w-full h-full select-none" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+                            </div>
+                            <div class="absolute bottom-2.5 left-0 right-0 flex justify-center gap-2 z-50">
+                                <button @click.stop="cancelCrop()" type="button" class="px-3 py-1 bg-bg-main/90 backdrop-blur text-text-70 text-[10px] font-bold uppercase tracking-wider rounded-md border border-text-60 hover:bg-bg-main shadow-lg transition-colors cursor-pointer">Cancel</button>
+                                <button @click.stop="applyCrop()" type="button" class="px-3 py-1 bg-secondary-100/95 backdrop-blur text-bg-main text-[10px] font-bold uppercase tracking-wider rounded-md shadow-lg border border-secondary-200 hover:bg-secondary-200 transition-colors cursor-pointer">Save</button>
+                            </div>
                         </div>
 
                         <div wire:loading.flex wire:target="coverUpload" class="absolute inset-0 bg-text-70/80 backdrop-blur-[1px] items-center justify-center gap-2 text-app-desc-feature z-40">
@@ -664,7 +796,7 @@ new #[Layout('layouts.app')] class extends Component {
                         <p class="text-app-caption text-subtext-90 mt-0.5">Press Enter to save, Esc to cancel</p>
                     </div>
 
-                    <p class="text-app-caption text-secondary-100" wire:poll.3s>
+                    <p class="text-app-caption text-secondary-100">
                         Last Edited: {{ $chapterCard->updated_at?->timezone('Asia/Jakarta')->format('d F Y, H.i') ?? '-' }}
                     </p>
                 </div>
