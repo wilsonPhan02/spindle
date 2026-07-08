@@ -63,9 +63,25 @@
             this.$nextTick(() => {
                 this.initEditorElement();
             });
+            window.addEventListener('refresh-editor-content', (e) => {
+                const cursor = e.detail ? (e.detail.cursor !== undefined ? e.detail.cursor : (Array.isArray(e.detail) && e.detail[0] && e.detail[0].cursor !== undefined ? e.detail[0].cursor : null)) : null;
+                this.initEditorElement(cursor);
+            });
+            window.addEventListener('request-undo', () => {
+                const editorEl = document.getElementById('{{ $editorId }}');
+                const html = editorEl ? editorEl.innerHTML : null;
+                const offset = editorEl ? this.getCursorCharacterOffset(editorEl) : null;
+                $wire.undoWithCurrentBody(html, offset);
+            });
+            window.addEventListener('request-redo', () => {
+                const editorEl = document.getElementById('{{ $editorId }}');
+                const html = editorEl ? editorEl.innerHTML : null;
+                const offset = editorEl ? this.getCursorCharacterOffset(editorEl) : null;
+                $wire.redoWithCurrentBody(html, offset);
+            });
         },
 
-        initEditorElement() {
+        initEditorElement(targetCursor = null) {
             const editorEl = document.getElementById('{{ $editorId }}');
             if (!editorEl) return;
 
@@ -79,6 +95,13 @@
             editorEl.innerHTML = initialBody;
             this.updateCounter();
             this.refreshToolbarState();
+
+            if (targetCursor !== null && targetCursor !== undefined) {
+                this.$nextTick(() => {
+                    editorEl.focus();
+                    this.restoreCursorToOffset(editorEl, targetCursor);
+                });
+            }
 
             editorEl.addEventListener('input', (e) => {
                 this.updateCounter();
@@ -825,9 +848,72 @@
             this.saveTimeout = setTimeout(() => {
                 const editorEl = document.getElementById('{{ $editorId }}');
                 if (editorEl && typeof $wire.{{ $updateMethod }} === 'function') {
-                    $wire.{{ $updateMethod }}(editorEl.innerHTML);
+                    $wire.{{ $updateMethod }}(editorEl.innerHTML, this.getCursorCharacterOffset(editorEl));
                 }
             }, 600);
+        },
+
+        getCursorCharacterOffset(element) {
+            if (!element) return null;
+            const selection = window.getSelection();
+            if (!selection || !selection.rangeCount) return null;
+            const range = selection.getRangeAt(0);
+            if (!element.contains(range.startContainer)) return null;
+
+            try {
+                const preCaretRange = range.cloneRange();
+                preCaretRange.selectNodeContents(element);
+                preCaretRange.setEnd(range.startContainer, range.startOffset);
+                return preCaretRange.toString().length;
+            } catch(e) {
+                return null;
+            }
+        },
+
+        restoreCursorToOffset(element, offset) {
+            if (!element || offset === null || offset === undefined) return;
+            const selection = window.getSelection();
+            if (!selection) return;
+
+            let charCount = 0;
+            let nodeToSelect = null;
+            let offsetInNode = 0;
+
+            function traverse(node) {
+                if (node.nodeType === Node.TEXT_NODE) {
+                    const nextCharCount = charCount + node.length;
+                    if (!nodeToSelect && offset <= nextCharCount) {
+                        nodeToSelect = node;
+                        offsetInNode = offset - charCount;
+                    }
+                    charCount = nextCharCount;
+                } else {
+                    for (let i = 0; i < node.childNodes.length; i++) {
+                        traverse(node.childNodes[i]);
+                        if (nodeToSelect) break;
+                    }
+                }
+            }
+
+            traverse(element);
+
+            if (nodeToSelect) {
+                try {
+                    const range = document.createRange();
+                    range.setStart(nodeToSelect, Math.max(0, Math.min(offsetInNode, nodeToSelect.length)));
+                    range.collapse(true);
+                    selection.removeAllRanges();
+                    selection.addRange(range);
+                } catch (e) {}
+            } else if (element.childNodes.length > 0) {
+                try {
+                    const range = document.createRange();
+                    range.selectNodeContents(element);
+                    range.collapse(false);
+                    selection.removeAllRanges();
+                    selection.addRange(range);
+                } catch (e) {}
+            }
         },
 
         updateCounter() {

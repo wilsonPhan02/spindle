@@ -35,11 +35,11 @@
         style="padding-left: {{ 10 + $indentPx }}px; padding-top: 6px; padding-bottom: 6px;"
         wire:click="selectNote('{{ $note->note_id }}')"
         draggable="true"
-        @dragstart="onDragStart('{{ $note->note_id }}', $event)"
-        @dragend="onDragEnd()"
-        @dragover="onDragOver('{{ $note->note_id }}', $event.offsetY < $event.currentTarget.offsetHeight * 0.3 ? 'before' : ($event.offsetY > $event.currentTarget.offsetHeight * 0.7 ? 'after' : 'inside'), $event)"
-        @dragleave="if (dragOverId === '{{ $note->note_id }}') dragOverId = null"
-        @drop="onDrop('{{ $note->note_id }}', dragPos, $event)"
+        @dragstart.stop="onDragStart('{{ $note->note_id }}', $event)"
+        @dragend.stop="onDragEnd()"
+        @dragover.stop.prevent="onDragOver('{{ $note->note_id }}', {{ $isLeaf ? 'true' : 'false' }}, $event)"
+        @dragleave.stop="if (dragOverId === '{{ $note->note_id }}') dragOverId = null"
+        @drop.stop.prevent="onDrop('{{ $note->note_id }}', dragPos, $event)"
         x-bind:class="{
             'drag-over-before': dragOverId === '{{ $note->note_id }}' && dragPos === 'before',
             'drag-over-after':  dragOverId === '{{ $note->note_id }}' && dragPos === 'after',
