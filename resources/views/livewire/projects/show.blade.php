@@ -1043,7 +1043,7 @@ new #[Layout('layouts.app')] class extends Component {
                                     </div>
 
                                     <div class="flex items-center gap-3 mb-2.5">
-                                        <x-icons.chapter-icon/>
+                                        <x-icons.chapter-icon class="shrink-0"/>
                                         <h4 class="text-[18px] text-app-title-1 leading-normal text-text-80 truncate transition-colors">
                                             {{ $chapter->title }}
                                         </h4>
