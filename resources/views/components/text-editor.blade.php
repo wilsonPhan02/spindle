@@ -267,8 +267,23 @@
                 while (block.firstChild) {
                     newBlock.appendChild(block.firstChild);
                 }
-                if (!newBlock.innerHTML.replace(/^[\s\u200B\uFEFF]+|[\s\u200B\uFEFF]+$/g, '') || newBlock.innerHTML === '') {
+                if (!newBlock.textContent.replace(/^[\s\u200B\uFEFF]+|[\s\u200B\uFEFF]+$/g, '') || newBlock.textContent.trim() === '') {
                     newBlock.innerHTML = '<br>';
+                } else if (tag === 'h1' || tag === 'h2' || tag === 'h3' || tag === 'p' || tag === 'blockquote') {
+                    newBlock.querySelectorAll('font, span, strong, b, em, i, u, s').forEach(el => {
+                        if (el.style) {
+                            el.removeAttribute('style');
+                        }
+                        if (el.removeAttribute) {
+                            el.removeAttribute('size');
+                            el.removeAttribute('face');
+                            el.removeAttribute('color');
+                        }
+                        while (el.firstChild) {
+                            el.parentNode.insertBefore(el.firstChild, el);
+                        }
+                        el.parentNode.removeChild(el);
+                    });
                 }
 
                 block.parentNode.replaceChild(newBlock, block);
@@ -620,15 +635,52 @@
             } catch (e) {}
         },
 
-        handleKeydown(e) {
+        customIndent(outdent = false) {
             const editorEl = document.getElementById('{{ $editorId }}');
-            if (e.key === 'Tab') {
-                e.preventDefault();
-                if (e.shiftKey) {
+            const sel = window.getSelection();
+            let node = sel && sel.anchorNode ? sel.anchorNode : null;
+            if (node && node.nodeType === 3) node = node.parentElement;
+            
+            const isList = node && node.closest('li, ul, ol, .todo-item');
+            if (isList) {
+                if (outdent) {
                     this.exec('outdent');
                 } else {
                     this.exec('indent');
                 }
+            } else {
+                const block = node ? node.closest('p, h1, h2, h3, div') : null;
+                if (block && editorEl && editorEl.contains(block)) {
+                    let currentIndent = parseInt(block.style.marginLeft || block.style.paddingLeft || '0', 10);
+                    if (isNaN(currentIndent)) currentIndent = 0;
+                    if (outdent) {
+                        currentIndent = Math.max(0, currentIndent - 40);
+                    } else {
+                        currentIndent += 40;
+                    }
+                    if (currentIndent > 0) {
+                        block.style.marginLeft = currentIndent + 'px';
+                    } else {
+                        block.style.marginLeft = '';
+                        block.style.paddingLeft = '';
+                    }
+                    this.scheduleSave();
+                    this.updateActiveFormats();
+                } else {
+                    if (outdent) {
+                        this.exec('outdent');
+                    } else {
+                        this.exec('indent');
+                    }
+                }
+            }
+        },
+
+        handleKeydown(e) {
+            const editorEl = document.getElementById('{{ $editorId }}');
+            if (e.key === 'Tab') {
+                e.preventDefault();
+                this.customIndent(e.shiftKey);
                 return;
             }
 
@@ -637,6 +689,29 @@
                 if (sel && sel.anchorNode) {
                     let node = sel.anchorNode;
                     if (node.nodeType === 3) node = node.parentElement;
+                    
+                    const block = node.closest('p, h1, h2, h3, div, li, .todo-item');
+                    if (block && editorEl.contains(block)) {
+                        let isAtStart = false;
+                        if (sel.isCollapsed && sel.anchorOffset === 0) {
+                            try {
+                                const rangeBefore = document.createRange();
+                                rangeBefore.setStart(block, 0);
+                                rangeBefore.setEnd(sel.anchorNode, sel.anchorOffset);
+                                if (rangeBefore.toString().replace(/^[\s\u200B\uFEFF]+|[\s\u200B\uFEFF]+$/g, '') === '') {
+                                    isAtStart = true;
+                                }
+                            } catch (err) {}
+                        }
+                        
+                        let currentIndent = parseInt(block.style.marginLeft || block.style.paddingLeft || '0', 10);
+                        if (!isNaN(currentIndent) && currentIndent > 0 && (block.textContent.replace(/^[\s\u200B\uFEFF]+|[\s\u200B\uFEFF]+$/g, '') === '' || isAtStart)) {
+                            e.preventDefault();
+                            this.customIndent(true);
+                            return;
+                        }
+                    }
+
                     const li = node.closest('li');
                     if (li && li.textContent.trim() === '' && editorEl.contains(li)) {
                         e.preventDefault();
@@ -1129,13 +1204,12 @@
 
         #{{ $editorId }}:focus { outline: none; }
         #{{ $editorId }} p { margin-bottom: 1em; }
-        #{{ $editorId }} h1 { font-size: 2em; font-weight: normal; margin-bottom: 0.5em; }
-        #{{ $editorId }} h2 { font-size: 1.5em; font-weight: normal; margin-bottom: 0.5em; }
-        #{{ $editorId }} h3 { font-size: 1.17em; font-weight: normal; margin-bottom: 0.5em; }
-        #{{ $editorId }} h1, #{{ $editorId }} h2, #{{ $editorId }} h3,
-        #{{ $editorId }} h1 *, #{{ $editorId }} h2 *, #{{ $editorId }} h3 * {
-            font-weight: normal !important;
-        }
+        #{{ $editorId }} h1 { font-size: 2em; font-weight: 700 !important; margin-bottom: 0.5em; }
+        #{{ $editorId }} h2 { font-size: 1.5em; font-weight: 600 !important; margin-bottom: 0.5em; }
+        #{{ $editorId }} h3 { font-size: 1.17em; font-weight: 600 !important; margin-bottom: 0.5em; }
+        #{{ $editorId }} h1, #{{ $editorId }} h1 * { font-weight: 700 !important; font-size: 2em !important; line-height: 1.3 !important; color: var(--color-text-90) !important; }
+        #{{ $editorId }} h2, #{{ $editorId }} h2 * { font-weight: 600 !important; font-size: 1.5em !important; line-height: 1.35 !important; color: var(--color-text-90) !important; }
+        #{{ $editorId }} h3, #{{ $editorId }} h3 * { font-weight: 600 !important; font-size: 1.17em !important; line-height: 1.4 !important; color: var(--color-text-90) !important; }
         
         #{{ $editorId }} ul { list-style-type: disc; padding-left: 1.5em; }
         #{{ $editorId }} ul ul { list-style-type: circle; }
@@ -1395,10 +1469,10 @@
         @endif
 
         @if($showIndent)
-            <button type="button" @mousedown.prevent="saveSelection()" @click="exec('outdent')" class="toolbar-btn" title="Decrease Indent">
+            <button type="button" @mousedown.prevent="saveSelection()" @click="customIndent(true)" class="toolbar-btn" title="Decrease Indent">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M11 17h10v-2H11v2zm-8-5l4 4V8l-4 4zm0 9h18v-2H3v2zM3 3v2h18V3H3zm8 6h10V7H11v2zm0 4h10v-2H11v2z"/></svg>
             </button>
-            <button type="button" @mousedown.prevent="saveSelection()" @click="exec('indent')" class="toolbar-btn" title="Increase Indent">
+            <button type="button" @mousedown.prevent="saveSelection()" @click="customIndent(false)" class="toolbar-btn" title="Increase Indent">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M3 21h18v-2H3v2zM3 8v8l4-4-4-4zm8 9h10v-2H11v2zM3 3v2h18V3H3zm8 6h10V7H11v2zm0 4h10v-2H11v2z"/></svg>
             </button>
         @endif
