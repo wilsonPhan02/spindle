@@ -31,6 +31,8 @@ Route::middleware('auth')->group(function () {
 
     // Rute Dashboard setelah sukses register/login
     Volt::route('/dashboard', 'dashboard.index')->name('dashboard');
+    // Rute Onboarding setelah register
+    Volt::route('/onboarding', 'auth.onboarding')->name('onboarding');
     // Rute untuk ke Settings Page
     Volt::route('/settings', 'settings.index')->name('settings');
     $missingProject = function (\Illuminate\Http\Request $request) {
