@@ -15,7 +15,8 @@ class ProjectCategory extends Model
 
     protected $fillable = ['project_id', 'name'];
 
-    public function project() {
+    public function project(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
         return $this->belongsTo(Project::class, 'project_id', 'project_id');
     }
 }

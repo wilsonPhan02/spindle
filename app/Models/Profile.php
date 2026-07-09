@@ -22,7 +22,7 @@ class Profile extends Model
         'birthdate'
     ];
 
-    public function user()
+    public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id', 'user_id');
     }

@@ -7,7 +7,7 @@ class Tag extends Model
 {
     protected $fillable = ['name'];
 
-    public function chapters()
+    public function chapters(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
         return $this->belongsToMany(ChapterCard::class, 'chapter_tag', 'tag_id', 'chapter_card_id');
     }

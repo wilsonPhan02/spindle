@@ -9,13 +9,13 @@ class Section extends Model
 {
     use HasUuids;
 
-    // Kasih tahu Laravel kalau primary key-nya adalah section_id
+    // Inform Laravel that the primary key is section_id
     protected $primaryKey = 'section_id';
 
     public $incrementing = false;
     protected $keyType = 'string';
 
-    // Sesuaikan fillable dengan kolom di foto database lu
+    // Adjust fillable fields with the database columns
     protected $fillable = [
         'section_id',
         'user_id',
@@ -23,13 +23,12 @@ class Section extends Model
         'archived_at'
     ];
 
-    public function user()
+    public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id', 'user_id');
     }
 
-    // Tambahkan di dalam class Section
-    public function projects()
+    public function projects(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(Project::class, 'section_id', 'section_id');
     }

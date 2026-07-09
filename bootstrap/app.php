@@ -24,7 +24,7 @@ return Application::configure(basePath: dirname(__DIR__))
                        "Time: " . now()->toDateTimeString();
 
             // 1. Send alert via Webhook if configured
-            $webhookUrl = env('ERROR_WEBHOOK_URL');
+            $webhookUrl = config('app.error_webhook_url');
             if ($webhookUrl) {
                 try {
                     \Illuminate\Support\Facades\Http::post($webhookUrl, [
@@ -38,7 +38,7 @@ return Application::configure(basePath: dirname(__DIR__))
             // 2. Send alert via Email
             try {
                 // You can change this via .env later using ERROR_EMAIL_ADDRESS
-                $email = env('ERROR_EMAIL_ADDRESS', 'bingle.spindle@gmail.com');
+                $email = config('app.error_email_address');
                 \Illuminate\Support\Facades\Mail::raw($message, function ($mail) use ($email) {
                     $mail->to($email)
                          ->subject('🚨 Critical Error in Spindle: /' . request()->path());
@@ -50,7 +50,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $exceptions->render(function (\Throwable $e, \Illuminate\Http\Request $request) {
             // Optional toggle to easily get Ignition back if needed
-            if (env('FORCE_CUSTOM_ERRORS', true) === false && config('app.debug')) {
+            if (config('app.force_custom_errors') === false && config('app.debug')) {
                 return null;
             }
 

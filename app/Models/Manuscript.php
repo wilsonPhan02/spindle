@@ -21,9 +21,12 @@ class Manuscript extends Model
         'word_count',
     ];
 
-    protected $casts = [
-        'word_count' => 'integer',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'word_count' => 'integer',
+        ];
+    }
 
     public function chapter(): BelongsTo
     {

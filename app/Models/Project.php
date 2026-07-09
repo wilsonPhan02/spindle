@@ -20,26 +20,27 @@ class Project extends Model
         'icon',
     ];
 
-    public function section()
+    public function section(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Section::class, 'section_id', 'section_id');
     }
 
-    public function user()
+    public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id', 'user_id');
     }
     
-    public function categories() {
+    public function categories(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
         return $this->hasMany(ProjectCategory::class, 'project_id', 'project_id');
     }
 
-    public function template() 
+    public function template(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Template::class, 'template_id', 'template_id');
     }
 
-    public function chapterCards() 
+    public function chapterCards(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(ChapterCard::class, 'project_id', 'project_id');
     }
@@ -51,19 +52,22 @@ class Project extends Model
         ];
     }
 
-    public function characters() {
+    public function characters(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
         return $this->hasMany(Character::class, 'project_id', 'project_id');
     }
 
-    public function relationshipTypes() {
+    public function relationshipTypes(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
         return $this->hasMany(RelationshipType::class, 'project_id', 'project_id');
     }
 
-    public function characterDetailGroups() {
+    public function characterDetailGroups(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
         return $this->hasMany(CharacterDetailGroup::class, 'project_id', 'project_id');
     }
 
-    protected static function booted()
+    protected static function booted(): void
     {
         static::created(function (Project $project) {
             $project->seedDefaultRelationshipTypes();

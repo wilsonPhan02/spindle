@@ -15,12 +15,12 @@ class CharacterDetailField extends Model
 
     protected $fillable = ['character_detail_group_id', 'name', 'order'];
 
-    public function group()
+    public function group(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(CharacterDetailGroup::class, 'character_detail_group_id', 'character_detail_group_id');
     }
 
-    public function values()
+    public function values(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(CharacterDetailValue::class, 'character_detail_field_id', 'character_detail_field_id');
     }

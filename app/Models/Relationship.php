@@ -15,17 +15,17 @@ class Relationship extends Model
 
     protected $fillable = ['from_id', 'to_id', 'relationship_type_id', 'context', 'curve_offset'];
 
-    public function from()
+    public function from(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Character::class, 'from_id', 'character_id');
     }
 
-    public function to()
+    public function to(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Character::class, 'to_id', 'character_id');
     }
 
-    public function relationshipType()
+    public function relationshipType(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(RelationshipType::class, 'relationship_type_id', 'relationship_type_id');
     }

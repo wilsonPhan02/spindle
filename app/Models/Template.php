@@ -15,7 +15,7 @@ class Template extends Model
     
     protected $guarded = ['template_id'];
 
-    public function sections()
+    public function sections(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(StructureSection::class, 'template_id', 'template_id');
     }

@@ -15,7 +15,16 @@ class ChapterCard extends Model
     public $incrementing = false;
     protected $keyType = 'string';
 
-    protected $guarded = ['chapter_card_id'];
+    protected $fillable = [
+        'project_id',
+        'structure_section_id',
+        'title',
+        'summary',
+        'is_custom_summary',
+        'cover_image_path',
+        'order_index',
+        'status',
+    ];
 
     public function project(): BelongsTo
     {

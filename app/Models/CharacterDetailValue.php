@@ -15,12 +15,12 @@ class CharacterDetailValue extends Model
 
     protected $fillable = ['character_id', 'character_detail_field_id', 'value'];
 
-    public function character()
+    public function character(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Character::class, 'character_id', 'character_id');
     }
 
-    public function field()
+    public function field(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(CharacterDetailField::class, 'character_detail_field_id', 'character_detail_field_id');
     }

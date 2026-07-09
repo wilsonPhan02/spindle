@@ -15,12 +15,12 @@ class RelationshipType extends Model
 
     protected $fillable = ['project_id', 'name', 'text_color', 'bg_color'];
 
-    public function project()
+    public function project(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Project::class, 'project_id', 'project_id');
     }
 
-    public function relationships()
+    public function relationships(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(Relationship::class, 'relationship_type_id', 'relationship_type_id');
     }

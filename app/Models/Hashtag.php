@@ -15,7 +15,7 @@ class Hashtag extends Model
 
     protected $fillable = ['name', 'slug'];
 
-    public function characters()
+    public function characters(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
         return $this->belongsToMany(Character::class, 'character_hashtag', 'hashtag_id', 'character_id');
     }

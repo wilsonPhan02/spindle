@@ -18,32 +18,32 @@ class Character extends Model
         'image_path', 'canvas_top', 'canvas_left',
     ];
 
-    public function project()
+    public function project(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Project::class, 'project_id', 'project_id');
     }
 
-    public function hashtags()
+    public function hashtags(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
         return $this->belongsToMany(Hashtag::class, 'character_hashtag', 'character_id', 'hashtag_id');
     }
 
-    public function outgoingRelationships()
+    public function outgoingRelationships(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(Relationship::class, 'from_id', 'character_id');
     }
 
-    public function incomingRelationships()
+    public function incomingRelationships(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(Relationship::class, 'to_id', 'character_id');
     }
 
-    public function detailValues()
+    public function detailValues(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(CharacterDetailValue::class, 'character_id', 'character_id');
     }
 
-    public function chapters()
+    public function chapters(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
         return $this->belongsToMany(ChapterCard::class, 'chapter_character', 'character_id', 'chapter_card_id');
     }

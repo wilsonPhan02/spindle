@@ -13,10 +13,7 @@
 ])
 
 @php
-    $customColorPath = resource_path('views/components/custom_color.blade.php');
-    if (!file_exists($customColorPath)) {
-        $customColorPath = resource_path('views/components/custom-color.blade.php');
-    }
+    $customColorPath = resource_path('views/components/custom-color.blade.php');
     $customColorsList = file_exists($customColorPath) ? json_decode(file_get_contents($customColorPath), true) : [];
     $presetTextColors = !empty($customColorsList) ? array_merge(['#000000'], array_column($customColorsList, 'textColor')) : ['#000000', '#43A047', '#1E88E5', '#D81B60', '#8E24AA', '#FB8C00', '#E53935', '#00897B', '#F9A825', '#3949AB', '#00ACC1', '#C0CA33', '#F4511E'];
     $presetBgColors = !empty($customColorsList) ? array_merge(['transparent'], array_column($customColorsList, 'bgColor')) : ['transparent', '#C8E6C9', '#BBDEFB', '#F8BBD0', '#E1BEE7', '#FFE0B2', '#FFCDD2', '#B2DFDB', '#FFF9C4', '#C5CAE9', '#B2EBF2', '#F0F4C3', '#FFCCBC'];
