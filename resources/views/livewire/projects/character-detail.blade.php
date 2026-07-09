@@ -14,9 +14,10 @@ use Livewire\Attributes\On;
 use Livewire\Attributes\Renderless;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use App\Traits\HandlesFileUpload;
 
 new #[Layout('layouts.app')] class extends Component {
-    use WithFileUploads;
+    use WithFileUploads, HandlesFileUpload;
 
     public Project $project;
     public Character $character;
@@ -193,18 +194,14 @@ new #[Layout('layouts.app')] class extends Component {
     public function updatedNewImage() {
         $this->validate(['newImage' => 'image|max:5120']);
 
-        if ($this->character->image_path) {
-            Storage::disk('public')->delete($this->character->image_path);
-        }
-
-        $path = $this->newImage->store('characters', 'public');
+        $path = $this->replaceImage($this->newImage, $this->character->image_path, 'characters');
         $this->character->update(['image_path' => $path]);
         $this->newImage = null;
     }
 
     public function removeImage() {
         if ($this->character->image_path) {
-            Storage::disk('public')->delete($this->character->image_path);
+            $this->deleteImage($this->character->image_path);
             $this->character->update(['image_path' => null]);
         }
     }

@@ -2,45 +2,49 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Project extends Model
 {
     use HasUuids;
 
     protected $primaryKey = 'project_id';
+
     public $incrementing = false;
+
     protected $keyType = 'string';
 
     protected $fillable = [
         'user_id', 'template_id', 'section_id',
         'title', 'synopsis', 'cover_image_path',
-        'is_pinned', 'archived_at', 'icon_type', 
+        'is_pinned', 'archived_at', 'icon_type',
         'icon',
     ];
 
-    public function section(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function section(): BelongsTo
     {
         return $this->belongsTo(Section::class, 'section_id', 'section_id');
     }
 
-    public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id', 'user_id');
     }
-    
-    public function categories(): \Illuminate\Database\Eloquent\Relations\HasMany
+
+    public function categories(): HasMany
     {
         return $this->hasMany(ProjectCategory::class, 'project_id', 'project_id');
     }
 
-    public function template(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function template(): BelongsTo
     {
         return $this->belongsTo(Template::class, 'template_id', 'template_id');
     }
 
-    public function chapterCards(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function chapterCards(): HasMany
     {
         return $this->hasMany(ChapterCard::class, 'project_id', 'project_id');
     }
@@ -52,17 +56,17 @@ class Project extends Model
         ];
     }
 
-    public function characters(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function characters(): HasMany
     {
         return $this->hasMany(Character::class, 'project_id', 'project_id');
     }
 
-    public function relationshipTypes(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function relationshipTypes(): HasMany
     {
         return $this->hasMany(RelationshipType::class, 'project_id', 'project_id');
     }
 
-    public function characterDetailGroups(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function characterDetailGroups(): HasMany
     {
         return $this->hasMany(CharacterDetailGroup::class, 'project_id', 'project_id');
     }

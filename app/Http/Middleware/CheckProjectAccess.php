@@ -2,17 +2,18 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Project;
 use Closure;
 use Illuminate\Http\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Facades\Auth;
+use Symfony\Component\HttpFoundation\Response;
 
 class CheckProjectAccess
 {
     /**
      * Handle an incoming request.
      *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
+     * @param  Closure(Request): (Response)  $next
      */
     public function handle(Request $request, Closure $next): Response
     {
@@ -20,7 +21,7 @@ class CheckProjectAccess
         $project = $request->route('project');
 
         if (is_string($project)) {
-            $project = \App\Models\Project::find($project);
+            $project = Project::find($project);
         }
 
         if ($project) {

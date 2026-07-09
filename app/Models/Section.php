@@ -2,8 +2,10 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Section extends Model
 {
@@ -13,6 +15,7 @@ class Section extends Model
     protected $primaryKey = 'section_id';
 
     public $incrementing = false;
+
     protected $keyType = 'string';
 
     // Adjust fillable fields with the database columns
@@ -20,15 +23,15 @@ class Section extends Model
         'section_id',
         'user_id',
         'title',
-        'archived_at'
+        'archived_at',
     ];
 
-    public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id', 'user_id');
     }
 
-    public function projects(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function projects(): HasMany
     {
         return $this->hasMany(Project::class, 'section_id', 'section_id');
     }

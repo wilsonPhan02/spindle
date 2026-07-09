@@ -2,21 +2,24 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
-use Illuminate\Database\Eloquent\Concerns\HasUuids; // Wajib import ini
 use Illuminate\Auth\Notifications\ResetPassword;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany; // Wajib import ini
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable, HasUuids;
+    use HasFactory, HasUuids, Notifiable;
 
     protected $primaryKey = 'user_id';
 
     // Because we use UUID, we must tell Eloquent that it's not auto-incrementing
     public $incrementing = false;
+
     protected $keyType = 'string';
 
     // Fields that are mass assignable
@@ -32,7 +35,7 @@ class User extends Authenticatable
     ];
 
     // One-to-one relationship with Profile
-    public function profile(): \Illuminate\Database\Eloquent\Relations\HasOne
+    public function profile(): HasOne
     {
         return $this->hasOne(Profile::class, 'user_id', 'user_id');
     }
@@ -61,12 +64,12 @@ class User extends Authenticatable
         $this->notify(new ResetPassword($token));
     }
 
-    public function sections(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function sections(): HasMany
     {
         return $this->hasMany(Section::class, 'user_id', 'user_id');
     }
 
-    public function projects(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function projects(): HasMany
     {
         return $this->hasMany(Project::class, 'user_id', 'user_id');
     }

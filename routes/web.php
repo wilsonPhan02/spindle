@@ -1,13 +1,13 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 
 Route::get('/', function () {
     return view('welcome');
 });
-
 
 Volt::route('/forgot-password', 'auth.forgot-password')->name('password.request');
 Volt::route('/reset-password/{token}', 'auth.reset-password')->name('password.reset');
@@ -28,7 +28,7 @@ Route::middleware('auth')->group(function () {
     Volt::route('/onboarding', 'auth.onboarding')->name('onboarding');
     // Rute untuk ke Settings Page
     Volt::route('/settings', 'settings.index')->name('settings');
-    $missingProject = function (\Illuminate\Http\Request $request) {
+    $missingProject = function (Request $request) {
         return redirect()->route('dashboard');
     };
 
@@ -39,7 +39,7 @@ Route::middleware('auth')->group(function () {
         Volt::route('/projects/{project}/characters', 'projects.characters')->name('projects.characters')->missing($missingProject);
         // Rute untuk halaman characters detail project
         Volt::route('/projects/{project}/characters/{character}', 'projects.character-detail')->name('projects.character.show')->missing($missingProject);
-        //Rute untuk ke structure project
+        // Rute untuk ke structure project
         Volt::route('/projects/{project}/structure', 'projects.structure')->name('projects.structure')->missing($missingProject);
         // Rute untuk halaman notes project
         Volt::route('/projects/{project}/notes', 'projects.notes')->name('projects.notes')->missing($missingProject);
@@ -48,7 +48,7 @@ Route::middleware('auth')->group(function () {
     });
     // Rute untuk halaman archive
     Volt::route('/archive', 'archive.index')->name('archive');
-    
+
 });
 
 // Fallback route to ensure 404 pages have access to the web session

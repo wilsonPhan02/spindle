@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::table('projects', function (Blueprint $table) {
             // Menambahkan kolom icon_type dengan nilai default 'default'
             $table->string('icon_type')->default('default')->after('cover_image_path');
-            
+
             // Menambahkan kolom icon yang nullable (kosong jika icon_type = default)
             $table->string('icon')->nullable()->after('icon_type');
         });

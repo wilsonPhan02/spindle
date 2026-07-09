@@ -12,5 +12,5 @@ return [
     ['textColor' => '#3949AB', 'bgColor' => '#C5CAE9'],
     ['textColor' => '#00ACC1', 'bgColor' => '#B2EBF2'],
     ['textColor' => '#C0CA33', 'bgColor' => '#F0F4C3'],
-    ['textColor' => '#F4511E', 'bgColor' => '#FFCCBC']
+    ['textColor' => '#F4511E', 'bgColor' => '#FFCCBC'],
 ];

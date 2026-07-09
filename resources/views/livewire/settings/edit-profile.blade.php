@@ -4,9 +4,10 @@ use Livewire\Volt\Component;
 use Livewire\WithFileUploads;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\On;
+use App\Traits\HandlesFileUpload;
 
 new class extends Component {
-    use WithFileUploads;
+    use WithFileUploads, HandlesFileUpload;
 
     public $username;
     public $occupation;
@@ -61,13 +62,12 @@ new class extends Component {
         ];
 
         if ($this->is_photo_removed && !$this->new_photo) {
-            if ($profile->avatar_url) Storage::disk('public')->delete($profile->avatar_url);
+            $this->deleteImage($profile->avatar_url);
             $updateData['avatar_url'] = null;
         }
 
         if ($this->new_photo) {
-            if ($profile->avatar_url) Storage::disk('public')->delete($profile->avatar_url);
-            $path = $this->new_photo->store('avatars', 'public');
+            $path = $this->replaceImage($this->new_photo, $profile->avatar_url, 'avatars');
             $updateData['avatar_url'] = $path; 
         }
 

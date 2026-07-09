@@ -9,15 +9,16 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up() {
+    public function up()
+    {
         Schema::create('chapter_tag', function (Blueprint $table) {
             $table->id();
-            
+
             // Sesuaikan nama kolom referensi di sini:
             $table->foreignUuid('chapter_card_id')
                 ->constrained('chapter_cards', 'chapter_card_id') // <--- TAMBAHKAN NAMA TABEL DAN KOLOM PRIMARY KEY-NYA
                 ->onDelete('cascade');
-                
+
             $table->foreignId('tag_id')
                 ->constrained('tags') // Asumsi tabel tags primary key-nya 'id'
                 ->onDelete('cascade');

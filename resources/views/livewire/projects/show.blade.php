@@ -8,9 +8,10 @@ use Livewire\WithFileUploads;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Livewire\Attributes\On;
+use App\Traits\HandlesFileUpload;
 
 new #[Layout('layouts.app')] class extends Component {
-    use WithFileUploads;
+    use WithFileUploads, HandlesFileUpload;
 
     public Project $project;
 
@@ -109,19 +110,15 @@ new #[Layout('layouts.app')] class extends Component {
             'cover_image.max' => 'The selected image is too large. The maximum allowed file size is 5MB.',
             'cover_image.image' => 'The selected file type is not supported. Please upload an image.',
         ]);
-        if ($this->project->cover_image_path && Storage::disk('public')->exists($this->project->cover_image_path)) {
-            Storage::disk('public')->delete($this->project->cover_image_path);
-        }
-        $path = $this->cover_image->store('covers', 'public');
+        
+        $path = $this->replaceImage($this->cover_image, $this->project->cover_image_path, 'covers');
         $this->project->update(['cover_image_path' => $path]);
         $this->cover_image = null;
         $this->project->refresh();
     }
 
     public function deleteCover() {
-        if ($this->project->cover_image_path && Storage::disk('public')->exists($this->project->cover_image_path)) {
-            Storage::disk('public')->delete($this->project->cover_image_path);
-        }
+        $this->deleteImage($this->project->cover_image_path);
         $this->project->update(['cover_image_path' => null]);
         $this->project->refresh();
     }
@@ -157,7 +154,7 @@ new #[Layout('layouts.app')] class extends Component {
         $this->icon_emoji = $emoji;
         
         if ($this->project->icon_type === 'image' && $this->project->icon) {
-            Storage::disk('public')->delete($this->project->icon);
+            $this->deleteImage($this->project->icon);
         }
         
         $this->project->update([
@@ -179,11 +176,8 @@ new #[Layout('layouts.app')] class extends Component {
         ]);
 
         if ($this->icon_image) {
-            if ($this->project->icon_type === 'image' && $this->project->icon) {
-                Storage::disk('public')->delete($this->project->icon);
-            }
-            
-            $path = $this->icon_image->store('project-icons', 'public');
+            $oldPath = ($this->project->icon_type === 'image') ? $this->project->icon : null;
+            $path = $this->replaceImage($this->icon_image, $oldPath, 'project-icons');
             
             $this->project->update([
                 'icon_type' => 'image',
@@ -202,7 +196,7 @@ new #[Layout('layouts.app')] class extends Component {
     public function removeIcon()
     {
         if ($this->project->icon_type === 'image' && $this->project->icon) {
-            Storage::disk('public')->delete($this->project->icon);
+            $this->deleteImage($this->project->icon);
         }
         
         $this->icon_type = 'default';
@@ -277,24 +271,7 @@ new #[Layout('layouts.app')] class extends Component {
                 class="relative w-full lg:w-[320px] xl:w-[360px] shrink-0 aspect-[1/1.6] z-10"
             >
             
-                @if($project->cover_image_path)
-                    <!-- Image / Front Cover -->
-                    <div class="absolute top-0 left-0 w-[calc(100%-16px)] h-full z-20 rounded-l-md rounded-r-xl overflow-hidden shadow-md bg-gradient-to-br from-[#C1AE8E] to-[#977E5C] p-[10px]">
-                        <div class="w-full h-full overflow-hidden rounded-sm bg-brand-100">
-                            <img src="{{ Storage::url($project->cover_image_path) }}" class="w-full h-full object-cover" />
-                        </div>
-                    </div>
-                    <!-- Book pages on the right -->
-                    <div class="absolute top-3.5 bottom-3.5 right-2 w-4 bg-gradient-to-r from-[#E8E3D9] to-[#D5C6A9] border-y border-r border-[#C4B7A3] rounded-r-sm z-10 shadow-inner"></div>
-                    <!-- Back cover sticking out -->
-                    <div class="absolute inset-y-0 right-0 w-8 bg-[#8C7558] rounded-r-xl z-0 shadow-xl border-l border-black/20"></div>
-                @else
-                    <x-default-project class="absolute inset-y-0 left-0 right-4 w-[calc(100%-16px)] h-full text-[#B69F78] rounded-l-md rounded-r-xl shadow-md z-20 border-r border-black/10" />
-                    <!-- Book pages on the right -->
-                    <div class="absolute top-3.5 bottom-3.5 right-2 w-4 bg-gradient-to-r from-[#E8E3D9] to-[#D5C6A9] border-y border-r border-[#C4B7A3] rounded-r-sm z-10 shadow-inner"></div>
-                    <!-- Back cover sticking out -->
-                    <div class="absolute inset-y-0 right-0 w-8 bg-[#8C7558] rounded-r-xl z-0 shadow-xl border-l border-black/20"></div>
-                @endif
+                <x-book-cover :imagePath="$project->cover_image_path" class="w-full h-full" />
 
                 {{-- Inline Cropper UI for Cover --}}
                 <div x-show="showCropper" style="display: none;" class="absolute inset-0 z-40 bg-brand-50 rounded-l-md rounded-r-xl border border-brand-200 overflow-hidden flex flex-col">

@@ -9,9 +9,10 @@ use App\Models\Manuscript;
 use App\Models\Character;
 use App\Models\Tag;
 use Illuminate\Support\Facades\Storage;
+use App\Traits\HandlesFileUpload;
 
 new #[Layout('layouts.app')] class extends Component {
-    use WithFileUploads;
+    use WithFileUploads, HandlesFileUpload;
 
     public Project $project;
     public ChapterCard $chapterCard;
@@ -183,11 +184,7 @@ new #[Layout('layouts.app')] class extends Component {
     {
         if (!$this->activeDraftId) return;
 
-        $text = strip_tags($this->editorBody);
-        $text = html_entity_decode($text, ENT_QUOTES | ENT_HTML5, 'UTF-8');
-        $text = str_replace(["\xC2\xA0", '&nbsp;', '&#160;', '&amp;nbsp;'], ' ', $text);
-        $text = preg_replace('/\s+/u', ' ', trim($text));
-        $wordCount = $text === '' ? 0 : count(preg_split('/\s+/u', $text));
+        $wordCount = \App\Helpers\TextHelper::wordCount($this->editorBody);
 
         Manuscript::where('manuscript_id', $this->activeDraftId)
             ->where('chapter_card_id', $this->chapterCard->chapter_card_id)
@@ -241,10 +238,7 @@ new #[Layout('layouts.app')] class extends Component {
         ]);
 
         if ($this->coverUpload) {
-            if ($this->chapterCard->cover_image_path) {
-                Storage::disk('public')->delete($this->chapterCard->cover_image_path);
-            }
-            $path = $this->coverUpload->store('chapter_covers', 'public');
+            $path = $this->replaceImage($this->coverUpload, $this->chapterCard->cover_image_path, 'chapter_covers');
             $this->chapterCard->update(['cover_image_path' => $path]);
             $this->coverUpload = null;
             $this->chapterCard->refresh();
@@ -254,11 +248,11 @@ new #[Layout('layouts.app')] class extends Component {
     public function detachCoverImage(): void
     {
         if ($this->chapterCard->cover_image_path) {
-            Storage::disk('public')->delete($this->chapterCard->cover_image_path);
+            $this->deleteImage($this->chapterCard->cover_image_path);
             $this->chapterCard->update(['cover_image_path' => null]);
             $this->chapterCard->refresh();
         } elseif ($this->project->cover_image_path) {
-            Storage::disk('public')->delete($this->project->cover_image_path);
+            $this->deleteImage($this->project->cover_image_path);
             $this->project->update(['cover_image_path' => null]);
             $this->project->refresh();
         }
@@ -339,36 +333,11 @@ new #[Layout('layouts.app')] class extends Component {
 
         $autoSummary = null;
         if ($firstDraft && !empty($firstDraft->content)) {
-            $autoSummary = $this->extractTwoSentences($firstDraft->content);
+            $autoSummary = \App\Helpers\TextHelper::extractSentences($firstDraft->content);
         }
 
         $this->chapterCard->update(['summary' => $autoSummary]);
         $this->chapterCard->refresh();
-    }
-
-    protected function extractTwoSentences(?string $html): ?string
-    {
-        if (empty($html)) return null;
-        $html = preg_replace('/<(br|\/p|\/div|\/h[1-6]|\/li|\/tr|\/blockquote|\/pre)[^>]*>/i', "\n", $html);
-        $text = html_entity_decode(strip_tags($html), ENT_QUOTES | ENT_HTML5, 'UTF-8');
-        $text = str_replace(["\xC2\xA0", '&nbsp;', '&#160;', '&amp;nbsp;'], ' ', $text);
-        $text = preg_replace('/[ \t]+/u', ' ', trim($text));
-
-        if ($text === '') return null;
-
-        if (preg_match_all('/[^.!?\r\n]+[.!?]?/', $text, $matches) && !empty($matches[0])) {
-            $sentences = [];
-            foreach ($matches[0] as $match) {
-                $cleaned = trim($match);
-                if ($cleaned !== '') {
-                    $sentences[] = $cleaned;
-                }
-            }
-            if (!empty($sentences)) {
-                return implode(' ', array_slice($sentences, 0, 2));
-            }
-        }
-        return $text;
     }
 
     public function with(): array
