@@ -29,6 +29,8 @@ Route::middleware('guest')->group(function () {
 // AREA AUTH: Hanya bisa diakses oleh orang yang SUDAH LOGIN
 Route::middleware('auth')->group(function () {
 
+    Volt::route('/verify-otp', 'auth.otp-verification')->name('verification.notice');
+    
     // Rute Dashboard setelah sukses register/login
     Volt::route('/dashboard', 'dashboard.index')->name('dashboard');
     // Rute Onboarding setelah register
