@@ -5,9 +5,12 @@ use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use App\Models\User;
 
-new #[Layout('layouts.guest')] #[Title('Profile Setup - Spindle')] class extends Component
+new #[Layout('layouts.guest')] #[Title('Complete Your Profile - Spindle')] class extends Component
 {
     public $username = '';
+    public $occupation = '';
+    public $gender = '';
+    public $birthdate = '';
     public $isSuccess = false;
 
     public function mount() {
@@ -24,13 +27,17 @@ new #[Layout('layouts.guest')] #[Title('Profile Setup - Spindle')] class extends
     {
         $this->validate([
             'username' => ['required', 'string', 'max:255', 'unique:profiles,username,' . auth()->user()->profile->profile_id . ',profile_id'],
-        ], [
-            'username.required' => 'Please enter your preferred name.'
+            'occupation' => ['nullable', 'string', 'max:255'],
+            'gender' => ['nullable', 'in:male,female'],
+            'birthdate' => ['nullable', 'date'],
         ]);
 
         $profile = auth()->user()->profile;
         $profile->update([
             'username' => $this->username,
+            'occupation' => $this->occupation ?: null,
+            'gender' => $this->gender ?: null,
+            'birthdate' => $this->birthdate ?: null,
         ]);
 
         $this->isSuccess = true;
@@ -39,44 +46,59 @@ new #[Layout('layouts.guest')] #[Title('Profile Setup - Spindle')] class extends
 };
 ?>
 
-<div class="relative flex flex-col items-center justify-center min-h-screen w-full bg-[#f3ede6]">
+<div class="relative flex flex-col items-center justify-center min-h-screen w-full">
     
-    <div class="absolute inset-0 z-0 pointer-events-none opacity-70">
+    <div class="absolute inset-0 z-0 pointer-events-none">
         @include('components.auth-bg') 
     </div>
 
     <div class="relative z-10 flex flex-col items-center justify-center w-full px-4">
           
-        <div class="mb-8">
-            <x-logo class="h-10 w-auto text-black" />
+        <div class="mb-5 text-4xl font-bold font-merriweather tracking-tight text-text-80">
+            <x-logo class="h-10 w-auto text-text-80" />
         </div>
 
-        <div class="w-full max-w-[420px] p-10 bg-[#fdfbf8] border border-[#e8dfd5] rounded-xl shadow-sm">
+        <div class="w-full max-w-md p-6 bg-card-bg border border-transparent rounded-xl shadow-md">
             
-            <h1 class="mb-10 text-[1.75rem] font-merriweather text-center text-[#1a1a1a]">Profile Setup</h1>
-            
-            <div class="flex justify-center mb-8">
-                <!-- Avatar placeholder -->
-                <div class="w-32 h-32 rounded-full border border-[#e8dfd5] bg-[#ebdccc] flex items-end justify-center overflow-hidden">
-                    <svg class="w-32 h-32 text-[#8c5c3c] translate-y-5" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v3h16v-3c0-2.66-5.33-4-8-4z"/>
-                    </svg>
-                </div>
-            </div>
+            <h1 class="mb-2 text-2xl font-merriweather text-center text-text-80">Complete Profile</h1>
+            <p class="mb-6 text-app-body-medium text-center text-subtext-90">Let's set up your creative identity.</p>
 
-            <p class="mb-5 text-center text-[15px] font-medium text-[#4a4a4a]">What should we call you?</p>
-
-            <form wire:submit="save" novalidate class="space-y-6">
+            <form wire:submit="save" novalidate class="space-y-4">
                 
                 <div>
-                    <input type="text" wire:model="username" placeholder="Enter your preferred name" 
-                        class="w-full px-4 py-3 bg-[#f3ede6] border border-[#e8dfd5] rounded-md focus:ring-1 focus:ring-[#8c5c3c] focus:border-[#8c5c3c] outline-none transition-all placeholder-[#a89f91] text-[15px] text-[#1a1a1a]">
-                    @error('username') <span class="text-xs text-red-500 mt-2 block text-center">{{ $message }}</span> @enderror
+                    <label class="block mb-1 text-app-body-medium text-text-80">Username <span class="text-danger-100">*</span></label>
+                    <input type="text" wire:model="username" placeholder="Enter your username" 
+                        class="w-full px-4 py-2 bg-white border border-subtext-70 rounded-md focus:ring-2 focus:ring-secondary-200 outline-none transition-all placeholder-subtext-90 text-app-body-medium text-text-80">
+                    @error('username') <span class="text-app-body-small text-danger-100 mt-1 block">{{ $message }}</span> @enderror
+                </div>
+
+                <div>
+                    <label class="block mb-1 text-app-body-medium text-text-80">Occupation (Optional)</label>
+                    <input type="text" wire:model="occupation" placeholder="e.g. Writer, Student" 
+                        class="w-full px-4 py-2 bg-white border border-subtext-70 rounded-md focus:ring-2 focus:ring-secondary-200 outline-none transition-all placeholder-subtext-90 text-app-body-medium text-text-80">
+                    @error('occupation') <span class="text-app-body-small text-danger-100 mt-1 block">{{ $message }}</span> @enderror
+                </div>
+
+                <div>
+                    <label class="block mb-1 text-app-body-medium text-text-80">Gender (Optional)</label>
+                    <select wire:model="gender" class="w-full px-4 py-2 bg-white border border-subtext-70 rounded-md focus:ring-2 focus:ring-secondary-200 outline-none transition-all text-app-body-medium text-text-80">
+                        <option value="">Select Gender</option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                    </select>
+                    @error('gender') <span class="text-app-body-small text-danger-100 mt-1 block">{{ $message }}</span> @enderror
+                </div>
+
+                <div class="mb-5">
+                    <label class="block mb-1 text-app-body-medium text-text-80">Birthdate (Optional)</label>
+                    <input type="date" wire:model="birthdate" 
+                        class="w-full px-4 py-2 bg-white border border-subtext-70 rounded-md focus:ring-2 focus:ring-secondary-200 outline-none transition-all text-app-body-medium text-text-80">
+                    @error('birthdate') <span class="text-app-body-small text-danger-100 mt-1 block">{{ $message }}</span> @enderror
                 </div>
 
                 <button type="submit" 
-                    class="w-full py-3.5 text-[15px] font-medium text-white transition-colors bg-[#78563c] rounded-md hover:bg-[#684a32] focus:outline-none">
-                    Next
+                    class="w-full py-2.5 mt-2 text-app-feature text-bg-main transition-colors bg-secondary-200 rounded-md hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary-200 focus:ring-offset-card-bg">
+                    Continue to Dashboard
                 </button>
                 
             </form>
@@ -85,12 +107,12 @@ new #[Layout('layouts.guest')] #[Title('Profile Setup - Spindle')] class extends
 
     @if($isSuccess)
     <div>
-        <div class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#f3ede6]/80 backdrop-blur-sm transition-all duration-300">
-            <svg class="animate-spin mb-4 h-12 w-12 text-[#78563c]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <div class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-bg-main/40 backdrop-blur-md transition-all duration-300">
+            <svg class="animate-spin mb-4 h-12 w-12 text-secondary-200" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
             </svg>
-            <p class="text-xl font-merriweather font-semibold text-[#1a1a1a] animate-pulse">Setting up your profile...</p>
+            <p class="text-xl font-merriweather font-semibold text-text-80 animate-pulse">Arriving at creative realm...</p>
         </div>
     </div>
     @endif

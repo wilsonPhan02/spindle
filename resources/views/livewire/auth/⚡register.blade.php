@@ -7,10 +7,6 @@ use Livewire\Attributes\Title;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
-use App\Models\OtpCode;
-use App\Mail\OtpMail;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Log;
 
 new #[Layout('layouts.guest')] #[Title('Sign Up - Spindle')] class extends Component
 {
@@ -51,24 +47,11 @@ new #[Layout('layouts.guest')] #[Title('Sign Up - Spindle')] class extends Compo
             'password' => $this->password,
         ]);
 
-        // Generate OTP
-        $otp = sprintf("%06d", mt_rand(1, 999999));
-        
-        OtpCode::create([
-            'user_id' => $user->user_id,
-            'otp_code' => $otp,
-            'expires_at' => now()->addMinutes(15),
-        ]);
-
-        // Send Email & Log
-        Log::info('Kode OTP untuk ' . $user->email . ' adalah: ' . $otp);
-        Mail::to($user->email)->send(new OtpMail($otp));
-
         // 3. Login & Redirect
         Auth::login($user);
         
         $this->isSuccess = true;
-        $this->js("setTimeout(() => window.location.href = '/verify-otp', 1200)");
+        $this->js("setTimeout(() => window.location.href = '/onboarding', 1200)");
     }
 };
 ?>
