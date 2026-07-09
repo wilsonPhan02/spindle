@@ -22,7 +22,6 @@ class User extends Authenticatable
     // field yang boleh diisi secara massal
     protected $fillable = [
         'email',
-        'email_verified_at',
         'password',
     ];
 
@@ -41,7 +40,6 @@ class User extends Authenticatable
     protected function casts(): array
     {
         return [
-            'email_verified_at' => 'datetime',
             'password' => 'hashed', // biar password otomatis dihash pas disimpan
         ];
     }
@@ -68,10 +66,6 @@ class User extends Authenticatable
 
     public function projects() {
         return $this->hasMany(Project::class, 'user_id', 'user_id');
-    }
-
-    public function otpCode() {
-        return $this->hasOne(OtpCode::class, 'user_id', 'user_id');
     }
 
     protected static function booted()
