@@ -122,19 +122,7 @@ new class extends Component {
                  resizeObserver.observe($refs.container);
              "
         >
-            <style>
-                .welcome-marquee {
-                    animation: welcome-slide var(--duration) linear infinite;
-                }
-                @keyframes welcome-slide {
-                    0% { transform: translateX(0); }
-                    85%, 100% { transform: translateX(var(--distance)); }
-                }
-                .mask-image-fade {
-                    -webkit-mask-image: linear-gradient(to right, transparent, black 24px, black calc(100% - 24px), transparent);
-                    mask-image: linear-gradient(to right, transparent, black 24px, black calc(100% - 24px), transparent);
-                }
-            </style>
+
             
             <div x-ref="container" class="w-full overflow-hidden flex" :class="overflows ? 'justify-start mask-image-fade' : 'justify-center'">
                 <div x-ref="text" 

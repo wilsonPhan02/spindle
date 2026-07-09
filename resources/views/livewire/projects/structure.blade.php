@@ -22,13 +22,7 @@ new #[Layout('layouts.app')] class extends Component {
 }; ?>
 
 <div>
-    <style>
-        .bg-dot-pattern {
-            background-color: var(--color-brand-10); 
-            background-image: radial-gradient(var(--color-brand-100) 1.5px, transparent 1.5px);
-            background-size: 24px 24px;
-        }
-    </style>
+
 
     <div class="p-6 lg:p-10 max-w-7xl mx-auto">
         <x-breadcrumb :items="[
