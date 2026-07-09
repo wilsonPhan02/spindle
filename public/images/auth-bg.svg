@@ -1,6 +1,5 @@
 <svg class="absolute inset-0 w-full h-full" preserveAspectRatio="xMaxYMid slice" viewBox="0 0 1440 1024" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
 <rect opacity="0.14" x="-79" y="-70" width="1565" height="1565" fill="url(#pattern0_2155_8343)"/>
-</g>
 <defs>
 <pattern id="pattern0_2155_8343" patternContentUnits="objectBoundingBox" width="1" height="1">
 <use xlink:href="#image0_2155_8343" transform="translate(-0.000272192 0.0754807) scale(0.0013587)"/>
