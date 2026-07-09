@@ -92,6 +92,14 @@ document.addEventListener('alpine:init', () => {
                 ? rel.curveOffset
                 : this.getGroupOffsetIndex(rel) * 26;
         },
+        /**
+         * Calculates the geometric properties of the relationship line connecting two characters.
+         * Accounts for character radius and applies a quadratic bezier curve to avoid overlapping 
+         * lines when multiple relationships exist between the same two characters.
+         * 
+         * @param {Object} rel - The relationship object
+         * @returns {Object} Line coordinates, control points, and label angle
+         */
         relationLine(rel) {
             const from = this.getCenter(rel.from);
             const to = this.getCenter(rel.to);
@@ -127,6 +135,13 @@ document.addEventListener('alpine:init', () => {
 
             return { x1, y1, x2, y2, labelAngle, controlX, controlY, midX, midY };
         },
+        /**
+         * Generates SVG path markup for all relationships on the whiteboard.
+         * Creates two paths for each edge: an invisible wider hit-area for easier clicking,
+         * and a visible thinner line styled according to the relationship type.
+         * 
+         * @returns {string} Combined HTML string of SVG path elements
+         */
         edgePathsMarkup() {
             return this.relationships.map(rel => {
                 const line = this.relationLine(rel);

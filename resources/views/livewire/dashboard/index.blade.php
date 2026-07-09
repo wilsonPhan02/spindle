@@ -102,6 +102,7 @@ new class extends Component {
                  checkOverflow() {
                      // Check after fonts render
                      setTimeout(() => {
+                         if (!this.$refs.container || !this.$refs.text) return;
                          const container = this.$refs.container.clientWidth;
                          const text = this.$refs.text.scrollWidth;
                          if (text > container) {
