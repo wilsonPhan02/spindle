@@ -2,45 +2,49 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
-use Illuminate\Database\Eloquent\Concerns\HasUuids; // Wajib import ini
 use Illuminate\Auth\Notifications\ResetPassword;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany; // Wajib import ini
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable, HasUuids;
+    use HasFactory, HasUuids, Notifiable;
 
     protected $primaryKey = 'user_id';
 
-    // karena pakai UUID, kita harus ngasih tau kalau kita ga auto increment
+    // Because we use UUID, we must tell Eloquent that it's not auto-incrementing
     public $incrementing = false;
+
     protected $keyType = 'string';
 
-    // field yang boleh diisi secara massal
+    // Fields that are mass assignable
     protected $fillable = [
         'email',
         'password',
     ];
 
-    // field yang harus disembunyikan ketika data diubah jadi array/json
+    // Fields to be hidden when serialized to array/json
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    // function untuk relasi one-to-one dengan Profile
-    public function profile() {
+    // One-to-one relationship with Profile
+    public function profile(): HasOne
+    {
         return $this->hasOne(Profile::class, 'user_id', 'user_id');
     }
 
-    // typecast ke tipe data tertentu
+    // Typecast to specific data types
     protected function casts(): array
     {
         return [
-            'password' => 'hashed', // biar password otomatis dihash pas disimpan
+            'password' => 'hashed', // Automatically hash password on save
         ];
     }
 
@@ -60,21 +64,23 @@ class User extends Authenticatable
         $this->notify(new ResetPassword($token));
     }
 
-    public function sections() {
+    public function sections(): HasMany
+    {
         return $this->hasMany(Section::class, 'user_id', 'user_id');
     }
 
-    public function projects() {
+    public function projects(): HasMany
+    {
         return $this->hasMany(Project::class, 'user_id', 'user_id');
     }
 
-    protected static function booted()
+    protected static function booted(): void
     {
         static::created(function ($user) {
-            // Langsung buatin data di tabel profiles
+            // Automatically create profile data when user is created
             $user->profile()->create([
                 'username' => null,
-                // kalau ada field lain kayak avatar_url, biarin default null dulu
+                // leave other fields like avatar_url default to null for now
             ]);
         });
     }

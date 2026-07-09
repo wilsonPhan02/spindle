@@ -1,8 +1,17 @@
 <?php
 
+use App\Http\Middleware\CheckProjectAccess;
+use Illuminate\Auth\AuthenticationException;
+use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -12,25 +21,25 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
-            'project.access' => \App\Http\Middleware\CheckProjectAccess::class,
+            'project.access' => CheckProjectAccess::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->reportable(function (Throwable $e) {
-            $message = "CRITICAL ERROR ALERT in " . config('app.name') . "\n\n" .
-                       "Message: " . $e->getMessage() . "\n" .
-                       "File: " . $e->getFile() . " (Line: " . $e->getLine() . ")\n" .
-                       "URL: " . request()->fullUrl() . "\n\n" .
-                       "Time: " . now()->toDateTimeString();
+            $message = 'CRITICAL ERROR ALERT in '.config('app.name')."\n\n".
+                       'Message: '.$e->getMessage()."\n".
+                       'File: '.$e->getFile().' (Line: '.$e->getLine().")\n".
+                       'URL: '.request()->fullUrl()."\n\n".
+                       'Time: '.now()->toDateTimeString();
 
             // 1. Send alert via Webhook if configured
-            $webhookUrl = env('ERROR_WEBHOOK_URL');
+            $webhookUrl = config('app.error_webhook_url');
             if ($webhookUrl) {
                 try {
-                    \Illuminate\Support\Facades\Http::post($webhookUrl, [
-                        'content' => "🚨 **Critical Error!** 🚨\n```text\n" . $message . "\n```"
+                    Http::post($webhookUrl, [
+                        'content' => "🚨 **Critical Error!** 🚨\n```text\n".$message."\n```",
                     ]);
-                } catch (\Throwable $t) {
+                } catch (Throwable $t) {
                     // Suppress webhook errors
                 }
             }
@@ -38,34 +47,34 @@ return Application::configure(basePath: dirname(__DIR__))
             // 2. Send alert via Email
             try {
                 // You can change this via .env later using ERROR_EMAIL_ADDRESS
-                $email = env('ERROR_EMAIL_ADDRESS', 'bingle.spindle@gmail.com');
-                \Illuminate\Support\Facades\Mail::raw($message, function ($mail) use ($email) {
+                $email = config('app.error_email_address');
+                Mail::raw($message, function ($mail) use ($email) {
                     $mail->to($email)
-                         ->subject('🚨 Critical Error in Spindle: /' . request()->path());
+                        ->subject('🚨 Critical Error in Spindle: /'.request()->path());
                 });
-            } catch (\Throwable $t) {
+            } catch (Throwable $t) {
                 // Suppress mail errors to avoid infinite loops if SMTP is not set up
             }
         });
 
-        $exceptions->render(function (\Throwable $e, \Illuminate\Http\Request $request) {
+        $exceptions->render(function (Throwable $e, Request $request) {
             // Optional toggle to easily get Ignition back if needed
-            if (env('FORCE_CUSTOM_ERRORS', true) === false && config('app.debug')) {
+            if (config('app.force_custom_errors') === false && config('app.debug')) {
                 return null;
             }
 
             // Biarkan Laravel menangani error validasi, auth, dan redirect
-            if ($e instanceof \Illuminate\Validation\ValidationException ||
-                $e instanceof \Illuminate\Auth\AuthenticationException ||
-                $e instanceof \Illuminate\Http\Exceptions\HttpResponseException) {
+            if ($e instanceof ValidationException ||
+                $e instanceof AuthenticationException ||
+                $e instanceof HttpResponseException) {
                 return null;
             }
 
             $status = 500;
 
-            if ($e instanceof \Symfony\Component\HttpKernel\Exception\HttpExceptionInterface) {
+            if ($e instanceof HttpExceptionInterface) {
                 $status = $e->getStatusCode();
-            } elseif ($e instanceof \Illuminate\Database\QueryException || $e instanceof \PDOException) {
+            } elseif ($e instanceof QueryException || $e instanceof PDOException) {
                 // Tangani khusus jika database terputus (connection refused)
                 if (str_contains($e->getMessage(), '2002')) {
                     $status = 503;
@@ -73,14 +82,14 @@ return Application::configure(basePath: dirname(__DIR__))
             }
 
             $allowedStatuses = [403, 404, 419, 500, 503];
-            if (!in_array($status, $allowedStatuses)) {
+            if (! in_array($status, $allowedStatuses)) {
                 $status = 500;
             }
 
-            if (!$request->wantsJson() && !$request->is('api/*')) {
+            if (! $request->wantsJson() && ! $request->is('api/*')) {
                 return response()->view("errors.{$status}", ['exception' => $e], $status);
             }
-            
+
             return null;
         });
     })->create();

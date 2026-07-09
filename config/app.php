@@ -123,4 +123,16 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Error Reporting
+    |--------------------------------------------------------------------------
+    |
+    | Custom configuration for handling critical errors.
+    |
+    */
+    'error_webhook_url' => env('ERROR_WEBHOOK_URL'),
+    'error_email_address' => env('ERROR_EMAIL_ADDRESS', 'bingle.spindle@gmail.com'),
+    'force_custom_errors' => env('FORCE_CUSTOM_ERRORS', true),
+
 ];

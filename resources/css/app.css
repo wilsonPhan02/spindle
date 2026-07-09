@@ -485,3 +485,23 @@
 
 @keyframes windBlow { 0% { transform: translateX(-100%); opacity: 0; } 50% { opacity: 1; } 100% { transform: translateX(300%); opacity: 0; } } .animate-wind-blow { animation: windBlow linear infinite; }
 @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+
+/* --- Extracted from structure.blade.php --- */
+.bg-dot-pattern {
+    background-color: var(--color-brand-10); 
+    background-image: radial-gradient(var(--color-brand-100) 1.5px, transparent 1.5px);
+    background-size: 24px 24px;
+}
+/* --- Extracted from dashboard/index.blade.php --- */
+.welcome-marquee {
+    animation: welcome-slide var(--duration) linear infinite;
+}
+@keyframes welcome-slide {
+    0% { transform: translateX(0); }
+    85%, 100% { transform: translateX(var(--distance)); }
+}
+.mask-image-fade {
+    -webkit-mask-image: linear-gradient(to right, transparent, black 24px, black calc(100% - 24px), transparent);
+    mask-image: linear-gradient(to right, transparent, black 24px, black calc(100% - 24px), transparent);
+}
+

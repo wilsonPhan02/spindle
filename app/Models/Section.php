@@ -2,34 +2,36 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Section extends Model
 {
     use HasUuids;
 
-    // Kasih tahu Laravel kalau primary key-nya adalah section_id
+    // Inform Laravel that the primary key is section_id
     protected $primaryKey = 'section_id';
 
     public $incrementing = false;
+
     protected $keyType = 'string';
 
-    // Sesuaikan fillable dengan kolom di foto database lu
+    // Adjust fillable fields with the database columns
     protected $fillable = [
         'section_id',
         'user_id',
         'title',
-        'archived_at'
+        'archived_at',
     ];
 
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id', 'user_id');
     }
 
-    // Tambahkan di dalam class Section
-    public function projects()
+    public function projects(): HasMany
     {
         return $this->hasMany(Project::class, 'section_id', 'section_id');
     }

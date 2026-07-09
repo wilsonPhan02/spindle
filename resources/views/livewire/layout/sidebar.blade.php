@@ -272,10 +272,10 @@ new class extends Component {
                 localStorage.setItem('recentSearches', JSON.stringify(s));
             }
         }"
-        x-init="
+        x-init="() => {
             try { recentSearches = JSON.parse(localStorage.getItem('recentSearches') || '[]'); }
             catch(e) { recentSearches = []; }
-        "
+        }"
         class="flex flex-col flex-1 overflow-y-auto [scrollbar-gutter:stable] px-6 pb-6 custom-scrollbar"
     >
         @if($this->searchResultsData !== null)

@@ -347,7 +347,7 @@ new class extends Component {
                                     <div class="relative z-10 w-full max-w-2xl h-full flex items-center justify-center transition-all duration-300 group-hover:blur-[1px] group-hover:opacity-90 pointer-events-none">
                                         @if($template->image_preview)
                                             @if(!$template->is_custom)
-                                                <x-dynamic-component :component="$template->image_preview" class="w-full max-w-lg h-auto" />
+                                                <img src="{{ asset('images/' . str_replace('.', '/', $template->image_preview) . '.svg') }}" class="w-full max-w-lg h-auto" alt="Template Preview" />
                                             @endif
                                         @else
                                             <div class="flex flex-col items-center justify-center h-48 text-brand-200">
@@ -419,7 +419,7 @@ new class extends Component {
                                     @if($this->selectedTemplate->is_custom)
                                         <img src="{{ Storage::url($this->selectedTemplate->image_preview) }}" alt="Preview" class="absolute inset-0 w-full h-full object-cover" />
                                     @else
-                                        <x-dynamic-component :component="$this->selectedTemplate->image_preview" class="w-full h-auto max-w-lg" />
+                                        <img src="{{ asset('images/' . str_replace('.', '/', $this->selectedTemplate->image_preview) . '.svg') }}" class="w-full h-auto max-w-lg" alt="Template Preview" />
                                     @endif
                                 @else
                                     <div class="flex flex-col items-center justify-center h-48 text-brand-200">

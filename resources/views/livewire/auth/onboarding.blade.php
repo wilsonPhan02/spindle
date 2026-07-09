@@ -49,7 +49,7 @@ new #[Layout('layouts.guest')] #[Title('Complete Your Profile - Spindle')] class
 <div class="relative flex flex-col items-center justify-center min-h-screen w-full">
     
     <div class="absolute inset-0 z-0 pointer-events-none">
-        @include('components.auth-bg') 
+        <img src="{{ asset('images/auth-bg.svg') }}" class="absolute inset-0 w-full h-full object-cover" alt="Background"> 
     </div>
 
     <div class="relative z-10 flex flex-col items-center justify-center w-full px-4">

@@ -2,9 +2,8 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
 use App\Models\Template;
+use Illuminate\Database\Seeder;
 
 class TemplateSeeder extends Seeder
 {
@@ -18,7 +17,7 @@ class TemplateSeeder extends Seeder
         // =========================================================
 
         $threeAct = Template::create([
-            'user_id' => null, 
+            'user_id' => null,
             'name' => 'Three-Act Structure',
             'description' => <<<'MARKDOWN'
             The Three-Act Structure is the most classic and widely used narrative model in screenwriting, novel writing, and even oral storytelling. It divides a story into three distinct parts: the Setup, the Confrontation, and the Resolution.
@@ -67,7 +66,7 @@ class TemplateSeeder extends Seeder
                 * **The Resolution/Denouement:** After the storm passes, we see how the dust settles. The tension is released, and the subplots are tied up.
                 * **New Status Quo:** The new life established after the conflict. The world has changed, and the protagonist has undergone a "Character Arc" (transformation).
                 MARKDOWN
-            ]
+            ],
         ]);
 
         // =========================================================
@@ -149,9 +148,8 @@ class TemplateSeeder extends Seeder
         // 3. Freytag's Comandment Structure (System Template)
         // =========================================================
 
-        
         $freytags = Template::create([
-            'user_id' => null, 
+            'user_id' => null,
             'name' => 'Freytag\'s Pyramid',
             'description' => <<<'MARKDOWN'
             Freytag’s Pyramid is one of the oldest and most fundamental frameworks in literary analysis, developed by 19th-century German playwright Gustav Freytag. Originally designed to map the structure of five-act Greek and Shakespearean tragedies, it remains a vital tool for writers who want to understand the rise and fall of dramatic tension.
@@ -205,7 +203,7 @@ class TemplateSeeder extends Seeder
         // =========================================================
 
         $fiveCommandments = Template::create([
-            'user_id' => null, 
+            'user_id' => null,
             'name' => 'The Five Commandments',
             'description' => <<<'MARKDOWN'
             The Five Commandments of Storytelling is a fundamental framework developed by Shawn Coyne as part of the Story Grid methodology. These five elements are the "DNA" of a story; they must exist in every scene, every sequence, every act, and the global story itself to ensure the narrative is functional and engaging.
@@ -259,7 +257,7 @@ class TemplateSeeder extends Seeder
         // =========================================================
 
         $saveTheCat = Template::create([
-            'user_id' => null, 
+            'user_id' => null,
             'name' => 'Save The Cat!',
             'description' => <<<'MARKDOWN'
             Save the Cat! is a highly influential beat sheet created by screenwriter Blake Snyder. While originally intended for film, it has become a go-to framework for novelists and storytellers of all kinds. It focuses on pacing and emotional resonance, breaking a story down into 15 essential "beats" that guide the reader through a satisfying transformation.
@@ -383,7 +381,7 @@ class TemplateSeeder extends Seeder
         // =========================================================
 
         $sevenPointStory = Template::create([
-            'user_id' => null, 
+            'user_id' => null,
             'name' => 'Seven Point Story',
             'description' => <<<'MARKDOWN'
             The 7-Point Story Structure is a highly versatile framework popularized by author Dan Wells. It is often described as a "backward" planning method because it encourages writers to define the ending first and then build the starting point as its perfect opposite. This ensures that every beat in the story is laser-focused on moving the protagonist toward their final transformation.
@@ -445,13 +443,12 @@ class TemplateSeeder extends Seeder
             ],
         ]);
 
-    
         // =========================================================
         // 7. 27 Chapter Method Structure (System Template)
         // =========================================================
 
         $ChapterMethod27 = Template::create([
-            'user_id' => null, 
+            'user_id' => null,
             'name' => '27 Chapter Method',
             'description' => <<<'MARKDOWN'
             The 27 Chapter Method is a hyper-structured evolution of the classic Three-Act Structure, breaking the narrative into nine blocks of three chapters each. Popularized by writers like Kat O'Keeffe, this method provides a literal roadmap for a first draft, ensuring that every 10% of the book has a specific purpose and thematic movement.
