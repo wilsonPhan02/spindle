@@ -5,6 +5,7 @@ use Livewire\Attributes\Layout;
 use Livewire\WithFileUploads;
 use App\Models\Note;
 use App\Models\Project;
+use App\Helpers\TextHelper;
 use Illuminate\Support\Facades\Storage;
 
 new #[Layout('layouts.app')] class extends Component {
@@ -53,21 +54,12 @@ new #[Layout('layouts.app')] class extends Component {
 
     private function nextDefaultTitle(?string $parentId = null): string
     {
-        $siblingCount = Note::where('project_id', $this->project->project_id)
-                            ->where('parent_note_id', $parentId)
-                            ->count() + 1;
-
-        if ($parentId === null) {
-            return 'Notes ' . $siblingCount;
-        }
-
-        $parent = Note::find($parentId);
-        if (!$parent) {
-            return 'Notes ' . $siblingCount;
-        }
-
-        $numericPart = preg_replace('/^Notes\s+/', '', $parent->title);
-        return 'Notes ' . $numericPart . '.' . $siblingCount;
+        return TextHelper::uniqueName(
+            'Untitled Notes',
+            fn () => Note::where('project_id', $this->project->project_id)
+                         ->where('parent_note_id', $parentId)
+                         ->pluck('title')
+        );
     }
 
     private function nextSortOrder(?string $parentId = null): int

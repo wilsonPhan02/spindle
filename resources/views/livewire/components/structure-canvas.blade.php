@@ -3,6 +3,7 @@ use Livewire\Volt\Component;
 use App\Models\Project;
 use App\Models\ChapterCard;
 use App\Models\Manuscript;
+use App\Helpers\TextHelper;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
 
@@ -78,10 +79,15 @@ new class extends Component {
             ->increment('order_index');
 
         // Buat Chapter Card & Manuscript
+        $chapterTitle = TextHelper::uniqueName(
+            'Untitled Chapter',
+            fn () => ChapterCard::where('project_id', $this->project->project_id)->pluck('title')
+        );
+
         $chapter = ChapterCard::create([
             'project_id' => $this->project->project_id,
             'structure_section_id' => $sectionId,
-            'title' => 'Untitled Chapter',
+            'title' => $chapterTitle,
             'status' => 'In Progress',
             'order_index' => $newOrder
         ]);

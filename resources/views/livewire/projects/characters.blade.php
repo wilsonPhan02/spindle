@@ -6,6 +6,7 @@ use App\Models\Character;
 use App\Models\Relationship;
 use App\Models\RelationshipType;
 use App\Models\Hashtag;
+use App\Helpers\TextHelper;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Renderless;
 use Illuminate\Support\Facades\Storage;
@@ -81,9 +82,14 @@ new #[Layout('layouts.app')] class extends Component {
     }
 
     public function addCharacter() {
+        $charName = TextHelper::uniqueName(
+            'Unnamed Character',
+            fn () => $this->project->characters()->pluck('full_name')
+        );
+
         $character = $this->project->characters()->create([
-            'full_name' => 'New Character',
-            'nick_name' => 'New Character',
+            'full_name' => $charName,
+            'nick_name' => $charName,
             'bio' => '',
             'canvas_top' => 860 + rand(-60, 60),
             'canvas_left' => 1160 + rand(-60, 60),

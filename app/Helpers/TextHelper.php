@@ -35,6 +35,31 @@ class TextHelper
     }
 
     /**
+     * Generate a unique name for a new item, following file-explorer convention:
+     *   "Untitled Project", "Untitled Project (1)", "Untitled Project (2)", …
+     *
+     * @param  string   $base      The base default name, e.g. "Untitled Project".
+     * @param  callable $existing  A callable that returns an iterable of existing
+     *                             title strings to check against. Receives no args.
+     * @return string
+     */
+    public static function uniqueName(string $base, callable $existing): string
+    {
+        $titles = collect($existing())->map(fn ($t) => strtolower((string) $t));
+
+        if (! $titles->contains(strtolower($base))) {
+            return $base;
+        }
+
+        $counter = 1;
+        while ($titles->contains(strtolower("{$base} ({$counter})"))) {
+            $counter++;
+        }
+
+        return "{$base} ({$counter})";
+    }
+
+    /**
      * Extract a certain number of sentences from HTML content.
      */
     public static function extractSentences(?string $html, int $count = 2): ?string
