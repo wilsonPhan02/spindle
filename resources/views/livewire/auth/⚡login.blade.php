@@ -18,9 +18,9 @@ new #[Layout('layouts.guest')] #[Title('Sign In - Spindle')] class extends Compo
             'email' => ['required', 'email:filter'],
             'password' => ['required'],
         ], [
-            'email.required' => 'Email is required.',
-            'email.email' => 'Please enter a valid email address.',
-            'password.required' => 'Password is required.',
+            'email.required' => __('Email is required.'),
+            'email.email' => __('Please enter a valid email address.'),
+            'password.required' => __('Password is required.'),
         ]);
 
         if (Auth::attempt(['email' => $this->email, 'password' => $this->password], $this->remember)) {
@@ -31,7 +31,7 @@ new #[Layout('layouts.guest')] #[Title('Sign In - Spindle')] class extends Compo
             return;
         }
 
-        $this->addError('login_failed', 'Invalid email or password');
+        $this->addError('login_failed', __('Invalid email or password'));
     }
 };
 ?>
