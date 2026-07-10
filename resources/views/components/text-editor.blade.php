@@ -115,7 +115,7 @@
                 @mousedown.prevent="saveSelection()"
                 @click="$refs.toolbarScroll.scrollBy({ left: -150, behavior: 'smooth' });"
                 class="p-1 text-secondary-200 hover:text-text-90 transition-colors duration-150 pointer-events-auto cursor-pointer outline-none"
-                title="Scroll Left"
+                title="{{ __('Scroll Left') }}"
             >
                 <svg class="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><path d="M18 4L6 12l12 8V4z"/></svg>
             </button>
@@ -141,7 +141,7 @@
                 "
                 class="h-7 px-2.5 flex items-center gap-1.5 text-app-desc-feature text-text-80 bg-card-bg border border-brand-200 rounded-md outline-none cursor-pointer hover:border-secondary-100 transition-colors shadow-sm"
                 style="min-width: 118px;"
-                title="Text Format"
+                title="{{ __('Text Format') }}"
             >
                 <span x-text="formatLabel" class="flex-1 text-left"></span>
                 <svg class="w-3 h-3 text-secondary-150 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
@@ -160,29 +160,29 @@
                     class="w-40 bg-white border border-brand-200 rounded-lg py-1"
                     style="display: none;"
                 >
-                    <button type="button" @mousedown.prevent="saveSelection()" @click="setFormat('p', 'Normal Text'); activeDropdown = null" class="format-option w-full text-left px-3 py-1.5 text-app-body-medium text-text-90 hover:bg-brand-50" x-bind:class="formatValue === 'p' ? 'bg-brand-150 font-semibold' : ''" title="Normal Text">Normal Text</button>
-                    <button type="button" @mousedown.prevent="saveSelection()" @click="setFormat('h1', 'Heading 1'); activeDropdown = null" class="format-option w-full text-left px-3 py-1.5 text-app-subtitle-1 font-bold text-text-90 hover:bg-brand-50" x-bind:class="formatValue === 'h1' ? 'bg-brand-150' : ''" title="Heading 1 (# + Space)">Heading 1</button>
-                    <button type="button" @mousedown.prevent="saveSelection()" @click="setFormat('h2', 'Heading 2'); activeDropdown = null" class="format-option w-full text-left px-3 py-1.5 text-app-subfeature font-bold text-text-90 hover:bg-brand-50" x-bind:class="formatValue === 'h2' ? 'bg-brand-150' : ''" title="Heading 2 (## + Space)">Heading 2</button>
-                    <button type="button" @mousedown.prevent="saveSelection()" @click="setFormat('h3', 'Heading 3'); activeDropdown = null" class="format-option w-full text-left px-3 py-1.5 text-app-body-medium font-bold text-text-90 hover:bg-brand-50" x-bind:class="formatValue === 'h3' ? 'bg-brand-150' : ''" title="Heading 3 (### + Space)">Heading 3</button>
-                    <button type="button" @mousedown.prevent="saveSelection()" @click="setFormat('blockquote', 'Quote'); activeDropdown = null" class="format-option w-full text-left px-3 py-1.5 text-app-body-medium italic text-text-70 hover:bg-brand-50" x-bind:class="formatValue === 'blockquote' ? 'bg-brand-150' : ''" title="Quote (> + Space)">Quote</button>
+                    <button type="button" @mousedown.prevent="saveSelection()" @click="setFormat('p', '{{ __('Normal Text') }}'); activeDropdown = null" class="format-option w-full text-left px-3 py-1.5 text-app-body-medium text-text-90 hover:bg-brand-50" x-bind:class="formatValue === 'p' ? 'bg-brand-150 font-semibold' : ''" title="{{ __('Normal Text') }}">{{ __('Normal Text') }}</button>
+                    <button type="button" @mousedown.prevent="saveSelection()" @click="setFormat('h1', '{{ __('Heading 1') }}'); activeDropdown = null" class="format-option w-full text-left px-3 py-1.5 text-app-subtitle-1 font-bold text-text-90 hover:bg-brand-50" x-bind:class="formatValue === 'h1' ? 'bg-brand-150' : ''" title="{{ __('Heading 1 (# + Space)') }}">{{ __('Heading 1') }}</button>
+                    <button type="button" @mousedown.prevent="saveSelection()" @click="setFormat('h2', '{{ __('Heading 2') }}'); activeDropdown = null" class="format-option w-full text-left px-3 py-1.5 text-app-subfeature font-bold text-text-90 hover:bg-brand-50" x-bind:class="formatValue === 'h2' ? 'bg-brand-150' : ''" title="{{ __('Heading 2 (## + Space)') }}">{{ __('Heading 2') }}</button>
+                    <button type="button" @mousedown.prevent="saveSelection()" @click="setFormat('h3', '{{ __('Heading 3') }}'); activeDropdown = null" class="format-option w-full text-left px-3 py-1.5 text-app-body-medium font-bold text-text-90 hover:bg-brand-50" x-bind:class="formatValue === 'h3' ? 'bg-brand-150' : ''" title="{{ __('Heading 3 (### + Space)') }}">{{ __('Heading 3') }}</button>
+                    <button type="button" @mousedown.prevent="saveSelection()" @click="setFormat('blockquote', '{{ __('Quote') }}'); activeDropdown = null" class="format-option w-full text-left px-3 py-1.5 text-app-body-medium italic text-text-70 hover:bg-brand-50" x-bind:class="formatValue === 'blockquote' ? 'bg-brand-150' : ''" title="{{ __('Quote (> + Space)') }}">{{ __('Quote') }}</button>
                 </div>
             </template>
         </div>
 
         <div class="toolbar-divider"></div>
 
-        <button type="button" @mousedown.prevent="saveSelection()" @click="exec('bold')" class="toolbar-btn" x-bind:class="activeStates.bold ? 'is-active' : ''" title="Bold (Ctrl+B or **text**)">
+        <button type="button" @mousedown.prevent="saveSelection()" @click="exec('bold')" class="toolbar-btn" x-bind:class="activeStates.bold ? 'is-active' : ''" title="{{ __('Bold (Ctrl+B or **text**)') }}">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M15.6 10.79c.97-.67 1.65-1.77 1.65-2.79 0-2.26-1.75-4-4-4H7v14h7.04c2.09 0 3.71-1.7 3.71-3.79 0-1.52-.86-2.82-2.15-3.42zM10 6.5h3c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5h-3v-3zm3.5 9H10v-3h3.5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5z"/></svg>
         </button>
-        <button type="button" @mousedown.prevent="saveSelection()" @click="exec('italic')" class="toolbar-btn" x-bind:class="activeStates.italic ? 'is-active' : ''" title="Italic (Ctrl+I or *text*)">
+        <button type="button" @mousedown.prevent="saveSelection()" @click="exec('italic')" class="toolbar-btn" x-bind:class="activeStates.italic ? 'is-active' : ''" title="{{ __('Italic (Ctrl+I or *text*)') }}">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M10 4v3h2.21l-3.42 8H6v3h8v-3h-2.21l3.42-8H18V4z"/></svg>
         </button>
-        <button type="button" @mousedown.prevent="saveSelection()" @click="exec('underline')" class="toolbar-btn" x-bind:class="activeStates.underline ? 'is-active' : ''" title="Underline (Ctrl+U)">
+        <button type="button" @mousedown.prevent="saveSelection()" @click="exec('underline')" class="toolbar-btn" x-bind:class="activeStates.underline ? 'is-active' : ''" title="{{ __('Underline (Ctrl+U)') }}">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 17c3.31 0 6-2.69 6-6V3h-2.5v8c0 1.93-1.57 3.5-3.5 3.5S8.5 12.93 8.5 11V3H6v8c0 3.31 2.69 6 6 6zm-7 2v2h14v-2H5z"/></svg>
         </button>
         
         @if($showStrike)
-            <button type="button" @mousedown.prevent="saveSelection()" @click="exec('strikeThrough')" class="toolbar-btn" x-bind:class="activeStates.strikeThrough ? 'is-active' : ''" title="Strikethrough (~~text~~)">
+            <button type="button" @mousedown.prevent="saveSelection()" @click="exec('strikeThrough')" class="toolbar-btn" x-bind:class="activeStates.strikeThrough ? 'is-active' : ''" title="{{ __('Strikethrough (~~text~~)') }}">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M10 19h4v-3h-4v3zM5 4v3h5v3h4V7h5V4H5zM3 14h18v-2H3v2z"/></svg>
             </button>
         @endif
@@ -192,32 +192,32 @@
         @endif
 
         @if($showLists)
-            <button type="button" @mousedown.prevent="saveSelection()" @click="exec('insertUnorderedList')" class="toolbar-btn" x-bind:class="activeStates.insertUnorderedList ? 'is-active' : ''" title="Bullet List (-, *, or + and Space)">
+            <button type="button" @mousedown.prevent="saveSelection()" @click="exec('insertUnorderedList')" class="toolbar-btn" x-bind:class="activeStates.insertUnorderedList ? 'is-active' : ''" title="{{ __('Bullet List (-, *, or + and Space)') }}">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M4 10.5c-.83 0-1.5.67-1.5 1.5s.67 1.5 1.5 1.5 1.5-.67 1.5-1.5-.67-1.5-1.5-1.5zm0-6c-.83 0-1.5.67-1.5 1.5S3.17 7.5 4 7.5 5.5 6.83 5.5 6 4.83 4.5 4 4.5zm0 12c-.83 0-1.5.68-1.5 1.5s.68 1.5 1.5 1.5 1.5-.68 1.5-1.5-.67-1.5-1.5-1.5zM7 19h14v-2H7v2zm0-6h14v-2H7v2zm0-8v2h14V5H7z"/></svg>
             </button>
-            <button type="button" @mousedown.prevent="saveSelection()" @click="exec('insertOrderedList')" class="toolbar-btn" x-bind:class="activeStates.insertOrderedList ? 'is-active' : ''" title="Numbered List (1. or a. and Space)">
+            <button type="button" @mousedown.prevent="saveSelection()" @click="exec('insertOrderedList')" class="toolbar-btn" x-bind:class="activeStates.insertOrderedList ? 'is-active' : ''" title="{{ __('Numbered List (1. or a. and Space)') }}">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M2 17h2v.5H3v1h1v.5H2v1h3v-4H2v1zm1-9h1V4H2v1h1v3zm-1 3h1.8L2 13.1v.9h3v-1H3.2L5 10.9V10H2v1zm5-6v2h14V5H7zm0 14h14v-2H7v2zm0-6h14v-2H7v2z"/></svg>
             </button>
         @endif
 
         @if($showTodo)
-            <button type="button" @mousedown.prevent="saveSelection()" @click="restoreSelection(); insertTodoBlock()" class="toolbar-btn" x-bind:class="activeStates.todo ? 'is-active' : ''" title="To-Do List ([] + Space)">
+            <button type="button" @mousedown.prevent="saveSelection()" @click="restoreSelection(); insertTodoBlock()" class="toolbar-btn" x-bind:class="activeStates.todo ? 'is-active' : ''" title="{{ __('To-Do List ([] + Space)') }}">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
             </button>
         @endif
 
         <div class="toolbar-divider"></div>
 
-        <button type="button" @mousedown.prevent="saveSelection()" @click="exec('justifyLeft')" class="toolbar-btn" x-bind:class="activeStates.justifyLeft ? 'is-active' : ''" title="Align Left">
+        <button type="button" @mousedown.prevent="saveSelection()" @click="exec('justifyLeft')" class="toolbar-btn" x-bind:class="activeStates.justifyLeft ? 'is-active' : ''" title="{{ __('Align Left') }}">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M15 15H3v2h12v-2zm0-8H3v2h12V7zM3 13h18v-2H3v2zm0 8h18v-2H3v2zM3 3v2h18V3H3z"/></svg>
         </button>
-        <button type="button" @mousedown.prevent="saveSelection()" @click="exec('justifyCenter')" class="toolbar-btn" x-bind:class="activeStates.justifyCenter ? 'is-active' : ''" title="Align Center">
+        <button type="button" @mousedown.prevent="saveSelection()" @click="exec('justifyCenter')" class="toolbar-btn" x-bind:class="activeStates.justifyCenter ? 'is-active' : ''" title="{{ __('Align Center') }}">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M7 15v2h10v-2H7zm-4 6h18v-2H3v2zm0-8h18v-2H3v2zm4-6v2h10V7H7zM3 3v2h18V3H3z"/></svg>
         </button>
-        <button type="button" @mousedown.prevent="saveSelection()" @click="exec('justifyRight')" class="toolbar-btn" x-bind:class="activeStates.justifyRight ? 'is-active' : ''" title="Align Right">
+        <button type="button" @mousedown.prevent="saveSelection()" @click="exec('justifyRight')" class="toolbar-btn" x-bind:class="activeStates.justifyRight ? 'is-active' : ''" title="{{ __('Align Right') }}">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M3 21h18v-2H3v2zm6-4h12v-2H9v2zm-6-4h18v-2H3v2zm6-4h12V7H9v2zM3 3v2h18V3H3z"/></svg>
         </button>
-        <button type="button" @mousedown.prevent="saveSelection()" @click="exec('justifyFull')" class="toolbar-btn" x-bind:class="activeStates.justifyFull ? 'is-active' : ''" title="Justify">
+        <button type="button" @mousedown.prevent="saveSelection()" @click="exec('justifyFull')" class="toolbar-btn" x-bind:class="activeStates.justifyFull ? 'is-active' : ''" title="{{ __('Justify') }}">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M3 21h18v-2H3v2zm0-4h18v-2H3v2zm0-4h18v-2H3v2zm0-4h18V7H3v2zm0-6v2h18V3H3z"/></svg>
         </button>
 
@@ -248,7 +248,7 @@
                         class="p-2.5 bg-white border border-brand-200 rounded-lg shadow-lg flex flex-col"
                         style="display: none; width: 172px;"
                     >
-                        <span class="text-app-caption font-semibold text-secondary-150 uppercase tracking-wider mb-2 block">Text Color</span>
+                        <span class="text-app-caption font-semibold text-secondary-150 uppercase tracking-wider mb-2 block">{{ __('Text Color') }}</span>
                         <div class="grid grid-cols-6 gap-2">
                             <template x-for="c in textColors" :key="c">
                                 <button type="button" @mousedown.prevent="saveSelection()" @click="exec('foreColor', c); currentTextColor = c;" class="w-5 h-5 rounded-full transition-all duration-150 relative flex items-center justify-center shrink-0" x-bind:class="(currentTextColor || '#000000') === c ? 'border border-secondary-200 bg-white p-[3px]' : 'border border-brand-200 hover:scale-110 hover:border-secondary-150'" x-bind:style="(currentTextColor || '#000000') === c ? '' : `background:${c}`" :title="c === '#000000' ? 'Default / Black' : c">
@@ -288,7 +288,7 @@
                         class="p-2.5 bg-white border border-brand-200 rounded-lg shadow-lg flex flex-col"
                         style="display: none; width: 184px;"
                     >
-                        <span class="text-app-caption font-semibold text-secondary-150 uppercase tracking-wider mb-2 block">Highlight Color</span>
+                        <span class="text-app-caption font-semibold text-secondary-150 uppercase tracking-wider mb-2 block">{{ __('Highlight Color') }}</span>
                         <div class="grid grid-cols-7 gap-1.5">
                             <template x-for="c in highlightColors" :key="c">
                                 <button type="button" @mousedown.prevent="saveSelection()" @click="exec('hiliteColor', c === 'transparent' ? 'transparent' : c); currentHighlightColor = c;" class="w-5 h-5 rounded-full transition-all duration-150 relative flex items-center justify-center shrink-0" x-bind:class="(currentHighlightColor || 'transparent') === c ? 'border border-secondary-200 bg-white p-[3px]' : 'border border-brand-200 hover:scale-110 hover:border-secondary-150'" x-bind:style="(currentHighlightColor || 'transparent') === c || c === 'transparent' ? '' : `background:${c}`" :title="c === 'transparent' ? 'No Highlight' : c">
@@ -311,16 +311,16 @@
         @endif
 
         @if($showIndent)
-            <button type="button" @mousedown.prevent="saveSelection()" @click="customIndent(true)" class="toolbar-btn" title="Decrease Indent">
+            <button type="button" @mousedown.prevent="saveSelection()" @click="customIndent(true)" class="toolbar-btn" title="{{ __('Decrease Indent') }}">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M11 17h10v-2H11v2zm-8-5l4 4V8l-4 4zm0 9h18v-2H3v2zM3 3v2h18V3H3zm8 6h10V7H11v2zm0 4h10v-2H11v2z"/></svg>
             </button>
-            <button type="button" @mousedown.prevent="saveSelection()" @click="customIndent(false)" class="toolbar-btn" title="Increase Indent">
+            <button type="button" @mousedown.prevent="saveSelection()" @click="customIndent(false)" class="toolbar-btn" title="{{ __('Increase Indent') }}">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M3 21h18v-2H3v2zM3 8v8l4-4-4-4zm8 9h10v-2H11v2zM3 3v2h18V3H3zm8 6h10V7H11v2zm0 4h10v-2H11v2z"/></svg>
             </button>
         @endif
 
         @if($showHr)
-            <button type="button" @mousedown.prevent="saveSelection()" @click="exec('insertHorizontalRule')" class="toolbar-btn" title="Horizontal Rule (--- + Space)">
+            <button type="button" @mousedown.prevent="saveSelection()" @click="exec('insertHorizontalRule')" class="toolbar-btn" title="{{ __('Horizontal Rule (--- + Space)') }}">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19 13H5v-2h14v2z"/></svg>
             </button>
         @endif
@@ -342,7 +342,7 @@
                 @mousedown.prevent="saveSelection()"
                 @click="$refs.toolbarScroll.scrollBy({ left: 150, behavior: 'smooth' });"
                 class="p-1 text-secondary-200 hover:text-text-90 transition-colors duration-150 pointer-events-auto cursor-pointer outline-none"
-                title="Scroll Right"
+                title="{{ __('Scroll Right') }}"
             >
                 <svg class="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><path d="M6 4l12 8-12 8V4z"/></svg>
             </button>
@@ -372,7 +372,7 @@
              @dragstart="onBlockDragStart($event)"
              @dragend="onBlockDragEnd($event)"
              @mouseenter="blockDragHandle.show = true"
-             title="Drag to move block"
+             title="{{ __('Drag to move block') }}"
              style="display: none;"
         >
             <svg viewBox="0 0 24 24" fill="currentColor" class="w-[16px] h-[16px]">

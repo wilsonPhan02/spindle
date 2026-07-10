@@ -21,9 +21,9 @@ new class extends Component {
 }" @clear-auth-session.window="clearAuth()">
     <x-confirm-dialog
         eventName="open-logout-dialog"
-        title="Log out"
-        description="Leaving the writer's desk? Your draft will wait here."
-        confirmText="Yes, Log out"
+        :title="__('Log out')"
+        :description="__('Leaving the writer\'s desk? Your draft will wait here.')"
+        :confirmText="__('Yes, Log out')"
         submitAction="logout"
     >
         <x-slot:icon>

@@ -76,14 +76,14 @@
                         {{-- Ikon Dinamis --}}
                         <div class="relative inline-block group mb-3">
                             <div class="w-10 h-10 flex items-center justify-center cursor-pointer rounded transition-colors group-hover:bg-brand-100"
-                                title="{{ $project->icon_type === 'default' ? 'Add Icon' : 'Change Icon' }}"
+                                title="{{ $project->icon_type === 'default' ? __('Add Icon') : __('Change Icon') }}"
                                 @click="showIconPicker = !showIconPicker">
 
                                 @if($project->icon_type === 'emoji')
                                     <span class="text-[32px] leading-none">{{ $project->icon }}</span>
                                 @elseif($project->icon_type === 'image' && $project->icon)
                                     <img src="{{ asset('storage/' . $project->icon) }}"
-                                        alt="Project Icon"
+                                        alt="{{ __('Project Icon') }}"
                                         class="w-8 h-8 object-cover rounded">
                                 @else
                                     <x-icons.sidebar-book class="w-8 h-8 text-secondary-100" />
@@ -110,12 +110,12 @@
                                     <button @click="tab = 'emoji'" 
                                             :class="tab === 'emoji' ? 'border-text-80 text-text-80' : 'border-transparent text-text-60 hover:text-text-80'"
                                             class="px-1 py-2.5 text-app-feature border-b-2 transition-colors -mb-[1px]">
-                                        Emoji
+                                        {{ __('Emoji') }}
                                     </button>
                                     <button @click="tab = 'upload'" 
                                             :class="tab === 'upload' ? 'border-text-80 text-text-80' : 'border-transparent text-text-60 hover:text-text-80'"
                                             class="px-1 py-2.5 text-app-feature border-b-2 transition-colors -mb-[1px]">
-                                        Upload
+                                        {{ __('Upload') }}
                                     </button>
                                 </div>
                                 
@@ -123,7 +123,7 @@
                                 <button wire:click="removeIcon" 
                                         @click="showIconPicker = false"
                                         class="text-danger-100 hover:bg-danger-100/10 transition-colors flex items-center gap-1 p-1.5 rounded-md" 
-                                        title="Remove Icon">
+                                        title="{{ __('Remove Icon') }}">
                                     <x-icons.delete class="w-4 h-4" />
                                 </button>
                             </div>
@@ -184,7 +184,7 @@
                                 
                                 <div x-show="!showCropper">
                                 
-                                <p class="text-text-60 text-app-desc-feature mb-3">Upload custom image (Max 2MB)</p>
+                                <p class="text-text-60 text-app-desc-feature mb-3">{{ __('Upload custom image (Max 2MB)') }}</p>
                                 
                                 <input type="file" id="icon-image-upload" x-ref="iconInput"
                                     class="hidden" accept=".jpg,.jpeg,.png,.svg,.webp"
@@ -228,15 +228,15 @@
                                     <label for="icon-image-upload" 
                                         class="mr-3 py-1.5 px-3 rounded-md text-app-desc-feature font-semibold bg-brand-150 text-text-80 hover:bg-brand-200 transition-colors cursor-pointer"
                                         :class="{ 'opacity-50 pointer-events-none': isUploading }">
-                                        Browse Image
+                                        {{ __('Browse Image') }}
                                     </label>
                                     
                                     <div class="text-app-desc-feature text-text-70 flex-1 min-w-0 flex items-center justify-between">
                                         <span x-show="!isUploading" wire:loading.remove wire:target="icon_image">
-                                            {{ $icon_image ? 'Image selected' : 'No file chosen' }}
+                                            {{ $icon_image ? __('Image selected') : __('No file chosen') }}
                                         </span>
                                         <span x-show="isUploading" class="text-secondary-100 font-medium">
-                                            Uploading... <span x-text="progress + '%'"></span>
+                                            {{ __('Uploading...') }} <span x-text="progress + '%'"></span>
                                         </span>
                                     </div>
                                 </div>
@@ -269,7 +269,7 @@
                                     
                                     <button wire:click="saveIcon" 
                                             class="w-full py-2 bg-secondary-100 text-bg-main font-medium text-app-feature rounded-md hover:bg-secondary-200 transition-colors">
-                                        Submit Image
+                                        {{ __('Submit Image') }}
                                     </button>
                                 @endif
                                 </div>
@@ -280,8 +280,8 @@
                                         <img x-ref="iconCropperImg" :src="cropImageUrl" class="block max-w-full" alt="Crop Preview">
                                     </div>
                                     <div class="flex justify-end gap-2">
-                                        <button @click="cancelCrop()" type="button" class="px-3 py-1.5 text-app-desc-feature font-semibold text-text-70 hover:bg-brand-100 rounded transition-colors">Cancel</button>
-                                        <button @click="applyCrop()" type="button" class="px-3 py-1.5 bg-secondary-100 text-bg-main text-app-desc-feature font-semibold rounded shadow hover:bg-secondary-200 transition-colors">Save</button>
+                                        <button @click="cancelCrop()" type="button" class="px-3 py-1.5 text-app-desc-feature font-semibold text-text-70 hover:bg-brand-100 rounded transition-colors">{{ __('Cancel') }}</button>
+                                        <button @click="applyCrop()" type="button" class="px-3 py-1.5 bg-secondary-100 text-bg-main text-app-desc-feature font-semibold rounded shadow hover:bg-secondary-200 transition-colors">{{ __('Save') }}</button>
                                     </div>
                                 </div>
                             </div>
@@ -300,7 +300,7 @@
                                 @dblclick="editingTitle = true; setTimeout(() => $refs.titleInput.focus(), 50)"
                                 class="{{ $dtlTitleSize }} text-app-title-1 text-text-80 transition-colors leading-tight cursor-pointer select-none group-hover:text-secondary-200 truncate"
                             >
-                                <span x-text="localTitle || 'Untitled Project'"></span>
+                                <span x-text="localTitle || '{{ __('Untitled Project') }}'"></span>
                             </h1>
                             <button x-show="hoverTitle && !editingTitle" @click="editingTitle = true; setTimeout(() => $refs.titleInput.focus(), 50)" class="stroke-2 text-secondary-200 transition-colors shrink-0">
                                 <x-icons.rename class="w-5 h-5" />
@@ -316,11 +316,11 @@
                                 class="{{ $dtlTitleSize }} text-app-title-1 text-text-80 bg-transparent border-b-2 border-secondary-100 outline-none w-full focus:border-secondary-200 focus:ring-0 px-0 py-1"
                             />
                         </div>
-                        <p class="text-app-body-large text-subtext-100 mt-2 truncate">from <span class="text-text-80" title="{{ $project->section->title ?? 'Uncategorized' }}">{{ \Illuminate\Support\Str::limit($project->section->title ?? 'Uncategorized', 30) }}</span></p>
+                        <p class="text-app-body-large text-subtext-100 mt-2 truncate">{{ __('from ') }}<span class="text-text-80" title="{{ $project->section->title ?? __('Uncategorized') }}">{{ \Illuminate\Support\Str::limit($project->section->title ?? __('Uncategorized'), 30) }}</span></p>
                     </div>
 
-                    <div class="flex items-center gap-3 shrink-0" @limit-reached.window="alert('Marked projects have reached the maximum limit (10). You cannot mark more projects.')">
-                        <button wire:click="togglePin" class="text-secondary-100 cursor-pointer hover:text-secondary-200 transition-colors focus:outline-none" title="{{ $project->is_pinned ? 'Unmark Project' : 'Mark Project' }}">
+                    <div class="flex items-center gap-3 shrink-0" @limit-reached.window="alert('{{ __('Marked projects have reached the maximum limit (10). You cannot mark more projects.') }}')">
+                        <button wire:click="togglePin" class="text-secondary-100 cursor-pointer hover:text-secondary-200 transition-colors focus:outline-none" title="{{ $project->is_pinned ? __('Unmark Project') : __('Mark Project') }}">
                             @if($project->is_pinned)
                                 <x-icons.bookmark-solid class="w-6 h-6" />
                             @else
@@ -354,7 +354,7 @@
                 }" class="mb-0 w-full max-w-full min-w-0">
                     <div class="flex items-center gap-3 mb-2">
                         <x-icons.category class="w-4 h-4 text-text-80" />
-                        <span class="text-app-feature text-text-80">Categories</span>
+                        <span class="text-app-feature text-text-80">{{ __('Categories') }}</span>
                     </div>
 
                     <div
@@ -369,7 +369,7 @@
                         <button x-show="!addingCat" @click="addingCat = true; addCount = 0; setTimeout(() => $refs.catInput.focus(), 50)" class="shrink-0 flex items-center gap-1 cursor-pointer rounded-md bg-brand-100 hover:bg-brand-200 text-secondary-150 hover:text-secondary-150 transition-colors p-2">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3"><path stroke-linecap="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
                             @if($project->categories->count() == 0)
-                                <span class="text-app-desc-feature">Add category</span>
+                                <span class="text-app-desc-feature">{{ __('Add category') }}</span>
                             @endif
                         </button>
 
@@ -379,7 +379,7 @@
                                         @keyup.enter="addingCat = false; $wire.addCategory()" 
                                         @blur="if(addingCat) { addingCat = false; $wire.set('newCategoryName', ''); }"
                                         @keydown.escape="addingCat = false; $wire.set('newCategoryName', '');" 
-                                        placeholder="Category..." 
+                                        placeholder="{{ __('Category...') }}" 
                                         class="w-28 text-app-body-small bg-transparent border-b border-secondary-100 outline-none px-1 py-0 text-text-70 focus:border-secondary-200"/>
                                 
                                 <button @mousedown.prevent="addingCat = false; $wire.addCategory()" 
@@ -452,7 +452,7 @@
                 @resize.window="checkScroll()"
                 class="w-full lg:flex-1 lg:min-h-0 flex flex-col">
                     <div @mouseover="hoverSyn = true" @mouseleave="hoverSyn = false" class="flex items-center gap-3 mb-2 shrink-0">
-                        <span class="text-app-heading-2 text-text-80">Synopsis</span>
+                        <span class="text-app-heading-2 text-text-80">{{ __('Synopsis') }}</span>
                         <button x-show="hoverSyn && !editingSyn" 
                                 @click="editingSyn = true; setTimeout(() => $refs.synInput.focus(), 50)" 
                                 class="text-[#A08866] hover:text-secondary-200 transition-colors">
@@ -469,7 +469,7 @@
                                 class="text-app-body-medium text-text-80 leading-[1.6] select-none cursor-pointer w-full shrink min-h-0 max-h-[140px] lg:max-h-none lg:flex-1 overflow-y-auto pr-3 custom-scrollbar"
                             >
                                 <div x-show="localSyn.trim() !== ''" class="whitespace-pre-wrap" x-text="localSyn.trim()"></div>
-                                <div x-show="localSyn.trim() === ''" class="text-app-desc-feature text-text-60">Write your synopsis here!</div>
+                                <div x-show="localSyn.trim() === ''" class="text-app-desc-feature text-text-60">{{ __('Write your synopsis here!') }}</div>
                             </div>
                             <div x-show="isOverflowing && !isAtBottom" class="absolute bottom-0 left-0 w-full h-12 bg-gradient-to-t from-[#F5EFE9] via-[#F5EFE9]/80 to-transparent pointer-events-none transition-opacity duration-300"></div>
                         </div>
@@ -490,7 +490,7 @@
                     <button
                         @click="$dispatch('open-archive-project-dialog')"
                         class="flex items-center gap-1.5 px-2 py-1 -ml-2 rounded-md text-[11px] font-medium text-[#A08866] hover:text-[#E64C4C] hover:bg-[#E64C4C]/10 transition-colors opacity-70 hover:opacity-100">
-                        <x-icons.archive class="w-3.5 h-3.5" /> Move To Archive
+                        <x-icons.archive class="w-3.5 h-3.5" /> {{ __('Move To Archive') }}
                     </button>
                     <div
                         x-data="{
@@ -517,15 +517,15 @@
                                 const totalDiff = this.diffSeconds + Math.max(0, elapsedSinceRender);
                                 
                                 if (totalDiff < 60) {
-                                    this.diffText = 'just now';
+                                    this.diffText = '{{ __('just now') }}';
                                 } else if (totalDiff < 120) {
-                                    this.diffText = '1 minute ago';
+                                    this.diffText = '{{ __('1 minute ago') }}';
                                 } else if (totalDiff < 3600) {
-                                    this.diffText = Math.floor(totalDiff / 60) + ' minutes ago';
+                                    this.diffText = Math.floor(totalDiff / 60) + ' ' + '{{ __('minutes ago') }}';
                                 } else if (totalDiff < 7200) {
-                                    this.diffText = '1 hour ago';
+                                    this.diffText = '{{ __('1 hour ago') }}';
                                 } else if (totalDiff < 86400) {
-                                    this.diffText = Math.floor(totalDiff / 3600) + ' hours ago';
+                                    this.diffText = Math.floor(totalDiff / 3600) + ' ' + '{{ __('hours ago') }}';
                                 } else {
                                     this.diffText = '{{ $project->updated_at->diffForHumans() }}';
                                 }
@@ -535,7 +535,7 @@
                     >
                         <span x-ref="serverDiff" class="hidden">{{ abs(now()->timestamp - $project->updated_at->timestamp) }}</span>
                         <span x-ref="renderTime" class="hidden">{{ microtime(true) }}</span>
-                        Last Edited <span x-text="diffText"></span>
+                        {{ __('Last Edited') }} <span x-text="diffText"></span>
                     </div>
                 </div>
             </div>

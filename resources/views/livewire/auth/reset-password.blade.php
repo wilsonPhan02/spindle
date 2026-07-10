@@ -75,9 +75,9 @@ new #[Layout('layouts.guest')] class extends Component {
     <div class="bg-brand-10 rounded-2xl shadow-2xl w-full max-w-lg py-12 px-15 text-center border-2 border-brand-150 relative">
         <div class="flex flex-col gap-8">
             <div class="flex flex-col gap-5">
-                <h2 class="text-app-heading-1 text-text-100">Rewrite Your Story</h2>
+                <h2 class="text-app-heading-1 text-text-100">{{ __('Rewrite Your Story') }}</h2>
                 <p class="text-app-subfeature text-text-80 px-3">
-                    Enter your new credentials to continue your masterpiece.
+                    {{ __('Enter your new credentials to continue your masterpiece.') }}
                 </p>
             </div>
 
@@ -85,23 +85,23 @@ new #[Layout('layouts.guest')] class extends Component {
 
                 <div class="flex flex-col gap-5">
                     <x-form-input 
-                        label="Confirm your email" 
+                        label="{{ __('Confirm your email') }}" 
                         type="email"
-                        placeholder="Your registered email" 
+                        placeholder="{{ __('Your registered email') }}" 
                         model="email" 
                     />
 
                     <x-form-input 
-                        label="New Password (Min. 8 characters)" 
+                        label="{{ __('New Password (Min. 8 characters)') }}" 
                         type="password" 
-                        placeholder="Enter your new password" 
+                        placeholder="{{ __('Enter your new password') }}" 
                         model="password"
                     />
 
                     <x-form-input 
-                        label="Confirm New Password" 
+                        label="{{ __('Confirm New Password') }}" 
                         type="password" 
-                        placeholder="Re-enter password" 
+                        placeholder="{{ __('Re-enter password') }}" 
                         model="password_confirmation" 
                     />
                 </div>
@@ -112,14 +112,14 @@ new #[Layout('layouts.guest')] class extends Component {
                     variant="primary" 
                     class="w-full mt-8"
                 >
-                    <span wire:loading.remove>Update Password</span>
+                    <span wire:loading.remove>{{ __('Update Password') }}</span>
 
                     <div wire:loading.flex class="items-center justify-center gap-2">
                         <svg class="animate-spin h-5 w-5 text-subtext-60" viewBox="0 0 24 24">
                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                         </svg>
-                        <span>Processing...</span>
+                        <span>{{ __('Processing...') }}</span>
                     </div>
                 </x-button>
             </form>

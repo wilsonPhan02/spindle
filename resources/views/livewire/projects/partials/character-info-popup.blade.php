@@ -22,20 +22,20 @@
                     <div class="shrink-0 p-4 sm:p-5 sm:pr-0 flex sm:block">
                         <div class="w-full aspect-[3/4] sm:w-84 bg-brand-100 relative overflow-hidden rounded-xl flex items-center justify-center">
                             <img x-show="infoCharacter.imagePath" :src="infoCharacter.imagePath" draggable="false" class="absolute inset-0 w-full h-full object-cover">
-                            <span x-show="!infoCharacter.imagePath" class="text-app-feature text-text-70 font-medium">Image Placeholder</span>
+                            <span x-show="!infoCharacter.imagePath" class="text-app-feature text-text-70 font-medium">{{ __('Image Placeholder') }}</span>
                         </div>
                     </div>
                     {{-- Right: content --}}
                     <div class="flex flex-col flex-1 min-w-0 sm:min-h-0 p-5 sm:p-7 sm:w-108 gap-4">
                         <div>
                             <h3 class="text-app-title-1 text-text-80 truncate" :title="infoCharacter.name" x-text="infoCharacter.name"></h3>
-                            <p class="text-app-subtitle-1 text-text-60 truncate" >Fullname : <span x-text="infoCharacter.fullName" :title="infoCharacter.fullName"></span></p>
+                            <p class="text-app-subtitle-1 text-text-60 truncate" >{{ __('Fullname : ') }}<span x-text="infoCharacter.fullName" :title="infoCharacter.fullName"></span></p>
                         </div>
                         
                         <hr class="border-t border-1 border-brand-150 w-full" />
                         
                         <div>
-                            <p class="text-app-feature text-text-70 mb-2">Tags</p>
+                            <p class="text-app-feature text-text-70 mb-2">{{ __('Tags') }}</p>
                             <div
                                 x-data="{
                                     hiddenCount: 0,
@@ -63,29 +63,29 @@
                                 <template x-for="tag in infoCharacter.tags" :key="tag">
                                     <span data-tag-item class="px-4 py-2 rounded-full bg-brand-100 text-app-body-medium text-text-60 truncate min-w-0 max-w-[10rem]" x-text="tag"></span>
                                 </template>
-                                <span x-show="infoCharacter.tags.length === 0" class="text-app-body-medium text-text-60">No tag yet</span>
+                                <span x-show="infoCharacter.tags.length === 0" class="text-app-body-medium text-text-60">{{ __('No tag yet') }}</span>
 
                                 <span
                                     x-show="hiddenCount > 0"
                                     style="display:none;"
                                     class="px-4 py-2 rounded-full bg-brand-150 text-app-body-medium text-text-60 shrink-0 whitespace-nowrap"
-                                    x-text="'+' + hiddenCount + ' more'"
+                                    x-text="'+' + hiddenCount + ' ' + '{{ __('more') }}'"
                                 ></span>
                             </div>
                         </div>
                         <div class="sm:flex-1 sm:min-h-0 flex flex-col">
-                            <p class="text-app-feature text-text-70 mb-2 shrink-0">Backstory</p>
+                            <p class="text-app-feature text-text-70 mb-2 shrink-0">{{ __('Backstory') }}</p>
                             <p
                                 class="text-app-body-medium text-text-60 break-words line-clamp-5"
-                                x-text="infoCharacter.bio || 'No Description Yet'"
+                                x-text="infoCharacter.bio || '{{ __('No Description Yet') }}'"
                             ></p>
                         </div>
                         <div class="flex gap-2.5 mt-2">
                             <button @click="$dispatch('open-delete-character-info-confirm')" class="p-3 rounded-lg cursor-pointer border border-danger-100 text-danger-100 hover:bg-danger-100/10 transition-colors"
-                            title="Delete Character">
+                            title="{{ __('Delete Character') }}">
                                 <x-icons.delete class="w-5 h-5"/>
                             </button>
-                            <button @click="viewCharacterDetail()" class="w-full p-3 cursor-pointer rounded-lg bg-secondary-100 text-app-feature text-bg-main hover:bg-secondary-150 transition-colors">Edit Character Detail</button>
+                            <button @click="viewCharacterDetail()" class="w-full p-3 cursor-pointer rounded-lg bg-secondary-100 text-app-feature text-bg-main hover:bg-secondary-150 transition-colors">{{ __('Edit Character Detail') }}</button>
                         </div>
                     </div>
                 </div>
@@ -96,9 +96,9 @@
 
     <x-confirm-dialog
         eventName="open-delete-character-info-confirm"
-        title="Delete Character?"
-        description='&quot;<span x-text="infoCharacter.fullName"></span>&quot; and every relationship involving them will be permanently removed.'
-        confirmText="Confirm Delete"
+        title="{{ __('Delete Character?') }}"
+        description='&quot;<span x-text="infoCharacter.fullName"></span>&quot; {{ __('and every relationship involving them will be permanently removed.') }}'
+        confirmText="{{ __('Confirm Delete') }}"
         dispatchAction="do-delete-character-info"
     >
         <x-slot:icon>

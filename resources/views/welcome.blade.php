@@ -54,17 +54,62 @@
                 <a href="#hero" class="flex items-center">
                     <img src="{{ $img('logo-spindle.png') }}" alt="Spindle" class="h-[26px] w-auto select-none">
                 </a>
-                <ul class="hidden md:flex items-center gap-12 text-web-body-small text-text-70">
-                    <li><a href="#hero"    class="nav-link hover:text-secondary-200 transition-colors">Introduction</a></li>
-                    <li><a href="#about"   class="nav-link hover:text-secondary-200 transition-colors">About Us</a></li>
-                    <li><a href="#tools"   class="nav-link hover:text-secondary-200 transition-colors">Guides</a></li>
-                    <li><a href="#writers" class="nav-link hover:text-secondary-200 transition-colors">Advantages</a></li>
+                <ul class="hidden md:flex items-center gap-6 lg:gap-10 text-web-body-small text-text-70">
+                    <li><a href="#hero"    class="nav-link hover:text-secondary-200 transition-colors">{{ __('Introduction') }}</a></li>
+                    <li><a href="#about"   class="nav-link hover:text-secondary-200 transition-colors">{{ __('About Us') }}</a></li>
+                    <li><a href="#writers" class="nav-link hover:text-secondary-200 transition-colors">{{ __('Challenges') }}</a></li>
+                    <li><a href="#tools"   class="nav-link hover:text-secondary-200 transition-colors">{{ __('Features') }}</a></li>
                 </ul>
-                <a href="{{ route('dashboard') }}"
-                   class="inline-flex items-center rounded-full bg-secondary-150 px-9 py-3.5 text-web-body-small font-merriweather text-brand-10
-                          transition-all duration-300 hover:bg-secondary-200 hover:-translate-y-0.5 hover:shadow-md">
-                    Enter the Realm
-                </a>
+                <div class="flex items-center gap-4">
+                    <div x-data="{ open: false }" 
+                         x-init="$watch('open', value => { if (value) { $nextTick(() => { const el = $refs.dropdown.querySelector('.bg-gray-50'); if (el) el.scrollIntoView({ block: 'nearest' }); }) } })" 
+                         class="relative hidden sm:block">
+                        <button @click="open = !open" @click.away="open = false" class="flex items-center gap-2 text-web-body-small text-text-70 hover:text-secondary-200 transition-colors focus:outline-none">
+                            @php
+                                $curLang = app()->getLocale();
+                                $langs = [
+                                    'en' => ['English', 'us'], 'id' => ['Bahasa Indonesia', 'id'], 'pt' => ['Português', 'br'],
+                                    'es' => ['Español', 'es'], 'fr' => ['Français', 'fr'], 'de' => ['Deutsch', 'de'],
+                                    'ja' => ['日本語', 'jp'], 'zh' => ['中文 (简体)', 'cn'], 'ko' => ['한국어', 'kr'],
+                                    'ar' => ['العربية', 'sa'], 'ru' => ['Русский', 'ru'], 'tr' => ['Türkçe', 'tr'],
+                                ];
+                                $cc = $langs[$curLang][1] ?? 'us';
+                            @endphp
+                            <div class="w-6 h-6 rounded-full border border-gray-400 shadow-sm overflow-hidden shrink-0">
+                                <img src="https://flagcdn.com/w40/{{ $cc }}.png" alt="{{ $curLang }}" class="w-full h-full object-cover">
+                            </div>
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                        </button>
+                        <div x-show="open" x-cloak @wheel.stop x-ref="dropdown"
+                             x-transition:enter="transition ease-out duration-200 origin-top"
+                             x-transition:enter-start="opacity-0 scale-y-75"
+                             x-transition:enter-end="opacity-100 scale-y-100"
+                             x-transition:leave="transition ease-in duration-150 origin-top"
+                             x-transition:leave-start="opacity-100 scale-y-100"
+                             x-transition:leave-end="opacity-0 scale-y-75"
+                             class="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50 py-1 max-h-64 overflow-y-auto overscroll-contain custom-scrollbar">
+                            @foreach($langs as $code => $data)
+                                <a href="{{ route('lang.switch', $code) }}" 
+                                   class="flex items-center gap-3 w-full text-left px-4 py-2 text-[13px] hover:bg-gray-50 transition-colors {{ $curLang === $code ? 'bg-gray-50 font-medium' : 'text-gray-600' }}">
+                                    <div class="w-5 h-5 rounded-full border border-gray-400 shadow-sm overflow-hidden shrink-0">
+                                        <img src="https://flagcdn.com/w20/{{ $data[1] }}.png" alt="{{ $code }}" class="w-full h-full object-cover">
+                                    </div>
+                                    <span class="flex-1 min-w-0 truncate">{{ $data[0] }}</span>
+                                    @if($curLang === $code)
+                                        <svg class="w-4 h-4 text-secondary-200 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+                                        </svg>
+                                    @endif
+                                </a>
+                            @endforeach
+                        </div>
+                    </div>
+                    <a href="{{ route('dashboard') }}"
+                       class="inline-flex items-center rounded-full bg-secondary-150 px-9 py-3.5 text-web-body-small font-merriweather text-brand-10
+                              transition-all duration-300 hover:bg-secondary-200 hover:-translate-y-0.5 hover:shadow-md">
+                        {{ __('Enter the Realm') }}
+                    </a>
+                </div>
             </div>
         </div>
     </nav>
@@ -120,20 +165,18 @@
 
         
         <div class="relative z-20 mx-auto max-w-[1240px] px-6 lg:px-[52px] pt-[150px]">
-            <div class="max-w-[560px]">
+            <div class="max-w-[700px]">
                 <h1 class="reveal text-web-title text-text-80">
-                    Are You Ready To<br>
-                    <span class="font-merriweather italic text-secondary-200">Spin A Yarn?</span>
+                    {{ __('Are You Ready To') }}<br>
+                    <span class="font-merriweather italic text-secondary-200">{{ __('Spin A Yarn?') }}</span>
                 </h1>
                 <p class="reveal reveal-d1 mt-6 max-w-[480px] font-montserrat text-[18px] leading-[28px] text-text-70">
-                    Weave every character, plot, and world into a story
-                    <br>worth telling, spinning countless narrative
-                    <br> threads into one cohesive universe.
+                    {!! __('Weave every character, plot, and world into a story worth telling, spinning countless narrative threads into one cohesive universe.') !!}
                 </p>
                 <a href="{{ route('dashboard') }}"
                    class="mt-8 inline-flex items-center rounded-[7px] bg-secondary-150 px-10 py-3.5 font-merriweather text-[16px] text-brand-10
                           shadow-md transition-all duration-700 hover:bg-secondary-200 hover:-translate-y-1 hover:shadow-lg">
-                    Enter the Realm
+                    {{ __('Enter the Realm') }}
                 </a>
             </div>
         </div>
@@ -151,10 +194,10 @@
             </div>
             @include('partials.starfield')
             <div class="relative z-10 mx-auto flex min-h-screen max-w-[1240px] flex-col justify-center px-6 lg:px-[52px] py-40">
-                <h2 class="reveal text-web-title leading-tight text-brand-10">The Creative<br>Realism</h2>
+                <h2 class="reveal text-web-title leading-tight text-brand-10 max-w-[600px]">{!! __('The Creative Realms') !!}</h2>
                 <p class="reveal reveal-d1 mt-6 max-w-[520px] font-montserrat text-[18px] leading-[28px] text-brand-200">
-                    In a Universe known as <span class="font-merriweather italic text-secondary-50">“The Creative Realms”</span>
-                    Lived the Writer of Worlds. They possess the power to create life from the void.
+                    {{ __('In a Universe known as') }} <span class="font-merriweather italic text-secondary-50">{{ __('“The Creative Realms”') }}</span><br>
+                    {{ __('Lived the Writer of Worlds. They possess the power to create life from the void.') }}
                 </p>
             </div>
         </section>
@@ -163,17 +206,32 @@
         <section class="relative min-h-screen flex flex-col justify-center overflow-hidden bg-[#2a1f17] py-20">
             @include('partials.starfield')
             <div class="relative z-10 mx-auto w-full max-w-[1240px] px-6 lg:px-[52px] text-center mt-6 lg:mt-8">
-                <p class="reveal font-montserrat text-[18px] text-brand-200">However, every Writer faces the same monster</p>
-                <h2 class="reveal reveal-d1 mt-2 font-merriweather text-[44px] font-bold italic text-brand-10">“The Great Tangle”</h2>
+                <p class="reveal font-montserrat text-[18px] text-brand-200">{{ __('However, every Writer faces the same monster') }}</p>
+                <h2 class="reveal reveal-d1 mt-2 font-merriweather text-[44px] font-bold italic text-brand-10 mx-auto max-w-[700px]">{{ __('“The Great Tangle”') }}</h2>
 
                 <div class="mt-14 flex flex-wrap items-center justify-center gap-6" style="perspective: 1500px;">
-                    @foreach(['tangle-1.png' => 'rotate-[-5deg]', 'tangle-2.png' => 'lg:-translate-y-4 z-10', 'tangle-3.png' => 'rotate-[5deg]'] as $file => $tilt)
-                        <div class="reveal reveal-d{{ $loop->iteration }} {{ $tilt }} w-[300px] max-w-[80%] transition-all duration-500 hover:z-20">
+                    @php
+                        $tangles = [
+                            ['file' => 'tangle-1.png', 'tilt' => 'rotate-[-5deg]', 'text' => 'Timelines twist into<br>deadly plot-holes...'],
+                            ['file' => 'tangle-2.png', 'tilt' => 'lg:-translate-y-4 z-10', 'text' => 'When a story grows vast,<br>magic begins to falter...'],
+                            ['file' => 'tangle-3.png', 'tilt' => 'rotate-[5deg]', 'text' => 'The army of characters<br>begins to lose its way...']
+                        ];
+                    @endphp
+                    @foreach($tangles as $tangle)
+                        <div class="reveal reveal-d{{ $loop->iteration }} {{ $tangle['tilt'] }} w-[300px] max-w-[80%] transition-all duration-500 hover:z-20">
                             <div class="animate-float hover:[animation-play-state:paused]" style="animation-delay: {{ $loop->index * 1.1 }}s; transform-style: preserve-3d;">
                                 <div class="tilt-container relative w-full h-auto cursor-pointer" style="perspective: 1000px;">
-                                    <img src="{{ $img($file) }}" alt="The Great Tangle" loading="lazy"
-                                         class="tilt-element w-full h-auto drop-shadow-[0_24px_40px_rgba(0,0,0,0.45)] transition-transform duration-[200ms] ease-out pointer-events-none"
+                                    <div class="tilt-element relative w-full h-auto drop-shadow-[0_24px_40px_rgba(0,0,0,0.45)] transition-transform duration-[200ms] ease-out pointer-events-none"
                                          style="transform-style: preserve-3d; transform: rotateX(0deg) rotateY(0deg) scale(1);">
+                                         <img src="{{ $img($tangle['file']) }}" alt="The Great Tangle" loading="lazy" class="w-full h-auto block">
+                                         
+                                         <!-- Localized Text Overlay -->
+                                         <div class="absolute bottom-[10.5%] inset-x-4 flex justify-center text-center">
+                                             <p class="font-merriweather text-[14px] leading-[22px] text-[#554c46]">
+                                                 {!! __($tangle['text']) !!}
+                                             </p>
+                                         </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -186,23 +244,24 @@
         @include('partials.starfield')
         <div class="relative z-10 mx-auto grid max-w-[1240px] grid-cols-1 items-center gap-12 px-6 lg:px-[52px] lg:grid-cols-2 mt-12 lg:mt-24">
             
-            
             <div class="reveal reveal-left relative order-2 h-[500px] w-full lg:order-1">
                 
+                <!-- Hand Image -->
                 <img src="{{ $img('hand.png') }}" alt="" loading="lazy"
-                     class="pointer-events-none absolute top-1/2 left-[-15%] lg:left-[-10%] z-0 w-[100%] lg:w-[500px] max-w-none -translate-y-[40%] select-none">
+                     class="pointer-events-none absolute top-1/2 left-[-15%] lg:left-[-8%] xl:left-[-12%] 2xl:left-[-18%] z-0 w-[100%] lg:w-[500px] max-w-none -translate-y-[40%] select-none transition-all duration-300">
                 
-                <!-- Spindle Tool/Card (Foreground) -->
-                <img src="{{ $img('group47.png') }}" alt="The Spindle" loading="lazy"
-                     class="absolute top-1/2 left-[24%] lg:left-[28%] z-10 w-[200px] lg:w-[260px] -translate-y-[85%] rotate-[8deg] drop-shadow-[0_30px_40px_rgba(0,0,0,0.5)]">
+                <!-- Spindle Tool/Card (Foreground with Float Animation) -->
+                <div class="absolute top-1/2 left-[24%] lg:left-[30%] xl:left-[26%] 2xl:left-[20%] z-10 w-[200px] lg:w-[260px] -translate-y-[85%] animate-float transition-all duration-300">
+                    <img src="{{ $img('group47.png') }}" alt="The Spindle" loading="lazy"
+                         class="w-full rotate-[8deg] drop-shadow-[0_30px_40px_rgba(0,0,0,0.5)]">
+                </div>
             </div>
 
             <div class="reveal reveal-right order-1 lg:order-2 -mt-12 lg:-mt-24">
-                <p class="font-montserrat text-[18px] font-semibold text-brand-200">WHO WE ARE?</p>
-                <h2 class="mt-1 text-web-title text-brand-10">But Spindle<br>Come as Solution</h2>
+                <p class="font-montserrat text-[18px] font-semibold text-brand-200">{{ __('WHO WE ARE?') }}</p>
+                <h2 class="mt-1 text-web-title text-brand-10 max-w-[600px]">{!! __('But Spindle Come as Solution') !!}</h2>
                 <p class="mt-6 max-w-[500px] font-montserrat text-[18px] leading-[28px] text-brand-200 opacity-90">
-                    We are going to help you create your story. Weave stories, characters, and notes
-                    easily by using Spindle. Convert your abstract yarn into a magic yarn!
+                    {{ __('We are going to help you create your story. Weave stories, characters, and notes easily by using Spindle. Convert your abstract yarn into a magic yarn!') }}
                 </p>
             </div>
         </div>
@@ -212,13 +271,12 @@
     
     <section id="writers" class="relative min-h-screen flex flex-col justify-center overflow-hidden bg-brand-50 py-20 scroll-mt-24">
         <div class="mx-auto max-w-[1240px] px-6 lg:px-[52px] text-center -mt-4">
-            <p class="reveal font-montserrat text-[18px] font-semibold text-secondary-200">OUR MISSION</p>
-            <h2 class="mt-1 text-web-title text-text-80">
-                From Writers To <span class="font-merriweather italic text-secondary-200">Writers</span>
+            <p class="reveal font-montserrat text-[18px] font-semibold text-secondary-200">{{ __('OUR MISSION') }}</p>
+            <h2 class="mt-1 text-web-title text-text-80 mx-auto max-w-[700px]">
+                {{ __('From Writers To') }} <span class="font-merriweather italic text-secondary-200">{{ __('Writers') }}</span>
             </h2>
             <p class="mx-auto mt-4 max-w-[560px] font-montserrat text-[18px] leading-[28px] text-text-70">
-                We are going to help you create your story. Weave stories, characters, and notes
-                easily by using Spindle. Convert your abstract yarn into a magic yarn!
+                {{ __('We are going to help you create your story. Weave stories, characters, and notes easily by using Spindle. Convert your abstract yarn into a magic yarn!') }}
             </p>
 
             <!-- Infinite Marquee Carousel -->
@@ -256,8 +314,8 @@
     
     <section id="tools" class="relative min-h-screen flex flex-col justify-center overflow-hidden bg-brand-50 pt-24 pb-8 scroll-mt-32">
         <div class="mx-auto max-w-[1240px] px-6 lg:px-[52px] -mt-16">
-            <p class="reveal font-montserrat text-[18px] font-semibold text-secondary-200">WHY CHOOSE US</p>
-            <h2 class="reveal reveal-d1 mt-1 max-w-[599px] text-web-title text-text-80">We Provide A Tools For Writing</h2>
+            <p class="reveal font-montserrat text-[18px] font-semibold text-secondary-200">{{ __('WHY CHOOSE US') }}</p>
+            <h2 class="reveal reveal-d1 mt-1 max-w-[599px] text-web-title text-text-80">{{ __('We Provide A Tools For Writing') }}</h2>
 
             @php $base = asset('images/landing') . '/'; @endphp
             <div x-data="{ 
@@ -265,10 +323,10 @@
                     base: '{{ $base }}', 
                     timer: null,
                     items: [
-                        { t: 'Create a New Project', d: 'Sections act as unified directories to organize and store every series of your creative works.', img: 'writers-center.png' },
-                        { t: 'Choose a Structure', d: 'Select the perfect narrative framework to seamlessly organize your timeline, plots, and acts.', img: 'writers-center.png' },
-                        { t: 'Create Character Relationship', d: 'Map out complex character relationships to ensure consistency across your storytelling universe.', img: 'writers-center.png' },
-                        { t: 'Add Your Notes', d: 'Consolidate your lore, world-building notes, and untamed ideas into a single, accessible repository.', img: 'writers-center.png' },
+                        { t: '{{ __('Create a New Project') }}', d: '{{ __('Sections act as unified directories to organize and store every series of your creative works.') }}', img: 'writers-center.png' },
+                        { t: '{{ __('Choose a Structure') }}', d: '{{ __('Select the perfect narrative framework to seamlessly organize your timeline, plots, and acts.') }}', img: 'writers-center.png' },
+                        { t: '{{ __('Create Character Relationship') }}', d: '{{ __('Map out complex character relationships to ensure consistency across your storytelling universe.') }}', img: 'writers-center.png' },
+                        { t: '{{ __('Add Your Notes') }}', d: '{{ __('Consolidate your lore, world-building notes, and untamed ideas into a single, accessible repository.') }}', img: 'writers-center.png' },
                     ],
                     startTimer() {
                         this.timer = setInterval(() => { this.sel = (this.sel + 1) % this.items.length; }, 3500);
@@ -280,9 +338,9 @@
                  x-init="startTimer()"
                  @mouseenter="stopTimer()"
                  @mouseleave="startTimer()"
-                 class="mt-8 grid grid-cols-1 items-center gap-10 lg:grid-cols-2 lg:gap-12">
+                 class="mt-8 grid grid-cols-1 items-center gap-10 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)] lg:gap-14">
                 
-                <div class="reveal reveal-left order-2 lg:order-1 w-11/12 mx-auto lg:w-11/12 lg:ml-auto">
+                <div class="reveal reveal-left order-2 lg:order-1 w-full lg:w-11/12 lg:ml-auto">
                       <div class="relative aspect-[566/419] w-full" style="perspective: 1500px; transform-style: preserve-3d;">
                           <template x-for="(it, i) in items" :key="i">
                               <div class="absolute inset-0 overflow-hidden rounded-sm border border-secondary-200/30 bg-brand-100 shadow-[0_15px_30px_rgba(43,31,23,0.15)] transition-all duration-[1200ms] ease-[cubic-bezier(0.4,0,0.2,1)]"
@@ -304,7 +362,7 @@
                               <div class="grid transition-all duration-[800ms] ease-[cubic-bezier(0.4,0,0.2,1)]"
                                    :class="sel === i ? 'grid-rows-[1fr] opacity-100 mt-2' : 'grid-rows-[0fr] opacity-0 mt-0'">
                                   <div class="overflow-hidden">
-                                      <p class="font-montserrat text-[14px] leading-[24px] text-black" x-text="it.d"></p>
+                                      <p class="font-montserrat text-[14px] leading-[24px] text-black h-[72px]" x-text="it.d"></p>
                                   </div>
                               </div>
                           </button>
@@ -317,6 +375,13 @@
     <section class="relative min-h-screen flex flex-col justify-center overflow-hidden bg-brand-50 py-20">
         <!-- Wind Rings Background -->
         <style>
+            .custom-scrollbar::-webkit-scrollbar-thumb:hover { background-color: #8C7558; }
+
+            /* Ensure correct reading direction for Arabic text without altering global layout */
+            html[lang="ar"] h1, html[lang="ar"] h2, html[lang="ar"] h3, html[lang="ar"] p, html[lang="ar"] span, html[lang="ar"] a, html[lang="ar"] button {
+                direction: rtl;
+                unicode-bidi: isolate;
+            }
             @keyframes wind-ring {
                 0% { transform: scale(0.3) rotate(0deg); opacity: 0; border-width: 8px; }
                 20% { opacity: 0.35; }
@@ -334,8 +399,8 @@
 
         <div class="relative z-10 mx-auto max-w-[1240px] px-6 lg:px-[52px] text-center">
             <p class="reveal mx-auto max-w-[800px] font-merriweather text-[28px] md:text-[36px] lg:text-[42px] italic leading-[1.5] text-text-80">
-                You Are The <span class="text-secondary-200">“Weavers”</span>...<br class="hidden md:block">
-                The Ones Who Will Turn A Yarn Into A Story.
+                {{ __('You Are The') }} <span class="text-secondary-200">{{ __('“Weavers”') }}</span>...<br class="hidden md:block">
+                {{ __('The Ones Who Will Turn A Yarn Into A Story.') }}
             </p>
         </div>
     </section>
@@ -343,13 +408,13 @@
     <section class="relative overflow-hidden bg-brand-50 pt-16 pb-0">
         <div class="reveal reveal-d1 relative mx-auto max-w-[1240px] px-6 lg:px-[52px]">
             <div class="relative overflow-hidden rounded-[28px] bg-brand-100 px-6 pt-20 mb-16 text-center shadow-lg">
-                <h2 class="text-web-title text-text-80">
-                    Are You Ready To <span class="font-merriweather italic text-secondary-200">Spin A Yarn?</span>
+                <h2 class="text-web-title text-text-80 mx-auto max-w-[700px]">
+                    {{ __('Are You Ready To') }} <span class="font-merriweather italic text-secondary-200">{{ __('Spin A Yarn?') }}</span>
                 </h2>
                 <a href="{{ route('dashboard') }}"
                    class="mt-6 inline-flex items-center rounded-[7px] bg-secondary-150 px-10 py-3.5 font-merriweather text-[16px] text-brand-10
                           shadow-md transition-all duration-700 hover:bg-secondary-200 hover:-translate-y-1 hover:shadow-lg">
-                    Enter the Realm
+                    {{ __('Enter the Realm') }}
                 </a>
                 
                 <div class="mt-10 flex justify-center px-4 pb-10">
@@ -387,14 +452,13 @@
                 <img src="{{ $img('logo-spindle.png') }}" alt="Spindle" class="h-9 w-auto select-none" style="filter: brightness(0) invert(1);">
             </a>
             <ul class="mt-7 flex flex-wrap items-center justify-center gap-x-10 gap-y-3 font-montserrat text-[15px] font-semibold tracking-wide">
-                <li><a href="#hero"    class="transition-colors hover:text-white/70">INTRODUCTION</a></li>
-                <li><a href="#about"   class="transition-colors hover:text-white/70">ABOUT US</a></li>
-                <li><a href="#tools"   class="transition-colors hover:text-white/70">GUIDES</a></li>
-                <li><a href="#writers" class="transition-colors hover:text-white/70">ADVANTAGES</a></li>
+                <li><a href="#hero"    class="transition-colors hover:text-white/70">{{ __('INTRODUCTION') }}</a></li>
+                <li><a href="#about"   class="transition-colors hover:text-white/70">{{ __('ABOUT US') }}</a></li>
+                <li><a href="#writers" class="transition-colors hover:text-white/70">{{ __('CHALLENGES') }}</a></li>
+                <li><a href="#tools"   class="transition-colors hover:text-white/70">{{ __('FEATURES') }}</a></li>
             </ul>
             <p class="mt-7 max-w-[640px] font-montserrat text-[15px] leading-[26px] text-white/70">
-                Copyright © {{ date('Y') }} Spindle. Empowering storytellers to weave unforgettable narratives.
-                Developed and maintained by the Spindle Team. All rights reserved.
+                {!! __('Copyright © :year Spindle. Empowering storytellers to weave unforgettable narratives. Developed and maintained by the Spindle Team. All rights reserved.', ['year' => date('Y')]) !!}
             </p>
             <div class="mt-8 flex items-center gap-4">
                 <a href="#" aria-label="Instagram" class="flex h-11 w-11 items-center justify-center rounded-full border border-white/40 transition-colors hover:bg-white/10">

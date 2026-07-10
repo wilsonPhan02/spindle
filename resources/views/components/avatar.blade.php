@@ -99,7 +99,7 @@
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-12 h-12">
                     <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
                 </svg>
-                <span class="text-web-body-small font-medium uppercase tracking-wider">Edit Photo</span>
+                <span class="text-web-body-small font-medium uppercase tracking-wider">{{ __('Edit Photo') }}</span>
 
                 {{-- Tombol Detach --}}
                 <template x-if="photoPreview || ('{{ $imageUrl }}' && !isRemoved)">
@@ -108,7 +108,7 @@
                         @click.stop="detach()"
                         class="mt-1 px-3 py-1 bg-text-70/70 hover:bg-text-70/90 text-subtext-60 text-[9px] font-bold rounded-full border border-text-70/90 transition-colors uppercase tracking-tighter"
                     >
-                        Detach Photo
+                        {{ __('Detach Photo') }}
                     </button>
                 </template>
             </div>
@@ -119,7 +119,7 @@
                     const file = $refs.photo.files[0];
                     if (file) {
                         if (file.size > 5 * 1024 * 1024) {
-                            clientError = 'The selected image is too large. The maximum allowed file size is 5MB.';
+                            clientError = '{{ __('The selected image is too large. The maximum allowed file size is 5MB.') }}';
                             $refs.photo.value = '';
                         } else {
                             clientError = null;
@@ -177,7 +177,7 @@
     <div x-show="showCropper" style="display: none;" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm">
         <div class="bg-bg-main w-full max-w-lg rounded-2xl overflow-hidden shadow-2xl flex flex-col" @click.away="cancelCrop()">
             <div class="p-4 border-b border-black/10 flex justify-between items-center bg-brand-10">
-                <h3 class="text-app-heading-3 text-text-100">Adjust Profile Photo</h3>
+                <h3 class="text-app-heading-3 text-text-100">{{ __('Adjust Profile Photo') }}</h3>
                 <button @click="cancelCrop()" class="p-2 text-text-60 hover:bg-black/5 rounded-full transition-colors" title="Cancel"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
             </div>
             
@@ -189,10 +189,10 @@
             </div>
             
             <div class="p-4 border-t border-black/10 bg-brand-10 flex justify-end gap-3">
-                <button @click="cancelCrop()" type="button" class="px-5 py-2 text-app-desc-feature font-semibold text-text-70 hover:bg-black/5 rounded-lg transition-colors">Cancel</button>
+                <button @click="cancelCrop()" type="button" class="px-5 py-2 text-app-desc-feature font-semibold text-text-70 hover:bg-black/5 rounded-lg transition-colors">{{ __('Cancel') }}</button>
                 <button @click="applyCrop()" type="button" class="px-5 py-2 bg-secondary-100 text-bg-main text-app-desc-feature font-semibold rounded-lg shadow hover:bg-secondary-200 transition-colors flex items-center gap-2">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
-                    Crop & Save
+                    {{ __('Crop & Save') }}
                 </button>
             </div>
         </div>

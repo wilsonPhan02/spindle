@@ -150,13 +150,13 @@ new #[Layout('layouts.app')] class extends Component {
 <div class="px-6 pt-6 lg:px-10 lg:pt-10 max-w-7xl mx-auto h-screen flex flex-col overflow-hidden">
     <div class="mb-4">
         <x-breadcrumb :items="[
-            ['label' => 'Dashboard', 'url' => route('dashboard')],
+            ['label' => __('Dashboard'), 'url' => route('dashboard')],
             ['label' => $project->title, 'url' => route('projects.show', $project), 'truncate' => true],
-            ['label' => 'Characters']
+            ['label' => __('Characters')]
         ]" />
 
         <div class="flex justify-between items-center">
-            <h1 class="text-app-title-1 text-text-100">Characters Sheet</h1>
+            <h1 class="text-app-title-1 text-text-100">{{ __('Characters Sheet') }}</h1>
         </div>
     </div>
 
@@ -217,7 +217,7 @@ new #[Layout('layouts.app')] class extends Component {
                                 @click.stop="startAddRelation(char.id)"
                                 class=" cursor-pointer absolute -top-10 left-1/2 -translate-x-1/2 whitespace-nowrap p-2 rounded-full bg-brand-150 border border-brand-100 text-app-desc-feature font-semibold text-text-80 hover:bg-brand-200 transition-colors shadow-sm"
                             >
-                                + Add Relation
+                                {{ __('+ Add Relation') }}
                             </button>
 
                             <div
@@ -262,8 +262,8 @@ new #[Layout('layouts.app')] class extends Component {
                     <x-icons.no-character class="w-full h-full" />
                 </div>
                 <div class="text-center">
-                    <p class="text-app-heading-2 text-secondary-150">No characters yet</p>
-                    <p class="text-app-feature text-medium text-secondary-100 mt-1">Click the <span class="font-bold">+</span> button below to add your first character</p>
+                    <p class="text-app-heading-2 text-secondary-150">{{ __('No characters yet') }}</p>
+                    <p class="text-app-feature text-medium text-secondary-100 mt-1">{!! __('Click the <span class="font-bold">+</span> button below to add your first character') !!}</p>
                 </div>
             </div>
 
@@ -274,8 +274,8 @@ new #[Layout('layouts.app')] class extends Component {
                 class="absolute top-4 inset-x-0 z-40 flex justify-center"
             >
                 <div class="flex items-center gap-3 bg-bg-main border border-secondary-100 rounded-full shadow-sm px-5 py-2">
-                    <span class="text-app-feature text-text-80">Choose one character</span>
-                    <button @click="cancelAddRelation()" class="text-app-feature text-danger-100 transition-colors px-4 py-1 rounded-full hover:bg-danger-100/10">Cancel</button>
+                    <span class="text-app-feature text-text-80">{{ __('Choose one character') }}</span>
+                    <button @click="cancelAddRelation()" class="text-app-feature text-danger-100 transition-colors px-4 py-1 rounded-full hover:bg-danger-100/10">{{ __('Cancel') }}</button>
                 </div>
             </div>
 
@@ -299,7 +299,7 @@ new #[Layout('layouts.app')] class extends Component {
                     x-transition
                     class="absolute -top-11 right-0 whitespace-nowrap p-2 rounded-md bg-text-100/60 text-app-caption font-semibold text-bg-main shadow-sm"
                 >
-                    Add New Character
+                    {{ __('Add New Character') }}
                 </span>
                 <button 
                     @mouseenter="hoverAdd = true"

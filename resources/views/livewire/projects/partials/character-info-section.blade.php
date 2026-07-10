@@ -1,6 +1,6 @@
         <div class="bg-brand-10 border border-brand-150 rounded-2xl p-6 flex flex-col gap-6 h-full">
             <div class="flex flex-col gap-3">
-                <h3 class="text-app-feature text-text-100">Character Image</h3>
+                <h3 class="text-app-feature text-text-100">{{ __('Character Image') }}</h3>
                 <div x-data="{ 
                         hoverCover: false,
                         isUploading: false,
@@ -52,7 +52,7 @@
                         <img src="{{ Storage::url($character->image_path) }}" class="absolute inset-0 w-full h-full object-cover">
                     @else
                         <div class="absolute inset-0 flex items-center justify-center text-subtext-80 text-app-desc-feature text-center px-4 border border-dashed border-brand-200 rounded-lg">
-                            No Image (3:4)
+                            {{ __('No Image (3:4)') }}
                         </div>
                     @endif
 
@@ -62,15 +62,15 @@
                             <img x-ref="cropperImg" :src="cropImageUrl" class="block max-w-full" alt="Crop Preview">
                         </div>
                         <div class="absolute bottom-4 left-0 right-0 flex justify-center gap-2 z-50">
-                            <button @click="cancelCrop()" type="button" class="px-4 py-1.5 bg-bg-main/90 backdrop-blur text-text-70 text-[11px] font-bold uppercase tracking-wider rounded-md border border-text-60 hover:bg-bg-main shadow-lg transition-colors">Cancel</button>
-                            <button @click="applyCrop()" type="button" class="px-4 py-1.5 bg-secondary-100/95 backdrop-blur text-bg-main text-[11px] font-bold uppercase tracking-wider rounded-md shadow-lg border border-secondary-200 hover:bg-secondary-200 transition-colors">Save</button>
+                            <button @click="cancelCrop()" type="button" class="px-4 py-1.5 bg-bg-main/90 backdrop-blur text-text-70 text-[11px] font-bold uppercase tracking-wider rounded-md border border-text-60 hover:bg-bg-main shadow-lg transition-colors">{{ __('Cancel') }}</button>
+                            <button @click="applyCrop()" type="button" class="px-4 py-1.5 bg-secondary-100/95 backdrop-blur text-bg-main text-[11px] font-bold uppercase tracking-wider rounded-md shadow-lg border border-secondary-200 hover:bg-secondary-200 transition-colors">{{ __('Save') }}</button>
                         </div>
                     </div>
 
                     <div x-show="hoverCover && !showCropper" x-transition class="absolute bottom-4 left-4 z-30 flex flex-wrap gap-2">
                         <label class="flex items-center gap-1.5 px-2.5 py-1.5 bg-text-80/95 border border-text-60 rounded-md cursor-pointer hover:bg-text-80 transition-colors shadow-lg">
                             <x-icons.upload class="w-3.5 h-3.5 text-bg-main" />
-                            <span class="text-bg-main text-app-desc-feature">Upload</span>
+                            <span class="text-bg-main text-app-desc-feature">{{ __('Upload') }}</span>
                             <input type="file" x-ref="characterImageInput" class="hidden" accept="image/*"
                                 @change="
                                     const file = $event.target.files[0];
@@ -112,7 +112,7 @@
                         @if($character->image_path)
                             <button type="button" wire:click="removeImage" class="flex items-center gap-1.5 px-2.5 py-1.5 bg-text-80/95 border border-text-60 rounded-md cursor-pointer hover:bg-text-80 transition-colors shadow-lg">
                                 <x-icons.delete class="w-3.5 h-3.5 text-danger-100" />
-                                <span class="text-app-desc-feature text-danger-100">Remove</span>
+                                <span class="text-app-desc-feature text-danger-100">{{ __('Remove') }}</span>
                             </button>
                         @endif
                     </div>
@@ -138,13 +138,13 @@
                     {{-- Progress Overlay --}}
                     <div x-show="isUploading" x-transition class="absolute inset-0 bg-[#F5EFE9]/80 backdrop-blur-md z-40 flex flex-col items-center justify-center rounded-lg">
                         <svg class="animate-spin h-8 w-8 text-secondary-200 mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                        <div class="text-secondary-200 font-semibold text-sm">Uploading... <span x-text="progress + '%'"></span></div>
+                        <div class="text-secondary-200 font-semibold text-sm">{{ __('Uploading...') }} <span x-text="progress + '%'"></span></div>
                     </div>
                 </div>
             </div>
 
             <div class="flex flex-col gap-4 mb-4">
-                <h3 class="text-app-feature text-text-100 pb-2 border-b border-brand-150">Tags</h3>
+                <h3 class="text-app-feature text-text-100 pb-2 border-b border-brand-150">{{ __('Tags') }}</h3>
                 <div
                     x-data="{
                         showNewTagInput: false,
@@ -186,7 +186,7 @@
                                 @keydown.enter="addTag()"
                                 @keydown.escape="showNewTagInput = false; newTagName = ''"
                                 maxlength="20"
-                                placeholder="New tag..."
+                                placeholder="{{ __('New tag...') }}"
                                 class="pl-3 pr-11 py-2 rounded-full bg-brand-100 border border-secondary-100 outline-none text-app-body-small text-text-70 w-36"
                             >
                             <span class="absolute right-3 top-1/2 -translate-y-1/2 text-app-desc-feature text-secondary-100 pointer-events-none" x-text="newTagName.length + '/20'"></span>
@@ -208,7 +208,7 @@
 
             <div class="flex flex-col gap-4">
                 <div class="flex items-center justify-between pb-2 border-b border-brand-150">
-                    <h3 class="text-app-feature text-text-100">Relationship</h3>
+                    <h3 class="text-app-feature text-text-100">{{ __('Relationship') }}</h3>
                     <button wire:click="$set('showAddRelation', true)" type="button" class="w-6 h-6 rounded-full bg-brand-100 flex items-center justify-center text-text-70 hover:bg-brand-150 transition-colors">
                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
                     </button>
@@ -273,7 +273,7 @@
                                 class="w-full px-3 py-2 bg-bg-main border border-brand-150 rounded-lg text-app-desc-feature text-left flex items-center justify-between gap-2 outline-none transition-colors hover:border-secondary-100"
                                 :class="selectedChar ? 'text-text-80' : 'text-subtext-70'"
                             >
-                                <span x-text="selectedChar ? selectedChar.name : 'Select character...'"></span>
+                                <span x-text="selectedChar ? selectedChar.name : '{{ __('Select character...') }}'"></span>
                                 <svg class="w-3 h-3 text-text-60 shrink-0 transition-transform duration-150" :class="charOpen ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
                             </button>
                             <div x-show="charOpen" x-cloak
@@ -286,7 +286,7 @@
                                         <span x-text="char.name"></span>
                                     </div>
                                 </template>
-                                <div x-show="characters.length === 0" class="px-3 py-2 text-app-desc-feature text-subtext-70 italic">No other characters</div>
+                                <div x-show="characters.length === 0" class="px-3 py-2 text-app-desc-feature text-subtext-70 italic">{{ __('No other characters') }}</div>
                             </div>
                         </div>
 
@@ -295,7 +295,7 @@
                             <button type="button" @click="typeOpen = !typeOpen"
                                 class="w-full px-3 py-2 bg-bg-main border border-brand-150 rounded-lg text-app-desc-feature text-left flex items-center justify-between gap-2 outline-none transition-colors hover:border-secondary-100"
                             >
-                                <span x-show="!selectedType" class="text-subtext-70">Select type...</span>
+                                <span x-show="!selectedType" class="text-subtext-70">{{ __('Select type...') }}</span>
                                 <span x-show="selectedType" x-cloak
                                     class="px-2.5 py-0.5 rounded-full text-app-desc-feature"
                                     :style="selectedType ? `background-color: ${selectedType.bgColor}; color: ${selectedType.textColor}` : ''"
@@ -317,12 +317,12 @@
                                         </span>
                                     </div>
                                 </template>
-                                <div x-show="types.length === 0" class="px-3 py-2 text-app-desc-feature text-subtext-70 italic">No types yet</div>
+                                <div x-show="types.length === 0" class="px-3 py-2 text-app-desc-feature text-subtext-70 italic">{{ __('No types yet') }}</div>
                                 <div class="border-t border-brand-150">
                                     <div @click="typeOpen = false; window.dispatchEvent(new CustomEvent('open-relation-type-popup', { detail: { relationId: null, charFromName: '{{ $character->nick_name }}', charToName: selectedChar ? selectedChar.name : null, usedTypeIds: selectedChar ? (relatedTypesByChar[selectedChar.id] || []) : [] } }))"
                                         class="px-3 py-2 flex items-center gap-2 text-app-desc-feature font-semibold text-secondary-200 hover:bg-brand-100 cursor-pointer">
                                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
-                                        Add New Relation
+                                        {{ __('Add New Relation') }}
                                     </div>
                                 </div>
                             </div>
@@ -335,13 +335,13 @@
                         <div class="flex gap-2">
                             <button wire:click="$set('showAddRelation', false)" type="button"
                                 class="flex-1 py-2 rounded-md border border-secondary-50 text-app-desc-feature text-text-80 hover:bg-[#EAE1D5] transition-colors">
-                                Cancel
+                                {{ __('Cancel') }}
                             </button>
                             <button wire:click="addRelationship" type="button"
                                 :disabled="!selectedChar || !selectedType"
                                 :class="(!selectedChar || !selectedType) ? 'opacity-50 cursor-not-allowed' : 'hover:bg-brand-200'"
                                 class="flex-1 py-2 rounded-md bg-brand-150 text-app-desc-feature text-text-80 transition-colors">
-                                Add
+                                {{ __('Add') }}
                             </button>
                         </div>
                     </div>
@@ -376,7 +376,7 @@
                             </button>
                         </div>
                     @empty
-                        <p class="text-app-desc-feature text-subtext-90">No relationships yet.</p>
+                        <p class="text-app-desc-feature text-subtext-90">{{ __('No relationships yet.') }}</p>
                     @endforelse
                 </div>
             </div>

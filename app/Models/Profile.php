@@ -23,6 +23,7 @@ class Profile extends Model
         'occupation',
         'gender',
         'birthdate',
+        'language',
     ];
 
     public function user(): BelongsTo

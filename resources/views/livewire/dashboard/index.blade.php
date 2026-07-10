@@ -92,7 +92,7 @@ new class extends Component {
     }
 })">
     <x-breadcrumb :items="[
-        ['label' => 'Dashboard']
+        ['label' => __('Dashboard')]
     ]" />
 
     @php
@@ -148,12 +148,12 @@ new class extends Component {
                      :style="overflows ? `--distance: -${distance}px; --duration: ${duration}s;` : ''"
                 >
                     <h1 class="{{ $titleSize }} font-merriweather text-text-100 mb-2">
-                        Welcome <span class="font-bold">{{ $displayName }}!</span>
+                        {{ __('Welcome') }} <span class="font-bold">{{ $displayName }}!</span>
                     </h1>
                 </div>
             </div>
             
-            <p class="text-app-body-large text-text-80 truncate w-full text-center">Are u ready to spin the <span class="italic">yarn</span>?</p>
+            <p class="text-app-body-large text-text-80 truncate w-full text-center">{!! __('Are u ready to spin the :yarn?', ['yarn' => '<span class="italic">'.__('yarn').'</span>']) !!}</p>
         </div>
         <div class="w-36 md:w-44 lg:w-48 mb-8 shrink-0 pointer-events-none flex justify-end">
             <x-right-dashboard class="w-full h-auto block" />
@@ -163,8 +163,8 @@ new class extends Component {
     @if(count($sections) === 0)
         <div class="flex flex-col items-center justify-center mt-12">
             <x-empty-dashboard class="w-48 h-48 mb-6 opacity-80" />
-            <h2 class="text-app-heading-1 text-subtext-80 mb-2">Looks like it's a bit quiet in here...</h2>
-            <p class="text-app-body-large text-subtext-70">Ready to create a new one?</p>
+            <h2 class="text-app-heading-1 text-subtext-80 mb-2">{{ __('Looks like it\'s a bit quiet in here...') }}</h2>
+            <p class="text-app-body-large text-subtext-70">{{ __('Ready to create a new one?') }}</p>
         </div>
     @else
         <div class="space-y-12 mb-8">
@@ -203,13 +203,13 @@ new class extends Component {
 
                             <div x-show="menuOpen" style="display: none;" class="absolute right-0 mt-2 w-48 bg-white border border-brand-150 rounded-lg shadow-lg z-50 py-1 overflow-hidden">
                                 <button wire:click="addProject('{{ $section->section_id }}')" @click="menuOpen = false" class="w-full text-left px-4 py-2 text-app-body-medium text-text-80 hover:bg-brand-10 flex items-center gap-3 transition-colors">
-                                    <x-icons.add class="w-4 h-4 shrink-0 text-text-80" /> Add Project
+                                    <x-icons.add class="w-4 h-4 shrink-0 text-text-80" /> {{ __('Add Project') }}
                                 </button>
                                 <button @click="editing = true; menuOpen = false; setTimeout(() => $refs.nameInput.focus(), 50)" class="w-full text-left px-4 py-2 text-app-body-medium text-text-80 hover:bg-brand-10 flex items-center gap-3 transition-colors">
-                                    <x-icons.rename class="w-4 h-4 shrink-0 text-text-80" /> Rename
+                                    <x-icons.rename class="w-4 h-4 shrink-0 text-text-80" /> {{ __('Rename') }}
                                 </button>
                                 <button @click="$dispatch('open-archive-section-dialog', { id: '{{ $section->section_id }}' }); menuOpen = false" class="w-full text-left px-4 py-2 text-app-body-medium text-text-80 hover:bg-brand-10 flex items-center gap-3 transition-colors">
-                                    <x-icons.archive class="w-4 h-4 shrink-0 text-text-80" /> Archive
+                                    <x-icons.archive class="w-4 h-4 shrink-0 text-text-80" /> {{ __('Archive') }}
                                 </button>
                             </div>
                         </div>
@@ -307,7 +307,7 @@ new class extends Component {
 
                         <button wire:click="addProject('{{ $section->section_id }}')" class="w-44 shrink-0 aspect-[2/3] border-2 border-dashed border-brand-200 rounded-xl flex flex-col items-center justify-center text-subtext-80 hover:border-secondary-200 hover:text-secondary-200 hover:bg-[#F5EFE9] transition-all group mb-3 select-none">
                             <svg class="w-8 h-8 mb-2 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                            <span class="text-sm font-medium">New Project</span>
+                            <span class="text-sm font-medium">{{ __('New Project') }}</span>
                         </button>
 
                     </div>
@@ -326,7 +326,7 @@ new class extends Component {
             </svg>
         </div>
         <span class="whitespace-nowrap font-medium text-[15px] opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex-1 text-right pr-2">
-            Add Section
+            {{ __('Add Section') }}
         </span>
     </button>
 

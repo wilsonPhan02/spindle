@@ -14,7 +14,7 @@
                         ])>
                             <div class="flex items-center gap-1.5 min-w-0">
                                 <x-icons.chapter-status :status="$chapterCard->status" class="w-3.5 h-3.5 shrink-0" />
-                                <span class="truncate">{{ $chapterCard->status ?? 'In Progress' }}</span>
+                                <span class="truncate">{{ __($chapterCard->status ?? 'In Progress') }}</span>
                             </div>
                             <x-icons.chevron rotate="90" size="w-3 h-3" color="subtext-70"/>
                         </button>
@@ -36,7 +36,7 @@
                                     ])
                                 >
                                     <x-icons.chapter-status :status="$st" class="w-3.5 h-3.5 shrink-0" />
-                                    <span class="truncate">{{ $st }}</span>
+                                    <span class="truncate">{{ __($st) }}</span>
                                 </button>
                             @endforeach
                         </div>
@@ -46,7 +46,7 @@
                         type="button"
                         @click="showDetailPanel = false"
                         class="flex items-center gap-1 px-1 py-1 rounded-md border border-secondary-150 bg-card-hover hover:bg-card-bg text-text-80 text-app-caption transition-all shadow-sm"
-                        title="Hide Chapter Details"
+                        title="{{ __('Hide Chapter Details') }}"
                     >
                         <x-icons.chevron size="w-3 h-3" rotate="180"/>
                     </button>
@@ -142,7 +142,7 @@
                         <!-- Progress Overlay -->
                         <div x-show="isUploading" x-transition class="absolute inset-0 bg-[#F5EFE9]/80 backdrop-blur-md z-40 flex flex-col items-center justify-center">
                             <svg class="animate-spin h-6 w-6 text-secondary-200 mb-1.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                            <div class="text-secondary-200 font-semibold text-xs">Uploading... <span x-text="progress + '%'"></span></div>
+                            <div class="text-secondary-200 font-semibold text-xs">{{ __('Uploading...') }} <span x-text="progress + '%'"></span></div>
                             
                             <div class="w-1/2 bg-brand-150 rounded-full h-1.5 mt-2 overflow-hidden shadow-inner mx-auto">
                                 <div class="bg-secondary-100 h-full rounded-full transition-all duration-200 ease-out" :style="`width: ${progress}%`"></div>
@@ -156,7 +156,7 @@
                         @else
                             <div class="flex flex-col items-center justify-center gap-1 p-4 text-center">
                                 <x-icons.no-structure class="w-8 h-8 text-secondary-150 opacity-60" />
-                                <span class="text-app-caption text-secondary-150">No cover image</span>
+                                <span class="text-app-caption text-secondary-150">{{ __('No cover image') }}</span>
                             </div>
                         @endif
 
@@ -164,14 +164,14 @@
                         <div x-show="hoverCover && !showCropper" x-transition class="absolute bottom-2.5 left-2.5 z-30 flex items-center gap-1.5">
                             <label class="flex items-center gap-1.5 px-2.5 py-1.5 bg-text-80/95 border border-text-60 hover:bg-text-80 text-bg-main text-app-caption text-[9px] rounded-md shadow-lg cursor-pointer transition-transform active:scale-95">
                                 <x-icons.upload class="w-3 h-3 text-bg-main" />
-                                <span>{{ $chapterCard->cover_image_path || $project->cover_image_path ? 'Change Cover' : 'Upload Cover' }}</span>
+                                <span>{{ $chapterCard->cover_image_path || $project->cover_image_path ? __('Change Cover') : __('Upload Cover') }}</span>
                                 <input type="file" x-ref="coverInput" @change="onFileChange" accept="image/*" class="hidden">
                             </label>
 
                             @if($chapterCard->cover_image_path || $project->cover_image_path)
                                 <button type="button" wire:click="detachCoverImage" class="flex items-center gap-1.5 px-2.5 py-1.5 bg-text-80/95 border border-text-60 hover:bg-text-80 text-danger-100 text-app-caption text-[9px] rounded-md shadow-lg cursor-pointer transition-transform active:scale-95" title="Detach Cover">
                                     <x-icons.delete class="w-3 h-3 text-danger-100" />
-                                    <span>Remove</span>
+                                    <span>{{ __('Remove') }}</span>
                                 </button>
                             @endif
                         </div>
@@ -204,14 +204,14 @@
                                 <img x-ref="cropImage" :src="cropImageUrl" draggable="false" class="block w-full h-full select-none" style="max-width: 100%; max-height: 100%; object-fit: contain;">
                             </div>
                             <div class="absolute bottom-2.5 left-0 right-0 flex justify-center gap-2 z-50">
-                                <button @click.stop="cancelCrop()" type="button" class="px-3 py-1 bg-bg-main/90 backdrop-blur text-text-70 text-[10px] font-bold uppercase tracking-wider rounded-md border border-text-60 hover:bg-bg-main shadow-lg transition-colors cursor-pointer">Cancel</button>
-                                <button @click.stop="applyCrop()" type="button" class="px-3 py-1 bg-secondary-100/95 backdrop-blur text-bg-main text-[10px] font-bold uppercase tracking-wider rounded-md shadow-lg border border-secondary-200 hover:bg-secondary-200 transition-colors cursor-pointer">Save</button>
+                                <button @click.stop="cancelCrop()" type="button" class="px-3 py-1 bg-bg-main/90 backdrop-blur text-text-70 text-[10px] font-bold uppercase tracking-wider rounded-md border border-text-60 hover:bg-bg-main shadow-lg transition-colors cursor-pointer">{{ __('Cancel') }}</button>
+                                <button @click.stop="applyCrop()" type="button" class="px-3 py-1 bg-secondary-100/95 backdrop-blur text-bg-main text-[10px] font-bold uppercase tracking-wider rounded-md shadow-lg border border-secondary-200 hover:bg-secondary-200 transition-colors cursor-pointer">{{ __('Save') }}</button>
                             </div>
                         </div>
 
                         <div wire:loading.flex wire:target="coverUpload" class="absolute inset-0 bg-text-70/80 backdrop-blur-[1px] items-center justify-center gap-2 text-app-desc-feature z-40">
                             <svg class="animate-spin h-5 w-5 text-bg-main" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                            <span class="text-bg-main">Uploading Cover...</span>
+                            <span class="text-bg-main">{{ __('Uploading Cover...') }}</span>
                         </div>
                     </div>
                 </div>
@@ -234,19 +234,19 @@
                         this.editingTitle = false;
                     }
                 }" class="border-b border-secondary-50/50 pb-3.5">
-                    <p class="text-app-caption font-medium text-secondary-200 mb-1">Chapter {{ $chapterCard->order_index }}</p>
+                    <p class="text-app-caption font-medium text-secondary-200 mb-1">{{ __('Chapter') }} {{ $chapterCard->order_index }}</p>
 
                     {{-- Display Title --}}
                     <div x-show="!editingTitle" class="group flex items-start justify-between gap-2 mb-1.5">
                         <h2 x-ref="titleDisplay" @dblclick="startEdit"
                             class="text-web-heading-2 text-[24px] text-text-80 leading-snug line-clamp-2 cursor-pointer hover:text-secondary-200 transition-colors"
-                            title="Double-click to rename chapter"
+                            title="{{ __('Double-click to rename chapter') }}"
                         >
                             {{ $chapterCard->title }}
                         </h2>
                         <button type="button" @click="startEdit"
                                 class="p-1 rounded hover:bg-brand-150 text-secondary-150 opacity-70 group-hover:opacity-100 transition-opacity shrink-0 cursor-pointer"
-                                title="Rename Chapter">
+                                title="{{ __('Rename Chapter') }}">
                             <x-icons.rename/>
                         </button>
                     </div>
@@ -256,11 +256,11 @@
                         <input type="text" x-ref="titleInput" x-model="titleVal"
                                @keydown.enter="saveTitle" @keydown.escape="editingTitle = false" @blur="saveTitle"
                                class="w-full text-web-heading-2 text-text-70 bg-bg-main border border-secondary-100 rounded px-2 py-1 shadow-sm focus:outline-none focus:ring-2 focus:ring-secondary-150/30">
-                        <p class="text-app-caption text-subtext-90 mt-0.5">Press Enter to save, Esc to cancel</p>
+                        <p class="text-app-caption text-subtext-90 mt-0.5">{{ __('Press Enter to save, Esc to cancel') }}</p>
                     </div>
 
                     <p class="text-app-caption text-secondary-100">
-                        Last Edited: {{ $chapterCard->updated_at?->timezone('Asia/Jakarta')->format('d F Y, H.i') ?? '-' }}
+                        {{ __('Last Edited:') }} {{ $chapterCard->updated_at?->timezone('Asia/Jakarta')->format('d F Y, H.i') ?? '-' }}
                     </p>
                 </div>
 
@@ -282,10 +282,10 @@
                     <div class="flex items-center justify-between py-1">
                         <button type="button" @click="openSummary = !openSummary" class="flex items-center gap-1.5 text-left group cursor-pointer flex-1">
                             <svg class="w-3.5 h-3.5 text-secondary-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                            <span class="text-app-desc-feature font-bold text-text-80 group-hover:text-secondary-200 transition-colors">Summary</span>
+                            <span class="text-app-desc-feature font-bold text-text-80 group-hover:text-secondary-200 transition-colors">{{ __('Summary') }}</span>
                         </button>
                         <div class="flex items-center gap-2.5">
-                            <button type="button" @click="if(!openSummary) openSummary = true; startEditSummary()" class="text-app-caption text-secondary-150 hover:underline font-semibold cursor-pointer">Edit</button>
+                            <button type="button" @click="if(!openSummary) openSummary = true; startEditSummary()" class="text-app-caption text-secondary-150 hover:underline font-semibold cursor-pointer">{{ __('Edit') }}</button>
                             <button type="button" @click="openSummary = !openSummary" class="text-secondary-150 transition-transform duration-200 cursor-pointer p-0.5" :class="openSummary ? 'rotate-180' : ''">
                                 <x-icons.chevron rotate="90" size="w-3 h-3" color="text-secondary-150"/>
                             </button>
@@ -298,7 +298,7 @@
                                  @dblclick="startEditSummary"
                                  style="word-break: break-word; overflow-wrap: break-word;"
                                  class="p-2.5 rounded-lg border border-transparent hover:border-secondary-100 hover:bg-brand-150/40 transition-all cursor-pointer text-app-body-small text-text-70 break-words whitespace-normal overflow-x-hidden"
-                                 title="Double click to edit summary">
+                                 title="{{ __('Double click to edit summary') }}">
                                 {{ $displaySummary }}
                             </div>
                         </div>
@@ -308,10 +308,10 @@
                             <textarea x-ref="summaryInput" x-model="summaryVal" rows="4"
                                       style="word-break: break-word; overflow-wrap: break-word;"
                                       class="w-full text-app-body-small text-text-70 bg-bg-main border border-secondary-100 rounded-lg p-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-secondary-150/30 custom-scrollbar break-words whitespace-normal overflow-x-hidden placeholder:text-subtext-80"
-                                      placeholder="Write chapter summary here..."></textarea>
+                                      placeholder="{{ __('Write chapter summary here...') }}"></textarea>
                             <div class="flex items-center justify-end gap-2 group">
-                                <button type="button" @click="editingSummary = false" class="px-2 py-1 text-app-desc-feature text-secondary-150 group-hover:bg-brand-100 rounded cursor-pointer">Cancel</button>
-                                <button type="button" @click="saveSummary" class="px-2.5 py-1 text-app-desc-feature bg-secondary-100 hover:bg-secondary-150 text-bg-main rounded shadow-sm cursor-pointer">Save</button>
+                                <button type="button" @click="editingSummary = false" class="px-2 py-1 text-app-desc-feature text-secondary-150 group-hover:bg-brand-100 rounded cursor-pointer">{{ __('Cancel') }}</button>
+                                <button type="button" @click="saveSummary" class="px-2.5 py-1 text-app-desc-feature bg-secondary-100 hover:bg-secondary-150 text-bg-main rounded shadow-sm cursor-pointer">{{ __('Save') }}</button>
                             </div>
                         </div>
                     </div>
@@ -322,7 +322,7 @@
                     <div class="flex items-center justify-between py-1">
                         <button type="button" @click="openTags = !openTags" class="flex items-center gap-1.5 text-left group cursor-pointer flex-1">
                             <x-icons.category class="w-3 h-3 text-secondary-200"/>
-                            <span class="text-app-desc-feature font-bold text-text-80 group-hover:text-secondary-200 transition-colors">Tags ({{ $chapterCard->tags->count() }})</span>
+                            <span class="text-app-desc-feature font-bold text-text-80 group-hover:text-secondary-200 transition-colors">{{ __('Tags') }} ({{ $chapterCard->tags->count() }})</span>
                         </button>
                         <button type="button" @click="openTags = !openTags" class="text-secondary-150 transition-transform duration-200 cursor-pointer p-0.5" :class="openTags ? 'rotate-180' : ''">
                             <x-icons.chevron rotate="90" size="w-3 h-3" color="text-secondary-150"/>
@@ -335,7 +335,7 @@
                             <button x-show="!addingTag" @click="addingTag = true; $nextTick(() => { $refs.tagInput.focus(); })"
                                     type="button"
                                     class="px-2.5 py-1 rounded-md border border-dashed border-secondary-150 bg-bg-main text-secondary-150 text-app-body-small text-[11px] font-medium hover:bg-bg-hover transition-colors cursor-pointer">
-                                + Add Tag
+                                {{ __('+ Add Tag') }}
                             </button>
 
                             {{-- Full Width Compact Add Tag Input Box (when adding, takes full line so tags drop below) --}}
@@ -345,7 +345,7 @@
                                            @input="if(tagVal.length > 20) tagVal = tagVal.substring(0, 20)"
                                            @keydown.enter="if(tagVal.trim() !== '') { $wire.addTag(tagVal); tagVal = ''; addingTag = false; }"
                                            @keydown.escape="addingTag = false; tagVal = ''"
-                                           placeholder="Tag..."
+                                           placeholder="{{ __('Tag...') }}"
                                            maxlength="20"
                                            class="w-full bg-transparent border-0 border-b border-secondary-200 px-0.5 py-0.5 text-app-body-small text-[11.5px] text-subtext-90 placeholder-text-80/60 focus:outline-none focus:ring-0 focus:border-secondary-200 font-medium leading-tight">
                                     <button type="button" @click="addingTag = false; tagVal = ''" class="text-secondary-150 hover:text-secondary-200 font-bold text-xs px-1 leading-none transition-colors cursor-pointer" title="Cancel">&times;</button>
@@ -373,7 +373,7 @@
                     <div class="flex items-center justify-between py-1">
                         <button type="button" @click="openChar = !openChar" class="flex items-center gap-1.5 text-left group cursor-pointer flex-1">
                             <svg class="w-3.5 h-3.5 text-secondary-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
-                            <span class="text-app-desc-feature font-bold text-text-80 group-hover:text-secondary-200 transition-colors">Characters ({{ $chapterCard->characters->count() }})</span>
+                            <span class="text-app-desc-feature font-bold text-text-80 group-hover:text-secondary-200 transition-colors">{{ __('Characters') }} ({{ $chapterCard->characters->count() }})</span>
                         </button>
                         <button type="button" @click="openChar = !openChar" class="transition-transform duration-200 cursor-pointer p-0.5" :class="openChar ? 'rotate-180' : ''">
                             <x-icons.chevron rotate="90" size="w-3 h-3" color="text-secondary-150"/>
@@ -385,14 +385,14 @@
                             <button type="button" @click="showCharDropdown = !showCharDropdown"
                                     class="w-full flex items-center justify-center gap-2 px-3.5 py-2 rounded-lg border border-dashed border-secondary-150 bg-bg-main text-app-desc-feature text-secondary-150 hover:bg-white transition-colors shadow-sm cursor-pointer">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                                <span>Add Character...</span>
+                                <span>{{ __('Add Character...') }}</span>
                             </button>
 
                             <div x-show="showCharDropdown" @click.away="showCharDropdown = false" x-cloak
                                  class="absolute left-0 top-full mt-1.5 w-full bg-bg-main rounded-lg shadow-xl border border-brand-150 max-h-[200px] overflow-y-auto info-panel-scrollbar z-50 py-1">
                                 @if(empty($projectCharacters) || $projectCharacters->isEmpty())
                                     <div class="px-3 py-3 text-center text-app-captiontext-secondary-50">
-                                        No characters found in this project yet.
+                                        {{ __('No characters found in this project yet.') }}
                                     </div>
                                 @else
                                     @php
@@ -418,9 +418,9 @@
                                                     <x-icons.default-avatar class="w-4 h-4 text-secondary-150" />
                                                 </div>
                                             @endif
-                                            <span class="truncate flex-1">{{ $pChar->full_name ?? $pChar->nick_name ?? 'Unnamed' }}</span>
+                                            <span class="truncate flex-1">{{ $pChar->full_name ?? $pChar->nick_name ?? __('Unnamed') }}</span>
                                             @if($isCharAdded)
-                                                <span class="text-app-caption text-[9.5px] text-subtext-90 font-semibold bg-subtext-80 px-1.5 py-0.5 rounded">Added</span>
+                                                <span class="text-app-caption text-[9.5px] text-subtext-90 font-semibold bg-subtext-80 px-1.5 py-0.5 rounded">{{ __('Added') }}</span>
                                             @endif
                                         </button>
                                     @endforeach
@@ -442,7 +442,7 @@
                                                 </div>
                                             @endif
                                             <div class="min-w-0">
-                                                <p class="text-app-body-small text-[12px] font-semibold text-text-80 truncate">{{ $char->full_name ?? $char->nick_name ?? 'Unnamed' }}</p>
+                                                <p class="text-app-body-small text-[12px] font-semibold text-text-80 truncate">{{ $char->full_name ?? $char->nick_name ?? __('Unnamed') }}</p>
                                                 @if($char->nick_name && $char->nick_name !== $char->full_name)
                                                     <p class="text-app-body-small text-[10px] text-subtext-90 truncate">"{{ $char->nick_name }}"</p>
                                                 @endif

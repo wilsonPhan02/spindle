@@ -405,7 +405,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Show navbar when mouse hovers near the top of the screen, hide when leaves
             window.addEventListener('mousemove', (e) => {
-                if (e.clientY <= 120) {
+                if (e.clientY <= 120 || (e.target && e.target.closest('#main-nav'))) {
                     nav.classList.remove('-translate-y-[150%]');
                 } else if (isScrollingDown && window.scrollY > 100) {
                     nav.classList.add('-translate-y-[150%]');

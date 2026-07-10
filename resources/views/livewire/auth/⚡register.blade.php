@@ -70,13 +70,13 @@ new #[Layout('layouts.guest')] #[Title('Sign Up - Spindle')] class extends Compo
 
         <div class="w-full max-w-md p-6 bg-card-bg border border-transparent rounded-xl shadow-md">
             
-            <h1 class="mb-5 text-2xl font-merriweather text-center text-text-80">Sign Up</h1>
+            <h1 class="mb-5 text-2xl font-merriweather text-center text-text-80">{{ __('Sign Up') }}</h1>
 
             <form wire:submit="register" novalidate x-data @submit="$wire.email = $refs.email.value; $wire.password = $refs.password.value; $wire.password_confirmation = $refs.password_confirmation.value" class="space-y-3">
                 
                 <div>
-                    <label class="block mb-1 text-app-body-medium text-text-80">Email</label>
-                    <input type="email" wire:model="email" x-ref="email" placeholder="Enter your email" 
+                    <label class="block mb-1 text-app-body-medium text-text-80">{{ __('Email') }}</label>
+                    <input type="email" wire:model="email" x-ref="email" placeholder="{{ __('Enter your email') }}" 
                         x-init="setTimeout(() => { let v = sessionStorage.getItem('auth_email'); if(v && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) { $el.value = v; $wire.email = v; } }, 10)"
                         @input="sessionStorage.setItem('auth_email', $el.value)"
                         class="w-full px-4 py-2 bg-white border border-subtext-70 rounded-md focus:ring-2 focus:ring-secondary-200 outline-none transition-all placeholder-subtext-90 text-app-body-medium text-text-80">
@@ -84,9 +84,9 @@ new #[Layout('layouts.guest')] #[Title('Sign Up - Spindle')] class extends Compo
                 </div>
 
                 <div x-data="{ show: false }">
-                    <label class="block mb-1 text-app-body-medium text-text-80">Password</label>
+                    <label class="block mb-1 text-app-body-medium text-text-80">{{ __('Password') }}</label>
                     <div class="relative">
-                        <input :type="show ? 'text' : 'password'" wire:model="password" x-ref="password" placeholder="Enter your password" 
+                        <input :type="show ? 'text' : 'password'" wire:model="password" x-ref="password" placeholder="{{ __('Enter your password') }}" 
                             x-init="setTimeout(() => { let e = sessionStorage.getItem('auth_email'); let v = sessionStorage.getItem('auth_password'); if(v && e && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)) { $el.value = v; $wire.password = v; } }, 10)"
                             @input="sessionStorage.setItem('auth_password', $el.value)"
                             class="w-full px-4 py-2 pr-10 bg-white border border-subtext-70 rounded-md focus:ring-2 focus:ring-secondary-200 outline-none transition-all placeholder-subtext-90 text-app-body-medium text-text-80">
@@ -99,9 +99,9 @@ new #[Layout('layouts.guest')] #[Title('Sign Up - Spindle')] class extends Compo
                 </div>
 
                 <div class="mb-5" x-data="{ showConfirm: false }">
-                    <label class="block mb-1 text-app-body-medium text-text-80">Confirm Password</label>
+                    <label class="block mb-1 text-app-body-medium text-text-80">{{ __('Confirm Password') }}</label>
                     <div class="relative">
-                        <input :type="showConfirm ? 'text' : 'password'" wire:model="password_confirmation" x-ref="password_confirmation" placeholder="Re-enter your password" 
+                        <input :type="showConfirm ? 'text' : 'password'" wire:model="password_confirmation" x-ref="password_confirmation" placeholder="{{ __('Re-enter your password') }}" 
                             class="w-full px-4 py-2 pr-10 bg-white border border-subtext-70 rounded-md focus:ring-2 focus:ring-secondary-200 outline-none transition-all placeholder-subtext-90 text-app-body-medium text-text-80">
                         <button type="button" @click="showConfirm = !showConfirm" class="absolute inset-y-0 right-0 flex items-center pr-3 text-subtext-90 hover:text-text-80 focus:outline-none transition-colors">
                             <svg x-show="!showConfirm" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7a9.978 9.978 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.542 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" /></svg>
@@ -116,21 +116,21 @@ new #[Layout('layouts.guest')] #[Title('Sign Up - Spindle')] class extends Compo
                     <input type="checkbox" wire:model="terms" id="terms" 
                         class="w-4 h-4 flex-shrink-0 mt-0.5 bg-white border-transparent rounded text-secondary-200 focus:ring-secondary-200 focus:ring-offset-card-bg">
                     <label for="terms" class="ml-2 text-app-body-medium text-text-80 cursor-pointer">
-                        I have read and agree to the <a href="#" class="text-interactive-100 hover:underline">terms and conditions</a>
+                        {!! __('I have read and agree to the <a href="#" class="text-interactive-100 hover:underline">terms and conditions</a>') !!}
                     </label>
                 </div>
                 @error('terms') <span class="text-app-body-small text-danger-100 block">{{ $message }}</span> @enderror
 
                 <button type="submit" 
                     class="w-full py-2.5 mt-2 text-app-feature text-bg-main transition-colors bg-secondary-200 rounded-md hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary-200 focus:ring-offset-card-bg">
-                    Sign Up
+                    {{ __('Sign Up') }}
                 </button>
                 
             </form>
 
             <div class="flex items-center my-4">
                 <div class="flex-grow border-t border-subtext-70"></div>
-                <span class="px-3 text-app-body-small text-subtext-90 bg-card-bg">Or</span>
+                <span class="px-3 text-app-body-small text-subtext-90 bg-card-bg">{{ __('Or') }}</span>
                 <div class="flex-grow border-t border-subtext-70"></div>
             </div>
 
@@ -142,12 +142,12 @@ new #[Layout('layouts.guest')] #[Title('Sign Up - Spindle')] class extends Compo
                     <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
                     <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
                 </svg>
-                Sign up with Google
+                {{ __('Sign up with Google') }}
             </button>
 
             <p class="text-app-body-medium text-center text-text-80">
-                Already have an account? 
-                <a href="{{ route('login') }}" wire:navigate class="text-interactive-100 hover:underline">Sign in</a>
+                {{ __('Already have an account?') }} 
+                <a href="{{ route('login') }}" wire:navigate class="text-interactive-100 hover:underline">{{ __('Sign in') }}</a>
             </p>
         </div>
     </div>
@@ -159,7 +159,7 @@ new #[Layout('layouts.guest')] #[Title('Sign Up - Spindle')] class extends Compo
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
             </svg>
-            <p class="text-xl font-merriweather font-semibold text-text-80 animate-pulse">Arriving at creative realm...</p>
+            <p class="text-xl font-merriweather font-semibold text-text-80 animate-pulse">{{ __('Arriving at creative realm...') }}</p>
         </div>
     </div>
     @endif

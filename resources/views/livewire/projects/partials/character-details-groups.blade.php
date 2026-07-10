@@ -1,6 +1,6 @@
             <div class="border-t border-brand-150 pt-6 flex flex-col gap-6">
                 <h3 class="text-app-feature text-secondary-200 tracking-wide flex items-center gap-2">
-                    DETAILS
+                    {{ __('DETAILS') }}
                     <button type="button" @click="window.dispatchEvent(new CustomEvent('open-edit-characters'))" class="text-text-80 hover:text-secondary-200 transition-colors">
                         <x-icons.rename class="w-3 h-3" />
                     </button>
@@ -17,15 +17,15 @@
                                         @blur="$wire.$commit()" 
                                         @keydown.enter="$event.target.blur()" 
                                         @keydown.escape="$event.target.blur()" 
-                                        value="{{ $detailValues[$field['id']] ?? '' }}" placeholder="Enter value"
+                                        value="{{ $detailValues[$field['id']] ?? '' }}" placeholder="{{ __('Enter value') }}"
                                         class="w-full px-4 py-2 bg-bg-main border-1 border-secondary-100 rounded-lg focus:border-secondary-250 focus:border-2 outline-none transition-all text-subtext-100 text-app-body-medium placeholder:text-subtext-80">
                                 </div>
                                  @empty
-                                    <p class="text-subtext-90 font-medium text-app-feature">No field in this group yet.</p>
+                                    <p class="text-subtext-90 font-medium text-app-feature">{{ __('No field in this group yet.') }}</p>
                             @endforelse
                         </div>
                     </div>
                 @empty
-                    <p class="text-subtext-90 font-medium text-app-feature">No detail groups yet.</p>
+                    <p class="text-subtext-90 font-medium text-app-feature">{{ __('No detail groups yet.') }}</p>
                 @endforelse
             </div>

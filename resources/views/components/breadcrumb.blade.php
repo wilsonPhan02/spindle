@@ -9,12 +9,12 @@
             @endphp
 
             @if(isset($item['url']) && $item['url'])
-                <a href="{{ $item['url'] }}" wire:navigate class="hover:text-[#8C7558] transition-colors block {{ $textClasses }}" title="{{ $item['label'] }}">
-                    {{ $item['label'] }}
+                <a href="{{ $item['url'] }}" wire:navigate class="hover:text-[#8C7558] transition-colors block {{ $textClasses }}" title="{{ __($item['label']) }}">
+                    {{ __($item['label']) }}
                 </a>
             @else
-                <span class="text-[#2C2C2C] font-semibold block {{ $textClasses }}" title="{{ $item['label'] }}">
-                    {{ $item['label'] }}
+                <span class="text-[#2C2C2C] font-semibold block {{ $textClasses }}" title="{{ __($item['label']) }}">
+                    {{ __($item['label']) }}
                 </span>
             @endif
 

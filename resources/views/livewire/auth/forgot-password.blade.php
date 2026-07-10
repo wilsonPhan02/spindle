@@ -49,16 +49,16 @@ new class extends Component {
             {{-- Form State --}}
             <div class="flex flex-col gap-8">
                 <div class="flex flex-col gap-5">
-                    <h2 class="text-app-heading-1 text-text-100">Forgot Password</h2>
+                    <h2 class="text-app-heading-1 text-text-100">{{ __('Forgot Password') }}</h2>
                     <p class="text-app-subfeature text-text-80 px-3">
-                        Drop your email, and we'll send a magic link to help you write the next line.
+                        {{ __('Drop your email, and we\'ll send a magic link to help you write the next line.') }}
                     </p>
                 </div>
 
                 <div class="text-left space-y-2">
                     <x-form-input 
-                        label="Email" 
-                        placeholder="Enter your email" 
+                        label="{{ __('Email') }}" 
+                        placeholder="{{ __('Enter your email') }}" 
                         model="email" 
                     />
                 </div>
@@ -70,7 +70,7 @@ new class extends Component {
                         variant="secondary" 
                         class="flex-1"
                     >
-                        Cancel
+                        {{ __('Cancel') }}
                     </x-button>
 
                     <x-button 
@@ -79,14 +79,14 @@ new class extends Component {
                         variant="primary" 
                         class="flex-1"
                     >
-                        <span wire:loading.remove>Send Link</span>
+                        <span wire:loading.remove>{{ __('Send Link') }}</span>
                         
                         <span wire:loading.flex class="flex items-center gap-2">
                             <svg class="animate-spin h-5 w-5 text-subtext-60" viewBox="0 0 24 24">
                                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                             </svg>
-                            Sending...
+                            {{ __('Sending...') }}
                         </span>
                     </x-button>
                 </div>
@@ -116,15 +116,15 @@ new class extends Component {
                 </div>
 
                 <div class="flex flex-col gap-5 mb-5">
-                    <h2 class="text-app-heading-1 text-text-100">Check Your Email!</h2>
+                    <h2 class="text-app-heading-1 text-text-100">{{ __('Check Your Email!') }}</h2>
                     <p class="text-app-subfeature text-text-80 px-3">
-                        We've sent the magic link to <strong>{{ $email }}</strong>.
+                        {!! __('We\'ve sent the magic link to <strong>:email</strong>.', ['email' => $email]) !!}
                     </p>
                 </div>
 
                 {{-- Resend Email --}}
                 <p class="text-app-desc-feature text-text-80 px-3 mb-3">
-                    Didn't receive the email yet? 
+                    {{ __('Didn\'t receive the email yet?') }} 
                     <button 
                         type="button"
                         :disabled="timer > 0" 
@@ -132,8 +132,8 @@ new class extends Component {
                         class="text-app-desc-feature text-text-80 hover:underline disabled:opacity-50 disabled:no-underline transition-all"
                         :class="timer > 0 ? 'cursor-not-allowed' : 'cursor-pointer'"
                     >
-                        <span x-show="timer === 0">Resend</span>
-                        <span x-show="timer > 0">Resend in 00:<span x-text="timer < 10 ? '0' + timer : timer"></span></span>
+                        <span x-show="timer === 0">{{ __('Resend') }}</span>
+                        <span x-show="timer > 0">{{ __('Resend in') }} 00:<span x-text="timer < 10 ? '0' + timer : timer"></span></span>
                     </button>
                 </p>
 
@@ -143,7 +143,7 @@ new class extends Component {
                     variant="secondary" 
                     class="w-full"
                 >
-                    Got it, Thanks!
+                    {{ __('Got it, Thanks!') }}
                 </x-button>
             </div>
         @endif

@@ -250,11 +250,11 @@ new class extends Component {
 
     <div class="px-6 mb-8">
         <div class="relative">
-            <svg wire:loading.remove wire:target="searchQuery" class="absolute left-3 top-2.5 w-4 h-4 text-subtext-90" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-            <svg wire:loading wire:target="searchQuery" class="absolute left-3 top-2.5 w-4 h-4 text-subtext-90 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-            <input wire:model.live.debounce.300ms="searchQuery" type="text" placeholder="Search The Yarn" class="w-full pl-9 pr-8 py-2 bg-brand-10 border-none rounded-full text-app-body-medium text-text-80 placeholder-subtext-70 focus:ring-1 focus:ring-secondary-150 outline-none transition-shadow">
+            <svg wire:loading.remove wire:target="searchQuery" class="absolute left-3 top-2.5 w-4 h-4 text-subtext-100" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            <svg wire:loading wire:target="searchQuery" class="absolute left-3 top-2.5 w-4 h-4 text-subtext-100 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+            <input wire:model.live.debounce.300ms="searchQuery" type="text" placeholder="{{ __('Search The Yarn') }}" class="w-full pl-9 pr-8 py-2 bg-brand-10 border border-brand-150 rounded-full text-app-body-medium text-text-80 placeholder-subtext-100 focus:ring-1 focus:ring-secondary-150 outline-none transition-shadow">
             
-            <button x-show="$wire.searchQuery !== ''" @click="$wire.set('searchQuery', ''); $wire.searchResultsData = null" class="absolute right-3 top-2.5 text-subtext-90 hover:text-text-80 transition-colors" x-cloak>
+            <button x-show="$wire.searchQuery !== ''" @click="$wire.set('searchQuery', ''); $wire.searchResultsData = null" class="absolute right-3 top-2.5 text-subtext-100 hover:text-text-80 transition-colors" x-cloak>
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
             </button>
         </div>
@@ -267,14 +267,14 @@ new class extends Component {
             <div wire:key="search-results-block" wire:transition>
                 <div class="space-y-4">
                     <div class="text-app-feature text-text-80 flex justify-between items-center">
-                        <span>Search Results</span>
-                        <span class="text-[10px] bg-brand-150 px-1.5 py-0.5 rounded text-[#8C7558] font-medium">{{ $this->searchResultsData['total'] }} found</span>
+                        <span>{{ __('Search Results') }}</span>
+                        <span class="text-[10px] bg-brand-150 px-1.5 py-0.5 rounded text-[#8C7558] font-medium">{{ $this->searchResultsData['total'] }} {{ __('found') }}</span>
                     </div>
                 
                 @if($this->searchResultsData['total'] === 0)
                     <div class="flex flex-col items-center justify-center py-4 text-center opacity-60">
                         <x-icons.sidebar-pen class="w-8 h-8 text-secondary-150 mb-1" />
-                        <p class="text-app-desc-feature text-secondary-200">No results found.</p>
+                        <p class="text-app-desc-feature text-secondary-200">{{ __('No results found.') }}</p>
                     </div>
                 @else
                     <div x-data="{ expandedSearch: false }" class="space-y-1 -mx-2 px-2 pb-2">
@@ -322,7 +322,7 @@ new class extends Component {
 
                         @if($this->searchResultsData['total'] > 5)
                             <button @click="expandedSearch = !expandedSearch" class="w-full text-center text-[11px] font-semibold text-[#8C7558] hover:text-[#5E4C38] py-2 mt-2 transition-colors">
-                                <span x-text="expandedSearch ? 'Show less' : 'Show more ({{ $this->searchResultsData['total'] - 5 }})'"></span>
+                                <span x-text="expandedSearch ? '{{ __('Show less') }}' : '{{ __('Show more') }} ({{ $this->searchResultsData['total'] - 5 }})'"></span>
                             </button>
                         @endif
                     </div>
@@ -335,7 +335,7 @@ new class extends Component {
         <div class="space-y-6 shrink-0">
             <div x-data="{ viewAll: false }">
             <div class="flex items-center justify-between w-full text-app-feature text-text-70 mb-2">
-                <span>Marked</span>
+                <span>{{ __('Marked') }}</span>
             </div>
             <div>
                 @if(count($pinnedProjects) > 0)
@@ -372,21 +372,21 @@ new class extends Component {
                                             @endif
                                             <span class="text-[13px] font-medium text-text-80 truncate transition-colors" :class="rowHovered ? 'text-text-100' : ''">{{ $pProject->title }}</span>
                                         </a>
-                                        <button wire:click="unpin('{{ $pProject->project_id }}')" class="transition-all p-1 shrink-0 text-[#A08866] hover:text-[#8C7558] opacity-0 group-hover:opacity-100" :class="rowHovered ? 'opacity-100' : 'opacity-0'" title="Unmark Project">
+                                        <button wire:click="unpin('{{ $pProject->project_id }}')" class="transition-all p-1 shrink-0 text-[#A08866] hover:text-[#8C7558] opacity-0 group-hover:opacity-100" :class="rowHovered ? 'opacity-100' : 'opacity-0'" title="{{ __('Unmark Project') }}">
                                             <x-icons.bookmark-slash class="w-4 h-4" />
                                         </button>
                                     </div>
                                 @endforeach
                             </div>
                             <button @click="viewAll = !viewAll" class="w-full text-center text-[11px] font-semibold text-[#8C7558] hover:text-[#5E4C38] py-1.5 transition-colors">
-                                <span x-text="viewAll ? 'Show less' : 'View all ({{ count($pinnedProjects) }})'"></span>
+                                <span x-text="viewAll ? '{{ __('Show less') }}' : '{{ __('View all') }} ({{ count($pinnedProjects) }})'"></span>
                             </button>
                         @endif
                     </div>
                 @else
                     <div class="flex flex-col items-center justify-center py-4 text-center opacity-60">
                         <x-icons.sidebar-pen class="w-8 h-8 text-secondary-150 mb-1" />
-                        <p class="text-app-desc-feature text-secondary-200">No Marked Projects!</p>
+                        <p class="text-app-desc-feature text-secondary-200">{{ __('No Marked Projects!') }}</p>
                     </div>
                 @endif
             </div>
@@ -394,7 +394,7 @@ new class extends Component {
 
         <div x-data="{ viewAll: false }">
             <div class="flex items-center justify-between w-full text-app-feature text-text-70 mb-2">
-                <span>Recent</span>
+                <span>{{ __('Recent') }}</span>
             </div>
             <div>
                 @if(count($recentProjects) > 0)
@@ -428,14 +428,14 @@ new class extends Component {
                                 @endforeach
                             </div>
                             <button @click="viewAll = !viewAll" class="w-full text-center text-[11px] font-semibold text-[#8C7558] hover:text-[#5E4C38] py-1.5 transition-colors">
-                                <span x-text="viewAll ? 'Show less' : 'View all ({{ count($recentProjects) }})'"></span>
+                                <span x-text="viewAll ? '{{ __('Show less') }}' : '{{ __('View all') }} ({{ count($recentProjects) }})'"></span>
                             </button>
                         @endif
                     </div>
                 @else
                     <div class="flex flex-col items-center justify-center py-4 text-center opacity-60">
                         <x-icons.sidebar-pen class="w-8 h-8 text-secondary-150 mb-1" />
-                        <p class="text-app-desc-feature text-secondary-200">You Didn't Have Any Project!</p>
+                        <p class="text-app-desc-feature text-secondary-200">{{ __('You Didn\'t Have Any Project!') }}</p>
                     </div>
                 @endif
             </div>
@@ -444,16 +444,16 @@ new class extends Component {
         </div>
         
         <div class="pt-6 shrink-0">
-            <div class="text-app-feature text-text-70 mb-2">Others</div>
+            <div class="text-app-feature text-text-70 mb-2">{{ __('Others') }}</div>
             <div class="space-y-1">
                 <a href="{{ route('archive') }}" wire:navigate class="flex items-center px-3 py-2 -mx-3 rounded-lg text-app-body-medium text-text-80 hover:bg-brand-150 hover:text-text-100 transition-colors group {{ request()->routeIs('archive') ? 'bg-brand-150 text-text-100' : '' }}">
                     <x-icons.archive class="w-5 h-5 mr-3 text-text-80 group-hover:text-text-100 transition-colors" />
-                    Archive
+                    {{ __('Archive') }}
                 </a>
 
                 <a href="{{ route('settings') }}" wire:navigate class="flex items-center px-3 py-2 -mx-3 rounded-lg text-app-body-medium text-text-80 hover:bg-brand-150 hover:text-text-100 transition-colors group {{ request()->routeIs('settings') ? 'bg-brand-150 text-text-100' : '' }}">
                     <x-icons.setting class="w-5 h-5 mr-3 text-text-80 group-hover:text-text-100 transition-colors" />
-                    Settings
+                    {{ __('Settings') }}
                 </a>
             </div>
             </div>

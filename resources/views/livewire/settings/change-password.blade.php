@@ -62,13 +62,13 @@ new class extends Component {
         class="bg-brand-10 rounded-2xl border-2 border-brand-150 shadow-2xl w-full max-w-3xl py-12 px-15 text-center"
     >
         <div class="flex flex-col gap-6">
-            <h2 class="text-app-heading-1 text-text-100">Change Password</h2>
+            <h2 class="text-app-heading-1 text-text-100">{{ __('Change Password') }}</h2>
 
             <form wire:submit="updatePassword" class="flex flex-col gap-6">
                 <x-form-input 
-                    label="Current Password" 
+                    label="{{ __('Current Password') }}" 
                     type="password" 
-                    placeholder="Enter your current password" 
+                    placeholder="{{ __('Enter your current password') }}" 
                     model="current_password" 
                 />
                 
@@ -78,26 +78,26 @@ new class extends Component {
                         @click="show = false; $dispatch('open-forgot-password')" 
                         class="text-app-desc-feature text-interactive-100 hover:underline italic focus:outline-none"
                     >
-                        Forgot Password?
+                        {{ __('Forgot Password?') }}
                     </button>
                 </div>
 
                 <x-form-input 
-                    label="New Password" 
+                    label="{{ __('New Password') }}" 
                     type="password" 
-                    placeholder="Enter your new password" 
+                    placeholder="{{ __('Enter your new password') }}" 
                     model="new_password" 
                 />
 
                 <x-form-input 
-                    label="Confirm New Password" 
+                    label="{{ __('Confirm New Password') }}" 
                     type="password" 
-                    placeholder="Re-enter your new password" 
+                    placeholder="{{ __('Re-enter your new password') }}" 
                     model="new_password_confirmation" 
                 />
 
                 <x-dialog-footer 
-                    message="Are you sure want to change your password?" 
+                    message="{{ __('Are you sure want to change your password?') }}" 
                 />
             </form>
         </div>

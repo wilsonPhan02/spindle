@@ -46,7 +46,7 @@
         <!-- Call to Action -->
         <a href="{{ Auth::check() ? route('dashboard') : url('/') }}" 
            class="inline-flex items-center rounded-full bg-secondary-150 px-9 py-3.5 font-merriweather text-[15px] text-brand-10 shadow-md transition-all duration-300 hover:bg-secondary-200 hover:-translate-y-1 hover:shadow-lg focus:outline-none">
-            Return to Safety
+            {{ __('Return to Safety') }}
         </a>
     </div>
 
