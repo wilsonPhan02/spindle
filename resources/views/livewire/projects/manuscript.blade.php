@@ -367,7 +367,7 @@ new #[Layout('layouts.app')] class extends Component {
             'drafts' => $drafts,
             'activeDraft' => $activeDraft,
             'projectCharacters' => $projectCharacters,
-            'displaySummary' => $displaySummary !== '' ? $displaySummary : 'No summary available for this chapter yet.',
+            'displaySummary' => $displaySummary !== '' ? $displaySummary : __('No summary available for this chapter yet.'),
         ];
     }
 }; ?>
@@ -469,10 +469,10 @@ new #[Layout('layouts.app')] class extends Component {
         {{-- Breadcrumb --}}
         <div class="mb-8">
             <x-breadcrumb :items="[
-                ['label' => 'Dashboard', 'url' => route('dashboard')],
+                ['label' => __('Dashboard'), 'url' => route('dashboard')],
                 ['label' => '...', 'url' => route('projects.show', $project)],
-                ['label' => 'Structure', 'url' => route('projects.structure', $project)],
-                ['label' => 'Chapter ' . $chapterCard->order_index]
+                ['label' => __('Structure'), 'url' => route('projects.structure', $project)],
+                ['label' => __('Chapter') . ' ' . $chapterCard->order_index]
             ]" />
         </div>
 
@@ -492,10 +492,10 @@ new #[Layout('layouts.app')] class extends Component {
                     type="button"
                     @click="showDetailPanel = true"
                     class="flex items-center gap-1.5 px-3 py-1 rounded-md border border-secondary-150 bg-card-bg hover:bg-card-hover text-text-80 text-app-caption transition-all shadow-sm cursor-pointer"
-                    title="Show Chapter Details Panel"
+                    title="{{ __('Show Chapter Details Panel') }}"
                 >
                     <x-icons.chevron size="w-3 h-3"/>
-                    <span>Show Details</span>
+                    <span>{{ __('Show Details') }}</span>
                 </button>
             </div>
         </div>
@@ -534,10 +534,10 @@ new #[Layout('layouts.app')] class extends Component {
     {{-- Delete Draft Confirm Dialog --}}
     <x-confirm-dialog
         eventName="open-delete-draft-dialog"
-        title="Delete Draft"
-        description="Are you sure you want to delete this draft? This action cannot be undone and all content in this draft will be permanently removed."
-        confirmText="Yes, Delete"
-        cancelText="Cancel"
+        title="{{ __('Delete Draft') }}"
+        description="{{ __('Are you sure you want to delete this draft? This action cannot be undone and all content in this draft will be permanently removed.') }}"
+        confirmText="{{ __('Yes, Delete') }}"
+        cancelText="{{ __('Cancel') }}"
         submitAction="deleteDraft"
     >
         <x-slot:icon>

@@ -55,15 +55,15 @@
                         <img x-ref="cropperImg" :src="cropImageUrl" class="block max-w-full" alt="Crop Preview">
                     </div>
                     <div class="absolute bottom-4 left-0 right-0 flex justify-center gap-2 z-50">
-                        <button @click="cancelCrop()" type="button" class="px-4 py-1.5 bg-bg-main/90 backdrop-blur text-text-70 text-[11px] font-bold uppercase tracking-wider rounded-md border border-text-60 hover:bg-bg-main shadow-lg transition-colors">Cancel</button>
-                        <button @click="applyCrop()" type="button" class="px-4 py-1.5 bg-secondary-100/95 backdrop-blur text-bg-main text-[11px] font-bold uppercase tracking-wider rounded-md shadow-lg border border-secondary-200 hover:bg-secondary-200 transition-colors">Save</button>
+                        <button @click="cancelCrop()" type="button" class="px-4 py-1.5 bg-bg-main/90 backdrop-blur text-text-70 text-[11px] font-bold uppercase tracking-wider rounded-md border border-text-60 hover:bg-bg-main shadow-lg transition-colors">{{ __('Cancel') }}</button>
+                        <button @click="applyCrop()" type="button" class="px-4 py-1.5 bg-secondary-100/95 backdrop-blur text-bg-main text-[11px] font-bold uppercase tracking-wider rounded-md shadow-lg border border-secondary-200 hover:bg-secondary-200 transition-colors">{{ __('Save') }}</button>
                     </div>
                 </div>
 
                 <div x-show="hoverCover && !showCropper" x-transition class="absolute bottom-5 left-5 z-30 flex gap-2">
                     <label class="flex items-center gap-2 px-3 py-1.5 bg-text-80/95 border border-text-60 rounded-md cursor-pointer hover:bg-text-80 transition-colors shadow-lg">
                         <x-icons.upload class="w-4 h-4 text-bg-main" />
-                        <span class="text-bg-main text-app-desc-feature">Upload Cover</span>
+                        <span class="text-bg-main text-app-desc-feature">{{ __('Upload Cover') }}</span>
                         <input type="file" x-ref="coverInput" class="hidden" accept="image/*"
                             @change="
                                 const file = $event.target.files[0];
@@ -105,7 +105,7 @@
                     @if($project->cover_image_path)
                         <button wire:click="deleteCover" class="flex items-center gap-2 px-3 py-1.5 bg-text-80/95 border border-text-60 rounded-md cursor-pointer hover:bg-text-80 transition-colors shadow-lg">
                             <x-icons.delete class="w-4 h-4 text-danger-100" />
-                            <span class="text-app-desc-feature text-danger-100">Remove</span>
+                            <span class="text-app-desc-feature text-danger-100">{{ __('Remove') }}</span>
                         </button>
                     @endif
                 </div>
@@ -130,7 +130,7 @@
                 {{-- Progress Overlay --}}
                 <div x-show="isUploading" x-transition class="absolute inset-y-0 left-0 right-4 w-[calc(100%-16px)] bg-[#F5EFE9]/80 backdrop-blur-md z-40 flex flex-col items-center justify-center rounded-l-md rounded-r-lg">
                     <svg class="animate-spin h-8 w-8 text-secondary-200 mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                    <div class="text-secondary-200 font-semibold text-sm">Uploading... <span x-text="progress + '%'"></span></div>
+                    <div class="text-secondary-200 font-semibold text-sm">{{ __('Uploading...') }} <span x-text="progress + '%'"></span></div>
                     
                     <div class="w-3/4 bg-brand-150 rounded-full h-1.5 mt-3 overflow-hidden shadow-inner mx-auto">
                         <div class="bg-secondary-100 h-full rounded-full transition-all duration-200 ease-out" :style="`width: ${progress}%`"></div>

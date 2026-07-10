@@ -7,7 +7,7 @@
 
 <div {{ $attributes->merge(['class' => 'flex flex-col gap-5']) }}>
     <p class="text-web-body-small text-text-80 mt-4 text-center">
-        {{ $message }}
+        {{ __($message) }}
     </p>
 
     <div class="flex gap-4 w-full max-w-2xl mx-auto">
@@ -16,7 +16,7 @@
             variant="secondary" 
             class="flex-1"
         >
-            {{ $cancelText }}
+            {{ __($cancelText) }}
         </x-button>
 
         <x-button 
@@ -24,7 +24,7 @@
             variant="primary" 
             class="flex-1"
         >
-            {{ $confirmText }}
+            {{ __($confirmText) }}
         </x-button>
     </div>
 </div>

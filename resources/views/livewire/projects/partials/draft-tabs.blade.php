@@ -27,7 +27,7 @@
                             @dragend="draggedDraftId = null; dragOverDraftId = null;"
                         >
                             {{-- Drag grip --}}
-                            <span class="draft-drag" title="Drag to reorder">
+                            <span class="draft-drag" title="{{ __('Drag to reorder') }}">
                                 <svg width="8" height="8" viewBox="0 0 24 24" fill="currentColor">
                                     <circle cx="8" cy="6" r="1.5"/><circle cx="16" cy="6" r="1.5"/>
                                     <circle cx="8" cy="12" r="1.5"/><circle cx="16" cy="12" r="1.5"/>
@@ -40,8 +40,8 @@
                                 x-show="renamingDraftId !== '{{ $draft->manuscript_id }}'"
                                 @dblclick.stop="startRenameDraft('{{ $draft->manuscript_id }}', $el.innerText.trim())"
                                 class="truncate max-w-[120px]"
-                                title="Double-click to rename"
-                            >{{ !empty(trim($draft->title ?? '')) ? $draft->title : 'Draft' }}</span>
+                                title="{{ __('Double-click to rename') }}"
+                            >{{ !empty(trim($draft->title ?? '')) ? $draft->title : __('Draft') }}</span>
 
                             <input
                                 x-show="renamingDraftId === '{{ $draft->manuscript_id }}'"
@@ -60,7 +60,7 @@
                                 <button
                                     class="draft-close"
                                     @click.stop="confirmDeleteDraft('{{ $draft->manuscript_id }}')"
-                                    title="Delete draft"
+                                    title="{{ __('Delete draft') }}"
                                 >
                                     <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
                                         <path stroke-linecap="round" d="M6 18L18 6M6 6l12 12"/>
@@ -74,7 +74,7 @@
                     <button
                         wire:click="addDraft"
                         class="shrink-0 w-7 h-7 flex items-center justify-center text-secondary-50 hover:text-secondary-100 hover:bg-brand-50 rounded transition-colors ml-1 mt-0.5"
-                        title="Add new draft"
+                        title="{{ __('Add new draft') }}"
                     >
                         <x-icons.add class="w-4 h-4"/>
                     </button>

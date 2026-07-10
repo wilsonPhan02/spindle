@@ -12,6 +12,18 @@ Route::get('/', function () {
 Volt::route('/forgot-password', 'auth.forgot-password')->name('password.request');
 Volt::route('/reset-password/{token}', 'auth.reset-password')->name('password.reset');
 
+// Rute untuk mengubah bahasa (bisa diakses guest maupun auth)
+Route::get('/lang/{locale}', function ($locale) {
+    $validCodes = ['en', 'id', 'pt', 'es', 'fr', 'de', 'ja', 'zh', 'ko', 'ar', 'ru', 'tr'];
+    if (in_array($locale, $validCodes, true)) {
+        session()->put('app_locale', $locale);
+        if (Auth::check() && Auth::user()->profile) {
+            Auth::user()->profile->update(['language' => $locale]);
+        }
+    }
+    return redirect()->back();
+})->name('lang.switch');
+
 // AREA GUEST: Hanya bisa diakses oleh orang yang BELUM LOGIN
 Route::middleware('guest')->group(function () {
 

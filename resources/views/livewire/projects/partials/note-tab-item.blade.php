@@ -47,7 +47,7 @@
         }"
     >
         {{-- Drag handle --}}
-        <span class="drag-handle shrink-0 text-text-60" title="Drag to move">
+        <span class="drag-handle shrink-0 text-text-60" title="{{ __('Drag to move') }}">
             <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor">
                 <circle cx="8" cy="6" r="1.5"/><circle cx="16" cy="6" r="1.5"/>
                 <circle cx="8" cy="12" r="1.5"/><circle cx="16" cy="12" r="1.5"/>
@@ -110,7 +110,7 @@
             data-title="{{ $note->title }}"
             class="w-5 h-5 flex items-center justify-center text-text-60 hover:text-text-90 transition-colors opacity-0 group-hover:opacity-100 shrink-0 rounded hover:bg-brand-150"
             @click.stop="openMenuId === '{{ $note->note_id }}' ? closeMenu() : openMenu('{{ $note->note_id }}', $el.dataset.title, {{ $isLeaf ? 'true' : 'false' }}, $event.currentTarget)"
-            title="Options"
+            title="{{ __('Options') }}"
         >
             <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
                 <circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/>

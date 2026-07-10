@@ -9,7 +9,7 @@
     <div class="flex justify-between items-end mb-1.5 px-1">
         
         <div class="text-app-desc-feature text-text-60 group-hover:text-secondary-200 transition-colors">
-            Chapter {{ $chapter->order_index }}
+            {{ __('Chapter') }} {{ $chapter->order_index }}
         </div>
         
         <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -19,7 +19,7 @@
                     @click.stop="open = !open"
                     :class="open ? 'bg-secondary-200/10 text-secondary-200' : 'text-text-60 hover:text-secondary-200 hover:bg-secondary-200/10'"
                     class="p-1 rounded transition-all focus:outline-none"
-                    title="Move to another section"
+                    title="{{ __('Move to another section') }}"
                 >
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
                 </button>
@@ -37,7 +37,7 @@
                 >
                     <div class="sticky top-0 bg-card-bg/95 backdrop-blur-sm px-3 py-2 border-b border-card-border z-10">
                         <span class="text-app-desc-feature font-bold uppercase text-text-40 tracking-wider">
-                            Move to Section
+                            {{ __('Move to Section') }}
                         </span>
                     </div>
                     
@@ -62,7 +62,7 @@
                                 
                                 @if($isCurrentSection)
                                     <span class="text-[9px] uppercase font-bold text-text-50 bg-card-border px-1.5 py-0.5 rounded-sm shrink-0">
-                                        Current
+                                        {{ __('Current') }}
                                     </span>
                                 @endif
                             </button>
@@ -74,7 +74,7 @@
             <button 
                 @click.stop="$dispatch('open-delete-dialog', { id: '{{ $chapter->chapter_card_id }}' })"
                 class="text-text-60 hover:text-danger-100 hover:bg-danger-100/10 px-1 pb-1 rounded transition-all focus:outline-none"
-                title="Delete Chapter"
+                title="{{ __('Delete Chapter') }}"
             >
                 <x-icons.delete class="w-4 h-4" />            
             </button>
@@ -95,7 +95,7 @@
             </div>
             
             <p class="text-app-body-small text-text-90 line-clamp-5">
-                {{ $chapter->summary ?? 'No Description About This Chapter!' }}
+                {{ $chapter->summary ?? __('No Description About This Chapter!') }}
             </p>
         </div>
 
@@ -111,12 +111,12 @@
 
                     @if($chapter->tags->count() > 2)
                         <span class="text-app-caption text-secondary-100 px-1">
-                            +{{ $chapter->tags->count() - 2 }} more
+                            +{{ $chapter->tags->count() - 2 }} {{ __('more') }}
                         </span>
                     @endif
                 @else
                     <span class="text-app-caption text-secondary-100 bg-card-hover border border-dashed border-brand-200 px-2 py-0.5 rounded italic">
-                        No tag here
+                        {{ __('No tag here') }}
                     </span>
                 @endif
             </div>
@@ -124,7 +124,7 @@
             <div class="flex justify-between items-center">
                 
                 <span class="text-app-body-small text-text-60">
-                    {{ $chapter->manuscript ? number_format($chapter->manuscript->count()) : 0 }} Draft(s)
+                    {{ $chapter->manuscript ? number_format($chapter->manuscript->count()) : 0 }} {{ __('Draft(s)') }}
                 </span>
                 
                 <span @class([
@@ -134,7 +134,7 @@
                     'bg-text-100' => !in_array($chapter->status, ['In Progress', 'Completed'])
                 ])>
                     <x-icons.chapter-status :status="$chapter->status" />
-                    {{ $chapter->status ?? 'In Progress' }}
+                    {{ __($chapter->status ?? 'In Progress') }}
                 </span>
             </div>
         </div>

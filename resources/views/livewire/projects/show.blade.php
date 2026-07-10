@@ -216,7 +216,7 @@ new #[Layout('layouts.app')] class extends Component {
 
     <div class="p-6 lg:p-10 max-w-7xl mx-auto">
         <x-breadcrumb :items="[
-            ['label' => 'Dashboard', 'url' => route('dashboard')],
+            ['label' => __('Dashboard'), 'url' => route('dashboard')],
             ['label' => $title, 'truncate' => true]
         ]" />
 
@@ -228,7 +228,7 @@ new #[Layout('layouts.app')] class extends Component {
 
         <div>
             <div class="flex items-center gap-6 mb-8">
-                <h2 class="text-[28px] text-web-heading-2">Workspace</h2>
+                <h2 class="text-[28px] text-web-heading-2">{{ __('Workspace') }}</h2>
                 <div class="flex-1 h-px bg-brand-150"></div>
             </div>
 
@@ -240,7 +240,7 @@ new #[Layout('layouts.app')] class extends Component {
                 ] as $workspace)
 
                 <div class="bg-brand-100 rounded-md p-4 flex flex-col justify-between h-[396px] border border-brand-150">
-                    <h3 class="text-app-heading-2 text-text-100 mb-4 px-1">{{ $workspace['title'] }}</h3>
+                    <h3 class="text-app-heading-2 text-text-100 mb-4 px-1">{{ __($workspace['title']) }}</h3>
 
                     @if($workspace['title'] === 'Notes' && $recentNotes->isNotEmpty()) 
                         <div class="flex-1 flex flex-col gap-3 overflow-y-auto pr-1.5 custom-scrollbar -mx-1.5 px-1.5">
@@ -273,7 +273,7 @@ new #[Layout('layouts.app')] class extends Component {
                                     @endphp
 
                                     <p class="text-app-body-small text-subtext-100 line-clamp-3" style="display:-webkit-box; -webkit-box-orient:vertical; overflow:hidden;">
-                                        {{ $cleanBody ?: 'No content yet' }}
+                                        {{ $cleanBody ?: __('No content yet') }}
                                     </p>
                                 </a>
                             @endforeach
@@ -301,7 +301,7 @@ new #[Layout('layouts.app')] class extends Component {
                                                     $remainingTagCount = $character->hashtags->count() - $visibleTags->count();
                                                 @endphp
                                                 <div class="flex items-center gap-1 flex-nowrap overflow-hidden">
-                                                    <span class="text-app-body-small text-subtext-90 shrink-0">Tags :</span>
+                                                    <span class="text-app-body-small text-subtext-90 shrink-0">{{ __('Tags') }} :</span>
                                                     
                                                     @if($character->hashtags->isNotEmpty())
                                                         @foreach($visibleTags as $tag)
@@ -312,7 +312,7 @@ new #[Layout('layouts.app')] class extends Component {
                                                     @else
                                                         {{-- Empty State --}}
                                                         <span class="px-2 py-0.5 rounded border border-dashed border-brand-200 bg-card-hover text-app-caption text-secondary-100 shrink-0">
-                                                            No tags
+                                                            {{ __('No tags') }}
                                                         </span>
                                                     @endif
                                                 </div>
@@ -320,7 +320,7 @@ new #[Layout('layouts.app')] class extends Component {
                                                 {{-- Remaining Tags Badge --}}
                                                 @if($remainingTagCount > 0)
                                                     <span class="inline-block mt-1 px-2 py-0.5 rounded-full bg-brand-150 text-app-caption text-text-70">
-                                                        +{{ $remainingTagCount }} tags
+                                                        +{{ $remainingTagCount }} {{ __('tags') }}
                                                     </span>
                                                 @endif
                                             </div>
@@ -336,7 +336,7 @@ new #[Layout('layouts.app')] class extends Component {
                                    class="flex flex-col bg-card-bg border border-1 border-card-border p-4 rounded-xl group cursor-pointer hover:bg-card-hover hover:border-secondary-150 hover:shadow-sm transition-all duration-200 shrink-0">
                                     
                                     <div class="text-app-desc-feature text-text-60 mb-1.5">
-                                        Chapter {{ $chapter->order_index }}
+                                        {{ __('Chapter') }} {{ $chapter->order_index }}
                                     </div>
 
                                     <div class="flex items-center gap-3 mb-2.5">
@@ -347,7 +347,7 @@ new #[Layout('layouts.app')] class extends Component {
                                     </div>
 
                                     <div class="flex items-center gap-1.5 mb-3 flex-wrap">
-                                        <span class="text-app-body-small text-subtext-90 shrink-0">Tags :</span>
+                                        <span class="text-app-body-small text-subtext-90 shrink-0">{{ __('Tags') }} :</span>
                                         @if($chapter->tags->isNotEmpty())
                                             @foreach($chapter->tags->take(2) as $tag)
                                                 <span class="px-2 py-0.5 border border-brand-200 bg-card-hover rounded text-app-caption text-secondary-100">
@@ -356,12 +356,12 @@ new #[Layout('layouts.app')] class extends Component {
                                             @endforeach
                                             @if($chapter->tags->count() > 2)
                                                 <span class="px-1 text-app-caption text-secondary-100">
-                                                    +{{ $chapter->tags->count() - 2 }} more
+                                                    +{{ $chapter->tags->count() - 2 }} {{ __('more') }}
                                                 </span>
                                             @endif
                                         @else
                                             <span class="px-2 py-0.5 rounded border border-dashed border-brand-200 bg-card-hover text-app-caption text-secondary-100">
-                                                No tags
+                                                {{ __('No tags') }}
                                             </span>
                                         @endif
                                     </div>
@@ -394,13 +394,13 @@ new #[Layout('layouts.app')] class extends Component {
                                         }
                                     @endphp
                                     <p class="text-app-body-small text-subtext-100 mb-4 line-clamp-2">
-                                        {{ !empty(trim($summaryText ?? '')) ? $summaryText : 'No summary available for this chapter yet.' }}
+                                        {{ !empty(trim($summaryText ?? '')) ? $summaryText : __('No summary available for this chapter yet.') }}
                                     </p>
 
                                     <div class="flex flex-wrap items-center justify-between gap-x-2 gap-y-2 mt-auto pt-3">
                                         <div class="flex items-center gap-2 text-subtext-90 whitespace-nowrap shrink-0">
                                             <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h8m-8 6h16"/></svg>
-                                            <span class="text-app-desc-feature">{{ $chapter->manuscript ? number_format($chapter->manuscript->count()) : 0 }} Drafts</span>
+                                            <span class="text-app-desc-feature">{{ $chapter->manuscript ? number_format($chapter->manuscript->count()) : 0 }} {{ __('Drafts') }}</span>
                                         </div>
 
                                         <span @class([
@@ -410,7 +410,7 @@ new #[Layout('layouts.app')] class extends Component {
                                             'bg-text-100' => !in_array($chapter->status, ['In Progress', 'Completed'])
                                         ])>
                                             <x-icons.chapter-status :status="$chapter->status" class="w-3.5 h-3.5 shrink-0" />
-                                            {{ $chapter->status ?? 'In Progress' }}
+                                            {{ $chapter->status ?? __('In Progress') }}
                                         </span>
                                         
                                     </div>
@@ -423,18 +423,18 @@ new #[Layout('layouts.app')] class extends Component {
                             <div class="w-28 h-28">
                                 <x-dynamic-component :component="$iconPath" class="w-full h-full" />
                             </div>
-                            <p class="mx-auto text-app-desc-feature text-center text-secondary-100">{{ $workspace['desc'] }}</p>
+                            <p class="mx-auto text-app-desc-feature text-center text-secondary-100">{{ __($workspace['desc']) }}</p>
                         </div>
                     @endif
 
                     @if($workspace['route'])
                         <a href="{{ route($workspace['route'], ['project' => $project->project_id]) }}" wire:navigate 
                             class="w-full py-3 mt-4 mx-1 border-2 border-secondary-100 bg-transparent rounded-lg text-app-feature text-secondary-200 hover:bg-secondary-100/10 transition-colors text-center block" style="width: calc(100% - 8px);">
-                            {{ $workspace['btn'] }}
+                            {{ __($workspace['btn']) }}
                         </a>
                     @else
                         <button class="w-full py-3 mt-4 mx-1 border-2 border-secondary-100 bg-transparent rounded-lg text-app-feature text-secondary-200 hover:bg-secondary-100/10 transition-colors text-center block" style="width: calc(100% - 8px);">
-                            {{ $workspace['btn'] }}
+                            {{ __($workspace['btn']) }}
                         </button>
                     @endif
                 </div>
@@ -445,10 +445,10 @@ new #[Layout('layouts.app')] class extends Component {
     
     <x-confirm-dialog
         eventName="open-archive-project-dialog"
-        title="Archive this Project?"
-        description="Are you sure you want to archive this project? You can restore it from the Archive page."
-        confirmText="Yes, Archive"
-        cancelText="Cancel"
+        title="{{ __('Archive this Project?') }}"
+        description="{{ __('Are you sure you want to archive this project? You can restore it from the Archive page.') }}"
+        confirmText="{{ __('Yes, Archive') }}"
+        cancelText="{{ __('Cancel') }}"
         submitAction="archiveProject"
         iconColor="text-warning-100"
         iconBg="bg-warning-100/10"

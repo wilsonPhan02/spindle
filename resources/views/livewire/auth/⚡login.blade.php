@@ -50,7 +50,7 @@ new #[Layout('layouts.guest')] #[Title('Sign In - Spindle')] class extends Compo
 
         <div class="w-full max-w-md p-6 bg-card-bg border border-transparent rounded-xl shadow-md">
 
-            <h1 class="mb-5 text-2xl font-merriweather text-center text-text-80">Sign In</h1>
+            <h1 class="mb-5 text-2xl font-merriweather text-center text-text-80">{{ __('Sign In') }}</h1>
 
             <form wire:submit="login" novalidate x-data @submit="$wire.email = $refs.email.value; $wire.password = $refs.password.value" class="space-y-3">
 
@@ -62,8 +62,8 @@ new #[Layout('layouts.guest')] #[Title('Sign In - Spindle')] class extends Compo
                 @enderror
 
                 <div>
-                    <label class="block mb-1 text-app-body-medium text-text-80">Email</label>
-                    <input type="email" wire:model="email" x-ref="email" placeholder="Enter your email"
+                    <label class="block mb-1 text-app-body-medium text-text-80">{{ __('Email') }}</label>
+                    <input type="email" wire:model="email" x-ref="email" placeholder="{{ __('Enter your email') }}"
                         x-init="setTimeout(() => { let v = sessionStorage.getItem('auth_email'); if(v && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) { $el.value = v; $wire.email = v; } }, 10)"
                         @input="sessionStorage.setItem('auth_email', $el.value)"
                         class="w-full px-4 py-2 bg-white border border-subtext-70 rounded-md focus:ring-2 focus:ring-secondary-200 outline-none transition-all placeholder-subtext-90 text-app-body-medium text-text-80">
@@ -71,9 +71,9 @@ new #[Layout('layouts.guest')] #[Title('Sign In - Spindle')] class extends Compo
                 </div>
 
                 <div class="mb-5" x-data="{ show: false }">
-                    <label class="block mb-1 text-app-body-medium text-text-80">Password</label>
+                    <label class="block mb-1 text-app-body-medium text-text-80">{{ __('Password') }}</label>
                     <div class="relative">
-                        <input :type="show ? 'text' : 'password'" wire:model="password" x-ref="password" placeholder="Enter your password"
+                        <input :type="show ? 'text' : 'password'" wire:model="password" x-ref="password" placeholder="{{ __('Enter your password') }}"
                             x-init="setTimeout(() => { let e = sessionStorage.getItem('auth_email'); let v = sessionStorage.getItem('auth_password'); if(v && e && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)) { $el.value = v; $wire.password = v; } }, 10)"
                             @input="sessionStorage.setItem('auth_password', $el.value)"
                             class="w-full px-4 py-2 pr-10 bg-white border border-subtext-70 rounded-md focus:ring-2 focus:ring-secondary-200 outline-none transition-all placeholder-subtext-90 text-app-body-medium text-text-80">
@@ -95,27 +95,27 @@ new #[Layout('layouts.guest')] #[Title('Sign In - Spindle')] class extends Compo
                     <div class="flex items-center">
                         <input type="checkbox" wire:model="remember" id="remember"
                             class="w-4 h-4 flex-shrink-0 mt-0.5 bg-white border-transparent rounded text-secondary-200 focus:ring-secondary-200 focus:ring-offset-card-bg">
-                        <label for="remember" class="ml-2 text-app-body-medium text-text-80 cursor-pointer">Remember me</label>
+                        <label for="remember" class="ml-2 text-app-body-medium text-text-80 cursor-pointer">{{ __('Remember me') }}</label>
                     </div>
                     <button
                         type="button"
                         @click="show = false; $dispatch('open-forgot-password')"
                         class="text-app-body-medium text-interactive-100 hover:underline"
                     >
-                        Forgot Password?
+                        {{ __('Forgot Password?') }}
                     </button>
                 </div>
 
                 <button type="submit"
                     class="w-full py-2.5 mt-2 text-app-feature text-bg-main transition-colors bg-secondary-200 rounded-md hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary-200 focus:ring-offset-card-bg">
-                    Sign In
+                    {{ __('Sign In') }}
                 </button>
 
             </form>
 
             <div class="flex items-center my-4">
                 <div class="flex-grow border-t border-subtext-70"></div>
-                <span class="px-3 text-app-body-small text-subtext-90 bg-card-bg">Or</span>
+                <span class="px-3 text-app-body-small text-subtext-90 bg-card-bg">{{ __('Or') }}</span>
                 <div class="flex-grow border-t border-subtext-70"></div>
             </div>
 
@@ -127,12 +127,12 @@ new #[Layout('layouts.guest')] #[Title('Sign In - Spindle')] class extends Compo
                     <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
                     <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
                 </svg>
-                Sign in with Google
+                {{ __('Sign in with Google') }}
             </button>
 
             <p class="text-app-body-medium text-center text-text-80">
-                Don't have an account?
-                <a href="{{ route('register') }}" wire:navigate class="text-interactive-100 hover:underline">Sign up</a>
+                {{ __('Don\'t have an account?') }}
+                <a href="{{ route('register') }}" wire:navigate class="text-interactive-100 hover:underline">{{ __('Sign up') }}</a>
             </p>
 
         </div>
@@ -148,7 +148,7 @@ new #[Layout('layouts.guest')] #[Title('Sign In - Spindle')] class extends Compo
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
             </svg>
-            <p class="text-xl font-merriweather font-semibold text-text-80 animate-pulse">Arriving at creative realm...</p>
+            <p class="text-xl font-merriweather font-semibold text-text-80 animate-pulse">{{ __('Arriving at creative realm...') }}</p>
         </div>
     </div>
     @endif

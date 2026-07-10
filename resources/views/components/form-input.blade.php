@@ -45,7 +45,7 @@
             <div x-data="{ open: false, selected: @entangle($model) }" class="relative w-full">
                 <button type="button" @click="open = !open" @click.away="open = false"
                     {{ $attributes->merge(['class' => "w-full px-6 pr-4 py-3 bg-bg-main border $errorClasses rounded-sm focus:ring-1/2 focus:border-secondary-250 outline-none transition-all text-subtext-90 text-web-body-small flex items-center justify-between cursor-pointer"]) }}>
-                    <span x-text="selected ? ({{ json_encode($options) }}[selected] || '{{ $placeholder }}') : '{{ $placeholder ?: 'Select option' }}'"></span>
+                    <span x-text="selected ? ({{ json_encode($options) }}[selected] || '{{ $placeholder }}') : '{{ $placeholder ?: __('Select option') }}'"></span>
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4 transition-transform duration-200" :class="open ? 'rotate-180' : ''">
                         <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
                     </svg>

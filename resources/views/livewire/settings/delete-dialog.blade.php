@@ -20,10 +20,10 @@ new class extends Component {
 <div>
     <x-confirm-dialog
         EventName="open-delete-dialog"
-        title="Delete Account"
-        description="Are you sure want to delete your account?"
-        cancelText="No, Keep it"
-        confirmText="Yes, Delete!"
+        :title="__('Delete Account')"
+        :description="__('Are you sure want to delete your account?')"
+        :cancelText="__('No, Keep it')"
+        :confirmText="__('Yes, Delete!')"
         submitAction="deleteAccount"
     >
         <x-slot:icon>
