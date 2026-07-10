@@ -97,7 +97,7 @@
     <x-confirm-dialog
         eventName="open-delete-character-info-confirm"
         title="{{ __('Delete Character?') }}"
-        description='&quot;<span x-text="infoCharacter.fullName"></span>&quot; {{ __('and every relationship involving them will be permanently removed.') }}'
+        description='&quot;<span x-text="infoCharacter.fullName"></span>&quot; {{ __("and every relationship involving them will be permanently removed.") }}'
         confirmText="{{ __('Confirm Delete') }}"
         dispatchAction="do-delete-character-info"
     >
