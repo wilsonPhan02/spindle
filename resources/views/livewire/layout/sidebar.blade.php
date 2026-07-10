@@ -261,21 +261,6 @@ new class extends Component {
     </div>
 
     <div 
-        x-data="{ 
-            recentSearches: [],
-            saveSearch(q) { 
-                if(!q || typeof q !== 'string' || !q.trim()) return;
-                let s = this.recentSearches.filter(x => x && typeof x === 'string' && x.toLowerCase() !== q.trim().toLowerCase());
-                s.unshift(q.trim());
-                if(s.length > 5) s.pop();
-                this.recentSearches = s;
-                localStorage.setItem('recentSearches', JSON.stringify(s));
-            }
-        }"
-        x-init="() => {
-            try { recentSearches = JSON.parse(localStorage.getItem('recentSearches') || '[]'); }
-            catch(e) { recentSearches = []; }
-        }"
         class="flex flex-col flex-1 overflow-y-auto [scrollbar-gutter:stable] px-6 pb-6 custom-scrollbar"
     >
         @if($this->searchResultsData !== null)
@@ -300,7 +285,6 @@ new class extends Component {
                             @if($item['type'] === 'section')
                                 <a href="{{ $item['url'] }}"
                                    @click.prevent="
-                                       saveSearch($wire.searchQuery);
                                        if (window.location.pathname === '{{ route('dashboard', [], false) }}' || window.location.pathname === '/') {
                                            document.getElementById('section-{{ $item['section_id'] }}')?.scrollIntoView({behavior: 'smooth'});
                                        } else {
@@ -309,7 +293,7 @@ new class extends Component {
                                    "
                                    class="flex items-center justify-between px-2 py-1.5 -mx-2 rounded-lg hover:bg-brand-150 transition-colors group cursor-pointer">
                             @else
-                                <a href="{{ $item['url'] }}" wire:navigate @click="saveSearch($wire.searchQuery)" class="flex items-center justify-between px-2 py-1.5 -mx-2 rounded-lg hover:bg-brand-150 transition-colors group cursor-pointer">
+                                <a href="{{ $item['url'] }}" wire:navigate class="flex items-center justify-between px-2 py-1.5 -mx-2 rounded-lg hover:bg-brand-150 transition-colors group cursor-pointer">
                             @endif
                                 <div class="flex items-center gap-2 min-w-0 flex-1">
                                     @if($item['type'] === 'project' || $item['type'] === 'category')
@@ -343,18 +327,6 @@ new class extends Component {
                         @endif
                     </div>
                 @endif
-                </div>
-                <div class="border-b border-brand-200 w-full my-6 shrink-0"></div>
-            </div>
-        @else
-            <div wire:key="recent-searches-block" x-show="recentSearches.length > 0 && $wire.searchQuery === ''" x-cloak>
-                <div class="text-[10px] font-semibold text-text-70 uppercase tracking-wider mb-3">Recent Searches</div>
-                <div class="flex flex-wrap gap-2">
-                    <template x-for="search in recentSearches" :key="search">
-                        <button @click="$wire.searchQuery = search" class="px-3 py-1 bg-[#F1E8D9] rounded-lg text-[11px] font-medium text-text-80 hover:bg-[#E5D8C3] hover:text-text-100 transition-colors flex items-center gap-1 shadow-sm">
-                            <span x-text="search"></span>
-                        </button>
-                    </template>
                 </div>
                 <div class="border-b border-brand-200 w-full my-6 shrink-0"></div>
             </div>
