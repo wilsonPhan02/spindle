@@ -160,7 +160,7 @@
         <div class="absolute bottom-3 translate-y-1/2 left-1/2 -translate-x-1/2 bg-danger-100/95 text-bg-main text-[11px] font-medium px-3 py-2 rounded-md shadow-xl w-max max-w-[160%] text-center flex items-start gap-1.5 z-40 whitespace-normal">
             <svg class="w-4 h-4 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
             <span x-text="clientError" class="flex-1 leading-snug text-left"></span>
-            <button @click.stop="clientError = null" class="shrink-0 ml-1 p-0.5 hover:bg-black/20 rounded transition-colors" title="Dismiss"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+            <button @click.stop="clientError = null" class="shrink-0 ml-1 p-0.5 hover:bg-black/20 rounded transition-colors" title="{{ __('Dismiss') }}"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
         </div>
     </template>
 
@@ -169,7 +169,7 @@
         <div x-data="{ show: true }" x-show="show" class="absolute bottom-3 translate-y-1/2 left-1/2 -translate-x-1/2 bg-danger-100/95 text-bg-main text-[11px] font-medium px-3 py-2 rounded-md shadow-xl w-max max-w-[160%] text-center flex items-start gap-1.5 z-40 whitespace-normal">
             <svg class="w-4 h-4 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
             <span class="flex-1 leading-snug text-left">{{ $message }}</span>
-            <button @click.stop="show = false" class="shrink-0 ml-1 p-0.5 hover:bg-black/20 rounded transition-colors" title="Dismiss"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+            <button @click.stop="show = false" class="shrink-0 ml-1 p-0.5 hover:bg-black/20 rounded transition-colors" title="{{ __('Dismiss') }}"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
         </div>
     @enderror
 
@@ -178,7 +178,7 @@
         <div class="bg-bg-main w-full max-w-lg rounded-2xl overflow-hidden shadow-2xl flex flex-col" @click.away="cancelCrop()">
             <div class="p-4 border-b border-black/10 flex justify-between items-center bg-brand-10">
                 <h3 class="text-app-heading-3 text-text-100">{{ __('Adjust Profile Photo') }}</h3>
-                <button @click="cancelCrop()" class="p-2 text-text-60 hover:bg-black/5 rounded-full transition-colors" title="Cancel"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+                <button @click="cancelCrop()" class="p-2 text-text-60 hover:bg-black/5 rounded-full transition-colors" title="{{ __('Cancel') }}"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
             </div>
             
             {{-- Cropper Area --}}

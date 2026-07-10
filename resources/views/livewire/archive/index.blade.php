@@ -100,7 +100,7 @@ new #[Layout('layouts.app')] class extends Component {
     <header class="flex justify-between items-center mb-12">
         <a href="{{ route('dashboard') }}" wire:navigate class="flex items-center gap-3 text-[18px] text-[#7A7A7A] hover:text-[#8C7558] transition-colors">
             <x-icons.chevron rotate="180" size="w-3.5 h-3.5" color="currentColor"/>
-            <span class="text-[#2C2C2C] font-semibold">Archive</span>
+            <span class="text-[#2C2C2C] font-semibold">{{ __('Archive') }}</span>
         </a>
     </header>
 
@@ -108,8 +108,8 @@ new #[Layout('layouts.app')] class extends Component {
         {{-- Empty State --}}
         <div class="flex flex-col items-center justify-center mt-16">
             <x-empty-archive class="w-64 h-64 mb-6 opacity-80" />
-            <h2 class="text-app-heading-1 text-subtext-80 mb-2">Your archive is empty</h2>
-            <p class="text-app-body-large text-subtext-70">Archived sections will appear here.</p>
+            <h2 class="text-app-heading-1 text-subtext-80 mb-2">{{ __('Your archive is empty') }}</h2>
+            <p class="text-app-body-large text-subtext-70">{{ __('Archived sections will appear here.') }}</p>
         </div>
     @else
         <div class="space-y-12">
@@ -124,11 +124,11 @@ new #[Layout('layouts.app')] class extends Component {
                             </h2>
                             <p class="text-[12px] text-subtext-90 mt-0.5">
                                 @if($section->archived_at)
-                                    Archived {{ $section->archived_at->diffForHumans() }} &middot;
+                                    {{ __('Archived') }} {{ $section->archived_at->diffForHumans() }} &middot;
                                 @else
-                                    Contains archived projects &middot;
+                                    {{ __('Contains archived projects') }} &middot;
                                 @endif
-                                {{ $section->projects->count() }} {{ $section->projects->count() === 1 ? 'project' : 'projects' }}
+                                {{ $section->projects->count() }} {{ $section->projects->count() === 1 ? __('project') : __('projects') }}
                             </p>
                         </div>
 
@@ -144,14 +144,14 @@ new #[Layout('layouts.app')] class extends Component {
                                     class="w-full text-left px-4 py-2 text-app-body-medium text-text-80 hover:bg-brand-10 flex items-center gap-3 transition-colors"
                                 >
                                     <x-icons.restore class="w-4 h-4 shrink-0 text-text-80" />
-                                    Restore All
+                                    {{ __('Restore All') }}
                                 </button>
                                 <button
                                     @click="$dispatch('open-delete-section-dialog', { id: '{{ $section->section_id }}' }); menuOpen = false"
                                     class="w-full text-left px-4 py-2 text-app-body-medium text-danger-100 hover:bg-danger-100/5 flex items-center gap-3 transition-colors"
                                 >
                                     <x-icons.delete class="w-4 h-4 shrink-0 text-danger-100" />
-                                    Delete Section
+                                    {{ __('Delete Section') }}
                                 </button>
                             </div>
                         </div>
@@ -183,14 +183,14 @@ new #[Layout('layouts.app')] class extends Component {
                                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
                                             </svg>
-                                            Restore
+                                            {{ __('Restore') }}
                                         </button>
                                         <button
                                             @click="$dispatch('open-delete-project-dialog', { id: '{{ $project->project_id }}' })"
                                             class="w-full flex items-center justify-center gap-1.5 py-1.5 bg-danger-100/90 backdrop-blur-sm rounded-lg text-[12px] text-white font-medium hover:bg-danger-100 transition-colors shadow-lg"
                                         >
                                             <x-icons.delete class="w-3 h-3 text-white" />
-                                            Delete
+                                            {{ __('Delete') }}
                                         </button>
                                     </div>
                                 </div>
@@ -205,11 +205,11 @@ new #[Layout('layouts.app')] class extends Component {
                                     @endif
                                     <h3 class="text-app-body-medium text-text-100 truncate">{{ $project->title }}</h3>
                                 </div>
-                                <p class="text-[11px] text-subtext-70">{{ $project->created_at->format('d F Y') }}</p>
+                                <p class="text-[11px] text-subtext-70">{{ $project->created_at->translatedFormat('d F Y') }}</p>
                             </div>
                         @empty
                             <div class="flex items-center justify-center w-full py-8 text-subtext-90 text-app-body-medium italic">
-                                No projects in this section.
+                                {{ __('No projects in this section.') }}
                             </div>
                         @endforelse
 
@@ -222,10 +222,10 @@ new #[Layout('layouts.app')] class extends Component {
     
     <x-confirm-dialog
         eventName="open-delete-section-dialog"
-        title="Delete All Projects?"
-        description="Are you sure you want to permanently delete all archived projects in this section? This action cannot be undone."
-        confirmText="Yes, Delete All"
-        cancelText="Cancel"
+        title="{{ __('Delete All Projects?') }}"
+        description="{{ __('Are you sure you want to permanently delete all archived projects in this section? This action cannot be undone.') }}"
+        confirmText="{{ __('Yes, Delete All') }}"
+        cancelText="{{ __('Cancel') }}"
         submitAction="deleteSection"
         btnColor="bg-danger-100 hover:bg-danger-100/90 text-white"
     >
@@ -236,10 +236,10 @@ new #[Layout('layouts.app')] class extends Component {
 
     <x-confirm-dialog
         eventName="open-delete-project-dialog"
-        title="Delete Project?"
-        description="Are you sure you want to permanently delete this project? This action cannot be undone."
-        confirmText="Yes, Delete"
-        cancelText="Cancel"
+        title="{{ __('Delete Project?') }}"
+        description="{{ __('Are you sure you want to permanently delete this project? This action cannot be undone.') }}"
+        confirmText="{{ __('Yes, Delete') }}"
+        cancelText="{{ __('Cancel') }}"
         submitAction="deleteProject"
         btnColor="bg-danger-100 hover:bg-danger-100/90 text-white"
     >

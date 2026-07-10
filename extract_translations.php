@@ -27,7 +27,7 @@ foreach ($dirs as $dir) {
     }
 }
 
-$langs = ['en', 'id', 'pt', 'es', 'fr', 'de', 'ja', 'zh', 'ko', 'ar', 'ru', 'tr'];
+$langs = ['en', 'id', 'ja', 'zh', 'ko'];
 
 foreach ($langs as $lang) {
     $file = __DIR__ . '/lang/' . $lang . '.json';

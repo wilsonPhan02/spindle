@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Spindle — Spin A Yarn</title>
+    <title>{{ __('Spindle — Spin A Yarn') }}</title>
 
     <link rel="icon" href="/favicon.png?v=5" type="image/png">
     
@@ -374,12 +374,6 @@
         <!-- Wind Rings Background -->
         <style>
             .custom-scrollbar::-webkit-scrollbar-thumb:hover { background-color: #8C7558; }
-
-            /* Ensure correct reading direction for Arabic text without altering global layout */
-            html[lang="ar"] h1, html[lang="ar"] h2, html[lang="ar"] h3, html[lang="ar"] p, html[lang="ar"] span, html[lang="ar"] a, html[lang="ar"] button {
-                direction: rtl;
-                unicode-bidi: isolate;
-            }
             @keyframes wind-ring {
                 0% { transform: scale(0.3) rotate(0deg); opacity: 0; border-width: 8px; }
                 20% { opacity: 0.35; }

@@ -34,7 +34,14 @@
         showHr: {{ $showHr ? 'true' : 'false' }},
         showStrike: {{ $showStrike ? 'true' : 'false' }},
         showTodo: {{ $showTodo ? 'true' : 'false' }},
-        showHighlight: {{ $showHighlight ? 'true' : 'false' }}
+        showHighlight: {{ $showHighlight ? 'true' : 'false' }},
+        i18n: {
+            normalText: '{{ __('Normal Text') }}',
+            heading1: '{{ __('Heading 1') }}',
+            heading2: '{{ __('Heading 2') }}',
+            heading3: '{{ __('Heading 3') }}',
+            quote: '{{ __('Quote') }}'
+        }
     })"
 >
     <style>
@@ -251,7 +258,7 @@
                         <span class="text-app-caption font-semibold text-secondary-150 uppercase tracking-wider mb-2 block">{{ __('Text Color') }}</span>
                         <div class="grid grid-cols-6 gap-2">
                             <template x-for="c in textColors" :key="c">
-                                <button type="button" @mousedown.prevent="saveSelection()" @click="exec('foreColor', c); currentTextColor = c;" class="w-5 h-5 rounded-full transition-all duration-150 relative flex items-center justify-center shrink-0" x-bind:class="(currentTextColor || '#000000') === c ? 'border border-secondary-200 bg-white p-[3px]' : 'border border-brand-200 hover:scale-110 hover:border-secondary-150'" x-bind:style="(currentTextColor || '#000000') === c ? '' : `background:${c}`" :title="c === '#000000' ? 'Default / Black' : c">
+                                <button type="button" @mousedown.prevent="saveSelection()" @click="exec('foreColor', c); currentTextColor = c;" class="w-5 h-5 rounded-full transition-all duration-150 relative flex items-center justify-center shrink-0" x-bind:class="(currentTextColor || '#000000') === c ? 'border border-secondary-200 bg-white p-[3px]' : 'border border-brand-200 hover:scale-110 hover:border-secondary-150'" x-bind:style="(currentTextColor || '#000000') === c ? '' : `background:${c}`" :title="c === '#000000' ? '{{ __('Default / Black') }}' : c">
                                     <template x-if="(currentTextColor || '#000000') === c">
                                         <span class="w-full h-full rounded-full block" x-bind:style="`background:${c}`"></span>
                                     </template>
@@ -291,7 +298,7 @@
                         <span class="text-app-caption font-semibold text-secondary-150 uppercase tracking-wider mb-2 block">{{ __('Highlight Color') }}</span>
                         <div class="grid grid-cols-7 gap-1.5">
                             <template x-for="c in highlightColors" :key="c">
-                                <button type="button" @mousedown.prevent="saveSelection()" @click="exec('hiliteColor', c === 'transparent' ? 'transparent' : c); currentHighlightColor = c;" class="w-5 h-5 rounded-full transition-all duration-150 relative flex items-center justify-center shrink-0" x-bind:class="(currentHighlightColor || 'transparent') === c ? 'border border-secondary-200 bg-white p-[3px]' : 'border border-brand-200 hover:scale-110 hover:border-secondary-150'" x-bind:style="(currentHighlightColor || 'transparent') === c || c === 'transparent' ? '' : `background:${c}`" :title="c === 'transparent' ? 'No Highlight' : c">
+                                <button type="button" @mousedown.prevent="saveSelection()" @click="exec('hiliteColor', c === 'transparent' ? 'transparent' : c); currentHighlightColor = c;" class="w-5 h-5 rounded-full transition-all duration-150 relative flex items-center justify-center shrink-0" x-bind:class="(currentHighlightColor || 'transparent') === c ? 'border border-secondary-200 bg-white p-[3px]' : 'border border-brand-200 hover:scale-110 hover:border-secondary-150'" x-bind:style="(currentHighlightColor || 'transparent') === c || c === 'transparent' ? '' : `background:${c}`" :title="c === 'transparent' ? '{{ __('No Highlight') }}' : c">
                                     <template x-if="c === 'transparent'">
                                         <svg class="w-full h-full text-danger-100" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                                     </template>
@@ -399,13 +406,13 @@
     {{-- Counter Footer inside Editor Sheet --}}
     <div class="px-8 lg:px-10 py-2.5 text-app-desc-feature text-secondary-150 font-medium border-t border-transparent select-none shrink-0 bg-brand-50 right-8">
         @if(in_array(strtolower($counterType), ['notes', 'limit', 'char-limit', 'char_limit', 'len']))
-            <span x-text="new Intl.NumberFormat().format(charCount) + ' / 65,535 • ' + new Intl.NumberFormat().format(wordCount) + ' words'"></span>
+            <span x-text="new Intl.NumberFormat().format(charCount) + ' / 65,535 • ' + new Intl.NumberFormat().format(wordCount) + ' {{ __('words') }}'"></span>
         @elseif(in_array(strtolower($counterType), ['character', 'char', 'characters', 'karakter']))
-            <span x-text="charCount + ' characters'"></span>
+            <span x-text="new Intl.NumberFormat().format(charCount) + ' {{ __('characters') }}'"></span>
         @elseif(in_array(strtolower($counterType), ['both', 'all']))
-            <span x-text="wordCount + ' words · ' + charCount + ' characters'"></span>
+            <span x-text="new Intl.NumberFormat().format(wordCount) + ' {{ __('words') }} · ' + new Intl.NumberFormat().format(charCount) + ' {{ __('characters') }}'"></span>
         @else
-            <span x-text="wordCount + ' words'"></span>
+            <span x-text="new Intl.NumberFormat().format(wordCount) + ' {{ __('words') }}'"></span>
         @endif
     </div>
 </div>

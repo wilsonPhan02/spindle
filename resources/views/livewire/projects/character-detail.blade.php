@@ -227,7 +227,7 @@ new #[Layout('layouts.app')] class extends Component {
             if ($property === 'fullName') {
                 $this->fullName = mb_substr(ltrim($this->fullName), 0, 60);
                 if (trim($this->fullName) === '') {
-                    $this->fullName = 'New Character';
+                    $this->fullName = 'Unnamed Character';
                 }
             }
 
@@ -235,7 +235,7 @@ new #[Layout('layouts.app')] class extends Component {
                 $this->nickName = mb_substr(ltrim($this->nickName), 0, 20);
 
                 if (trim($this->nickName) === '') {
-                    $this->nickName = 'New Character';
+                    $this->nickName = 'Unnamed Character';
                     $this->nickNameError = '';
                 } else {
                     $isDuplicate = $this->project->characters()
@@ -294,13 +294,13 @@ new #[Layout('layouts.app')] class extends Component {
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
                     </svg>
-                    Back
+                    {{ __('Back') }}
                 </a>
 
                 <!-- Tombol Kanan (Trash / Delete) -->
                 <button type="button" @click="$dispatch('open-delete-character-confirm')" 
                         class="p-1.5 text-danger-100/80 border hover:text-danger-100 hover:bg-danger-100/10 rounded-md transition-colors" 
-                        title="Delete Character">
+                        title="{{ __('Delete Character') }}">
                     <!-- Menggunakan komponen ikon delete milikmu, ukurannya diperkecil agar proporsional untuk header -->
                     <x-icons.delete class="w-3 h-3 border-none"/>
                 </button>
@@ -317,7 +317,7 @@ new #[Layout('layouts.app')] class extends Component {
                     fullNameCount: {{ mb_strlen($fullName) }},
                     init() {
                         this.$wire.$watch('nickName', (value) => {
-                            const displayValue = value === '' ? 'New Character' : value;
+                            const displayValue = value === '' ? 'Unnamed Character' : value;
                             this.nickNameDisplay = displayValue;
                             this.nickNameCount = displayValue.length;
                         });
@@ -337,7 +337,7 @@ new #[Layout('layouts.app')] class extends Component {
                         const typed = this.nickNameDraft.trim();
                         this.$wire.set('nickName', typed, true);
 
-                        const displayValue = typed === '' ? 'New Character' : typed;
+                        const displayValue = typed === '' ? 'Unnamed Character' : typed;
                         this.nickNameDraft = displayValue;
                         this.nickNameDisplay = displayValue;
                         this.nickNameCount = displayValue.length;
@@ -369,7 +369,7 @@ new #[Layout('layouts.app')] class extends Component {
                             @keydown.enter="$event.target.blur()"
                             @keydown.escape="$event.target.blur()"
                             maxlength="20"
-                            placeholder="Nickname"
+                            placeholder="{{ __('Nickname') }}"
                             class="text-app-title-1 text-text-100 bg-transparent outline-none w-full truncate"
                         >
                         <button type="button" @mousedown.prevent @click="cancelNickNameEdit()" class="shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-text-60 hover:bg-black/10 hover:text-danger-100 transition-colors">
@@ -391,15 +391,15 @@ new #[Layout('layouts.app')] class extends Component {
                         @blur="editingFullName = false; $wire.$commit()"
                         @keydown.enter="$event.target.blur()"
                         @keydown.escape="$event.target.blur()"
-                        maxlength="60" placeholder="Full Name"
+                        maxlength="60" placeholder="{{ __('Full Name') }}"
                         class="bg-transparent text-text-60 outline-none border-b border-transparent focus:border-subtext-70 transition-colors">
                     <span x-show="editingFullName" x-cloak class="text-app-desc-feature text-subtext-80"><span x-text="fullNameCount"></span>/60</span>
                 </div>
             </div>
 
             <div class="flex flex-col gap-2">
-                <h3 class="text-app-heading-2 text-text-80">Backstory</h3>
-                <textarea wire:model.live.debounce.500ms="bio" @blur="$wire.$commit()" placeholder="Write their backstory..."
+                <h3 class="text-app-heading-2 text-text-80">{{ __('Backstory') }}</h3>
+                <textarea wire:model.live.debounce.500ms="bio" @blur="$wire.$commit()" placeholder="{{ __('Write their backstory...') }}"
                     class="w-full bg-transparent outline-none text-text-60 text-app-body-medium resize-none [field-sizing:content] min-h-[50px]"></textarea>
             </div>
 
@@ -412,7 +412,7 @@ new #[Layout('layouts.app')] class extends Component {
 
     <x-confirm-dialog
         eventName="open-delete-character-confirm"
-        title="Delete Character?"
+        title="{{ __('Delete Character?') }}"
         description='"{{ $nickName }}" and every relationship involving them will be permanently removed.'
         confirmText="Confirm Delete"
         submitAction="deleteCharacter"

@@ -234,15 +234,15 @@ new #[Layout('layouts.app')] class extends Component {
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 @foreach([
-                    ['title' => 'Structure', 'icon' => 'no-structure', 'desc' => 'You Didn\'t Have Any Chapters!', 'btn' => 'View Structure', 'route' => 'projects.structure'],
-                    ['title' => 'Character', 'icon' => 'no-character', 'desc' => 'You Didn\'t Have Any Characters!', 'btn' => 'View Character', 'route' => 'projects.characters'],
-                    ['title' => 'Notes', 'icon' => 'no-notes', 'desc' => 'You Didn\'t Have Any Notes!', 'btn' => 'View Notes', 'route' => 'projects.notes']
+                    ['id' => 'structure', 'title' => __('Structure'), 'icon' => 'no-structure', 'desc' => __('You Didn\'t Have Any Chapters!'), 'btn' => __('View Structure'), 'route' => 'projects.structure'],
+                    ['id' => 'character', 'title' => __('Character'), 'icon' => 'no-character', 'desc' => __('You Didn\'t Have Any Characters!'), 'btn' => __('View Character'), 'route' => 'projects.characters'],
+                    ['id' => 'notes', 'title' => __('Notes'), 'icon' => 'no-notes', 'desc' => __('You Didn\'t Have Any Notes!'), 'btn' => __('View Notes'), 'route' => 'projects.notes']
                 ] as $workspace)
 
                 <div class="bg-brand-100 rounded-md p-4 flex flex-col justify-between h-[396px] border border-brand-150">
-                    <h3 class="text-app-heading-2 text-text-100 mb-4 px-1">{{ __($workspace['title']) }}</h3>
+                    <h3 class="text-app-heading-2 text-text-100 mb-4 px-1">{{ $workspace['title'] }}</h3>
 
-                    @if($workspace['title'] === 'Notes' && $recentNotes->isNotEmpty()) 
+                    @if($workspace['id'] === 'notes' && $recentNotes->isNotEmpty()) 
                         <div class="flex-1 flex flex-col gap-3 overflow-y-auto pr-1.5 custom-scrollbar -mx-1.5 px-1.5">
                             @foreach($recentNotes as $note)
                                 <a
@@ -278,7 +278,7 @@ new #[Layout('layouts.app')] class extends Component {
                                 </a>
                             @endforeach
                         </div>
-                    @elseif($workspace['title'] === 'Character' && $recentCharacters->isNotEmpty())
+                    @elseif($workspace['id'] === 'character' && $recentCharacters->isNotEmpty())
                         <div class="flex-1 flex flex-col gap-2 overflow-y-auto custom-scrollbar -mx-1.5 px-1">
                             @foreach($recentCharacters as $character)
                                 <a
@@ -328,7 +328,7 @@ new #[Layout('layouts.app')] class extends Component {
                                 </a>
                             @endforeach
                         </div>
-                    @elseif($workspace['title'] === 'Structure' && $recentChapters->isNotEmpty())
+                    @elseif($workspace['id'] === 'structure' && $recentChapters->isNotEmpty())
                         <div class="flex-1 flex flex-col gap-3 overflow-y-auto pr-1.5 custom-scrollbar -mx-1.5 px-1.5 pb-2">
                             @foreach($recentChapters as $chapter)
                                 <a href="{{ route('projects.manuscript', ['project' => $chapter->project_id, 'chapterCard' => $chapter->chapter_card_id]) }}" 

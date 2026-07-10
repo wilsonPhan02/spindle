@@ -40,10 +40,7 @@ new #[Layout('layouts.app')] class extends Component {
         $validCodes = array_column(self::availableLanguages(), 'code');
         if (! in_array($lang, $validCodes, true)) return;
 
-        $this->language = $lang;
-        $this->profile->update(['language' => $lang]);
-
-        return $this->redirect(route('settings'), navigate: true);
+        return redirect()->route('lang.switch', $lang);
     }
 
     #[On('profile-updated')]
@@ -84,7 +81,7 @@ new #[Layout('layouts.app')] class extends Component {
                 <x-settings-items variant="info" label="{{ __('Occupation') }}" :value="$profile->occupation ?? __('None')"></x->
                 <x-settings-items variant="info" label="{{ __('Gender') }}"     :value="$profile->gender ? __(ucfirst($profile->gender)) : __('None')"></x->
                 <x-settings-items variant="info" label="{{ __('Email') }}"      :value="$user->email ?? __('None')"></x->
-                <x-settings-items variant="info" label="{{ __('Birth Date') }}" :value="$profile->birthdate ? \Carbon\Carbon::parse($profile->birthdate)->format('d F Y') : __('None')"></x->
+                <x-settings-items variant="info" label="{{ __('Birth Date') }}" :value="$profile->birthdate ? \Carbon\Carbon::parse($profile->birthdate)->translatedFormat('d F Y') : __('None')"></x->
             </div>
         </div>
     </section>

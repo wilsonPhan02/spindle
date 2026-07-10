@@ -301,7 +301,7 @@ new class extends Component {
                                     @endif
                                     <h3 class="text-app-body-medium text-text-100 truncate group-hover:text-secondary-200 transition-colors">{{ $project->title }}</h3>
                                 </div>
-                                <p class="text-[11px] font-medium text-subtext-90">{{ $project->created_at->format('d F Y') }}</p>
+                                <p class="text-[11px] font-medium text-subtext-90">{{ $project->created_at->translatedFormat('d F Y') }}</p>
                             </a>
                         @endforeach
 
@@ -319,20 +319,20 @@ new class extends Component {
     @endif
 
     <!-- Floating Action Button for Add Section -->
-    <button wire:click="addSection" class="group fixed bottom-10 right-10 flex flex-row-reverse items-center bg-secondary-200 text-brand-10 rounded-full h-14 w-14 hover:w-44 transition-all duration-300 ease-out shadow-xl hover:bg-secondary-250 overflow-hidden z-50 focus:outline-none cursor-pointer">
-        <div class="flex items-center justify-center shrink-0 w-14 h-14">
+    <button wire:click="addSection" class="group fixed bottom-10 right-10 flex flex-row-reverse items-center bg-secondary-200 text-brand-10 rounded-full h-14 transition-all duration-300 ease-out shadow-xl hover:bg-secondary-250 z-50 focus:outline-none cursor-pointer">
+        <div class="flex items-center justify-center shrink-0 w-14 h-14 rounded-full">
             <svg class="w-6 h-6 transition-transform duration-300 group-hover:rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
             </svg>
         </div>
-        <span class="whitespace-nowrap font-medium text-[15px] opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex-1 text-right pr-2">
+        <span class="whitespace-nowrap font-medium text-[15px] max-w-0 opacity-0 group-hover:max-w-[300px] group-hover:opacity-100 overflow-hidden transition-all duration-300 group-hover:pl-6 group-hover:pr-2">
             {{ __('Add Section') }}
         </span>
     </button>
 
     <x-confirm-dialog
         eventName="open-archive-section-dialog"
-        title="Archive this Section?"
+        title="{{ __('Archive this Section?') }}"
         description="Are you sure you want to archive this section? You can restore it from the Archive page."
         confirmText="Yes, Archive"
         cancelText="Cancel"

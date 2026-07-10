@@ -2,7 +2,7 @@ document.addEventListener('alpine:init', () => {
     Alpine.data('textEditor', (config) => ({
         ...config,
         formatValue: 'p',
-        formatLabel: 'Normal Text',
+        formatLabel: config.i18n ? config.i18n.normalText : 'Normal Text',
         activeStates: {
             bold: false, italic: false, underline: false, strikeThrough: false,
             insertUnorderedList: false, insertOrderedList: false, todo: false,
@@ -316,7 +316,13 @@ document.addEventListener('alpine:init', () => {
                         }
 
                         const tag = block.tagName.toLowerCase();
-                        const map = { p: 'Normal Text', h1: 'Heading 1', h2: 'Heading 2', h3: 'Heading 3', blockquote: 'Quote' };
+                        const map = { 
+                            p: this.i18n ? this.i18n.normalText : 'Normal Text', 
+                            h1: this.i18n ? this.i18n.heading1 : 'Heading 1', 
+                            h2: this.i18n ? this.i18n.heading2 : 'Heading 2', 
+                            h3: this.i18n ? this.i18n.heading3 : 'Heading 3', 
+                            blockquote: this.i18n ? this.i18n.quote : 'Quote' 
+                        };
                         if (map[tag]) {
                             this.formatValue = tag;
                             this.formatLabel = map[tag];
@@ -475,22 +481,22 @@ document.addEventListener('alpine:init', () => {
 
                     if (hasTrailingSpace && trimmed === '#') {
                         this.deleteShortcutPrefix(node, sel.anchorOffset);
-                        this.setFormat('h1', 'Heading 1', block);
+                        this.setFormat('h1', this.i18n ? this.i18n.heading1 : 'Heading 1', block);
                         return;
                     }
                     if (hasTrailingSpace && trimmed === '##') {
                         this.deleteShortcutPrefix(node, sel.anchorOffset);
-                        this.setFormat('h2', 'Heading 2', block);
+                        this.setFormat('h2', this.i18n ? this.i18n.heading2 : 'Heading 2', block);
                         return;
                     }
                     if (hasTrailingSpace && trimmed === '###') {
                         this.deleteShortcutPrefix(node, sel.anchorOffset);
-                        this.setFormat('h3', 'Heading 3', block);
+                        this.setFormat('h3', this.i18n ? this.i18n.heading3 : 'Heading 3', block);
                         return;
                     }
                     if (hasTrailingSpace && (trimmed === '>' || trimmed === '{}' || trimmed === '&gt;')) {
                         this.deleteShortcutPrefix(node, sel.anchorOffset);
-                        this.setFormat('blockquote', 'Quote', block);
+                        this.setFormat('blockquote', this.i18n ? this.i18n.quote : 'Quote', block);
                         return;
                     }
 
@@ -720,7 +726,7 @@ document.addEventListener('alpine:init', () => {
                         }
                         if (formatBlock.textContent.replace(/^[\s\u200B\uFEFF]+|[\s\u200B\uFEFF]+$/g, '') === '' || isAtStart) {
                             e.preventDefault();
-                            this.setFormat('p', 'Normal Text', formatBlock);
+                            this.setFormat('p', this.i18n ? this.i18n.normalText : 'Normal Text', formatBlock);
                             return;
                         }
                     }
@@ -807,7 +813,7 @@ document.addEventListener('alpine:init', () => {
                             const newBlock = newNode.closest('h1, h2, h3, blockquote');
                             if (newBlock && editorEl.contains(newBlock)) {
                                 if (newBlock !== currentBlock) {
-                                    this.setFormat('p', 'Normal Text');
+                                    this.setFormat('p', this.i18n ? this.i18n.normalText : 'Normal Text');
                                 } else {
                                     const p = document.createElement('p');
                                     p.innerHTML = '<br>';

@@ -4,6 +4,71 @@ namespace App\Helpers;
 
 class TextHelper
 {
+    public static function getDefaultNames(): array
+    {
+        return [
+            'Untitled Section',
+            'Untitled Project',
+            'Untitled Chapter',
+            'Untitled Notes',
+            'Unnamed Character',
+            'New Character', // legacy support
+            'Personal Identity',
+            'Physical Appearance',
+            'Gender',
+            'Age',
+            'Place of Birth',
+            'Date of Birth',
+            'Height',
+            'Weight',
+            'Blood Type',
+            'Hair Color',
+            'Eye Color',
+            'Skin Color',
+            'Parent',
+            'Sibling',
+            'Friend',
+            'Enemy',
+            'Neighbor',
+            'Lover'
+        ];
+    }
+
+    public static function localizeDefaultName(?string $name): string
+    {
+        if (!$name) {
+            return '';
+        }
+
+        foreach (self::getDefaultNames() as $default) {
+            if ($name === $default) {
+                return __($default);
+            }
+            if (preg_match('/^(' . preg_quote($default, '/') . ')\s*\((\d+)\)$/', $name, $matches)) {
+                return __($default) . ' (' . $matches[2] . ')';
+            }
+        }
+        return $name;
+    }
+
+    public static function normalizeDefaultName(?string $name): ?string
+    {
+        if (!$name) {
+            return $name;
+        }
+
+        foreach (self::getDefaultNames() as $default) {
+            $localized = __($default);
+            if ($name === $localized) {
+                return $default;
+            }
+            if (preg_match('/^(' . preg_quote($localized, '/') . ')\s*\((\d+)\)$/', $name, $matches)) {
+                return $default . ' (' . $matches[2] . ')';
+            }
+        }
+        return $name;
+    }
+
     /**
      * Strip HTML tags and normalize whitespace.
      */
@@ -45,7 +110,10 @@ class TextHelper
      */
     public static function uniqueName(string $base, callable $existing): string
     {
-        $titles = collect($existing())->map(fn ($t) => strtolower((string) $t));
+        $titles = collect($existing())->map(function ($t) {
+            $normalized = self::normalizeDefaultName((string) $t);
+            return strtolower($normalized);
+        });
 
         if (! $titles->contains(strtolower($base))) {
             return $base;

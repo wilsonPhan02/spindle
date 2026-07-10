@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use App\Helpers\TextHelper;
 
 class Note extends Model
 {
@@ -30,6 +32,14 @@ class Note extends Model
         'title',
         'body',
     ];
+
+    protected function title(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => TextHelper::localizeDefaultName($value),
+            set: fn ($value) => TextHelper::normalizeDefaultName($value),
+        );
+    }
 
     protected function casts(): array
     {

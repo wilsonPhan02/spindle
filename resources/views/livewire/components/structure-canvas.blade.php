@@ -242,7 +242,7 @@ new class extends Component {
                         <div class="col-span-full w-full min-h-40 flex items-center justify-center border-2 border-dashed border-brand-100 rounded-lg text-text-60 bg-transparent">
                             <div class="flex flex-col items-center justify-center gap-2 text-center w-full">
                                 <x-icons.no-structure class="w-15 h-15 opacity-80" />
-                                <span class="text-app-sub-feature">No chapters in this section yet.</span>
+                                <span class="text-app-sub-feature">{{ __('No chapters in this section yet.') }}</span>
                             </div>
                         </div>
                     @endforelse
@@ -260,7 +260,7 @@ new class extends Component {
 
     <x-confirm-dialog
         eventName="open-delete-dialog"
-        title="Delete Chapter"
+        title="{{ __('Delete Chapter') }}"
         description="Are you sure you want to delete this chapter? This action will shift the order of subsequent chapters and cannot be undone."
         confirmText="Yes, Delete"
         cancelText="Cancel"

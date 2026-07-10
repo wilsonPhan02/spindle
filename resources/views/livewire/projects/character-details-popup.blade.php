@@ -320,7 +320,7 @@ new class extends Component {
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" d="M6 18L18 6M6 6l12 12"/></svg>
         </button>
 
-        <h2 class="text-app-title-1 text-text-100">Character Details</h2>
+        <h2 class="text-app-title-1 text-text-100">{{ __('Character Details') }}</h2>
 
         <div class="flex flex-col gap-6 max-h-[28rem] overflow-y-auto pr-2 custom-scrollbar" x-ref="groupList">
             <template x-for="group in detailGroups" :key="group.id">
@@ -401,7 +401,7 @@ new class extends Component {
                                     @keydown.escape="addField(group.id)"
                                     @input="fieldNameError = ''"
                                     maxlength="30"
-                                    placeholder="New field..."
+                                    placeholder="{{ __('New field...') }}"
                                     class="pl-3 pr-11 py-1.5 rounded-full bg-brand-100 border border-secondary-200 outline-none text-app-body-medium text-text-90 w-36"
                                 >
                                 <span class="absolute right-3 top-1/2 -translate-y-1/2 text-app-desc-feature text-subtext-90 pointer-events-none" x-text="(newFieldName[group.id] || '').length + '/30'"></span>
@@ -426,7 +426,7 @@ new class extends Component {
                         @keydown.escape="showNewGroupInput = false; newGroupName = ''; groupNameError = ''"
                         @input="groupNameError = ''"
                         maxlength="30"
-                        placeholder="New group name..."
+                        placeholder="{{ __('New group name...') }}"
                         class="text-app-subheading-2 font-semibold text-secondary-200 bg-transparent border-b border-secondary-200 outline-none min-w-0 flex-1"
                     >
                     <button @click="showNewGroupInput = false; newGroupName = ''; groupNameError = ''" type="button" class="w-6 h-6 rounded-full flex items-center justify-center text-text-60 hover:bg-black/10 hover:text-danger-100 transition-colors">
@@ -461,13 +461,13 @@ new class extends Component {
                         </div>
 
                         <div class="flex flex-col w-full gap-5">
-                            <h3 class="text-app-heading-1 text-text-80">Delete Detail Group?</h3>
+                            <h3 class="text-app-heading-1 text-text-80">{{ __('Delete Detail Group?') }}</h3>
                             <p class="text-app-subfeature text-text-80 px-3">This group and every field & value inside it will be permanently removed for all characters.</p>
                         </div>
 
                         <div class="flex gap-4 w-full justify-center">
-                            <button @click="confirmingDeleteGroupId = null" class="flex-1 py-2 px-4 rounded-lg border border-card-border text-text-70 text-web-body-small font-semibold hover:bg-card-hover transition-colors">Cancel</button>
-                            <button @click="deleteGroup(confirmingDeleteGroupId)" class="flex-1 py-3 px-4 rounded-lg text-subtext-60 transition-colors text-web-body-small font-semibold bg-danger-100 hover:bg-red-600">Delete</button>
+                            <button @click="confirmingDeleteGroupId = null" class="flex-1 py-2 px-4 rounded-lg border border-card-border text-text-70 text-web-body-small font-semibold hover:bg-card-hover transition-colors">{{ __('Cancel') }}</button>
+                            <button @click="deleteGroup(confirmingDeleteGroupId)" class="flex-1 py-3 px-4 rounded-lg text-subtext-60 transition-colors text-web-body-small font-semibold bg-danger-100 hover:bg-red-600">{{ __('Delete') }}</button>
                         </div>
                     </div>
                 </template>
@@ -481,13 +481,13 @@ new class extends Component {
                         </div>
 
                         <div class="flex flex-col w-full gap-5">
-                            <h3 class="text-app-heading-1 text-text-80">Delete Field?</h3>
-                            <p class="text-app-subfeature text-text-80 px-3">This field and its value for every character will be permanently removed.</p>
+                            <h3 class="text-app-heading-1 text-text-80">{{ __('Delete Field?') }}</h3>
+                            <p class="text-app-subfeature text-text-80 px-3">{{ __('This field and its value for every character will be permanently removed.') }}</p>
                         </div>
 
                         <div class="flex gap-4 w-full justify-center">
-                            <button @click="confirmingDeleteFieldId = null" class="flex-1 py-2 px-4 rounded-lg border border-card-border text-text-70 text-web-body-small font-semibold hover:bg-card-hover transition-colors">Cancel</button>
-                            <button @click="deleteField(confirmingDeleteFieldId)" class="flex-1 py-3 px-4 rounded-lg text-subtext-60 transition-colors text-web-body-small font-semibold bg-danger-100 hover:bg-red-600">Delete</button>
+                            <button @click="confirmingDeleteFieldId = null" class="flex-1 py-2 px-4 rounded-lg border border-card-border text-text-70 text-web-body-small font-semibold hover:bg-card-hover transition-colors">{{ __('Cancel') }}</button>
+                            <button @click="deleteField(confirmingDeleteFieldId)" class="flex-1 py-3 px-4 rounded-lg text-subtext-60 transition-colors text-web-body-small font-semibold bg-danger-100 hover:bg-red-600">{{ __('Delete') }}</button>
                         </div>
                     </div>
                 </template>

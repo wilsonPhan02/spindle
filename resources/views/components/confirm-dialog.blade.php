@@ -51,7 +51,7 @@
             @if($showCancel)
                 <button 
                     @click="show = false" 
-                    class="flex-1 py-2 px-4 rounded-lg border border-card-border text-text-70 text-web-body-small font-semibold hover:bg-card-hover transition-colors"
+                    class="flex-1 py-2 px-4 rounded-lg border border-card-border text-text-80 text-web-body-small font-semibold hover:bg-card-hover transition-colors"
                 >
                     {{ __($cancelText) }}
                 </button>
@@ -68,7 +68,7 @@
                     }
                     show = false;
                 "
-                class="flex-1 py-3 px-4 rounded-lg text-subtext-60 transition-colors text-web-body-small font-semibold {{ $btnColor }}"
+                class="flex-1 py-3 px-4 rounded-lg text-bg-main transition-colors text-web-body-small font-semibold {{ $btnColor }}"
             >
                 {{ __($confirmText) }}
             </button>
