@@ -2,6 +2,7 @@
 
 use Livewire\Volt\Component;
 use App\Models\Section;
+use App\Helpers\TextHelper;
 
 new class extends Component {
     public $sections = [];
@@ -23,14 +24,24 @@ new class extends Component {
     }
 
     public function addSection() {
+        $sectionTitle = TextHelper::uniqueName(
+            'Untitled Section',
+            fn () => auth()->user()->sections()->pluck('title')
+        );
+
         $section = auth()->user()->sections()->create([
-            'title' => 'Untitled Section'
+            'title' => $sectionTitle
         ]);
 
         // Otomatis buat 1 project kosong saat section dibuat
+        $projectTitle = TextHelper::uniqueName(
+            'Untitled Project',
+            fn () => auth()->user()->projects()->pluck('title')
+        );
+
         $section->projects()->create([
             'user_id' => auth()->id(),
-            'title' => 'Untitled Project'
+            'title' => $projectTitle
         ]);
 
         $this->loadSections();
@@ -48,9 +59,14 @@ new class extends Component {
     public function addProject($sectionId) {
         $section = auth()->user()->sections()->find($sectionId);
         if ($section) {
+            $projectTitle = TextHelper::uniqueName(
+                'Untitled Project',
+                fn () => auth()->user()->projects()->pluck('title')
+            );
+
             $section->projects()->create([
                 'user_id' => auth()->id(),
-                'title' => 'Untitled Project'
+                'title' => $projectTitle
             ]);
             $this->loadSections();
             $this->dispatch('project-updated');
