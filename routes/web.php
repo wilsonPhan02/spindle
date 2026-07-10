@@ -14,7 +14,7 @@ Volt::route('/reset-password/{token}', 'auth.reset-password')->name('password.re
 
 // Rute untuk mengubah bahasa (bisa diakses guest maupun auth)
 Route::get('/lang/{locale}', function ($locale) {
-    $validCodes = ['en', 'id', 'pt', 'es', 'fr', 'de', 'ja', 'zh', 'ko', 'ar', 'ru', 'tr'];
+    $validCodes = ['en', 'id', 'ja', 'zh', 'ko'];
     if (in_array($locale, $validCodes, true)) {
         session()->put('app_locale', $locale);
         if (Auth::check() && Auth::user()->profile) {

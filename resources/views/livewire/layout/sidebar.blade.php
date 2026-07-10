@@ -352,7 +352,7 @@ new class extends Component {
                                     @endif
                                     <span class="text-[13px] font-medium text-text-80 truncate transition-colors" :class="rowHovered ? 'text-text-100' : ''">{{ $pProject->title }}</span>
                                 </a>
-                                <button wire:click="unpin('{{ $pProject->project_id }}')" class="transition-all p-1 shrink-0 text-[#A08866] hover:text-[#8C7558] opacity-0 group-hover:opacity-100" :class="rowHovered ? 'opacity-100' : 'opacity-0'" title="Unmark Project">
+                                <button wire:click="unpin('{{ $pProject->project_id }}')" class="transition-all p-1 shrink-0 text-[#A08866] hover:text-[#8C7558] opacity-0 group-hover:opacity-100" :class="rowHovered ? 'opacity-100' : 'opacity-0'" title="{{ __('Unmark Project') }}">
                                     <x-icons.bookmark-slash class="w-4 h-4" />
                                 </button>
                             </div>

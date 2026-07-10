@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use App\Helpers\TextHelper;
 
 class Character extends Model
 {
@@ -22,6 +24,22 @@ class Character extends Model
         'project_id', 'full_name', 'nick_name', 'bio',
         'image_path', 'canvas_top', 'canvas_left',
     ];
+
+    protected function fullName(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => TextHelper::localizeDefaultName($value),
+            set: fn ($value) => TextHelper::normalizeDefaultName($value),
+        );
+    }
+
+    protected function nickName(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => TextHelper::localizeDefaultName($value),
+            set: fn ($value) => TextHelper::normalizeDefaultName($value),
+        );
+    }
 
     public function project(): BelongsTo
     {

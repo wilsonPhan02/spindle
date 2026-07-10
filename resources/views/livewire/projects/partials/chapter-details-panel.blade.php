@@ -169,7 +169,7 @@
                             </label>
 
                             @if($chapterCard->cover_image_path || $project->cover_image_path)
-                                <button type="button" wire:click="detachCoverImage" class="flex items-center gap-1.5 px-2.5 py-1.5 bg-text-80/95 border border-text-60 hover:bg-text-80 text-danger-100 text-app-caption text-[9px] rounded-md shadow-lg cursor-pointer transition-transform active:scale-95" title="Detach Cover">
+                                <button type="button" wire:click="detachCoverImage" class="flex items-center gap-1.5 px-2.5 py-1.5 bg-text-80/95 border border-text-60 hover:bg-text-80 text-danger-100 text-app-caption text-[9px] rounded-md shadow-lg cursor-pointer transition-transform active:scale-95" title="{{ __('Detach Cover') }}">
                                     <x-icons.delete class="w-3 h-3 text-danger-100" />
                                     <span>{{ __('Remove') }}</span>
                                 </button>
@@ -181,7 +181,7 @@
                             <div class="absolute inset-x-2 top-2 bg-danger-100/95 text-bg-main text-[11px] font-medium px-2.5 py-2 rounded shadow-xl z-50 flex items-start gap-1.5">
                                 <svg class="w-3.5 h-3.5 mt-0.5 shrink-0 text-bg-main" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
                                 <span x-text="clientError" class="flex-1 leading-relaxed"></span>
-                                <button type="button" @click.stop="clientError = null" class="shrink-0 ml-1 p-0.5 hover:bg-black/20 rounded transition-colors" title="Dismiss"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+                                <button type="button" @click.stop="clientError = null" class="shrink-0 ml-1 p-0.5 hover:bg-black/20 rounded transition-colors" title="{{ __('Dismiss') }}"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
                             </div> 
                         </template>
 
@@ -190,7 +190,7 @@
                             <div x-data="{ show: true }" x-show="show" class="absolute inset-x-2 top-2 bg-danger-100/95 text-bg-main text-[11px] font-medium px-2.5 py-2 rounded shadow-xl z-50 flex items-start gap-1.5">
                                 <svg class="w-3.5 h-3.5 mt-0.5 shrink-0 text-bg-main" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
                                 <span class="flex-1 leading-relaxed">{{ $message }}</span>
-                                <button type="button" @click.stop="show = false" class="shrink-0 ml-1 p-0.5 hover:bg-black/20 rounded transition-colors" title="Dismiss"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+                                <button type="button" @click.stop="show = false" class="shrink-0 ml-1 p-0.5 hover:bg-black/20 rounded transition-colors" title="{{ __('Dismiss') }}"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
                             </div> 
                         @enderror
 
@@ -260,7 +260,7 @@
                     </div>
 
                     <p class="text-app-caption text-secondary-100">
-                        {{ __('Last Edited:') }} {{ $chapterCard->updated_at?->timezone('Asia/Jakarta')->format('d F Y, H.i') ?? '-' }}
+                        {{ __('Last Edited:') }} {{ $chapterCard->updated_at?->timezone('Asia/Jakarta')->translatedFormat('d F Y, H.i') ?? '-' }}
                     </p>
                 </div>
 
@@ -348,7 +348,7 @@
                                            placeholder="{{ __('Tag...') }}"
                                            maxlength="20"
                                            class="w-full bg-transparent border-0 border-b border-secondary-200 px-0.5 py-0.5 text-app-body-small text-[11.5px] text-subtext-90 placeholder-text-80/60 focus:outline-none focus:ring-0 focus:border-secondary-200 font-medium leading-tight">
-                                    <button type="button" @click="addingTag = false; tagVal = ''" class="text-secondary-150 hover:text-secondary-200 font-bold text-xs px-1 leading-none transition-colors cursor-pointer" title="Cancel">&times;</button>
+                                    <button type="button" @click="addingTag = false; tagVal = ''" class="text-secondary-150 hover:text-secondary-200 font-bold text-xs px-1 leading-none transition-colors cursor-pointer" title="{{ __('Cancel') }}">&times;</button>
                                 </div>
                                 <div class="flex justify-end">
                                     <span class="text-app-caption text-[9px] font-semibold text-secondary-150 leading-none" x-text="tagVal.length + '/20'">0/20</span>
@@ -360,7 +360,7 @@
                                     <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-brand-150 text-[11.5px] text-app-body-small text-secondary-200 font-semibold border border-brand-200 max-w-[140px] shadow-2xs group"
                                           title="{{ $tag->name }}">
                                         <span class="truncate">{{ $tag->name }}</span>
-                                        <button type="button" wire:click="removeTag({{ $tag->id }})" class="text-secondary-150 hover:text-secondary-200 opacity-60 group-hover:opacity-100 transition-opacity ml-0.5 cursor-pointer" title="Remove tag">&times;</button>
+                                        <button type="button" wire:click="removeTag({{ $tag->id }})" class="text-secondary-150 hover:text-secondary-200 opacity-60 group-hover:opacity-100 transition-opacity ml-0.5 cursor-pointer" title="{{ __('Remove tag') }}">&times;</button>
                                     </span>
                                 @endforeach
                             @endif
@@ -449,7 +449,7 @@
                                             </div>
                                         </div>
                                         <button type="button" wire:click="detachCharacter('{{ $char->character_id }}')"
-                                                class="text-secondary-150 hover:text-secondary-200 opacity-50 group-hover:opacity-100 transition-opacity p-1 cursor-pointer" title="Remove character from chapter">
+                                                class="text-secondary-150 hover:text-secondary-200 opacity-50 group-hover:opacity-100 transition-opacity p-1 cursor-pointer" title="{{ __('Remove character from chapter') }}">
                                             &times;
                                         </button>
                                     </div>

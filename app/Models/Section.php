@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use App\Helpers\TextHelper;
 
 class Section extends Model
 {
@@ -25,6 +27,14 @@ class Section extends Model
         'title',
         'archived_at',
     ];
+
+    protected function title(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => TextHelper::localizeDefaultName($value),
+            set: fn ($value) => TextHelper::normalizeDefaultName($value),
+        );
+    }
 
     public function user(): BelongsTo
     {

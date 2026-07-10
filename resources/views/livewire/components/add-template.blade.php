@@ -328,9 +328,9 @@ new class extends Component {
 
                 @if($step === 1)
                     <div class="shrink-0 pt-12 pb-6 px-10 text-center z-10 bg-bg-main">
-                        <h2 class="text-web-heading-1 text-text-80 mb-2">Narrative Structures</h2>
+                        <h2 class="text-web-heading-1 text-text-80 mb-2">{{ __('Narrative Structures') }}</h2>
                         <p class="text-app-subfeature text-text-60">
-                            A lack of narrative structure, as you know, will cause anxiety.<br>- John Dufresne -
+                            {!! __('A lack of narrative structure, as you know, will cause anxiety.<br>- John Dufresne -') !!}
                         </p>
                     </div>
 
@@ -352,7 +352,7 @@ new class extends Component {
                                         @else
                                             <div class="flex flex-col items-center justify-center h-48 text-brand-200">
                                                 <x-icons.no-structure class="w-12 h-12 opacity-50 mb-2"/>
-                                                <span class="text-app-desc-feature">No Preview Available</span>
+                                                <span class="text-app-desc-feature">{{ __('No Preview Available') }}</span>
                                             </div>
                                         @endif
                                     </div>
@@ -370,14 +370,14 @@ new class extends Component {
                                                     class="flex items-center gap-1 px-2 py-1 bg-bg-main/95 backdrop-blur-sm border border-brand-200 text-secondary-200 rounded-sm hover:bg-brand-200 transition-all shadow-md" 
                                                     title="Edit Structure">
                                                 <x-icons.rename class="w-3 h-3"/>
-                                                <span class="text-app-caption font-semibold">Edit</span>
+                                                <span class="text-app-caption font-semibold">{{ __('Edit') }}</span>
                                             </button>
                                             
                                             <button @click.stop wire:click="attemptDeleteTemplate('{{ $template->template_id }}')" 
                                                     class="flex items-center gap-2 px-2 py-1 bg-bg-main/95 backdrop-blur-sm border border-danger-100/50 text-danger-100 rounded-sm hover:bg-danger-100 hover:border-danger-100 hover:text-brand-50 transition-all shadow-md group/btn" 
                                                     title="Delete Structure">
                                                 <x-icons.delete class="w-3 h-3" />
-                                                <span class="text-app-caption font-semibold">Delete</span>
+                                                <span class="text-app-caption font-semibold">{{ __('Delete') }}</span>
                                             </button>
                                             
                                         </div>
@@ -390,7 +390,7 @@ new class extends Component {
                     <div class="shrink-0 p-6 flex justify-center bg-bg-main z-10 border-t border-bg-border/60">
                         <button wire:click="goToStep4" class="flex items-center gap-2 px-6 py-2.5 bg-transparent border border-brand-200 text-secondary-200 rounded-md hover:bg-brand-50 hover:text-secondary-300 transition-colors text-web-button">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                            Create Template
+                            {{ __('Create Template') }}
                         </button>
                     </div>
                 @endif
@@ -410,7 +410,7 @@ new class extends Component {
                                     {{ $this->selectedTemplate->name }}
                                 </h1>
                                 <button wire:click="useTemplate" class="px-5 py-2 border border-brand-200 text-secondary-200 rounded-md hover:bg-brand-50 hover:text-secondary-300 transition-colors text-web-button">
-                                    Use Template
+                                    {{ __('Use Template') }}
                                 </button>
                             </div>
 
@@ -424,7 +424,7 @@ new class extends Component {
                                 @else
                                     <div class="flex flex-col items-center justify-center h-48 text-brand-200">
                                         <x-icons.no-structure class="w-12 h-12 opacity-50 mb-2"/>
-                                        <span class="text-app-desc-feature">No Preview Available</span>
+                                        <span class="text-app-desc-feature">{{ __('No Preview Available') }}</span>
                                     </div>
                                 @endif
                             </div>
@@ -435,7 +435,7 @@ new class extends Component {
                                 @if ($this->selectedTemplate->description)
                                     <p class="text-web-body-small text-text-70 leading-relaxed whitespace-pre-wrap">{{ $this->selectedTemplate->description }}</p>
                                 @else
-                                    <p class="text-center text-web-body-small text-text-70 leading-relaxed whitespace-pre-wrap">No description for this template</p>
+                                    <p class="text-center text-web-body-small text-text-70 leading-relaxed whitespace-pre-wrap">{{ __('No description for this template') }}</p>
                                 @endif
                                 <hr class="mt-4 border-text-60 border-t-1">
                             </div>
@@ -452,11 +452,11 @@ new class extends Component {
                                                 {!! Str::markdown($section->goal) !!}
                                             </div>
                                         @else
-                                            <p class=" text-text-60 italic text-app-body-small">No details for this section yet.</p>
+                                            <p class=" text-text-60 italic text-app-body-small">{{ __('No details for this section yet.') }}</p>
                                         @endif
                                     </div>
                                 @empty
-                                    <p class="text-center text-text-60 italic text-app-body-small">No detailed steps for this template yet.</p>
+                                    <p class="text-center text-text-60 italic text-app-body-small">{{ __('No detailed steps for this template yet.') }}</p>
                                 @endforelse
                             </div>
 
@@ -472,20 +472,20 @@ new class extends Component {
                         </div>
 
                         <h3 class="text-app-heading-1 text-text-90 mb-4">
-                            Are you sure you want to change the template?
+                            {{ __('Are you sure you want to change the template?') }}
                         </h3>
                         
                         <p class="text-app-subfeature text-text-70 mb-10 max-w-2xl leading-relaxed">
-                            Your current template has more sections than the new one you selected. All of your chapters in the excess sections will be merged into the <strong class="text-text-90 bg-brand-100 px-2 py-0.5 rounded">last section</strong> of your new template to prevent data loss.
+                            {!! __('Your current template has more sections than the new one you selected. All of your chapters in the excess sections will be merged into the <strong class="text-text-90 bg-brand-100 px-2 py-0.5 rounded">last section</strong> of your new template to prevent data loss.') !!}
                         </p>
 
                         <div class="flex gap-4">
                             <button wire:click="$set('step', 2)" class="px-8 py-3 rounded-md border-2 border-brand-200 text-text-70 hover:bg-brand-50 transition-colors font-semibold text-web-button shadow-sm">
-                                Cancel
+                                {{ __('Cancel') }}
                             </button>
                             
                             <button wire:click="confirmTemplateChange" class="px-8 py-3 rounded-md bg-secondary-200 text-brand-10 hover:bg-secondary-300 hover:shadow-md transition-all font-semibold text-web-button shadow-sm transform active:scale-95">
-                                Yes, Change Template
+                                {{ __('Yes, Change Template') }}
                             </button>
                         </div>
                     </div>
@@ -496,7 +496,7 @@ new class extends Component {
                         <button wire:click="goBack" class="w-10 h-10 rounded-full border border-brand-200 text-text-60 hover:bg-brand-50 hover:text-text-100 flex items-center justify-center transition-colors bg-bg-main" title="Back to structures">
                             <x-icons.back/>
                         </button>
-                        <h2 class="text-app-title-1 text-text-90 ml-6">Architect Your Structure</h2>
+                        <h2 class="text-app-title-1 text-text-90 ml-6">{{ __('Architect Your Structure') }}</h2>
                     </div>
 
                     <div class="flex-1 overflow-y-auto custom-scrollbar px-10 md:px-14 py-8 bg-bg-main">
@@ -504,14 +504,14 @@ new class extends Component {
                             
                             <div class="flex flex-col gap-4">
                                 <div>
-                                    <label class="block text-app-desc-feature font-bold text-text-70 uppercase tracking-wider mb-2">Template Name <span class="text-danger-100">*</span></label>
-                                    <input type="text" wire:model="customTemplateName" placeholder="e.g. My Hero's Journey" class="w-full bg-card-bg border border-card-border rounded-lg px-4 py-3 text-text-90 placeholder-text-60/40 focus:outline-none focus:border-secondary-200 focus:ring-1 focus:ring-secondary-200 transition-all text-app-body-medium">
+                                    <label class="block text-app-desc-feature font-bold text-text-70 uppercase tracking-wider mb-2">{{ __('Template Name') }} <span class="text-danger-100">*</span></label>
+                                    <input type="text" wire:model="customTemplateName" placeholder="{{ __('e.g. My Hero\'s Journey') }}" class="w-full bg-card-bg border border-card-border rounded-lg px-4 py-3 text-text-90 placeholder-text-60/40 focus:outline-none focus:border-secondary-200 focus:ring-1 focus:ring-secondary-200 transition-all text-app-body-medium">
                                     @error('customTemplateName') <span class="text-danger-100 text-xs mt-1">{{ $message }}</span> @enderror
                                 </div>
                                 
                                 <div>
-                                    <label class="block text-app-desc-feature font-bold text-text-70 uppercase tracking-wider mb-2">Description</label>
-                                    <textarea wire:model="customTemplateDescription" rows="2" placeholder="Briefly explain what this structure is for..." class="w-full bg-card-bg border border-card-border rounded-lg px-4 py-3 text-text-90 placeholder-text-60/40 focus:outline-none focus:border-secondary-200 focus:ring-1 focus:ring-secondary-200 transition-all custom-scrollbar resize-none text-app-body-medium"></textarea>
+                                    <label class="block text-app-desc-feature font-bold text-text-70 uppercase tracking-wider mb-2">{{ __('Description') }}</label>
+                                    <textarea wire:model="customTemplateDescription" rows="2" placeholder="{{ __('Briefly explain what this structure is for...') }}" class="w-full bg-card-bg border border-card-border rounded-lg px-4 py-3 text-text-90 placeholder-text-60/40 focus:outline-none focus:border-secondary-200 focus:ring-1 focus:ring-secondary-200 transition-all custom-scrollbar resize-none text-app-body-medium"></textarea>
                                 </div>
 
                                 <div x-data="{ 
@@ -595,14 +595,14 @@ new class extends Component {
                                             }, 'image/jpeg', 0.9);
                                         }
                                     }">
-                                    <label class="block text-app-desc-feature font-bold text-text-70 uppercase tracking-wider mb-2">Cover Image</label>
+                                    <label class="block text-app-desc-feature font-bold text-text-70 uppercase tracking-wider mb-2">{{ __('Cover Image') }}</label>
                                     
                                     <div @mouseover="hoverCover = true" @mouseleave="hoverCover = false" class="relative w-full max-w-lg aspect-[16/9] mx-auto border border-brand-100 rounded-lg bg-card-bg transition-colors flex flex-col items-center justify-center overflow-hidden">
                                         
                                         <!-- Progress Overlay -->
                                         <div x-show="isUploading" x-transition class="absolute inset-0 bg-[#F5EFE9]/80 backdrop-blur-md z-40 flex flex-col items-center justify-center">
                                             <svg class="animate-spin h-8 w-8 text-secondary-200 mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                                            <div class="text-secondary-200 font-semibold text-sm">Uploading... <span x-text="progress + '%'"></span></div>
+                                            <div class="text-secondary-200 font-semibold text-sm">{{ __('Uploading...') }} <span x-text="progress + '%'"></span></div>
                                             
                                             <div class="w-3/4 bg-brand-150 rounded-full h-1.5 mt-3 overflow-hidden shadow-inner mx-auto">
                                                 <div class="bg-secondary-100 h-full rounded-full transition-all duration-200 ease-out" :style="`width: ${progress}%`"></div>
@@ -618,21 +618,21 @@ new class extends Component {
                                         @else
                                             <div class="absolute inset-0 z-10 flex flex-col items-center justify-center pointer-events-none opacity-50">
                                                 <svg class="w-8 h-8 text-text-40 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                                                <span class="text-app-body-small text-text-60">Upload Cover Image</span>
+                                                <span class="text-app-body-small text-text-60">{{ __('Upload Cover Image') }}</span>
                                             </div>
                                         @endif
 
                                         <div x-show="hoverCover && !showCropper" x-transition class="absolute bottom-5 left-5 z-30 flex gap-2">
                                             <label class="flex items-center gap-2 px-3 py-1.5 bg-text-80/95 border border-text-60 rounded-md cursor-pointer hover:bg-text-80 transition-colors shadow-lg">
                                                 <x-icons.upload class="w-4 h-4 text-bg-main" />
-                                                <span class="text-bg-main text-app-desc-feature">Upload Cover</span>
+                                                <span class="text-bg-main text-app-desc-feature">{{ __('Upload Cover') }}</span>
                                                 <input type="file" x-ref="coverInput" @change="onFileChange" accept="image/*" class="hidden">
                                             </label>
 
                                             @if ($customImagePreview || $existingImagePath)
                                                 <button type="button" wire:click.prevent="removeImage" class="flex items-center gap-2 px-3 py-1.5 bg-text-80/95 border border-text-60 rounded-md cursor-pointer hover:bg-text-80 transition-colors shadow-lg">
                                                     <x-icons.delete class="w-4 h-4 text-danger-100" />
-                                                    <span class="text-app-desc-feature text-danger-100">Remove</span>
+                                                    <span class="text-app-desc-feature text-danger-100">{{ __('Remove') }}</span>
                                                 </button>
                                             @endif
                                         </div>
@@ -642,7 +642,7 @@ new class extends Component {
                                             <div class="absolute inset-x-4 top-4 bg-danger-100/95 text-bg-main text-[12px] font-medium px-3 py-2.5 rounded shadow-xl z-50 flex items-start gap-2">
                                                 <svg class="w-4 h-4 mt-0.5 shrink-0 text-bg-main" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
                                                 <span x-text="clientError" class="flex-1 leading-relaxed"></span>
-                                                <button type="button" @click.stop="clientError = null" class="shrink-0 ml-2 p-0.5 hover:bg-black/20 rounded transition-colors" title="Dismiss"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+                                                <button type="button" @click.stop="clientError = null" class="shrink-0 ml-2 p-0.5 hover:bg-black/20 rounded transition-colors" title="{{ __('Dismiss') }}"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
                                             </div> 
                                         </template>
 
@@ -651,7 +651,7 @@ new class extends Component {
                                             <div x-data="{ show: true }" x-show="show" class="absolute inset-x-4 top-4 bg-danger-100/95 text-bg-main text-[12px] font-medium px-3 py-2.5 rounded shadow-xl z-50 flex items-start gap-2">
                                                 <svg class="w-4 h-4 mt-0.5 shrink-0 text-bg-main" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
                                                 <span class="flex-1 leading-relaxed">{{ $message }}</span>
-                                                <button type="button" @click.stop="show = false" class="shrink-0 ml-2 p-0.5 hover:bg-black/20 rounded transition-colors" title="Dismiss"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+                                                <button type="button" @click.stop="show = false" class="shrink-0 ml-2 p-0.5 hover:bg-black/20 rounded transition-colors" title="{{ __('Dismiss') }}"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
                                             </div> 
                                         @enderror
 
@@ -661,8 +661,8 @@ new class extends Component {
                                                 <img x-ref="cropImage" :src="cropImageUrl" class="block w-full h-full" style="max-width: 100%; max-height: 100%; object-fit: contain;">
                                             </div>
                                             <div class="absolute bottom-4 left-0 right-0 flex justify-center gap-2 z-50">
-                                                <button @click.stop="cancelCrop()" type="button" class="px-4 py-1.5 bg-bg-main/90 backdrop-blur text-text-70 text-[11px] font-bold uppercase tracking-wider rounded-md border border-text-60 hover:bg-bg-main shadow-lg transition-colors">Cancel</button>
-                                                <button @click.stop="applyCrop()" type="button" class="px-4 py-1.5 bg-secondary-100/95 backdrop-blur text-bg-main text-[11px] font-bold uppercase tracking-wider rounded-md shadow-lg border border-secondary-200 hover:bg-secondary-200 transition-colors">Save</button>
+                                                <button @click.stop="cancelCrop()" type="button" class="px-4 py-1.5 bg-bg-main/90 backdrop-blur text-text-70 text-[11px] font-bold uppercase tracking-wider rounded-md border border-text-60 hover:bg-bg-main shadow-lg transition-colors">{{ __('Cancel') }}</button>
+                                                <button @click.stop="applyCrop()" type="button" class="px-4 py-1.5 bg-secondary-100/95 backdrop-blur text-bg-main text-[11px] font-bold uppercase tracking-wider rounded-md shadow-lg border border-secondary-200 hover:bg-secondary-200 transition-colors">{{ __('Save') }}</button>
                                             </div>
                                         </div>
                                     </div>
@@ -673,7 +673,7 @@ new class extends Component {
 
                             <div class="flex flex-col gap-5">
                                 <div class="flex items-center justify-between">
-                                    <h3 class="text-app-heading-1 text-text-90">Narrative Sections</h3>
+                                    <h3 class="text-app-heading-1 text-text-90">{{ __('Narrative Sections') }}</h3>
                                 </div>
 
                                 @foreach($customSections as $index => $section)
@@ -684,19 +684,19 @@ new class extends Component {
                                                 {{ $index + 1 }}
                                             </div>
                                             <div class="flex-1">
-                                                <input type="text" wire:model="customSections.{{ $index }}.title" placeholder="e.g. Inciting Incident" class="w-full bg-transparent border-b border-card-border focus:border-secondary-200 px-1 py-1.5 text-text-90 placeholder-text-60/40 focus:outline-none transition-all text-app-body-large">
+                                                <input type="text" wire:model="customSections.{{ $index }}.title" placeholder="{{ __('e.g. Inciting Incident') }}" class="w-full bg-transparent border-b border-card-border focus:border-secondary-200 px-1 py-1.5 text-text-90 placeholder-text-60/40 focus:outline-none transition-all text-app-body-large">
                                                 @error('customSections.'.$index.'.title') <span class="text-danger-100 text-xs mt-1 block">{{ $message }}</span> @enderror
                                             </div>
                                             
                                             @if(count($customSections) > 1)
-                                                <button type="button" wire:click="removeCustomSection({{ $index }})" class="text-text-60/70 hover:text-danger-100 p-1.5 pt-0 rounded-md hover:bg-danger-100/10 transition-colors mt-1" title="Remove section">
+                                                <button type="button" wire:click="removeCustomSection({{ $index }})" class="text-text-60/70 hover:text-danger-100 p-1.5 pt-0 rounded-md hover:bg-danger-100/10 transition-colors mt-1" title="{{ __('Remove section') }}">
                                                     <x-icons.delete class="w-4 h-4" />
                                                 </button>
                                             @endif
                                         </div>
 
                                         <div class="pl-12">
-                                            <textarea wire:model="customSections.{{ $index }}.goal" rows="2" placeholder="Describe what needs to happen in this section..." class="w-full bg-bg-main border border-card-border rounded-lg px-3 py-2 text-text-80 placeholder-text-60/40 focus:outline-none focus:border-secondary-200 transition-all custom-scrollbar resize-none text-app-body-small"></textarea>
+                                            <textarea wire:model="customSections.{{ $index }}.goal" rows="2" placeholder="{{ __('Describe what needs to happen in this section...') }}" class="w-full bg-bg-main border border-card-border rounded-lg px-3 py-2 text-text-80 placeholder-text-60/40 focus:outline-none focus:border-secondary-200 transition-all custom-scrollbar resize-none text-app-body-small"></textarea>
                                         </div>
                                     </div>
                                 @endforeach
@@ -705,16 +705,16 @@ new class extends Component {
 
                                 <button type="button" wire:click="addCustomSection" class="w-full py-4 border-2 border-dashed border-card-border rounded-xl text-text-60 hover:text-secondary-200 hover:border-brand-200 hover:bg-brand-50/50 transition-all flex items-center justify-center gap-2 group focus:outline-none text-web-button">
                                     <x-icons.add class="w-4 h-4" />
-                                    Add New Section
+                                    {{ __('Add New Section') }}
                                 </button>
                             </div>
 
                             <div class="pt-3 mt-2 border-t border-bg-border/60 flex justify-end">
                                 <button type="submit" class="flex items-center gap-2 px-8 py-3 bg-secondary-200 text-brand-10 rounded-md hover:bg-secondary-300 transition-all text-web-button shadow-sm transform active:scale-95">
                                     <span wire:loading.remove wire:target="saveCustomTemplate">
-                                        {{ $editingTemplateId ? 'Update Structure' : 'Build This Structure' }}
+                                        {{ $editingTemplateId ? __('Update Structure') : __('Build This Structure') }}
                                     </span>
-                                    <span wire:loading wire:target="saveCustomTemplate">Saving...</span>
+                                    <span wire:loading wire:target="saveCustomTemplate">{{ __('Saving...') }}</span>
                                 </button>
                             </div>
                         </form>
@@ -726,7 +726,7 @@ new class extends Component {
 
     <x-confirm-dialog
         eventName="open-delete-template-dialog"
-        title="Delete this Structure?"
+        title="{{ __('Delete this Structure?') }}"
         description="Are you sure you want to permanently delete this narrative structure? This action cannot be undone."
         confirmText="Yes, Delete"
         cancelText="Cancel"

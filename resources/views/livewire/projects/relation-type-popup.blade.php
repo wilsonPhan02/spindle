@@ -281,7 +281,7 @@ new class extends Component {
                                 @input="selectedTypeId = null"
                                 @keydown.enter="if (!((!selectedTypeId && newTypeName.trim() === '') || isDuplicateTypeName())) saveRelation()"
                                 maxlength="20"
-                                placeholder="New type..."
+                                placeholder="{{ __('New type...') }}"
                                 :class="isDuplicateTypeName() ? 'border-danger-100' : 'border-brand-200'"
                                 class="w-full px-3 py-2 pr-10 bg-bg-main border rounded-md outline-none text-app-body-small text-text-80 focus:border-secondary-150 focus:border-2 transition-colors"
                             >
@@ -313,7 +313,7 @@ new class extends Component {
                             </div>
                         </div>
                     </div>
-                    <p x-show="isDuplicateTypeName()" style="display: none;" class="text-app-desc-feature text-danger-100 -mt-1">Type already exists.</p>
+                    <p x-show="isDuplicateTypeName()" style="display: none;" class="text-app-desc-feature text-danger-100 -mt-1">{{ __('Type already exists.') }}</p>
 
                     <div class="flex gap-2 mt-2">
                         <button 
@@ -321,7 +321,7 @@ new class extends Component {
                                style="display:none;" 
                                @click="confirmingDeleteRel = true" 
                                class="cursor-pointer flex-1 py-3 rounded-lg border border-danger-100 text-app-feature text-danger-100 hover:bg-danger-100/10 transition-colors"
-                            >Delete
+                            >{{ __('Delete') }}
                         </button>
 
                         <button
@@ -329,7 +329,7 @@ new class extends Component {
                             :disabled="(!selectedTypeId && newTypeName.trim() === '') || isDuplicateTypeName()"
                             :class="((!selectedTypeId && newTypeName.trim() === '') || isDuplicateTypeName()) ? 'opacity-40 cursor-not-allowed' : ''"
                             class="cursor-pointer flex-1 py-3 rounded-lg bg-secondary-100 text-app-feature text-bg-main hover:bg-secondary-150 transition-colors"
-                        >Save</button>
+                        >{{ __('Save') }}</button>
                     </div>
                 </div>
             </div>
@@ -343,13 +343,13 @@ new class extends Component {
                 </div>
 
                 <div class="flex flex-col w-full gap-5">
-                    <h3 class="text-app-heading-1 text-text-80">Delete Relationship?</h3>
-                    <p class="text-app-subfeature text-text-80 px-3">This relationship will be permanently removed.</p>
+                    <h3 class="text-app-heading-1 text-text-80">{{ __('Delete Relationship?') }}</h3>
+                    <p class="text-app-subfeature text-text-80 px-3">{{ __('This relationship will be permanently removed.') }}</p>
                 </div>
 
                 <div class="flex gap-4 w-full justify-center">
-                    <button @click="confirmingDeleteRel = false" class="flex-1 py-2 px-4 rounded-lg border border-card-border text-text-70 text-web-body-small font-semibold hover:bg-card-hover transition-colors">Cancel</button>
-                    <button @click="deleteRelation()" class="flex-1 py-3 px-4 rounded-lg text-subtext-60 transition-colors text-web-body-small font-semibold bg-danger-100 hover:bg-red-600">Confirm Delete</button>
+                    <button @click="confirmingDeleteRel = false" class="flex-1 py-2 px-4 rounded-lg border border-card-border text-text-70 text-web-body-small font-semibold hover:bg-card-hover transition-colors">{{ __('Cancel') }}</button>
+                    <button @click="deleteRelation()" class="flex-1 py-3 px-4 rounded-lg text-subtext-60 transition-colors text-web-body-small font-semibold bg-danger-100 hover:bg-red-600">{{ __('Confirm Delete') }}</button>
                 </div>
             </div>
 
@@ -362,13 +362,13 @@ new class extends Component {
                 </div>
 
                 <div class="flex flex-col w-full gap-5">
-                    <h3 class="text-app-heading-1 text-text-80">Delete Relationship Type?</h3>
+                    <h3 class="text-app-heading-1 text-text-80">{{ __('Delete Relationship Type?') }}</h3>
                     <p class="text-app-subfeature text-text-80 px-3">"<span x-text="types.find(t => t.id === pendingDeleteTypeId)?.name"></span>" and every relationship using it will be permanently removed.</p>
                 </div>
 
                 <div class="flex gap-4 w-full justify-center">
-                    <button @click="confirmingDeleteType = false; pendingDeleteTypeId = null" class="flex-1 py-2 px-4 rounded-lg border border-card-border text-text-70 text-web-body-small font-semibold hover:bg-card-hover transition-colors">Cancel</button>
-                    <button @click="deleteType(pendingDeleteTypeId)" class="flex-1 py-3 px-4 rounded-lg text-subtext-60 transition-colors text-web-body-small font-semibold bg-danger-100 hover:bg-red-600">Confirm Delete</button>
+                    <button @click="confirmingDeleteType = false; pendingDeleteTypeId = null" class="flex-1 py-2 px-4 rounded-lg border border-card-border text-text-70 text-web-body-small font-semibold hover:bg-card-hover transition-colors">{{ __('Cancel') }}</button>
+                    <button @click="deleteType(pendingDeleteTypeId)" class="flex-1 py-3 px-4 rounded-lg text-subtext-60 transition-colors text-web-body-small font-semibold bg-danger-100 hover:bg-red-600">{{ __('Confirm Delete') }}</button>
                 </div>
             </div>
         </div>

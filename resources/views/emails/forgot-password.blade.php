@@ -5,7 +5,7 @@
         <div style="background-color: #ffffff; padding: 45px; border-radius: 2px; text-align: left; border: 1px solid #e8e5ef; box-shadow: 0 2px 0 rgba(0, 0, 150, 0.025), 2px 4px 0 rgba(0, 0, 150, 0.015);">
             
             {{-- Header --}}
-            <h1 style="color: #37322E; font-size: 18px; font-weight: bold; margin-top: 0;">Hello!</h1>
+            <h1 style="color: #37322E; font-size: 18px; font-weight: bold; margin-top: 0;">{{ __('Hello!') }}</h1>
             
             {{-- Body --}}
             <p style="color: #718096; font-size: 16px; line-height: 1.5; margin-bottom: 25px;">
