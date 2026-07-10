@@ -17,16 +17,9 @@ new #[Layout('layouts.app')] class extends Component {
         return [
             ['code' => 'en', 'name' => 'English',           'cc' => 'us'],
             ['code' => 'id', 'name' => 'Bahasa Indonesia',   'cc' => 'id'],
-            ['code' => 'pt', 'name' => 'Português',          'cc' => 'br'],
-            ['code' => 'es', 'name' => 'Español',            'cc' => 'es'],
-            ['code' => 'fr', 'name' => 'Français',           'cc' => 'fr'],
-            ['code' => 'de', 'name' => 'Deutsch',            'cc' => 'de'],
             ['code' => 'ja', 'name' => '日本語',              'cc' => 'jp'],
             ['code' => 'zh', 'name' => '中文 (简体)',          'cc' => 'cn'],
             ['code' => 'ko', 'name' => '한국어',              'cc' => 'kr'],
-            ['code' => 'ar', 'name' => 'العربية',            'cc' => 'sa'],
-            ['code' => 'ru', 'name' => 'Русский',            'cc' => 'ru'],
-            ['code' => 'tr', 'name' => 'Türkçe',             'cc' => 'tr'],
         ];
     }
 

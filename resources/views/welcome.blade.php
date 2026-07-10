@@ -68,10 +68,8 @@
                             @php
                                 $curLang = app()->getLocale();
                                 $langs = [
-                                    'en' => ['English', 'us'], 'id' => ['Bahasa Indonesia', 'id'], 'pt' => ['Português', 'br'],
-                                    'es' => ['Español', 'es'], 'fr' => ['Français', 'fr'], 'de' => ['Deutsch', 'de'],
+                                    'en' => ['English', 'us'], 'id' => ['Bahasa Indonesia', 'id'],
                                     'ja' => ['日本語', 'jp'], 'zh' => ['中文 (简体)', 'cn'], 'ko' => ['한국어', 'kr'],
-                                    'ar' => ['العربية', 'sa'], 'ru' => ['Русский', 'ru'], 'tr' => ['Türkçe', 'tr'],
                                 ];
                                 $cc = $langs[$curLang][1] ?? 'us';
                             @endphp
