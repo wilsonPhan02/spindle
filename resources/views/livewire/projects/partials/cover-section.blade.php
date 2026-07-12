@@ -61,9 +61,9 @@
                 </div>
 
                 <div x-show="hoverCover && !showCropper" x-transition class="absolute bottom-5 left-5 z-30 flex gap-2">
-                    <label class="flex items-center gap-2 px-3 py-1.5 bg-text-80/95 border border-text-60 rounded-md cursor-pointer hover:bg-text-80 transition-colors shadow-lg">
-                        <x-icons.upload class="w-4 h-4 text-bg-main" />
-                        <span class="text-bg-main text-app-desc-feature">{{ __('Upload Cover') }}</span>
+                    <label class="flex items-center gap-2 px-3.5 py-2 bg-black/75 backdrop-blur-md border border-white/15 rounded-lg cursor-pointer hover:bg-black/90 transition-all shadow-xl text-white">
+                        <x-icons.upload class="w-4 h-4 text-white" />
+                        <span class="text-white font-semibold text-app-desc-feature">{{ $project->cover_image_path ? __('Change Cover') : __('Upload Cover') }}</span>
                         <input type="file" x-ref="coverInput" class="hidden" accept="image/*"
                             @change="
                                 const file = $event.target.files[0];
@@ -103,9 +103,9 @@
                     </label>
 
                     @if($project->cover_image_path)
-                        <button wire:click="deleteCover" class="flex items-center gap-2 px-3 py-1.5 bg-text-80/95 border border-text-60 rounded-md cursor-pointer hover:bg-text-80 transition-colors shadow-lg">
+                        <button wire:click="deleteCover" class="flex items-center gap-2 px-3.5 py-2 bg-black/75 backdrop-blur-md border border-danger-100/40 rounded-lg cursor-pointer hover:bg-danger-100/20 transition-all shadow-xl text-danger-100">
                             <x-icons.delete class="w-4 h-4 text-danger-100" />
-                            <span class="text-app-desc-feature text-danger-100">{{ __('Remove') }}</span>
+                            <span class="text-app-desc-feature font-semibold text-danger-100">{{ __('Remove') }}</span>
                         </button>
                     @endif
                 </div>

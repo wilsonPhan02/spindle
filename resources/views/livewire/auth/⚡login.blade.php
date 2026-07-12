@@ -66,7 +66,7 @@ new #[Layout('layouts.guest')] #[Title('Sign In - Spindle')] class extends Compo
                     <input type="email" wire:model="email" x-ref="email" placeholder="{{ __('Enter your email') }}"
                         x-init="setTimeout(() => { let v = sessionStorage.getItem('auth_email'); if(v && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) { $el.value = v; $wire.email = v; } }, 10)"
                         @input="sessionStorage.setItem('auth_email', $el.value)"
-                        class="w-full px-4 py-2 bg-white border border-subtext-70 rounded-md focus:ring-2 focus:ring-secondary-200 outline-none transition-all placeholder-subtext-90 text-app-body-medium text-text-80">
+                        class="w-full px-4 py-2 bg-bg-main border border-card-border rounded-md focus:ring-2 focus:ring-secondary-200 outline-none transition-all placeholder-subtext-90 text-app-body-medium text-text-90">
                     @error('email') <span class="text-app-body-small text-danger-100 mt-1 block">{{ $message }}</span> @enderror
                 </div>
 
@@ -76,7 +76,7 @@ new #[Layout('layouts.guest')] #[Title('Sign In - Spindle')] class extends Compo
                         <input :type="show ? 'text' : 'password'" wire:model="password" x-ref="password" placeholder="{{ __('Enter your password') }}"
                             x-init="setTimeout(() => { let e = sessionStorage.getItem('auth_email'); let v = sessionStorage.getItem('auth_password'); if(v && e && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)) { $el.value = v; $wire.password = v; } }, 10)"
                             @input="sessionStorage.setItem('auth_password', $el.value)"
-                            class="w-full px-4 py-2 pr-10 bg-white border border-subtext-70 rounded-md focus:ring-2 focus:ring-secondary-200 outline-none transition-all placeholder-subtext-90 text-app-body-medium text-text-80">
+                            class="w-full px-4 py-2 pr-10 bg-bg-main border border-card-border rounded-md focus:ring-2 focus:ring-secondary-200 outline-none transition-all placeholder-subtext-90 text-app-body-medium text-text-90">
 
                         <button type="button" @click="show = !show" class="absolute inset-y-0 right-0 flex items-center pr-3 text-subtext-90 hover:text-text-80 focus:outline-none transition-colors">
                             <svg x-show="!show" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -94,7 +94,7 @@ new #[Layout('layouts.guest')] #[Title('Sign In - Spindle')] class extends Compo
                 <div class="flex items-center justify-between pt-1">
                     <div class="flex items-center">
                         <input type="checkbox" wire:model="remember" id="remember"
-                            class="w-4 h-4 flex-shrink-0 mt-0.5 bg-white border-transparent rounded text-secondary-200 focus:ring-secondary-200 focus:ring-offset-card-bg">
+                            class="w-4 h-4 flex-shrink-0 mt-0.5 bg-bg-main border border-card-border rounded text-secondary-200 focus:ring-secondary-200 focus:ring-offset-card-bg">
                         <label for="remember" class="ml-2 text-app-body-medium text-text-80 cursor-pointer">{{ __('Remember me') }}</label>
                     </div>
                     <button
@@ -120,7 +120,7 @@ new #[Layout('layouts.guest')] #[Title('Sign In - Spindle')] class extends Compo
             </div>
 
             <button type="button"
-                class="flex items-center justify-center w-full py-2.5 mb-4 text-app-feature text-text-80 transition-colors bg-white border border-subtext-70 rounded-md hover:bg-card-hover">
+                class="flex items-center justify-center w-full py-2.5 mb-4 text-app-feature text-text-80 transition-colors bg-bg-main border border-card-border rounded-md hover:bg-card-hover">
                 <svg class="w-5 h-5 mr-2" viewBox="0 0 24 24">
                     <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
                     <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>

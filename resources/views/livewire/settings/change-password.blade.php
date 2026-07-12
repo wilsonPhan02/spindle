@@ -55,7 +55,7 @@ new class extends Component {
     @open-change-password.window="show = true"
     @close-modal.window="show = false"
     style="display: none;"
-    class="fixed inset-0 z-50 flex items-center justify-center bg-text-80/75 backdrop-blur-[1.5px]"
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm"
 >
     <div 
         @click.away="show = false"

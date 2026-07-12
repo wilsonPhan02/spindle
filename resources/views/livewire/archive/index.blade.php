@@ -137,7 +137,7 @@ new #[Layout('layouts.app')] class extends Component {
                                 <svg class="w-6 h-6 text-text-80" fill="currentColor" viewBox="0 0 24 24"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
                             </button>
 
-                            <div x-show="menuOpen" style="display: none;" class="absolute right-0 mt-2 w-48 bg-white border border-brand-150 rounded-lg shadow-lg z-20 py-1 overflow-hidden">
+                            <div x-show="menuOpen" style="display: none;" class="absolute right-0 mt-2 w-48 bg-card-bg border border-card-border rounded-lg shadow-lg z-20 py-1 overflow-hidden">
                                 <button
                                     wire:click="restoreSection('{{ $section->section_id }}')"
                                     @click="menuOpen = false"

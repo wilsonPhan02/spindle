@@ -311,7 +311,7 @@ new class extends Component {
     @open-edit-characters.window="show = true; resetDetailUi()"
     x-show="show"
     style="display: none;"
-    class="fixed inset-0 z-50 flex items-center justify-center bg-text-80/75 backdrop-blur-[1.5px]"
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm"
     wire:ignore
 >
     <div @click.away="show = false" class="bg-brand-10 rounded-2xl border-2 border-brand-150 shadow-2xl w-full max-h-[90vh] max-w-2xl p-10 flex flex-col gap-6 relative">
@@ -449,9 +449,9 @@ new class extends Component {
         <div
             x-show="confirmingDeleteGroupId || confirmingDeleteFieldId"
             style="display: none;"
-            class="fixed inset-0 z-[60] flex items-center justify-center bg-text-80/50 backdrop-blur-[1.5px]"
+            class="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 backdrop-blur-sm"
         >
-            <div @click.away="confirmingDeleteGroupId = null; confirmingDeleteFieldId = null" class="flex flex-col bg-white rounded-2xl shadow-xl w-full max-w-md px-12 py-8 text-center gap-8">
+            <div @click.away="confirmingDeleteGroupId = null; confirmingDeleteFieldId = null" class="flex flex-col bg-card-bg border border-card-border rounded-2xl shadow-2xl w-full max-w-md px-12 py-8 text-center gap-8">
                 <template x-if="confirmingDeleteGroupId">
                     <div class="flex flex-col items-center w-full gap-8">
                         <div class="mx-auto flex items-center justify-center h-24 w-24 rounded-full bg-danger-100/10">
@@ -467,7 +467,7 @@ new class extends Component {
 
                         <div class="flex gap-4 w-full justify-center">
                             <button @click="confirmingDeleteGroupId = null" class="flex-1 py-2 px-4 rounded-lg border border-card-border text-text-70 text-web-body-small font-semibold hover:bg-card-hover transition-colors">{{ __('Cancel') }}</button>
-                            <button @click="deleteGroup(confirmingDeleteGroupId)" class="flex-1 py-3 px-4 rounded-lg text-subtext-60 transition-colors text-web-body-small font-semibold bg-danger-100 hover:bg-red-600">{{ __('Delete') }}</button>
+                            <button @click="deleteGroup(confirmingDeleteGroupId)" class="flex-1 py-3 px-4 rounded-lg text-bg-main transition-colors text-web-body-small font-semibold bg-danger-100 hover:bg-danger-100/90">{{ __('Delete') }}</button>
                         </div>
                     </div>
                 </template>
@@ -487,7 +487,7 @@ new class extends Component {
 
                         <div class="flex gap-4 w-full justify-center">
                             <button @click="confirmingDeleteFieldId = null" class="flex-1 py-2 px-4 rounded-lg border border-card-border text-text-70 text-web-body-small font-semibold hover:bg-card-hover transition-colors">{{ __('Cancel') }}</button>
-                            <button @click="deleteField(confirmingDeleteFieldId)" class="flex-1 py-3 px-4 rounded-lg text-subtext-60 transition-colors text-web-body-small font-semibold bg-danger-100 hover:bg-red-600">{{ __('Delete') }}</button>
+                            <button @click="deleteField(confirmingDeleteFieldId)" class="flex-1 py-3 px-4 rounded-lg text-bg-main transition-colors text-web-body-small font-semibold bg-danger-100 hover:bg-danger-100/90">{{ __('Delete') }}</button>
                         </div>
                     </div>
                 </template>

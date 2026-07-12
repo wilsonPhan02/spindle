@@ -91,7 +91,7 @@ new class extends Component {
     x-data="{ show: false }" x-show="show" style="display: none;"
     @open-edit-profile.window="show = true; $wire.resetState()" 
     @close-modal.window="show = false"
-    class="fixed inset-0 z-50 flex items-center justify-center bg-text-80/75 backdrop-blur-[1.5px]"
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm"
 >
     <div @click.away="show = false" 
         class="bg-brand-10 rounded-2xl border-2 border-brand-150 shadow-2xl w-full max-w-5xl p-12 relative overflow-visible flex flex-col gap-10">
