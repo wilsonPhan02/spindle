@@ -586,11 +586,49 @@
 @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
 
 /* --- Extracted from structure.blade.php --- */
-.bg-dot-pattern {
+/* .bg-dot-pattern {
     background-color: var(--color-brand-10); 
-    background-image: radial-gradient(var(--color-brand-100) 1.5px, transparent 1.5px);
-    background-size: 24px 24px;
+    background-image: radial-gradient(
+        circle, 
+        color-mix(in srgb, var(--color-brand-150) 50%, transparent) 1.5px, 
+        transparent 1.5px
+    );
+    background-size: 22px 22px;
 }
+.dark .bg-dot-pattern {
+    background-color: var(--color-brand-10);
+    background-image: radial-gradient(
+        circle, 
+        color-mix(in srgb, var(--color-brand-200) 40%, transparent) 1.5px, 
+        transparent 1.5px
+    );
+} */
+
+.bg-dot-pattern {
+    /* Ambil nilai dari HTML, jika tidak ada pakai nilai default di sebelah kanan */
+    --z: var(--zoom, 1);
+    --px: var(--pan-x, 0px);
+    --py: var(--pan-y, 0px);
+
+    background-color: var(--color-brand-10); 
+    background-image: radial-gradient(
+        circle, 
+        color-mix(in srgb, var(--color-brand-150) 50%, transparent) calc(1.5px * var(--z)), 
+        transparent calc(1.5px * var(--z))
+    );
+    background-size: calc(22px * var(--z)) calc(22px * var(--z));
+    background-position: var(--px) var(--py);
+}
+
+/* Otomatis handle warna untuk Dark Mode */
+.dark .bg-dot-pattern {
+    background-image: radial-gradient(
+        circle, 
+        color-mix(in srgb, var(--color-brand-200) 40%, transparent) calc(1.5px * var(--z)), 
+        transparent calc(1.5px * var(--z))
+    );
+}
+
 /* --- Extracted from dashboard/index.blade.php --- */
 .welcome-marquee {
     animation: welcome-slide var(--duration) linear infinite;

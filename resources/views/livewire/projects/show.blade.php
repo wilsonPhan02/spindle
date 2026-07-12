@@ -290,7 +290,7 @@ new #[Layout('layouts.app')] class extends Component {
                                         @if($character->image_path)
                                             <img src="{{ Storage::url($character->image_path) }}" class="w-full h-full object-cover">
                                         @else
-                                            <x-icons.default-avatar class="w-full h-full text-secondary-100" />
+                                            <x-icons.default-avatar class="w-full h-full text-brand-200" />
                                         @endif
                                     </div>
                                     <div class="min-w-0 flex-1 gap-1 py-1">
@@ -340,7 +340,7 @@ new #[Layout('layouts.app')] class extends Component {
                                     </div>
 
                                     <div class="flex items-center gap-3 mb-2.5">
-                                        <x-icons.chapter-icon class="shrink-0"/>
+                                        <x-icons.chapter-icon class="shrink-0 text-secondary-100 stroke-brand-50"/>
                                         <h4 class="text-[18px] text-app-title-1 leading-normal text-text-80 truncate transition-colors">
                                             {{ $chapter->title }}
                                         </h4>
@@ -429,7 +429,7 @@ new #[Layout('layouts.app')] class extends Component {
 
                     @if($workspace['route'])
                         <a href="{{ route($workspace['route'], ['project' => $project->project_id]) }}" wire:navigate 
-                            class="w-full py-3 mt-4 mx-1 border-2 border-secondary-100 bg-transparent rounded-lg text-app-feature text-secondary-200 hover:bg-secondary-100/10 transition-colors text-center block" style="width: calc(100% - 8px);">
+                            class="w-full py-3 mt-4 mx-1 border-2 border-secondary-200/70 bg-transparent rounded-lg text-app-feature text-secondary-200 hover:bg-secondary-100/10 transition-colors text-center block" style="width: calc(100% - 8px);">
                             {{ __($workspace['btn']) }}
                         </a>
                     @else

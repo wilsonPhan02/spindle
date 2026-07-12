@@ -176,9 +176,9 @@ new #[Layout('layouts.app')] class extends Component {
             @mousemove="if (characters.length > 0) { onPan($event); onDragChar($event); onDragLabel($event); }"
             @mouseup="stopPan(); stopDragChar(); stopDragLabel()"
             @mouseleave="stopPan(); stopDragChar(); stopDragLabel()"
-            :style="`background-image: radial-gradient(circle, var(--color-brand-150) ${1.5 * zoom}px, transparent ${1.5 * zoom}px); background-size: ${22 * zoom}px ${22 * zoom}px; background-position: ${panX}px ${panY}px;`"
+            {{-- :style="`background-image: radial-gradient(circle, var(--color-brand-150) ${1.5 * zoom}px, transparent ${1.5 * zoom}px); background-size: ${22 * zoom}px ${22 * zoom}px; background-position: ${panX}px ${panY}px;`" --}}
             :class="characters.length === 0 ? 'cursor-default' : (isAnyPopupOpen() ? 'cursor-auto' : (panning ? 'cursor-grabbing' : 'cursor-grab'))"
-            class="relative w-full h-full rounded-xl border border-brand-200 bg-brand-10 overflow-hidden"
+            class="bg-dot-pattern relative w-full h-full rounded-xl border border-brand-200 bg-brand-10 overflow-hidden"
             wire:ignore
         >
             <div x-ref="canvas" class="absolute inset-0 origin-top-left" :style="`transform: translate(${panX}px, ${panY}px) scale(${zoom}); width: 2400px; height: 1800px;`">
