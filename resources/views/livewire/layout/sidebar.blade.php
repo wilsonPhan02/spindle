@@ -273,7 +273,7 @@ new class extends Component {
                 
                 @if($this->searchResultsData['total'] === 0)
                     <div class="flex flex-col items-center justify-center py-4 text-center opacity-60">
-                        <x-icons.sidebar-pen class="w-8 h-8 text-secondary-150 mb-1" />
+                        <x-icons.sidebar-pen class="w-8 h-8 text-secondary-150 stroke-brand-100 dark:text-secondary-200 mb-1" />
                         <p class="text-app-desc-feature text-secondary-200">{{ __('No results found.') }}</p>
                     </div>
                 @else
@@ -385,7 +385,7 @@ new class extends Component {
                     </div>
                 @else
                     <div class="flex flex-col items-center justify-center py-4 text-center opacity-60">
-                        <x-icons.sidebar-pen class="w-8 h-8 text-secondary-150 stroke-brand-100 dark:text-secondary-200 dark:[theme(colors.brand.10)] mb-1" />
+                        <x-icons.sidebar-pen class="w-8 h-8 text-secondary-150 stroke-brand-100 dark:text-secondary-200 mb-1" />
                         <p class="text-app-desc-feature text-secondary-200">{{ __('No Marked Projects!') }}</p>
                     </div>
                 @endif
@@ -434,7 +434,7 @@ new class extends Component {
                     </div>
                 @else
                     <div class="flex flex-col items-center justify-center py-4 text-center opacity-60">
-                        <x-icons.sidebar-pen class="w-8 h-8 text-secondary-150 mb-1" />
+                        <x-icons.sidebar-pen class="w-8 h-8 text-secondary-150 stroke-brand-100 dark:text-secondary-200 mb-1" />
                         <p class="text-app-desc-feature text-secondary-200">{{ __('You Didn\'t Have Any Project!') }}</p>
                     </div>
                 @endif
