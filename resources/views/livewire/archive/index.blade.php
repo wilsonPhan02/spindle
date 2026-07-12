@@ -97,10 +97,10 @@ new #[Layout('layouts.app')] class extends Component {
 <div class="p-10 max-w-7xl mx-auto">
 
     <!-- Header -->
-    <header class="flex justify-between items-center mb-12">
-        <a href="{{ route('dashboard') }}" wire:navigate class="flex items-center gap-3 text-[18px] text-text-70 hover:text-secondary-250 transition-colors">
+    <header class="flex justify-between items-center mb-8">
+        <a href="{{ route('dashboard') }}" wire:navigate class="flex items-center gap-3 text-[18px] text-subtext-100 hover:text-secondary-200 transition-colors">
             <x-icons.chevron rotate="180" size="w-3.5 h-3.5" color="currentColor"/>
-            <span class="text-text-100 font-semibold">{{ __('Archive') }}</span>
+            <span class="text-text-70 font-semibold">{{ __('Archive') }}</span>
         </a>
     </header>
 
