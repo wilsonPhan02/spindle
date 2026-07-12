@@ -83,7 +83,7 @@
         
     </div>
     
-    <a href="{{ route('projects.manuscript', ['project' => $chapter->project_id, 'chapterCard' => $chapter->chapter_card_id]) }}" wire:navigate 
+    <a href="{{ route('projects.manuscript', ['project' => $chapter->project_id, 'chapterCard' => $chapter->chapter_card_id]) }}" wire:navigate draggable="false"
         class="cursor-grab active:cursor-grabbing bg-card-bg border border-card-border rounded-lg shadow-md flex flex-col flex-col-1 overflow-hidden transition-all duration-300 group-hover:border-secondary-200 dark:group-hover:border-secondary-150 group-hover:shadow-xl group-hover:-translate-y-1 min-h-[230px]">
         
         <div class="p-5 flex-1 flex flex-col">
