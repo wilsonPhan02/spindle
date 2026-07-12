@@ -774,7 +774,7 @@ new #[Layout('layouts.app')] class extends Component {
                     x-transition:leave-end="opacity-0 scale-95"
                     @click.outside="closeMenu()"
                     x-bind:style="`position: fixed; top: ${menuPos.top}px; left: ${menuPos.left}px; z-index: 9999;`"
-                    class="w-48 bg-white border border-brand-150 rounded-lg shadow-lg py-1 overflow-hidden z-50"
+                    class="w-48 bg-card-bg border border-brand-150 rounded-lg shadow-lg py-1 overflow-hidden z-50"
                     style="display: none;"
                 >
                     <button

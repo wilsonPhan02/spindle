@@ -426,7 +426,7 @@ new #[Layout('layouts.app')] class extends Component {
             gap: 6px;
             padding: 8px 16px;
             background: var(--color-brand-10);
-            border: 1px solid var(--color-brand-100);
+            border: 1px solid var(--color-brand-200);
             border-top: none;
             border-radius: 0 0 8px 8px;
             cursor: pointer;
@@ -439,7 +439,7 @@ new #[Layout('layouts.app')] class extends Component {
         }
         .draft-tab:first-child {
             margin-left: 0;
-            border-left: 1px solid var(--color-brand-100);
+            border-left: 1px solid var(--color-brand-200);
         }
         .draft-tab:hover {
             background: var(--color-brand-150);
@@ -509,7 +509,7 @@ new #[Layout('layouts.app')] class extends Component {
 
         {{-- RIGHT: Editor Area + Tabs --}}
         <div class="min-w-0 flex-1 flex flex-col relative">
-                <div class="border border-b-0 border-brand-150 shadow-sm overflow-hidden bg-brand-50 flex-1 flex flex-col relative min-h-0"
+                <div class="border border-b-0 border-brand-200 shadow-sm overflow-hidden bg-brand-50 flex-1 flex flex-col relative min-h-0"
                      :class="showDetailPanel ? 'rounded-tr-xl border-l' : 'rounded-t-xl border-l'"
                 >
                     @if($activeDraft)

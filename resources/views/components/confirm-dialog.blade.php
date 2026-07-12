@@ -8,7 +8,7 @@
     'dispatchAction' => null,
     'iconColor' => 'text-danger-100', 
     'iconBg' => 'bg-danger-100/10',
-    'btnColor' => 'bg-danger-100 hover:bg-red-600',
+    'btnColor' => 'bg-danger-100 hover:opacity-90 text-white',
     'showCancel' => true
 ])
 

@@ -98,7 +98,7 @@ new #[Layout('layouts.app')] class extends Component {
 
     <!-- Header -->
     <header class="flex justify-between items-center mb-12">
-        <a href="{{ route('dashboard') }}" wire:navigate class="flex items-center gap-3 text-[18px] text-subtext-100 hover:text-secondary-250 transition-colors">
+        <a href="{{ route('dashboard') }}" wire:navigate class="flex items-center gap-3 text-[18px] text-text-70 hover:text-secondary-250 transition-colors">
             <x-icons.chevron rotate="180" size="w-3.5 h-3.5" color="currentColor"/>
             <span class="text-text-100 font-semibold">{{ __('Archive') }}</span>
         </a>
@@ -109,7 +109,7 @@ new #[Layout('layouts.app')] class extends Component {
         <div class="flex flex-col items-center justify-center mt-16">
             <x-empty-archive class="w-64 h-64 mb-6 opacity-80" />
             <h2 class="text-app-heading-1 text-subtext-80 mb-2">{{ __('Your archive is empty') }}</h2>
-            <p class="text-app-body-large text-subtext-70">{{ __('Archived sections will appear here.') }}</p>
+            <p class="text-app-subfeature text-subtext-70">{{ __('Archived sections will appear here.') }}</p>
         </div>
     @else
         <div class="space-y-12">

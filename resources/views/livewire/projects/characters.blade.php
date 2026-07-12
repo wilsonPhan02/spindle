@@ -282,12 +282,12 @@ new #[Layout('layouts.app')] class extends Component {
             @include('livewire.projects.partials.character-info-popup')
 
             {{-- Kontrol Zoom --}}
-            <div class="absolute bottom-5 left-5 z-30 flex flex-col bg-white border border-brand-150 px-1 rounded-lg shadow-sm overflow-hidden">
-                <button @click="zoomIn()" class="w-9 h-9 flex items-center justify-center text-text-80 hover:bg-bg-main transition-colors border-b border-secondary-100">
+            <div class="absolute bottom-5 left-5 z-30 flex flex-col bg-card-bg border border-brand-200 px-1 rounded-lg shadow-md overflow-hidden">
+                <button @click="zoomIn()" class="w-9 h-9 flex items-center justify-center text-text-80 hover:bg-brand-50 transition-colors border-b border-brand-200 cursor-pointer" title="{{ __('Zoom In') }}">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
                 </button>
-                <span class="text-app-desc-feature text-center text-text-80 py-2" x-text="Math.round(zoom * 100) + '%'"></span>
-                <button @click="zoomOut()" class="w-9 h-9 flex items-center justify-center text-text-80 hover:bg-bg-main transition-colors border-t border-secondary-100">
+                <span class="text-app-desc-feature font-semibold text-center text-text-80 py-2" x-text="Math.round(zoom * 100) + '%'"></span>
+                <button @click="zoomOut()" class="w-9 h-9 flex items-center justify-center text-text-80 hover:bg-brand-50 transition-colors border-t border-brand-200 cursor-pointer" title="{{ __('Zoom Out') }}">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 12h-15"/></svg>
                 </button>
             </div>
