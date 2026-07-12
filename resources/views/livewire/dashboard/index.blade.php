@@ -282,12 +282,12 @@ new class extends Component {
                                                 <img src="{{ Storage::url($project->cover_image_path) }}" class="w-full h-full object-cover" />
                                             </div>
                                         </div>
-                                        <div class="absolute top-2 bottom-2 right-1.5 w-3 bg-gradient-to-r from-brand-100 to-secondary-10 border-y border-r border-secondary-50 rounded-r-[2px] z-10 shadow-inner"></div>
-                                        <div class="absolute inset-y-0 right-0 w-6 bg-secondary-250 rounded-r-md z-0 shadow-sm border-l border-black/20 transition-shadow duration-300 group-hover:shadow-lg"></div>
+                                        <div class="absolute top-2 bottom-2 right-1.5 w-3 bg-gradient-to-r from-[#e9e1da] to-[#d9c5a4] border-y border-r border-[#c6b395] rounded-r-[2px] z-10 shadow-inner"></div>
+                                        <div class="absolute inset-y-0 right-0 w-6 bg-[#8a6144] rounded-r-md z-0 shadow-sm border-l border-black/20 transition-shadow duration-300 group-hover:shadow-lg"></div>
                                     @else
                                         <x-default-project class="absolute inset-y-0 left-0 right-3 w-[calc(100%-12px)] h-full text-secondary-100 rounded-l-sm rounded-r-md shadow-md z-20 border-r border-black/10 transition-shadow duration-300 group-hover:shadow-xl" />
-                                        <div class="absolute top-2 bottom-2 right-1.5 w-3 bg-gradient-to-r from-brand-100 to-secondary-10 border-y border-r border-secondary-50 rounded-r-[2px] z-10 shadow-inner"></div>
-                                        <div class="absolute inset-y-0 right-0 w-6 bg-secondary-250 rounded-r-md z-0 shadow-sm border-l border-black/20 transition-shadow duration-300 group-hover:shadow-lg"></div>
+                                        <div class="absolute top-2 bottom-2 right-1.5 w-3 bg-gradient-to-r from-[#e9e1da] to-[#d9c5a4] border-y border-r border-[#c6b395] rounded-r-[2px] z-10 shadow-inner"></div>
+                                        <div class="absolute inset-y-0 right-0 w-6 bg-[#8a6144] rounded-r-md z-0 shadow-sm border-l border-black/20 transition-shadow duration-300 group-hover:shadow-lg"></div>
                                     @endif
                                 </div>
 
@@ -297,7 +297,7 @@ new class extends Component {
                                     @elseif($project->icon_type === 'image' && $project->icon)
                                         <img src="{{ asset('storage/' . $project->icon) }}" alt="" class="w-4 h-4 object-cover rounded shrink-0">
                                     @else
-                                        <x-icons.sidebar-book class="w-4 h-4 text-text-80 shrink-0 group-hover:text-secondary-200 transition-colors" />
+                                        <x-icons.sidebar-book class="w-4 h-4 text-secondary-100 shrink-0 group-hover:text-secondary-200 transition-colors" />
                                     @endif
                                     <h3 class="text-app-body-medium text-text-100 truncate group-hover:text-secondary-200 transition-colors">{{ $project->title }}</h3>
                                 </div>

@@ -84,12 +84,12 @@
     </div>
     
     <a href="{{ route('projects.manuscript', ['project' => $chapter->project_id, 'chapterCard' => $chapter->chapter_card_id]) }}" wire:navigate 
-        class="cursor-grab active:cursor-grabbing bg-card-bg border border-card-border rounded-lg shadow-md flex flex-col flex-col-1 overflow-hidden transition-all group-hover:border-secondary-200 group-hover:shadow-lg group-hover:bg-card-hover min-h-[230px]">
+        class="cursor-grab active:cursor-grabbing bg-card-bg border border-card-border rounded-lg shadow-md flex flex-col flex-col-1 overflow-hidden transition-all duration-300 group-hover:border-secondary-200 dark:group-hover:border-secondary-150 group-hover:shadow-xl group-hover:-translate-y-1 min-h-[230px]">
         
         <div class="p-5 flex-1 flex flex-col">
             
             <div class="flex justify-between items-baseline border-b-1 border-card-border pb-2 mb-3">
-                <h3 class="text-app-body-large truncate pr-4">
+                <h3 class="text-app-body-large truncate pr-4 group-hover:text-secondary-200 transition-colors">
                     {{ $chapter->title }}
                 </h3>
             </div>
@@ -99,7 +99,7 @@
             </p>
         </div>
 
-        <div class="bg-brand-100 px-2 py-3 flex flex-col gap-2 group-hover:bg-brand-150">
+        <div class="bg-brand-100 dark:bg-brand-150 px-2 py-3 flex flex-col gap-2 transition-colors">
             
             <div class="flex items-center gap-1 overflow-hidden">
                 @if($chapter->tags->isNotEmpty())

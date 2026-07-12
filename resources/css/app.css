@@ -37,7 +37,7 @@
     --color-warning-100: rgb(255 190 0);
 
     /* Danger */
-    --color-danger-100: rgb(255 59 47);
+    --color-danger-100: var(--danger-100);
 
     /* --- Background Colors --- */
     --color-bg-main: var(--bg-main);
@@ -109,49 +109,63 @@
         --secondary-20: #d4c6bc;
         --secondary-10: #d9c5a4;
         --secondary-5: #f4ece5;
+
+        /* Scrollbar (Light) */
+        --scrollbar-thumb: #D5C6A9;
+        --scrollbar-thumb-hover: #B69F78;
+
+        /* Danger (Light) */
+        --danger-100: rgb(255 59 47);
     }
 
     .dark {
-        /* Neutrals Colors (Dark Mode - Vintage Theme) */
-        --text-60: #A3A09A;
-        --text-70: #BDBAB3;
-        --text-80: #D4D2CD;
-        --text-90: #E5E3DF;
-        --text-100: #F5F4F0;
+        /* Neutrals Colors (Dark Mode - Cohesive Warm Editorial Night Theme) */
+        --text-60: #8F887F;
+        --text-70: #AEA59A;
+        --text-80: #CBC1B5;
+        --text-90: #E3DBD0;
+        --text-100: #F3ECE3;
 
         /* Sub Text (Dark Mode) */
-        --subtext-60: #2A2825;
-        --subtext-70: #383632;
-        --subtext-80: #4A4742;
-        --subtext-90: #88857F;
-        --subtext-100: #A19E98;
+        --subtext-60: #1E1C19;
+        --subtext-70: #2C2A26;
+        --subtext-80: #44403A;
+        --subtext-90: #7E776E;
+        --subtext-100: #9E968C;
 
         /* Background (Dark Mode) */
-        --bg-main: #141311;
-        --bg-border: #24221F;
+        --bg-main: #131210;
+        --bg-border: #23211D;
 
         /* Card (Dark Mode) */
-        --card-bg: #1D1C1A;
-        --card-hover: #262421;
-        --card-border: #33302C;
+        --card-bg: #1A1916;
+        --card-hover: #23211D;
+        --card-border: #2E2B26;
 
         /* Brand Colors (Dark Mode) */
-        --brand-200: #6F6F6E;
-        --brand-150: #4C4A45;
-        --brand-100: #2F2E2C;
-        --brand-50: #23211E;
-        --brand-10: #181714;
+        --brand-200: #3D3831;
+        --brand-150: #2E2A25;
+        --brand-100: #161513;
+        --brand-50: #191815;
+        --brand-10: #1C1A17;
 
         /* Secondary Colors (Dark Mode) */
-        --secondary-300: #765137;
-        --secondary-250: #8a6144;
-        --secondary-200: #81644d;
-        --secondary-150: #9a7d66;
-        --secondary-100: #b1a086;
-        --secondary-50: #c6b395;
-        --secondary-20: #463b32;
-        --secondary-10: #362E27;
-        --secondary-5: #231E19;
+        --secondary-300: #73583D;
+        --secondary-250: #7F6346;
+        --secondary-200: #8A6D50;
+        --secondary-150: #9E8263;
+        --secondary-100: #B5A184;
+        --secondary-50: #CAB79B;
+        --secondary-20: #3A3228;
+        --secondary-10: #2B251D;
+        --secondary-5: #1E1A14;
+
+        /* Scrollbar (Dark Mode) */
+        --scrollbar-thumb: #3A3630;
+        --scrollbar-thumb-hover: #544E45;
+
+        /* Danger (Dark Mode - Warm Crimson Red) */
+        --danger-100: #C83E31;
     }
 
     button,
@@ -532,7 +546,7 @@
     /* Global Scrollbar Style */
     * {
         scrollbar-width: thin;
-        scrollbar-color: #D5C6A9 transparent;
+        scrollbar-color: var(--scrollbar-thumb) transparent;
     }
     ::-webkit-scrollbar {
         width: 6px;
@@ -542,11 +556,11 @@
         background: transparent;
     }
     ::-webkit-scrollbar-thumb {
-        background-color: #D5C6A9;
+        background-color: var(--scrollbar-thumb);
         border-radius: 10px;
     }
     ::-webkit-scrollbar-thumb:hover {
-        background-color: #B69F78;
+        background-color: var(--scrollbar-thumb-hover);
     }
 
 

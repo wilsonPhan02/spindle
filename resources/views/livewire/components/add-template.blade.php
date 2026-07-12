@@ -414,7 +414,7 @@ new class extends Component {
                                 </button>
                             </div>
 
-                            <div class="relative overflow-hidden w-full max-w-xl h-[60vh] bg-text-100 rounded-xl p-8 flex items-center justify-center mb-8">
+                            <div class="relative overflow-hidden w-full max-w-xl h-[60vh] bg-[#212121] rounded-xl p-8 flex items-center justify-center mb-8">
                                 @if($this->selectedTemplate->image_preview)
                                     @if($this->selectedTemplate->is_custom)
                                         <img src="{{ Storage::url($this->selectedTemplate->image_preview) }}" alt="Preview" class="absolute inset-0 w-full h-full object-cover" />

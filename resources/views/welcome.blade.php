@@ -11,6 +11,19 @@
     <link rel="preload" as="image" href="{{ asset('images/landing/hero-figure.png') }}">
     <link rel="preload" as="image" href="{{ asset('images/landing/mtn-peak2.png') }}">
 
+    <script>
+        (() => {
+            try {
+                const stored = localStorage.getItem('theme');
+                if (stored === 'dark') {
+                    document.documentElement.classList.add('dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                }
+            } catch (e) {}
+        })();
+    </script>
+
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <style>
@@ -45,26 +58,65 @@
 
 @php $img = fn ($f) => asset('images/landing/' . $f); @endphp
 
-<body class="bg-brand-50 text-text-80 font-montserrat antialiased overflow-x-hidden">
+<body class="bg-brand-50 dark:bg-bg-main text-text-80 dark:text-text-100 font-montserrat antialiased overflow-x-hidden">
 
     
     <nav id="main-nav" class="fixed top-5 inset-x-0 z-50 transition-transform duration-700">
         <div class="mx-auto max-w-[1280px] px-6 lg:px-10">
-            <div class="flex w-full items-center justify-between rounded-full bg-white py-2 pl-10 pr-2.5 shadow-lg">
+            <div class="flex w-full items-center justify-between rounded-full bg-white dark:bg-card-bg dark:border dark:border-brand-150 py-2 pl-10 pr-2.5 shadow-lg transition-colors duration-300">
                 <a href="#hero" class="flex items-center">
-                    <img src="{{ $img('logo-spindle.png') }}" alt="Spindle" class="h-[26px] w-auto select-none">
+                    <x-logo class="h-[26px] w-auto select-none text-text-80 dark:text-text-100 transition-colors" />
                 </a>
-                <ul class="hidden md:flex items-center gap-6 lg:gap-10 text-web-body-small text-text-70">
+                <ul class="hidden md:flex items-center gap-6 lg:gap-10 text-web-body-small text-text-70 dark:text-text-90">
                     <li><a href="#hero"    class="nav-link hover:text-secondary-200 transition-colors">{{ __('Introduction') }}</a></li>
                     <li><a href="#about"   class="nav-link hover:text-secondary-200 transition-colors">{{ __('About Us') }}</a></li>
                     <li><a href="#writers" class="nav-link hover:text-secondary-200 transition-colors">{{ __('Challenges') }}</a></li>
                     <li><a href="#tools"   class="nav-link hover:text-secondary-200 transition-colors">{{ __('Features') }}</a></li>
                 </ul>
-                <div class="flex items-center gap-4">
+                <div class="flex items-center gap-3 sm:gap-4">
+                    <!-- Bulletproof Spindle Theme Toggle -->
+                    <div x-data="{
+                             isDark: document.documentElement.classList.contains('dark'),
+                             toggle() {
+                                 this.isDark = !this.isDark;
+                                 if (this.isDark) {
+                                     document.documentElement.classList.add('dark');
+                                     localStorage.setItem('theme', 'dark');
+                                 } else {
+                                     document.documentElement.classList.remove('dark');
+                                     localStorage.setItem('theme', 'light');
+                                 }
+                                 if (window.Alpine && Alpine.store('theme')) {
+                                     Alpine.store('theme').isDark = this.isDark;
+                                 }
+                                 window.dispatchEvent(new CustomEvent('theme-changed', { detail: { isDark: this.isDark } }));
+                             }
+                         }"
+                         x-init="
+                             isDark = document.documentElement.classList.contains('dark');
+                             window.addEventListener('theme-changed', e => isDark = e.detail.isDark);
+                         "
+                         class="flex items-center">
+                        <button @click="toggle()" 
+                                type="button"
+                                class="group relative flex h-9 w-9 items-center justify-center rounded-full border border-secondary-100/50 dark:border-secondary-200/50 bg-secondary-5 dark:bg-brand-50 text-secondary-200 shadow-sm transition-all duration-300 hover:scale-105 hover:border-secondary-200 hover:shadow focus:outline-none"
+                                :title="isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'"
+                                aria-label="Toggle Theme">
+                            <!-- Sun icon (shows in Dark mode) -->
+                            <svg x-show="isDark" x-cloak class="h-4 w-4 text-secondary-200 transition-transform duration-300 group-hover:rotate-45" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+                            </svg>
+                            <!-- Moon icon (shows in Light mode) -->
+                            <svg x-show="!isDark" class="h-4 w-4 text-secondary-200 transition-transform duration-300 group-hover:-rotate-12" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+                            </svg>
+                        </button>
+                    </div>
+
                     <div x-data="{ open: false }" 
                          x-init="$watch('open', value => { if (value) { $nextTick(() => { const el = $refs.dropdown.querySelector('.bg-gray-50'); if (el) el.scrollIntoView({ block: 'nearest' }); }) } })" 
                          class="relative hidden sm:block">
-                        <button @click="open = !open" @click.away="open = false" class="flex items-center gap-2 text-web-body-small text-text-70 hover:text-secondary-200 transition-colors focus:outline-none">
+                        <button @click="open = !open" @click.away="open = false" class="flex items-center gap-2 text-web-body-small text-text-70 dark:text-text-90 hover:text-secondary-200 transition-colors focus:outline-none">
                             @php
                                 $curLang = app()->getLocale();
                                 $langs = [
@@ -85,10 +137,10 @@
                              x-transition:leave="transition ease-in duration-150 origin-top"
                              x-transition:leave-start="opacity-100 scale-y-100"
                              x-transition:leave-end="opacity-0 scale-y-75"
-                             class="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50 py-1 max-h-64 overflow-y-auto overscroll-contain custom-scrollbar">
+                             class="absolute right-0 mt-2 w-48 bg-white dark:bg-card-bg border border-gray-200 dark:border-brand-150 rounded-lg shadow-lg z-50 py-1 max-h-64 overflow-y-auto overscroll-contain custom-scrollbar">
                             @foreach($langs as $code => $data)
                                 <a href="{{ route('lang.switch', $code) }}" 
-                                   class="flex items-center gap-3 w-full text-left px-4 py-2 text-[13px] hover:bg-gray-50 transition-colors {{ $curLang === $code ? 'bg-gray-50 font-medium' : 'text-gray-600' }}">
+                                   class="flex items-center gap-3 w-full text-left px-4 py-2 text-[13px] hover:bg-gray-50 dark:hover:bg-brand-50 transition-colors {{ $curLang === $code ? 'bg-gray-50 dark:bg-brand-50 font-medium text-text-80 dark:text-text-100' : 'text-gray-600 dark:text-text-80' }}">
                                     <div class="w-5 h-5 rounded-full border border-gray-400 shadow-sm overflow-hidden shrink-0">
                                         <img src="https://flagcdn.com/w20/{{ $data[1] }}.png" alt="{{ $code }}" class="w-full h-full object-cover">
                                     </div>
@@ -164,11 +216,11 @@
         
         <div class="relative z-20 mx-auto max-w-[1240px] px-6 lg:px-[52px] pt-[150px]">
             <div class="max-w-[700px]">
-                <h1 class="reveal text-web-title text-text-80">
+                <h1 class="reveal text-web-title text-[#37322e]">
                     {{ __('Are You Ready To') }}<br>
                     <span class="font-merriweather italic text-secondary-200">{{ __('Spin A Yarn?') }}</span>
                 </h1>
-                <p class="reveal reveal-d1 mt-6 max-w-[480px] font-montserrat text-[18px] leading-[28px] text-text-70">
+                <p class="reveal reveal-d1 mt-6 max-w-[480px] font-montserrat text-[18px] leading-[28px] text-[#524d49]">
                     {!! __('Weave every character, plot, and world into a story worth telling, spinning countless narrative threads into one cohesive universe.') !!}
                 </p>
                 <a href="{{ route('dashboard') }}"
@@ -192,9 +244,9 @@
             </div>
             @include('partials.starfield')
             <div class="relative z-10 mx-auto flex min-h-screen max-w-[1240px] flex-col justify-center px-6 lg:px-[52px] py-40">
-                <h2 class="reveal text-web-title leading-tight text-brand-10 max-w-[600px]">{!! __('The Creative Realms') !!}</h2>
-                <p class="reveal reveal-d1 mt-6 max-w-[520px] font-montserrat text-[18px] leading-[28px] text-brand-200">
-                    {{ __('In a Universe known as') }} <span class="font-merriweather italic text-secondary-50">{{ __('“The Creative Realms”') }}</span><br>
+                <h2 class="reveal text-web-title leading-tight text-[#F3ECE3] max-w-[600px]">{!! __('The Creative Realms') !!}</h2>
+                <p class="reveal reveal-d1 mt-6 max-w-[520px] font-montserrat text-[18px] leading-[28px] text-[#E3DBD0]">
+                    {{ __('In a Universe known as') }} <span class="font-merriweather italic text-[#CAB79B]">{{ __('“The Creative Realms”') }}</span><br>
                     {{ __('Lived the Writer of Worlds. They possess the power to create life from the void.') }}
                 </p>
             </div>
@@ -204,8 +256,8 @@
         <section class="relative min-h-screen flex flex-col justify-center overflow-hidden bg-[#2a1f17] py-20">
             @include('partials.starfield')
             <div class="relative z-10 mx-auto w-full max-w-[1240px] px-6 lg:px-[52px] text-center mt-6 lg:mt-8">
-                <p class="reveal font-montserrat text-[18px] text-brand-200">{{ __('However, every Writer faces the same monster') }}</p>
-                <h2 class="reveal reveal-d1 mt-2 font-merriweather text-[44px] font-bold italic text-brand-10 mx-auto max-w-[700px]">{{ __('“The Great Tangle”') }}</h2>
+                <p class="reveal font-montserrat text-[18px] text-[#E3DBD0]">{{ __('However, every Writer faces the same monster') }}</p>
+                <h2 class="reveal reveal-d1 mt-2 font-merriweather text-[44px] font-bold italic text-[#F3ECE3] mx-auto max-w-[700px]">{{ __('“The Great Tangle”') }}</h2>
 
                 <div class="mt-14 flex flex-wrap items-center justify-center gap-6" style="perspective: 1500px;">
                     @php
@@ -225,7 +277,7 @@
                                          
                                          <!-- Localized Text Overlay -->
                                          <div class="absolute bottom-[10.5%] inset-x-4 flex justify-center text-center">
-                                             <p class="font-merriweather text-[14px] leading-[22px] text-[#554c46]">
+                                             <p class="font-merriweather text-[14px] leading-[22px] text-[#554c46] dark:text-[#2E2A25]">
                                                  {!! __($tangle['text']) !!}
                                              </p>
                                          </div>
@@ -256,9 +308,9 @@
             </div>
 
             <div class="reveal reveal-right order-1 lg:order-2 -mt-12 lg:-mt-24">
-                <p class="font-montserrat text-[18px] font-semibold text-brand-200">{{ __('WHO WE ARE?') }}</p>
-                <h2 class="mt-1 text-web-title text-brand-10 max-w-[600px]">{!! __('But Spindle Come as Solution') !!}</h2>
-                <p class="mt-6 max-w-[500px] font-montserrat text-[18px] leading-[28px] text-brand-200 opacity-90">
+                <p class="font-montserrat text-[18px] font-semibold text-[#CAB79B]">{{ __('WHO WE ARE?') }}</p>
+                <h2 class="mt-1 text-web-title text-[#F3ECE3] max-w-[600px]">{!! __('But Spindle Come as Solution') !!}</h2>
+                <p class="mt-6 max-w-[500px] font-montserrat text-[18px] leading-[28px] text-[#E3DBD0] opacity-90">
                     {{ __('We are going to help you create your story. Weave stories, characters, and notes easily by using Spindle. Convert your abstract yarn into a magic yarn!') }}
                 </p>
             </div>
@@ -267,21 +319,21 @@
 </div>
 
     
-    <section id="writers" class="relative min-h-screen flex flex-col justify-center overflow-hidden bg-brand-50 py-20 scroll-mt-24">
+    <section id="writers" class="relative min-h-screen flex flex-col justify-center overflow-hidden bg-brand-50 dark:bg-bg-main py-20 scroll-mt-24">
         <div class="mx-auto max-w-[1240px] px-6 lg:px-[52px] text-center -mt-4">
             <p class="reveal font-montserrat text-[18px] font-semibold text-secondary-200">{{ __('OUR MISSION') }}</p>
-            <h2 class="mt-1 text-web-title text-text-80 mx-auto max-w-[700px]">
+            <h2 class="mt-1 text-web-title text-text-80 dark:text-text-100 mx-auto max-w-[700px]">
                 {{ __('From Writers To') }} <span class="font-merriweather italic text-secondary-200">{{ __('Writers') }}</span>
             </h2>
-            <p class="mx-auto mt-4 max-w-[560px] font-montserrat text-[18px] leading-[28px] text-text-70">
+            <p class="mx-auto mt-4 max-w-[560px] font-montserrat text-[18px] leading-[28px] text-text-70 dark:text-text-90">
                 {{ __('We are going to help you create your story. Weave stories, characters, and notes easily by using Spindle. Convert your abstract yarn into a magic yarn!') }}
             </p>
 
             <!-- Infinite Marquee Carousel -->
             <div class="relative mt-6 overflow-x-clip overflow-y-visible w-full max-w-full pb-16 pt-4">
                 <!-- Shadow overlays for smooth fading edges -->
-                <div class="pointer-events-none absolute inset-y-0 left-0 z-10 w-12 md:w-32 bg-gradient-to-r from-brand-50 to-transparent"></div>
-                <div class="pointer-events-none absolute inset-y-0 right-0 z-10 w-12 md:w-32 bg-gradient-to-l from-brand-50 to-transparent"></div>
+                <div class="pointer-events-none absolute inset-y-0 left-0 z-10 w-12 md:w-32 bg-gradient-to-r from-brand-50 dark:from-bg-main to-transparent"></div>
+                <div class="pointer-events-none absolute inset-y-0 right-0 z-10 w-12 md:w-32 bg-gradient-to-l from-brand-50 dark:from-bg-main to-transparent"></div>
                 
                 <div class="flex w-max animate-[marquee_50s_linear_infinite]" id="scale-carousel-track">
                     <!-- Group 1 -->
@@ -310,10 +362,10 @@
     </section>
 
     
-    <section id="tools" class="relative min-h-screen flex flex-col justify-center overflow-hidden bg-brand-50 pt-24 pb-8 scroll-mt-32">
+    <section id="tools" class="relative min-h-screen flex flex-col justify-center overflow-hidden bg-brand-50 dark:bg-bg-main pt-24 pb-8 scroll-mt-32">
         <div class="mx-auto max-w-[1240px] px-6 lg:px-[52px] -mt-16">
             <p class="reveal font-montserrat text-[18px] font-semibold text-secondary-200">{{ __('WHY CHOOSE US') }}</p>
-            <h2 class="reveal reveal-d1 mt-1 max-w-[599px] text-web-title text-text-80">{{ __('We Provide A Tools For Writing') }}</h2>
+            <h2 class="reveal reveal-d1 mt-1 max-w-[599px] text-web-title text-text-80 dark:text-text-100">{{ __('We Provide A Tools For Writing') }}</h2>
 
             @php $base = asset('images/landing') . '/'; @endphp
             <div x-data="{ 
@@ -354,13 +406,13 @@
                       <template x-for="(it, i) in items" :key="i">
                           <button type="button" x-on:click="sel = i" x-on:mouseenter="sel = i"
                                   class="block w-full rounded-[6px] border-2 px-7 text-left transition-all duration-[800ms] ease-[cubic-bezier(0.4,0,0.2,1)]"
-                                  :class="sel === i ? 'border-secondary-200 bg-brand-150 pt-5 pb-5' : 'border-brand-200 py-4 hover:border-secondary-150 hover:bg-brand-10'">
+                                  :class="sel === i ? 'border-secondary-200 bg-brand-150 dark:bg-card-bg pt-5 pb-5' : 'border-brand-200 dark:border-brand-150 py-4 hover:border-secondary-150 hover:bg-brand-10 dark:hover:bg-brand-50'">
                               <span class="font-merriweather text-[20px] italic transition-colors duration-[800ms]"
-                                    :class="sel === i ? 'text-secondary-200' : 'text-secondary-100'" x-text="it.t"></span>
+                                    :class="sel === i ? 'text-secondary-200 dark:text-secondary-50' : 'text-text-70 dark:text-text-80'" x-text="it.t"></span>
                               <div class="grid transition-all duration-[800ms] ease-[cubic-bezier(0.4,0,0.2,1)]"
                                    :class="sel === i ? 'grid-rows-[1fr] opacity-100 mt-2' : 'grid-rows-[0fr] opacity-0 mt-0'">
                                   <div class="overflow-hidden">
-                                      <p class="font-montserrat text-[14px] leading-[24px] text-black h-[72px]" x-text="it.d"></p>
+                                      <p class="font-montserrat text-[14px] leading-[24px] text-text-80 dark:text-text-90 h-[72px]" x-text="it.d"></p>
                                   </div>
                               </div>
                           </button>
@@ -370,7 +422,7 @@
         </div>
     </section>
 
-    <section class="relative min-h-screen flex flex-col justify-center overflow-hidden bg-brand-50 py-20">
+    <section class="relative min-h-screen flex flex-col justify-center overflow-hidden bg-brand-50 dark:bg-bg-main py-20">
         <!-- Wind Rings Background -->
         <style>
             .custom-scrollbar::-webkit-scrollbar-thumb:hover { background-color: #8C7558; }
@@ -390,22 +442,26 @@
         </div>
 
         <div class="relative z-10 mx-auto max-w-[1240px] px-6 lg:px-[52px] text-center">
-            <p class="reveal mx-auto max-w-[800px] font-merriweather text-[28px] md:text-[36px] lg:text-[42px] italic leading-[1.5] text-text-80">
+            <p class="reveal mx-auto max-w-[800px] font-merriweather text-[28px] md:text-[36px] lg:text-[42px] italic leading-[1.5] text-text-80 dark:text-text-100">
                 {{ __('You Are The') }} <span class="text-secondary-200">{{ __('“Weavers”') }}</span>...<br class="hidden md:block">
                 {{ __('The Ones Who Will Turn A Yarn Into A Story.') }}
             </p>
         </div>
     </section>
 
-    <section class="relative overflow-hidden bg-brand-50 pt-16 pb-0">
+    <section class="relative overflow-hidden bg-brand-50 dark:bg-bg-main pt-16 pb-0">
         <div class="reveal reveal-d1 relative mx-auto max-w-[1240px] px-6 lg:px-[52px]">
-            <div class="relative overflow-hidden rounded-[28px] bg-brand-100 px-6 pt-20 mb-16 text-center shadow-lg">
-                <h2 class="text-web-title text-text-80 mx-auto max-w-[700px]">
-                    {{ __('Are You Ready To') }} <span class="font-merriweather italic text-secondary-200">{{ __('Spin A Yarn?') }}</span>
+            <div class="relative overflow-hidden rounded-[28px] px-6 pt-20 mb-16 text-center shadow-lg" style="background-color: #E9E1DA;">
+                <h2 class="text-web-title text-[#231D18] mx-auto max-w-[700px]">
+                    {{ __('Are You Ready To') }} <span class="font-merriweather italic text-[#81644D]">{{ __('Spin A Yarn?') }}</span>
                 </h2>
+                <p class="mx-auto mt-4 max-w-[580px] font-montserrat text-[18px] leading-[28px] text-[#37322E]">
+                    {{ __('Weave every character, plot, and world into a story worth telling, spinning countless narrative threads into one cohesive universe.') }}
+                </p>
                 <a href="{{ route('dashboard') }}"
-                   class="mt-6 inline-flex items-center rounded-[7px] bg-secondary-150 px-10 py-3.5 font-merriweather text-[16px] text-brand-10
-                          shadow-md transition-all duration-700 hover:bg-secondary-200 hover:-translate-y-1 hover:shadow-lg">
+                   class="mt-6 inline-flex items-center rounded-[7px] bg-secondary-150 px-10 py-3.5 font-merriweather text-[16px]
+                          shadow-md transition-all duration-700 hover:bg-secondary-200 hover:-translate-y-1 hover:shadow-lg"
+                   style="color: #F7F5F4;">
                     {{ __('Enter the Realm') }}
                 </a>
                 
@@ -441,7 +497,7 @@
     <footer class="bg-black py-16 text-white">
         <div class="mx-auto flex max-w-[1240px] flex-col items-center px-6 text-center">
             <a href="#hero" class="flex items-center">
-                <img src="{{ $img('logo-spindle.png') }}" alt="Spindle" class="h-9 w-auto select-none" style="filter: brightness(0) invert(1);">
+                <x-logo class="h-9 w-auto select-none text-white" />
             </a>
             <ul class="mt-7 flex flex-wrap items-center justify-center gap-x-10 gap-y-3 font-montserrat text-[15px] font-semibold tracking-wide">
                 <li><a href="#hero"    class="transition-colors hover:text-white/70">{{ __('INTRODUCTION') }}</a></li>

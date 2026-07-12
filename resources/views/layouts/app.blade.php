@@ -1,7 +1,22 @@
 <!DOCTYPE html>
-<html lang="en" class="{{ (auth()->user()?->profile?->theme === 'dark') ? 'dark' : '' }}">
+<html lang="en" class="{{ auth()->user()?->profile?->theme === 'dark' ? 'dark' : '' }}">
 <head>
     <meta charset="UTF-8">
+    {{-- This MUST be the very first script — blocking, no defer/async — to prevent Flash of Incorrect Theme (FOIT) --}}
+    <script>
+        (() => {
+            try {
+                const stored = localStorage.getItem('theme');
+                const dbTheme = "{{ auth()->user()?->profile?->theme ?? '' }}";
+                const isDark = stored ? stored === 'dark' : dbTheme === 'dark';
+                if (isDark) {
+                    document.documentElement.classList.add('dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                }
+            } catch (e) {}
+        })();
+    </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ __('Spindle - Dashboard') }}</title>
 
@@ -56,29 +71,38 @@
             if (e.persisted) checkStaleData();
         });
 
-        // Bootstrap & SPA navigation dark mode sync to prevent FOUC during wire:navigate
+        // SPA navigation: aggressively guard the dark class during wire:navigate morphing.
+        // Livewire's morphdom will try to strip the class when the new HTML has none;
+        // we use a MutationObserver to put it back instantly before the browser paints.
         const applyThemeSync = () => {
             try {
                 const stored = localStorage.getItem('theme');
-                const dbTheme = "{{ auth()->user()?->profile?->theme ?? '' }}";
-                const isDark = stored ? stored === 'dark' : (dbTheme === 'dark' || window.matchMedia('(prefers-color-scheme: dark)').matches);
-                if (isDark) {
+                if (stored === 'dark') {
                     document.documentElement.classList.add('dark');
-                    if (!stored && dbTheme === 'dark') localStorage.setItem('theme', 'dark');
                 } else {
                     document.documentElement.classList.remove('dark');
                 }
             } catch (e) {}
         };
 
-        applyThemeSync();
+        // Guard: watch for dark class being removed by morphdom and immediately re-add it
+        const themeObserver = new MutationObserver(() => {
+            try {
+                const stored = localStorage.getItem('theme');
+                if (stored === 'dark' && !document.documentElement.classList.contains('dark')) {
+                    document.documentElement.classList.add('dark');
+                }
+            } catch (e) {}
+        });
+        themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+
         document.addEventListener('livewire:navigating', applyThemeSync);
         document.addEventListener('livewire:navigated', applyThemeSync);
     </script>
 </head>
 <body
     data-load-time="{{ microtime(true) }}"
-    class="bg-bg-main text-text-100 antialiased min-h-screen flex overflow-hidden transition-colors duration-200"
+    class="bg-bg-main text-text-100 antialiased min-h-screen flex overflow-hidden"
     x-data="{
         currentUsername: '{{ Auth::user()->profile?->username ?? explode('@', Auth::user()->email)[0] }}',
         currentAvatarUrl: '{{ Auth::user()->profile?->avatar_url ? Storage::url(Auth::user()->profile->avatar_url) : '' }}'
