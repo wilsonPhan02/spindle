@@ -24,6 +24,7 @@ class Profile extends Model
         'gender',
         'birthdate',
         'language',
+        'theme',
     ];
 
     public function user(): BelongsTo

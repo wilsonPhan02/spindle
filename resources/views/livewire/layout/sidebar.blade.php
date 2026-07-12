@@ -268,7 +268,7 @@ new class extends Component {
                 <div class="space-y-4">
                     <div class="text-app-feature text-text-80 flex justify-between items-center">
                         <span>{{ __('Search Results') }}</span>
-                        <span class="text-[10px] bg-brand-150 px-1.5 py-0.5 rounded text-[#8C7558] font-medium">{{ $this->searchResultsData['total'] }} {{ __('found') }}</span>
+                        <span class="text-[10px] bg-brand-150 px-1.5 py-0.5 rounded text-secondary-250 font-medium">{{ $this->searchResultsData['total'] }} {{ __('found') }}</span>
                     </div>
                 
                 @if($this->searchResultsData['total'] === 0)
@@ -305,7 +305,7 @@ new class extends Component {
                                             <x-icons.sidebar-book class="w-4 h-4 text-secondary-150 shrink-0" />
                                         @endif
                                     @elseif($item['type'] === 'section')
-                                        <x-icons.list class="w-4 h-4 text-[#8C7558] shrink-0" />
+                                        <x-icons.list class="w-4 h-4 text-secondary-250 shrink-0" />
                                     @endif
                                     <span class="text-[13px] font-medium text-text-80 truncate group-hover:text-text-100">{!! $this->highlight($item['title'], $searchQuery, 'font-bold text-text-100') !!}</span>
                                 </div>
@@ -321,7 +321,7 @@ new class extends Component {
                         @endforeach
 
                         @if($this->searchResultsData['total'] > 5)
-                            <button @click="expandedSearch = !expandedSearch" class="w-full text-center text-[11px] font-semibold text-[#8C7558] hover:text-[#5E4C38] py-2 mt-2 transition-colors">
+                            <button @click="expandedSearch = !expandedSearch" class="w-full text-center text-[11px] font-semibold text-secondary-250 hover:text-secondary-300 py-2 mt-2 transition-colors">
                                 <span x-text="expandedSearch ? '{{ __('Show less') }}' : '{{ __('Show more') }} ({{ $this->searchResultsData['total'] - 5 }})'"></span>
                             </button>
                         @endif
@@ -352,7 +352,7 @@ new class extends Component {
                                     @endif
                                     <span class="text-[13px] font-medium text-text-80 truncate transition-colors" :class="rowHovered ? 'text-text-100' : ''">{{ $pProject->title }}</span>
                                 </a>
-                                <button wire:click="unpin('{{ $pProject->project_id }}')" class="transition-all p-1 shrink-0 text-[#A08866] hover:text-[#8C7558] opacity-0 group-hover:opacity-100" :class="rowHovered ? 'opacity-100' : 'opacity-0'" title="{{ __('Unmark Project') }}">
+                                <button wire:click="unpin('{{ $pProject->project_id }}')" class="transition-all p-1 shrink-0 text-secondary-100 hover:text-secondary-250 opacity-0 group-hover:opacity-100" :class="rowHovered ? 'opacity-100' : 'opacity-0'" title="{{ __('Unmark Project') }}">
                                     <x-icons.bookmark-slash class="w-4 h-4" />
                                 </button>
                             </div>
@@ -372,13 +372,13 @@ new class extends Component {
                                             @endif
                                             <span class="text-[13px] font-medium text-text-80 truncate transition-colors" :class="rowHovered ? 'text-text-100' : ''">{{ $pProject->title }}</span>
                                         </a>
-                                        <button wire:click="unpin('{{ $pProject->project_id }}')" class="transition-all p-1 shrink-0 text-[#A08866] hover:text-[#8C7558] opacity-0 group-hover:opacity-100" :class="rowHovered ? 'opacity-100' : 'opacity-0'" title="{{ __('Unmark Project') }}">
+                                        <button wire:click="unpin('{{ $pProject->project_id }}')" class="transition-all p-1 shrink-0 text-secondary-100 hover:text-secondary-250 opacity-0 group-hover:opacity-100" :class="rowHovered ? 'opacity-100' : 'opacity-0'" title="{{ __('Unmark Project') }}">
                                             <x-icons.bookmark-slash class="w-4 h-4" />
                                         </button>
                                     </div>
                                 @endforeach
                             </div>
-                            <button @click="viewAll = !viewAll" class="w-full text-center text-[11px] font-semibold text-[#8C7558] hover:text-[#5E4C38] py-1.5 transition-colors">
+                            <button @click="viewAll = !viewAll" class="w-full text-center text-[11px] font-semibold text-secondary-250 hover:text-secondary-300 py-1.5 transition-colors">
                                 <span x-text="viewAll ? '{{ __('Show less') }}' : '{{ __('View all') }} ({{ count($pinnedProjects) }})'"></span>
                             </button>
                         @endif
@@ -427,7 +427,7 @@ new class extends Component {
                                     </a>
                                 @endforeach
                             </div>
-                            <button @click="viewAll = !viewAll" class="w-full text-center text-[11px] font-semibold text-[#8C7558] hover:text-[#5E4C38] py-1.5 transition-colors">
+                            <button @click="viewAll = !viewAll" class="w-full text-center text-[11px] font-semibold text-secondary-250 hover:text-secondary-300 py-1.5 transition-colors">
                                 <span x-text="viewAll ? '{{ __('Show less') }}' : '{{ __('View all') }} ({{ count($recentProjects) }})'"></span>
                             </button>
                         @endif

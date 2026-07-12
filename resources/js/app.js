@@ -2,6 +2,7 @@ import collapse from '@alpinejs/collapse';
 import './whiteboard';
 import './text-editor';
 import './landing';
+import './theme';
 
 // ---- Komponen carousel (From Writers To Writers) ----
 document.addEventListener('alpine:init', () => {

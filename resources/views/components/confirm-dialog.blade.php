@@ -18,7 +18,7 @@
     x-on:{{ $eventName }}.window="show = true; itemId = $event.detail?.id || null"
     x-show="show" 
     style="display: none;"
-    class="fixed inset-0 z-[100] flex items-center justify-center bg-text-80/75 backdrop-blur-[1.5px]"
+    class="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-sm"
     x-transition:enter="transition ease-out duration-300"
     x-transition:enter-start="opacity-0"
     x-transition:enter-end="opacity-100"
@@ -28,7 +28,7 @@
 >
     <div
         @click.away="show = false"
-        class="flex flex-col bg-white rounded-2xl shadow-xl w-full max-w-md px-12 py-8 text-center gap-8"
+        class="flex flex-col bg-card-bg border border-card-border rounded-2xl shadow-2xl w-full max-w-md px-12 py-8 text-center gap-8"
         x-transition:enter="transition ease-out duration-300"
         x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
         x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"

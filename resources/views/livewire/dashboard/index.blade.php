@@ -106,7 +106,7 @@ new class extends Component {
         }
     @endphp
 
-    <div class="bg-[#F5EFE9] rounded-xl overflow-hidden mb-8 shadow-sm h-[200px] flex justify-between items-end">
+    <div class="bg-secondary-5 rounded-xl overflow-hidden mb-8 shadow-sm h-[200px] flex justify-between items-end">
         <div class="w-36 md:w-44 lg:w-48 mb-10 shrink-0 pointer-events-none">
             <x-left-dashboard class="w-full h-auto block" />
         </div>
@@ -277,17 +277,17 @@ new class extends Component {
                             <a href="{{ route('projects.show', $project->project_id) }}" draggable="false" @dragstart.prevent wire:navigate class="w-44 shrink-0 group cursor-pointer block select-none">
                                 <div class="w-full aspect-[1/1.6] relative mb-3">
                                     @if($project->cover_image_path)
-                                        <div class="absolute inset-y-0 left-0 right-3 w-[calc(100%-12px)] h-full z-20 rounded-l-sm rounded-r-md overflow-hidden shadow-md bg-gradient-to-br from-[#C1AE8E] to-[#977E5C] p-[8px] border-r border-black/10 transition-shadow duration-300 group-hover:shadow-xl">
+                                        <div class="absolute inset-y-0 left-0 right-3 w-[calc(100%-12px)] h-full z-20 rounded-l-sm rounded-r-md overflow-hidden shadow-md bg-gradient-to-br from-secondary-50 to-secondary-150 p-[8px] border-r border-black/10 transition-shadow duration-300 group-hover:shadow-xl">
                                             <div class="w-full h-full overflow-hidden rounded-sm bg-brand-100">
                                                 <img src="{{ Storage::url($project->cover_image_path) }}" class="w-full h-full object-cover" />
                                             </div>
                                         </div>
-                                        <div class="absolute top-2 bottom-2 right-1.5 w-3 bg-gradient-to-r from-[#E8E3D9] to-[#D5C6A9] border-y border-r border-[#C4B7A3] rounded-r-[2px] z-10 shadow-inner"></div>
-                                        <div class="absolute inset-y-0 right-0 w-6 bg-[#8C7558] rounded-r-md z-0 shadow-sm border-l border-black/20 transition-shadow duration-300 group-hover:shadow-lg"></div>
+                                        <div class="absolute top-2 bottom-2 right-1.5 w-3 bg-gradient-to-r from-brand-100 to-secondary-10 border-y border-r border-secondary-50 rounded-r-[2px] z-10 shadow-inner"></div>
+                                        <div class="absolute inset-y-0 right-0 w-6 bg-secondary-250 rounded-r-md z-0 shadow-sm border-l border-black/20 transition-shadow duration-300 group-hover:shadow-lg"></div>
                                     @else
-                                        <x-default-project class="absolute inset-y-0 left-0 right-3 w-[calc(100%-12px)] h-full text-[#B69F78] rounded-l-sm rounded-r-md shadow-md z-20 border-r border-black/10 transition-shadow duration-300 group-hover:shadow-xl" />
-                                        <div class="absolute top-2 bottom-2 right-1.5 w-3 bg-gradient-to-r from-[#E8E3D9] to-[#D5C6A9] border-y border-r border-[#C4B7A3] rounded-r-[2px] z-10 shadow-inner"></div>
-                                        <div class="absolute inset-y-0 right-0 w-6 bg-[#8C7558] rounded-r-md z-0 shadow-sm border-l border-black/20 transition-shadow duration-300 group-hover:shadow-lg"></div>
+                                        <x-default-project class="absolute inset-y-0 left-0 right-3 w-[calc(100%-12px)] h-full text-secondary-100 rounded-l-sm rounded-r-md shadow-md z-20 border-r border-black/10 transition-shadow duration-300 group-hover:shadow-xl" />
+                                        <div class="absolute top-2 bottom-2 right-1.5 w-3 bg-gradient-to-r from-brand-100 to-secondary-10 border-y border-r border-secondary-50 rounded-r-[2px] z-10 shadow-inner"></div>
+                                        <div class="absolute inset-y-0 right-0 w-6 bg-secondary-250 rounded-r-md z-0 shadow-sm border-l border-black/20 transition-shadow duration-300 group-hover:shadow-lg"></div>
                                     @endif
                                 </div>
 
@@ -305,7 +305,7 @@ new class extends Component {
                             </a>
                         @endforeach
 
-                        <button wire:click="addProject('{{ $section->section_id }}')" class="w-44 shrink-0 aspect-[2/3] border-2 border-dashed border-brand-200 rounded-xl flex flex-col items-center justify-center text-subtext-80 hover:border-secondary-200 hover:text-secondary-200 hover:bg-[#F5EFE9] transition-all group mb-3 select-none">
+                        <button wire:click="addProject('{{ $section->section_id }}')" class="w-44 shrink-0 aspect-[2/3] border-2 border-dashed border-brand-200 rounded-xl flex flex-col items-center justify-center text-subtext-80 hover:border-secondary-200 hover:text-secondary-200 hover:bg-secondary-5 transition-all group mb-3 select-none">
                             <svg class="w-8 h-8 mb-2 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                             <span class="text-sm font-medium">{{ __('New Project') }}</span>
                         </button>

@@ -206,7 +206,7 @@ new class extends Component {
     <div
         x-show="showPopup"
         style="display: none;"
-        class="fixed inset-0 z-50 flex items-center justify-center bg-text-80/50 backdrop-blur-[1.5px]"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm"
     >
         <div
             @click.away="close()"
@@ -349,7 +349,7 @@ new class extends Component {
 
                 <div class="flex gap-4 w-full justify-center">
                     <button @click="confirmingDeleteRel = false" class="flex-1 py-2 px-4 rounded-lg border border-card-border text-text-70 text-web-body-small font-semibold hover:bg-card-hover transition-colors">{{ __('Cancel') }}</button>
-                    <button @click="deleteRelation()" class="flex-1 py-3 px-4 rounded-lg text-subtext-60 transition-colors text-web-body-small font-semibold bg-danger-100 hover:bg-red-600">{{ __('Confirm Delete') }}</button>
+                    <button @click="deleteRelation()" class="flex-1 py-3 px-4 rounded-lg text-bg-main transition-colors text-web-body-small font-semibold bg-danger-100 hover:bg-danger-100/90">{{ __('Confirm Delete') }}</button>
                 </div>
             </div>
 
@@ -368,7 +368,7 @@ new class extends Component {
 
                 <div class="flex gap-4 w-full justify-center">
                     <button @click="confirmingDeleteType = false; pendingDeleteTypeId = null" class="flex-1 py-2 px-4 rounded-lg border border-card-border text-text-70 text-web-body-small font-semibold hover:bg-card-hover transition-colors">{{ __('Cancel') }}</button>
-                    <button @click="deleteType(pendingDeleteTypeId)" class="flex-1 py-3 px-4 rounded-lg text-subtext-60 transition-colors text-web-body-small font-semibold bg-danger-100 hover:bg-red-600">{{ __('Confirm Delete') }}</button>
+                    <button @click="deleteType(pendingDeleteTypeId)" class="flex-1 py-3 px-4 rounded-lg text-bg-main transition-colors text-web-body-small font-semibold bg-danger-100 hover:bg-danger-100/90">{{ __('Confirm Delete') }}</button>
                 </div>
             </div>
         </div>

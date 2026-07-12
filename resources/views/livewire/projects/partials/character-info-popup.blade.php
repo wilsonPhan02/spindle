@@ -3,7 +3,7 @@
     x-show="showCharacterInfoPopup"
     style="display: none;"
     @do-delete-character-info.window="deleteCharacterConfirmed()"
-    class="fixed inset-0 z-[60] flex items-center justify-center bg-text-80/50 backdrop-blur-[1.5px] p-4 sm:p-6"
+    class="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 backdrop-blur-sm p-4 sm:p-6"
 >
     <div @click.away="closeCharacterInfo()" class="bg-bg-main border border-brand-150 rounded-xl shadow-xl w-auto overflow-hidden relative max-h-[calc(100vh-2rem)] sm:max-h-[calc(100vh-2rem)] overflow-y-auto">
         <template x-if="infoCharacter">

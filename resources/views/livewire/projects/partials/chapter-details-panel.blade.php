@@ -10,7 +10,7 @@
                             'w-full text-app-caption px-3 py-1.5 rounded-lg flex items-center justify-between gap-1.5 shadow-sm border border-brand-150 transition-all cursor-pointer hover:opacity-90',
                             'bg-warning-100/50 text-text-80' => $chapterCard->status === 'In Progress',
                             'bg-success-100/50 text-text-80' => $chapterCard->status === 'Completed',
-                            'bg-text-100 text-text-80' => !in_array($chapterCard->status, ['In Progress', 'Completed'])
+                            'bg-brand-150 text-text-80' => !in_array($chapterCard->status, ['In Progress', 'Completed'])
                         ])>
                             <div class="flex items-center gap-1.5 min-w-0">
                                 <x-icons.chapter-status :status="$chapterCard->status" class="w-3.5 h-3.5 shrink-0" />
@@ -20,7 +20,7 @@
                         </button>
 
                         <div x-show="showStatusMenu" @click.away="showStatusMenu = false" x-cloak
-                             class="absolute left-0 top-full mt-1.5 w-full min-w-full bg-white rounded-lg shadow-lg border border-brand-150 py-1 z-50">
+                             class="absolute left-0 top-full mt-1.5 w-full min-w-full bg-card-bg rounded-lg shadow-xl border border-card-border py-1 z-50">
                             @foreach(['In Progress', 'Completed'] as $st)
                                 @php
                                     $isSelected = $chapterCard->status === $st;
@@ -31,8 +31,8 @@
                                     @disabled($isSelected)
                                     @class([
                                         'w-full text-left px-3 py-2 text-app-caption flex items-center gap-2 transition-colors',
-                                        'opacity-50 cursor-not-allowed bg-subtext-60/50 text-subtext-100' => $isSelected,
-                                        'hover:bg-card-bg text-text-70 cursor-pointer' => !$isSelected,
+                                        'opacity-60 cursor-not-allowed bg-card-hover text-text-60' => $isSelected,
+                                        'hover:bg-card-hover text-text-90 cursor-pointer' => !$isSelected,
                                     ])
                                 >
                                     <x-icons.chapter-status :status="$st" class="w-3.5 h-3.5 shrink-0" />
@@ -140,7 +140,7 @@
                         class="relative w-full aspect-[16/8] rounded-xl overflow-hidden bg-brand-50 border border-brand-150 shadow-inner group shrink-0 flex items-center justify-center">
 
                         <!-- Progress Overlay -->
-                        <div x-show="isUploading" x-transition class="absolute inset-0 bg-[#F5EFE9]/80 backdrop-blur-md z-40 flex flex-col items-center justify-center">
+                        <div x-show="isUploading" x-transition class="absolute inset-0 bg-secondary-5/80 backdrop-blur-md z-40 flex flex-col items-center justify-center">
                             <svg class="animate-spin h-6 w-6 text-secondary-200 mb-1.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
                             <div class="text-secondary-200 font-semibold text-xs">{{ __('Uploading...') }} <span x-text="progress + '%'"></span></div>
                             
@@ -162,15 +162,15 @@
 
                         {{-- Hover Action Buttons for Chapter Cover--}}
                         <div x-show="hoverCover && !showCropper" x-transition class="absolute bottom-2.5 left-2.5 z-30 flex items-center gap-1.5">
-                            <label class="flex items-center gap-1.5 px-2.5 py-1.5 bg-text-80/95 border border-text-60 hover:bg-text-80 text-bg-main text-app-caption text-[9px] rounded-md shadow-lg cursor-pointer transition-transform active:scale-95">
-                                <x-icons.upload class="w-3 h-3 text-bg-main" />
+                            <label class="flex items-center gap-1.5 px-2.5 py-1.5 bg-black/75 backdrop-blur-md border border-white/15 hover:bg-black/90 text-white text-app-caption text-[10px] font-semibold rounded-md shadow-lg cursor-pointer transition-all active:scale-95">
+                                <x-icons.upload class="w-3.5 h-3.5 text-white" />
                                 <span>{{ $chapterCard->cover_image_path || $project->cover_image_path ? __('Change Cover') : __('Upload Cover') }}</span>
                                 <input type="file" x-ref="coverInput" @change="onFileChange" accept="image/*" class="hidden">
                             </label>
 
                             @if($chapterCard->cover_image_path || $project->cover_image_path)
-                                <button type="button" wire:click="detachCoverImage" class="flex items-center gap-1.5 px-2.5 py-1.5 bg-text-80/95 border border-text-60 hover:bg-text-80 text-danger-100 text-app-caption text-[9px] rounded-md shadow-lg cursor-pointer transition-transform active:scale-95" title="{{ __('Detach Cover') }}">
-                                    <x-icons.delete class="w-3 h-3 text-danger-100" />
+                                <button type="button" wire:click="detachCoverImage" class="flex items-center gap-1.5 px-2.5 py-1.5 bg-black/75 backdrop-blur-md border border-danger-100/40 hover:bg-danger-100/20 text-danger-100 text-app-caption text-[10px] font-semibold rounded-md shadow-lg cursor-pointer transition-all active:scale-95" title="{{ __('Detach Cover') }}">
+                                    <x-icons.delete class="w-3.5 h-3.5 text-danger-100" />
                                     <span>{{ __('Remove') }}</span>
                                 </button>
                             @endif
@@ -209,7 +209,7 @@
                             </div>
                         </div>
 
-                        <div wire:loading.flex wire:target="coverUpload" class="absolute inset-0 bg-text-70/80 backdrop-blur-[1px] items-center justify-center gap-2 text-app-desc-feature z-40">
+                        <div wire:loading.flex wire:target="coverUpload" class="absolute inset-0 bg-black/70 backdrop-blur-[1px] items-center justify-center gap-2 text-app-desc-feature z-40">
                             <svg class="animate-spin h-5 w-5 text-bg-main" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
                             <span class="text-bg-main">{{ __('Uploading Cover...') }}</span>
                         </div>
@@ -339,7 +339,7 @@
                             </button>
 
                             {{-- Full Width Compact Add Tag Input Box (when adding, takes full line so tags drop below) --}}
-                            <div x-show="addingTag" x-cloak class="w-full p-1.5 rounded-lg bg-secondary-100/50 border border-secondary-50/50 shadow-2xs flex flex-col gap-0.5 mb-1.5">
+                            <div x-show="addingTag" x-cloak class="w-full p-1.5 rounded-lg bg-secondary-10/50 border border-secondary-50/50 shadow-2xs flex flex-col gap-0.5 mb-1.5">
                                 <div class="flex items-center justify-between gap-1">
                                     <input type="text" x-ref="tagInput" x-model="tagVal"
                                            @input="if(tagVal.length > 20) tagVal = tagVal.substring(0, 20)"
@@ -357,7 +357,7 @@
 
                             @if($chapterCard->tags && $chapterCard->tags->isNotEmpty())
                                 @foreach($chapterCard->tags as $tag)
-                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-brand-150 text-[11.5px] text-app-body-small text-secondary-200 font-semibold border border-brand-200 max-w-[140px] shadow-2xs group"
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-brand-10 text-[11.5px] text-app-body-small text-secondary-200 font-semibold border border-secondary-100 max-w-[140px] shadow-2xs group"
                                           title="{{ $tag->name }}">
                                         <span class="truncate">{{ $tag->name }}</span>
                                         <button type="button" wire:click="removeTag({{ $tag->id }})" class="text-secondary-150 hover:text-secondary-200 opacity-60 group-hover:opacity-100 transition-opacity ml-0.5 cursor-pointer" title="{{ __('Remove tag') }}">&times;</button>
@@ -383,15 +383,15 @@
                     <div x-show="openChar" x-cloak x-transition class="pt-2">
                         <div class="relative">
                             <button type="button" @click="showCharDropdown = !showCharDropdown"
-                                    class="w-full flex items-center justify-center gap-2 px-3.5 py-2 rounded-lg border border-dashed border-secondary-150 bg-bg-main text-app-desc-feature text-secondary-150 hover:bg-white transition-colors shadow-sm cursor-pointer">
+                                    class="w-full flex items-center justify-center gap-2 px-3.5 py-2 rounded-lg border border-dashed border-secondary-150 bg-bg-main text-app-desc-feature text-secondary-150 hover:bg-card-hover transition-colors shadow-sm cursor-pointer">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                                 <span>{{ __('Add Character...') }}</span>
                             </button>
 
                             <div x-show="showCharDropdown" @click.away="showCharDropdown = false" x-cloak
-                                 class="absolute left-0 top-full mt-1.5 w-full bg-bg-main rounded-lg shadow-xl border border-brand-150 max-h-[200px] overflow-y-auto info-panel-scrollbar z-50 py-1">
+                                 class="absolute left-0 top-full mt-1.5 w-full bg-card-bg rounded-lg shadow-xl border border-card-border max-h-[200px] overflow-y-auto info-panel-scrollbar z-50 py-1">
                                 @if(empty($projectCharacters) || $projectCharacters->isEmpty())
-                                    <div class="px-3 py-3 text-center text-app-captiontext-secondary-50">
+                                    <div class="px-3 py-3 text-center text-app-caption text-secondary-50">
                                         {{ __('No characters found in this project yet.') }}
                                     </div>
                                 @else
@@ -407,8 +407,8 @@
                                             @if(!$isCharAdded) wire:click="attachCharacter('{{ $pChar->character_id }}')" @click="showCharDropdown = false" @endif
                                             @class([
                                                 'w-full flex items-center gap-2.5 px-3 py-2 text-left text-[12px] font-app-body-small font-medium transition-colors',
-                                                'opacity-50 cursor-not-allowed bg-bg-main' => $isCharAdded,
-                                                'hover:bg-brand-50 text-text-70 cursor-pointer' => !$isCharAdded,
+                                                'opacity-50 cursor-not-allowed bg-card-bg' => $isCharAdded,
+                                                'hover:bg-card-hover text-text-90 cursor-pointer' => !$isCharAdded,
                                             ])
                                         >
                                             @if($pChar->image_path)

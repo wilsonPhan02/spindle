@@ -79,7 +79,7 @@ new #[Layout('layouts.guest')] #[Title('Sign Up - Spindle')] class extends Compo
                     <input type="email" wire:model="email" x-ref="email" placeholder="{{ __('Enter your email') }}" 
                         x-init="setTimeout(() => { let v = sessionStorage.getItem('auth_email'); if(v && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) { $el.value = v; $wire.email = v; } }, 10)"
                         @input="sessionStorage.setItem('auth_email', $el.value)"
-                        class="w-full px-4 py-2 bg-white border border-subtext-70 rounded-md focus:ring-2 focus:ring-secondary-200 outline-none transition-all placeholder-subtext-90 text-app-body-medium text-text-80">
+                        class="w-full px-4 py-2 bg-bg-main border border-card-border rounded-md focus:ring-2 focus:ring-secondary-200 outline-none transition-all placeholder-subtext-90 text-app-body-medium text-text-90">
                     @error('email') <span class="text-app-body-small text-danger-100 mt-1 block">{{ $message }}</span> @enderror
                 </div>
 
@@ -89,7 +89,7 @@ new #[Layout('layouts.guest')] #[Title('Sign Up - Spindle')] class extends Compo
                         <input :type="show ? 'text' : 'password'" wire:model="password" x-ref="password" placeholder="{{ __('Enter your password') }}" 
                             x-init="setTimeout(() => { let e = sessionStorage.getItem('auth_email'); let v = sessionStorage.getItem('auth_password'); if(v && e && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)) { $el.value = v; $wire.password = v; } }, 10)"
                             @input="sessionStorage.setItem('auth_password', $el.value)"
-                            class="w-full px-4 py-2 pr-10 bg-white border border-subtext-70 rounded-md focus:ring-2 focus:ring-secondary-200 outline-none transition-all placeholder-subtext-90 text-app-body-medium text-text-80">
+                            class="w-full px-4 py-2 pr-10 bg-bg-main border border-card-border rounded-md focus:ring-2 focus:ring-secondary-200 outline-none transition-all placeholder-subtext-90 text-app-body-medium text-text-90">
                         <button type="button" @click="show = !show" class="absolute inset-y-0 right-0 flex items-center pr-3 text-subtext-90 hover:text-text-80 focus:outline-none transition-colors">
                             <svg x-show="!show" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7a9.978 9.978 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.542 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" /></svg>
                             <svg x-show="show" style="display: none;" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
@@ -102,7 +102,7 @@ new #[Layout('layouts.guest')] #[Title('Sign Up - Spindle')] class extends Compo
                     <label class="block mb-1 text-app-body-medium text-text-80">{{ __('Confirm Password') }}</label>
                     <div class="relative">
                         <input :type="showConfirm ? 'text' : 'password'" wire:model="password_confirmation" x-ref="password_confirmation" placeholder="{{ __('Re-enter your password') }}" 
-                            class="w-full px-4 py-2 pr-10 bg-white border border-subtext-70 rounded-md focus:ring-2 focus:ring-secondary-200 outline-none transition-all placeholder-subtext-90 text-app-body-medium text-text-80">
+                            class="w-full px-4 py-2 pr-10 bg-bg-main border border-card-border rounded-md focus:ring-2 focus:ring-secondary-200 outline-none transition-all placeholder-subtext-90 text-app-body-medium text-text-90">
                         <button type="button" @click="showConfirm = !showConfirm" class="absolute inset-y-0 right-0 flex items-center pr-3 text-subtext-90 hover:text-text-80 focus:outline-none transition-colors">
                             <svg x-show="!showConfirm" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7a9.978 9.978 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.542 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" /></svg>
                             <svg x-show="showConfirm" style="display: none;" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
@@ -114,7 +114,7 @@ new #[Layout('layouts.guest')] #[Title('Sign Up - Spindle')] class extends Compo
                 <!-- Bagian Checkbox yang sudah disederhanakan dan diposisikan ulang -->
                 <div class="flex items-center pt-1">
                     <input type="checkbox" wire:model="terms" id="terms" 
-                        class="w-4 h-4 flex-shrink-0 mt-0.5 bg-white border-transparent rounded text-secondary-200 focus:ring-secondary-200 focus:ring-offset-card-bg">
+                        class="w-4 h-4 flex-shrink-0 mt-0.5 bg-bg-main border border-card-border rounded text-secondary-200 focus:ring-secondary-200 focus:ring-offset-card-bg">
                     <label for="terms" class="ml-2 text-app-body-medium text-text-80 cursor-pointer">
                         {!! __('I have read and agree to the <a href="#" class="text-interactive-100 hover:underline">terms and conditions</a>') !!}
                     </label>
@@ -135,7 +135,7 @@ new #[Layout('layouts.guest')] #[Title('Sign Up - Spindle')] class extends Compo
             </div>
 
             <button type="button" 
-                class="flex items-center justify-center w-full py-2.5 mb-4 text-app-feature text-text-80 transition-colors bg-white border border-subtext-70 rounded-md hover:bg-card-hover">
+                class="flex items-center justify-center w-full py-2.5 mb-4 text-app-feature text-text-80 transition-colors bg-bg-main border border-card-border rounded-md hover:bg-card-hover">
                 <svg class="w-5 h-5 mr-2" viewBox="0 0 24 24">
                     <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
                     <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>

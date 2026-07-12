@@ -98,9 +98,9 @@ new #[Layout('layouts.app')] class extends Component {
 
     <!-- Header -->
     <header class="flex justify-between items-center mb-12">
-        <a href="{{ route('dashboard') }}" wire:navigate class="flex items-center gap-3 text-[18px] text-[#7A7A7A] hover:text-[#8C7558] transition-colors">
+        <a href="{{ route('dashboard') }}" wire:navigate class="flex items-center gap-3 text-[18px] text-subtext-100 hover:text-secondary-250 transition-colors">
             <x-icons.chevron rotate="180" size="w-3.5 h-3.5" color="currentColor"/>
-            <span class="text-[#2C2C2C] font-semibold">{{ __('Archive') }}</span>
+            <span class="text-text-100 font-semibold">{{ __('Archive') }}</span>
         </a>
     </header>
 
@@ -137,7 +137,7 @@ new #[Layout('layouts.app')] class extends Component {
                                 <svg class="w-6 h-6 text-text-80" fill="currentColor" viewBox="0 0 24 24"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
                             </button>
 
-                            <div x-show="menuOpen" style="display: none;" class="absolute right-0 mt-2 w-48 bg-white border border-brand-150 rounded-lg shadow-lg z-20 py-1 overflow-hidden">
+                            <div x-show="menuOpen" style="display: none;" class="absolute right-0 mt-2 w-48 bg-card-bg border border-card-border rounded-lg shadow-lg z-20 py-1 overflow-hidden">
                                 <button
                                     wire:click="restoreSection('{{ $section->section_id }}')"
                                     @click="menuOpen = false"
@@ -164,13 +164,13 @@ new #[Layout('layouts.app')] class extends Component {
                             <div class="w-44 shrink-0 group" x-data="{ menuOpen: false }">
                                 <div class="relative">
                                     {{-- Book Cover --}}
-                                    <div class="w-full aspect-[2/3] bg-[#B69F78] rounded-r-xl rounded-l-sm border-l-[6px] border-[#705D42] shadow-md relative mb-3 opacity-75 group-hover:opacity-95 transition-all duration-200">
+                                    <div class="w-full aspect-[2/3] bg-secondary-100 rounded-r-xl rounded-l-sm border-l-[6px] border-secondary-300 shadow-md relative mb-3 opacity-75 group-hover:opacity-95 transition-all duration-200">
                                         @if($project->cover_image_path)
                                             <img src="{{ Storage::url($project->cover_image_path) }}" class="absolute inset-y-0 left-0 right-0 w-full h-full object-cover rounded-r-xl rounded-l-sm" />
                                         @endif
-                                        <div class="absolute inset-1 border border-[#D5C6A9] opacity-40 rounded-r-lg pointer-events-none"></div>
-                                        <div class="absolute top-1.5 left-1.5 w-4 h-4 border-t border-l border-[#E2D6C0] opacity-60"></div>
-                                        <div class="absolute bottom-1.5 right-1.5 w-4 h-4 border-b border-r border-[#E2D6C0] opacity-60"></div>
+                                        <div class="absolute inset-1 border border-secondary-10 opacity-40 rounded-r-lg pointer-events-none"></div>
+                                        <div class="absolute top-1.5 left-1.5 w-4 h-4 border-t border-l border-brand-200 opacity-60"></div>
+                                        <div class="absolute bottom-1.5 right-1.5 w-4 h-4 border-b border-r border-brand-200 opacity-60"></div>
                                         <div class="absolute right-0 top-0 bottom-0 w-1.5 bg-white opacity-40 rounded-r-xl"></div>
                                     </div>
 
@@ -178,7 +178,7 @@ new #[Layout('layouts.app')] class extends Component {
                                     <div class="absolute inset-x-0 bottom-3 flex flex-col gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 px-3">
                                         <button
                                             wire:click="restoreProject('{{ $project->project_id }}')"
-                                            class="w-full flex items-center justify-center gap-1.5 py-1.5 bg-[#1F2328]/90 backdrop-blur-sm rounded-lg text-[12px] text-white font-medium hover:bg-[#1F2328] transition-colors shadow-lg cursor-pointer"
+                                            class="w-full flex items-center justify-center gap-1.5 py-1.5 bg-text-100/90 backdrop-blur-sm rounded-lg text-[12px] text-bg-main font-medium hover:bg-text-100 transition-colors shadow-lg cursor-pointer"
                                         >
                                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>

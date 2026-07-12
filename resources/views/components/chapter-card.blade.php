@@ -131,7 +131,7 @@
                     'text-app-caption text-text-80 px-2 py-1 rounded-md flex items-center gap-1.5 shadow-sm',
                     'bg-warning-100/50' => $chapter->status === 'In Progress',
                     'bg-success-100/50' => $chapter->status === 'Completed',
-                    'bg-text-100' => !in_array($chapter->status, ['In Progress', 'Completed'])
+                    'bg-brand-150' => !in_array($chapter->status, ['In Progress', 'Completed'])
                 ])>
                     <x-icons.chapter-status :status="$chapter->status" />
                     {{ __($chapter->status ?? 'In Progress') }}

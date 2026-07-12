@@ -68,20 +68,20 @@ new #[Layout('layouts.guest')] #[Title('Complete Your Profile - Spindle')] class
                 <div>
                     <label class="block mb-1 text-app-body-medium text-text-80">{{ __('Username') }} <span class="text-danger-100">*</span></label>
                     <input type="text" wire:model="username" placeholder="{{ __('Enter your username') }}" 
-                        class="w-full px-4 py-2 bg-white border border-subtext-70 rounded-md focus:ring-2 focus:ring-secondary-200 outline-none transition-all placeholder-subtext-90 text-app-body-medium text-text-80">
+                        class="w-full px-4 py-2 bg-bg-main border border-card-border rounded-md focus:ring-2 focus:ring-secondary-200 outline-none transition-all placeholder-subtext-90 text-app-body-medium text-text-90">
                     @error('username') <span class="text-app-body-small text-danger-100 mt-1 block">{{ $message }}</span> @enderror
                 </div>
 
                 <div>
                     <label class="block mb-1 text-app-body-medium text-text-80">{{ __('Occupation (Optional)') }}</label>
                     <input type="text" wire:model="occupation" placeholder="{{ __('e.g. Writer, Student') }}" 
-                        class="w-full px-4 py-2 bg-white border border-subtext-70 rounded-md focus:ring-2 focus:ring-secondary-200 outline-none transition-all placeholder-subtext-90 text-app-body-medium text-text-80">
+                        class="w-full px-4 py-2 bg-bg-main border border-card-border rounded-md focus:ring-2 focus:ring-secondary-200 outline-none transition-all placeholder-subtext-90 text-app-body-medium text-text-90">
                     @error('occupation') <span class="text-app-body-small text-danger-100 mt-1 block">{{ $message }}</span> @enderror
                 </div>
 
                 <div>
                     <label class="block mb-1 text-app-body-medium text-text-80">{{ __('Gender (Optional)') }}</label>
-                    <select wire:model="gender" class="w-full px-4 py-2 bg-white border border-subtext-70 rounded-md focus:ring-2 focus:ring-secondary-200 outline-none transition-all text-app-body-medium text-text-80">
+                    <select wire:model="gender" class="w-full px-4 py-2 bg-bg-main border border-card-border rounded-md focus:ring-2 focus:ring-secondary-200 outline-none transition-all text-app-body-medium text-text-90">
                         <option value="">{{ __('Select Gender') }}</option>
                         <option value="male">{{ __('Male') }}</option>
                         <option value="female">{{ __('Female') }}</option>
@@ -92,7 +92,7 @@ new #[Layout('layouts.guest')] #[Title('Complete Your Profile - Spindle')] class
                 <div class="mb-5">
                     <label class="block mb-1 text-app-body-medium text-text-80">{{ __('Birthdate (Optional)') }}</label>
                     <input type="date" wire:model="birthdate" 
-                        class="w-full px-4 py-2 bg-white border border-subtext-70 rounded-md focus:ring-2 focus:ring-secondary-200 outline-none transition-all text-app-body-medium text-text-80">
+                        class="w-full px-4 py-2 bg-bg-main border border-card-border rounded-md focus:ring-2 focus:ring-secondary-200 outline-none transition-all text-app-body-medium text-text-90">
                     @error('birthdate') <span class="text-app-body-small text-danger-100 mt-1 block">{{ $message }}</span> @enderror
                 </div>
 
