@@ -32,7 +32,7 @@
                     x-transition:leave="transition ease-in duration-100"
                     x-transition:leave-start="opacity-100 scale-100 translate-y-0"
                     x-transition:leave-end="opacity-0 scale-95 translate-y-1"
-                    class="absolute right-0 top-full mt-2 w-56 origin-top-right bg-card-bg border border-card-border rounded-lg shadow-xl z-50 flex flex-col max-h-52 overflow-y-auto custom-scrollbar"
+                    class="absolute right-0 sm:-right-4 md:-right-6 top-full mt-2 w-48 origin-top-right bg-card-bg border border-card-border rounded-lg shadow-xl z-50 flex flex-col max-h-52 overflow-y-auto custom-scrollbar"
                     style="display: none;"
                 >
                     <div class="sticky top-0 bg-card-bg/95 backdrop-blur-sm px-3 py-2 border-b border-card-border z-10">
@@ -73,7 +73,7 @@
 
             <button 
                 @click.stop="$dispatch('open-delete-dialog', { id: '{{ $chapter->chapter_card_id }}' })"
-                class="text-text-60 hover:text-danger-100 hover:bg-danger-100/10 px-1 pb-1 rounded transition-all focus:outline-none"
+                class="text-text-60 hover:text-danger-100 hover:bg-danger-100/10 px-1 py-1 rounded transition-all focus:outline-none"
                 title="{{ __('Delete Chapter') }}"
             >
                 <x-icons.delete class="w-4 h-4" />            
