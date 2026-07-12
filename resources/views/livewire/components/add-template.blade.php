@@ -317,12 +317,17 @@ new class extends Component {
 }; ?>
 
 <div>
+    {{-- Top loading progress bar (appears at top of browser page matching global NProgress bar style) --}}
+    <div wire:loading class="fixed top-0 inset-x-0 z-[200] h-[2px] overflow-hidden pointer-events-none">
+        <div class="h-full animate-progress-fill"></div>
+    </div>
+
     @if($isOpen)
         <div class="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-sm transition-opacity">
             
             <div class="relative bg-bg-main w-full max-w-3xl h-[90vh] rounded-2xl shadow-2xl flex flex-col overflow-hidden mx-4 border border-bg-border">
                 
-                <button wire:click="closeModal" class="absolute top-6 right-6 w-10 h-10 rounded-full border border-brand-200 text-text-60 hover:bg-brand-50 hover:text-secondary-200 flex items-center justify-center transition-colors z-50 bg-bg-main">
+                <button wire:click="closeModal" wire:loading.attr="disabled" class="absolute top-6 right-6 w-10 h-10 rounded-full border border-brand-200 text-text-60 hover:bg-brand-50 hover:text-secondary-200 flex items-center justify-center transition-colors z-50 bg-bg-main disabled:opacity-50">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" d="M6 18L18 6M6 6l12 12"/></svg>
                 </button>
 
@@ -338,6 +343,7 @@ new class extends Component {
                         <div class="flex flex-col gap-8 items-center w-full">
                             @foreach($this->availableTemplates as $template)
                                 <div wire:click="viewDetail('{{ $template->template_id }}')" 
+                                     wire:loading.class="opacity-60 pointer-events-none"
                                      class="group relative w-full max-w-lg aspect-[16/9] bg-[#212121] rounded-xl overflow-hidden cursor-pointer border border-transparent hover:border-brand-200 transition-all p-8 md:p-12 shadow-sm">
                                     
                                     @if($template->image_preview && $template->is_custom)
@@ -367,14 +373,16 @@ new class extends Component {
                                         <div class="absolute top-3 right-3 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all transform translate-y-2 group-hover:translate-y-0 duration-300">
                                             
                                             <button @click.stop wire:click="editCustomTemplate('{{ $template->template_id }}')" 
-                                                    class="flex items-center gap-1 px-2 py-1 bg-bg-main/95 backdrop-blur-sm border border-brand-200 text-secondary-200 rounded-sm hover:bg-brand-200 transition-all shadow-md" 
+                                                    wire:loading.attr="disabled"
+                                                    class="flex items-center gap-1 px-2 py-1 bg-bg-main/95 backdrop-blur-sm border border-brand-200 text-secondary-200 rounded-sm hover:bg-brand-200 transition-all shadow-md disabled:opacity-50" 
                                                     title="Edit Structure">
                                                 <x-icons.rename class="w-3 h-3"/>
                                                 <span class="text-app-caption font-semibold">{{ __('Edit') }}</span>
                                             </button>
                                             
                                             <button @click.stop wire:click="attemptDeleteTemplate('{{ $template->template_id }}')" 
-                                                    class="flex items-center gap-2 px-2 py-1 bg-bg-main/95 backdrop-blur-sm border border-danger-100/50 text-danger-100 rounded-sm hover:bg-danger-100 hover:border-danger-100 hover:text-brand-50 transition-all shadow-md group/btn" 
+                                                    wire:loading.attr="disabled"
+                                                    class="flex items-center gap-2 px-2 py-1 bg-bg-main/95 backdrop-blur-sm border border-danger-100/50 text-danger-100 rounded-sm hover:bg-danger-100 hover:border-danger-100 hover:text-brand-50 transition-all shadow-md group/btn disabled:opacity-50" 
                                                     title="Delete Structure">
                                                 <x-icons.delete class="w-3 h-3" />
                                                 <span class="text-app-caption font-semibold">{{ __('Delete') }}</span>
@@ -388,7 +396,7 @@ new class extends Component {
                     </div>
 
                     <div class="shrink-0 p-6 flex justify-center bg-bg-main z-10 border-t border-bg-border/60">
-                        <button wire:click="goToStep4" class="flex items-center gap-2 px-6 py-2.5 bg-transparent border border-brand-200 text-secondary-200 rounded-md hover:bg-brand-50 hover:text-secondary-300 transition-colors text-web-button">
+                        <button wire:click="goToStep4" wire:loading.attr="disabled" class="flex items-center gap-2 px-6 py-2.5 bg-transparent border border-brand-200 text-secondary-200 rounded-md hover:bg-brand-50 hover:text-secondary-300 transition-colors text-web-button disabled:opacity-50">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                             {{ __('Create Template') }}
                         </button>
@@ -400,7 +408,7 @@ new class extends Component {
 
                         {{-- Header bar with back + conditional sticky Use Template button --}}
                         <div class="shrink-0 pt-6 px-6 pb-4 relative z-10 bg-bg-main flex items-center justify-between">
-                            <button wire:click="goBack" class="w-10 h-10 rounded-full border border-brand-200 text-text-60 hover:bg-brand-50 hover:text-text-100 flex items-center justify-center transition-colors bg-bg-main" title="Back to structures">
+                            <button wire:click="goBack" wire:loading.attr="disabled" class="w-10 h-10 rounded-full border border-brand-200 text-text-60 hover:bg-brand-50 hover:text-text-100 flex items-center justify-center transition-colors bg-bg-main disabled:opacity-50" title="Back to structures">
                                 <x-icons.back/>
                             </button>
 
@@ -416,8 +424,12 @@ new class extends Component {
                                 class="mr-14 sm:mr-16"
                                 style="display: none;"
                             >
-                                <button wire:click="useTemplate" class="h-10 px-5 border border-brand-200 text-secondary-200 rounded-md hover:bg-brand-50 hover:text-secondary-300 transition-colors text-web-button flex items-center justify-center shadow-sm">
-                                    {{ __('Use Template') }}
+                                <button wire:click="useTemplate" wire:loading.attr="disabled" class="h-10 min-w-[145px] px-5 border border-brand-200 text-secondary-200 rounded-md hover:bg-brand-50 hover:text-secondary-300 transition-colors text-web-button flex items-center justify-center gap-2 shadow-sm disabled:opacity-60 disabled:cursor-not-allowed">
+                                    <span wire:loading.remove wire:target="useTemplate">{{ __('Use Template') }}</span>
+                                    <span wire:loading.flex wire:target="useTemplate" class="items-center justify-center gap-2">
+                                        <svg class="animate-spin h-3.5 w-3.5 shrink-0 text-secondary-200" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                        <span>{{ __('Applying...') }}</span>
+                                    </span>
                                 </button>
                             </div>
                         </div>
@@ -441,8 +453,12 @@ new class extends Component {
                                             observer.observe($refs.primaryUseBtn);
                                         }"
                                     >
-                                        <button wire:click="useTemplate" class="px-5 py-2 border border-brand-200 text-secondary-200 rounded-md hover:bg-brand-50 hover:text-secondary-300 transition-colors text-web-button">
-                                            {{ __('Use Template') }}
+                                        <button wire:click="useTemplate" wire:loading.attr="disabled" class="px-5 py-2 min-w-[160px] border border-brand-200 text-secondary-200 rounded-md hover:bg-brand-50 hover:text-secondary-300 transition-colors text-web-button flex items-center justify-center gap-2 mx-auto disabled:opacity-60 disabled:cursor-not-allowed">
+                                            <span wire:loading.remove wire:target="useTemplate">{{ __('Use Template') }}</span>
+                                            <span wire:loading.flex wire:target="useTemplate" class="items-center justify-center gap-2">
+                                                <svg class="animate-spin h-4 w-4 shrink-0 text-secondary-200" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                                <span>{{ __('Applying...') }}</span>
+                                            </span>
                                         </button>
                                     </div>
                                 </div>
@@ -514,12 +530,16 @@ new class extends Component {
                         </p>
 
                         <div class="flex gap-4">
-                            <button wire:click="$set('step', 2)" class="px-8 py-3 rounded-md border-2 border-brand-200 text-text-70 hover:bg-brand-50 transition-colors font-semibold text-web-button shadow-sm">
+                            <button wire:click="$set('step', 2)" wire:loading.attr="disabled" class="px-8 py-3 rounded-md border-2 border-brand-200 text-text-70 hover:bg-brand-50 transition-colors font-semibold text-web-button shadow-sm disabled:opacity-50">
                                 {{ __('Cancel') }}
                             </button>
                             
-                            <button wire:click="confirmTemplateChange" class="px-8 py-3 rounded-md bg-secondary-200 text-brand-10 hover:bg-secondary-300 hover:shadow-md transition-all font-semibold text-web-button shadow-sm transform active:scale-95">
-                                {{ __('Yes, Change Template') }}
+                            <button wire:click="confirmTemplateChange" wire:loading.attr="disabled" class="px-8 py-3 min-w-[230px] rounded-md bg-secondary-200 text-brand-10 hover:bg-secondary-300 hover:shadow-md transition-all font-semibold text-web-button shadow-sm transform active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+                                <span wire:loading.remove wire:target="confirmTemplateChange">{{ __('Yes, Change Template') }}</span>
+                                <span wire:loading.flex wire:target="confirmTemplateChange" class="items-center justify-center gap-2.5">
+                                    <svg class="animate-spin h-4 w-4 shrink-0 text-brand-10" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                    <span>{{ __('Applying...') }}</span>
+                                </span>
                             </button>
                         </div>
                     </div>
@@ -527,7 +547,7 @@ new class extends Component {
                 
                 @if($step === 4)
                     <div class="shrink-0 pt-6 px-6 relative z-10 bg-bg-main flex items-center border-b border-bg-border/60 pb-4">
-                        <button wire:click="goBack" class="w-10 h-10 rounded-full border border-brand-200 text-text-60 hover:bg-brand-50 hover:text-text-100 flex items-center justify-center transition-colors bg-bg-main" title="Back to structures">
+                        <button wire:click="goBack" wire:loading.attr="disabled" class="w-10 h-10 rounded-full border border-brand-200 text-text-60 hover:bg-brand-50 hover:text-text-100 flex items-center justify-center transition-colors bg-bg-main disabled:opacity-50" title="Back to structures">
                             <x-icons.back/>
                         </button>
                         <h2 class="text-app-title-1 text-text-90 ml-6">{{ __('Architect Your Structure') }}</h2>
@@ -744,11 +764,14 @@ new class extends Component {
                             </div>
 
                             <div class="pt-3 mt-2 border-t border-bg-border/60 flex justify-end">
-                                <button type="submit" class="flex items-center gap-2 px-8 py-3 bg-secondary-200 text-brand-10 rounded-md hover:bg-secondary-300 transition-all text-web-button shadow-sm transform active:scale-95">
+                                <button type="submit" wire:loading.attr="disabled" class="flex items-center justify-center gap-2 min-w-[220px] px-8 py-3 bg-secondary-200 text-brand-10 rounded-md hover:bg-secondary-300 transition-all text-web-button shadow-sm transform active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed">
                                     <span wire:loading.remove wire:target="saveCustomTemplate">
                                         {{ $editingTemplateId ? __('Update Structure') : __('Build This Structure') }}
                                     </span>
-                                    <span wire:loading wire:target="saveCustomTemplate">{{ __('Saving...') }}</span>
+                                    <span wire:loading.flex wire:target="saveCustomTemplate" class="items-center justify-center gap-2.5">
+                                        <svg class="animate-spin h-4 w-4 shrink-0 text-brand-10" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                        <span>{{ __('Saving...') }}</span>
+                                    </span>
                                 </button>
                             </div>
                         </form>
