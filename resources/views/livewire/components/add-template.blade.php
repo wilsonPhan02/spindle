@@ -396,70 +396,104 @@ new class extends Component {
                 @endif
 
                 @if($step === 2 && $this->selectedTemplate)
-                    <div class="shrink-0 pt-6 px-6 relative z-10 bg-bg-main">
-                        <button wire:click="goBack" class="w-10 h-10 rounded-full border border-brand-200 text-text-60 hover:bg-brand-50 hover:text-text-100 flex items-center justify-center transition-colors bg-bg-main" title="Back to structures">
-                            <x-icons.back/>
-                        </button>
-                    </div>
+                    <div x-data="{ showStickyBtn: false }" class="flex flex-col flex-1 overflow-hidden">
 
-                    <div class="flex-1 overflow-y-auto custom-scrollbar px-10 md:px-14 pb-14 bg-bg-main">
-                        <div class="flex flex-col items-center max-w-4xl mx-auto w-full">
-                            
-                            <div class="text-center mb-10 w-full mt-4 max-w-xl mx-auto">
-                                <h1 class="block w-full text-app-title-1 text-text-100 mb-6 break-words" title="{{ $this->selectedTemplate->name }}">
-                                    {{ $this->selectedTemplate->name }}
-                                </h1>
-                                <button wire:click="useTemplate" class="px-5 py-2 border border-brand-200 text-secondary-200 rounded-md hover:bg-brand-50 hover:text-secondary-300 transition-colors text-web-button">
+                        {{-- Header bar with back + conditional sticky Use Template button --}}
+                        <div class="shrink-0 pt-6 px-6 pb-4 relative z-10 bg-bg-main flex items-center justify-between">
+                            <button wire:click="goBack" class="w-10 h-10 rounded-full border border-brand-200 text-text-60 hover:bg-brand-50 hover:text-text-100 flex items-center justify-center transition-colors bg-bg-main" title="Back to structures">
+                                <x-icons.back/>
+                            </button>
+
+                            {{-- Sticky Use Template button — only visible when primary button is out of view --}}
+                            <div
+                                x-show="showStickyBtn"
+                                x-transition:enter="transition ease-out duration-200"
+                                x-transition:enter-start="opacity-0 scale-95"
+                                x-transition:enter-end="opacity-100 scale-100"
+                                x-transition:leave="transition ease-in duration-150"
+                                x-transition:leave-start="opacity-100 scale-100"
+                                x-transition:leave-end="opacity-0 scale-95"
+                                class="mr-14 sm:mr-16"
+                                style="display: none;"
+                            >
+                                <button wire:click="useTemplate" class="h-10 px-5 border border-brand-200 text-secondary-200 rounded-md hover:bg-brand-50 hover:text-secondary-300 transition-colors text-web-button flex items-center justify-center shadow-sm">
                                     {{ __('Use Template') }}
                                 </button>
                             </div>
+                        </div>
 
-                            <div class="relative overflow-hidden w-full max-w-xl h-[60vh] bg-[#212121] rounded-xl p-8 flex items-center justify-center mb-8">
-                                @if($this->selectedTemplate->image_preview)
-                                    @if($this->selectedTemplate->is_custom)
-                                        <img src="{{ Storage::url($this->selectedTemplate->image_preview) }}" alt="Preview" class="absolute inset-0 w-full h-full object-cover" />
-                                    @else
-                                        <img src="{{ asset('images/' . str_replace('.', '/', $this->selectedTemplate->image_preview) . '.svg') }}" class="w-full h-auto max-w-lg" alt="Template Preview" />
-                                    @endif
-                                @else
-                                    <div class="flex flex-col items-center justify-center h-48 text-brand-200">
-                                        <x-icons.no-structure class="w-12 h-12 opacity-50 mb-2"/>
-                                        <span class="text-app-desc-feature">{{ __('No Preview Available') }}</span>
+                        {{-- Scrollable content --}}
+                        <div class="flex-1 overflow-y-auto custom-scrollbar px-10 md:px-14 pb-14 bg-bg-main">
+                            <div class="flex flex-col items-center max-w-4xl mx-auto w-full">
+
+                                <div class="text-center mb-10 w-full mt-4 max-w-xl mx-auto">
+                                    <h1 class="block w-full text-app-title-1 text-text-100 mb-6 break-words" title="{{ $this->selectedTemplate->name }}">
+                                        {{ $this->selectedTemplate->name }}
+                                    </h1>
+
+                                    {{-- Primary Use Template button — observed by IntersectionObserver --}}
+                                    <div
+                                        x-ref="primaryUseBtn"
+                                        x-init="() => {
+                                            const observer = new IntersectionObserver(([entry]) => {
+                                                showStickyBtn = !entry.isIntersecting;
+                                            }, { threshold: 0.5 });
+                                            observer.observe($refs.primaryUseBtn);
+                                        }"
+                                    >
+                                        <button wire:click="useTemplate" class="px-5 py-2 border border-brand-200 text-secondary-200 rounded-md hover:bg-brand-50 hover:text-secondary-300 transition-colors text-web-button">
+                                            {{ __('Use Template') }}
+                                        </button>
                                     </div>
-                                @endif
-                            </div>
-                            
-                            
-                            <div class="w-full mb-12 px-3">
-                                <hr class="mb-4 border-text-60 border-t-1">
-                                @if ($this->selectedTemplate->description)
-                                    <p class="text-web-body-small text-text-70 leading-relaxed whitespace-pre-wrap">{{ $this->selectedTemplate->description }}</p>
-                                @else
-                                    <p class="text-center text-web-body-small text-text-70 leading-relaxed whitespace-pre-wrap">{{ __('No description for this template') }}</p>
-                                @endif
-                                <hr class="mt-4 border-text-60 border-t-1">
-                            </div>
-                            
+                                </div>
 
-                            <div class="w-full flex flex-col gap-10 px-3">
-                                @forelse($this->selectedTemplate->sections as $section)
-                                    <div>
-                                        <h3 class="text-app-title-1 font-semibold text-text-90 mb-4">
-                                            {{ $section->title }}
-                                        </h3>
-                                        @if ($section->goal)
-                                            <div class="prose prose-stone prose-p:text-text-70 prose-li:text-text-70 prose-strong:text-text-80 max-w-none text-web-body-small leading-relaxed">
-                                                {!! Str::markdown($section->goal) !!}
-                                            </div>
+                                <div class="relative overflow-hidden w-full max-w-xl h-[60vh] bg-[#212121] rounded-xl p-8 flex items-center justify-center mb-8">
+                                    @if($this->selectedTemplate->image_preview)
+                                        @if($this->selectedTemplate->is_custom)
+                                            <img src="{{ Storage::url($this->selectedTemplate->image_preview) }}" alt="Preview" class="absolute inset-0 w-full h-full object-cover" />
                                         @else
-                                            <p class=" text-text-60 italic text-app-body-small">{{ __('No details for this section yet.') }}</p>
+                                            <img src="{{ asset('images/' . str_replace('.', '/', $this->selectedTemplate->image_preview) . '.svg') }}" class="w-full h-auto max-w-lg" alt="Template Preview" />
                                         @endif
-                                    </div>
-                                @empty
-                                    <p class="text-center text-text-60 italic text-app-body-small">{{ __('No detailed steps for this template yet.') }}</p>
-                                @endforelse
-                            </div>
+                                    @else
+                                        <div class="flex flex-col items-center justify-center h-48 text-brand-200">
+                                            <x-icons.no-structure class="w-12 h-12 opacity-50 mb-2"/>
+                                            <span class="text-app-desc-feature">{{ __('No Preview Available') }}</span>
+                                        </div>
+                                    @endif
+                                </div>
 
+
+                                <div class="w-full mb-12 px-3">
+                                    <hr class="mb-4 border-text-60 border-t-1">
+                                    @if ($this->selectedTemplate->description)
+                                        <p class="text-web-body-small text-text-70 leading-relaxed whitespace-pre-wrap">{{ $this->selectedTemplate->description }}</p>
+                                    @else
+                                        <p class="text-center text-web-body-small text-text-70 leading-relaxed whitespace-pre-wrap">{{ __('No description for this template') }}</p>
+                                    @endif
+                                    <hr class="mt-4 border-text-60 border-t-1">
+                                </div>
+
+
+                                <div class="w-full flex flex-col gap-10 px-3">
+                                    @forelse($this->selectedTemplate->sections as $section)
+                                        <div>
+                                            <h3 class="text-app-title-1 font-semibold text-text-90 mb-4">
+                                                {{ $section->title }}
+                                            </h3>
+                                            @if ($section->goal)
+                                                <div class="prose prose-stone prose-p:text-text-70 prose-li:text-text-70 prose-strong:text-text-80 max-w-none text-web-body-small leading-relaxed">
+                                                    {!! Str::markdown($section->goal) !!}
+                                                </div>
+                                            @else
+                                                <p class=" text-text-60 italic text-app-body-small">{{ __('No details for this section yet.') }}</p>
+                                            @endif
+                                        </div>
+                                    @empty
+                                        <p class="text-center text-text-60 italic text-app-body-small">{{ __('No detailed steps for this template yet.') }}</p>
+                                    @endforelse
+                                </div>
+
+                            </div>
                         </div>
                     </div>
                 @endif
