@@ -455,7 +455,7 @@
                         <span class="text-app-heading-2 text-text-80">{{ __('Synopsis') }}</span>
                         <button x-show="hoverSyn && !editingSyn" 
                                 @click="editingSyn = true; setTimeout(() => $refs.synInput.focus(), 50)" 
-                                class="text-[#A08866] hover:text-secondary-200 transition-colors">
+                                class="text-secondary-100 hover:text-secondary-200 transition-colors">
                             <x-icons.rename class="w-4 h-4" />
                         </button>
                     </div>
@@ -471,7 +471,7 @@
                                 <div x-show="localSyn.trim() !== ''" class="whitespace-pre-wrap" x-text="localSyn.trim()"></div>
                                 <div x-show="localSyn.trim() === ''" class="text-app-desc-feature text-text-60">{{ __('Write your synopsis here!') }}</div>
                             </div>
-                            <div x-show="isOverflowing && !isAtBottom" class="absolute bottom-0 left-0 w-full h-12 bg-gradient-to-t from-[#F5EFE9] via-[#F5EFE9]/80 to-transparent pointer-events-none transition-opacity duration-300"></div>
+                            <div x-show="isOverflowing && !isAtBottom" class="absolute bottom-0 left-0 w-full h-12 bg-gradient-to-t from-secondary-5 via-secondary-5/80 to-transparent pointer-events-none transition-opacity duration-300"></div>
                         </div>
                     </div>
 
@@ -482,14 +482,14 @@
                         @click.outside="if(editingSyn) { $wire.saveSynopsis(); editingSyn = false; $nextTick(() => checkScroll()); }"
                         @keydown.ctrl.enter="$wire.saveSynopsis(); editingSyn = false; $nextTick(() => checkScroll())"
                         @keydown.escape="editingSyn = false; localSyn = `{{ addslashes($project->synopsis ?? '') }}`; $nextTick(() => checkScroll())"
-                        class="w-full mt-2 lg:flex-1 lg:min-h-0 min-h-[150px] text-app-body-medium text-text-60 bg-transparent border-2 border-[#D5C6A9] rounded-md outline-none resize-none p-4 focus:border-[#A08866] transition-colors custom-scrollbar"
+                        class="w-full mt-2 lg:flex-1 lg:min-h-0 min-h-[150px] text-app-body-medium text-text-60 bg-transparent border-2 border-secondary-10 rounded-md outline-none resize-none p-4 focus:border-secondary-100 transition-colors custom-scrollbar"
                     ></textarea>
                 </div>
 
                 <div class="absolute bottom-4 text-app-desc-feature text-[11px] left-8 right-8 flex justify-between items-center">
                     <button
                         @click="$dispatch('open-archive-project-dialog')"
-                        class="flex items-center gap-1.5 px-2 py-1 -ml-2 rounded-md text-[11px] font-medium text-[#A08866] hover:text-[#E64C4C] hover:bg-[#E64C4C]/10 transition-colors opacity-70 hover:opacity-100">
+                        class="flex items-center gap-1.5 px-2 py-1 -ml-2 rounded-md text-[11px] font-medium text-secondary-100 hover:text-danger-100 hover:bg-danger-100/10 transition-colors opacity-70 hover:opacity-100">
                         <x-icons.archive class="w-3.5 h-3.5" /> {{ __('Move To Archive') }}
                     </button>
                     <div

@@ -13,7 +13,7 @@
                     {{ __($item['label']) }}
                 </a>
             @else
-                <span class="text-[#2C2C2C] font-semibold block {{ $textClasses }}" title="{{ __($item['label']) }}">
+                <span class="text-text-70 font-semibold block {{ $textClasses }}" title="{{ __($item['label']) }}">
                     {{ __($item['label']) }}
                 </span>
             @endif
@@ -26,6 +26,6 @@
         @endforeach
     </div>
     <a href="{{ url('/') }}" class="shrink-0 transition-opacity hover:opacity-80">
-        <x-logo class="h-8 w-auto text-[#2C2C2C]" />
+        <x-logo class="h-8 w-auto text-text-100" />
     </a>
 </header>

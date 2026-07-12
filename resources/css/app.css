@@ -13,18 +13,18 @@
     --font-inter: 'Inter', sans-serif;
 
     /* Neutrals Colors */
-    --color-text-60: rgb(104 101 99);
-    --color-text-70: rgb(82 77 73);
-    --color-text-80: rgb(55 50 46);
-    --color-text-90: rgb(35 29 24);
-    --color-text-100: rgb(35 29 24);
+    --color-text-60: var(--text-60);
+    --color-text-70: var(--text-70);
+    --color-text-80: var(--text-80);
+    --color-text-90: var(--text-90);
+    --color-text-100: var(--text-100);
 
     /* Sub Text */
-    --color-subtext-60: rgb(229 229 229);
-    --color-subtext-70: rgb(217 217 217);
-    --color-subtext-80: rgb(199 199 199);
-    --color-subtext-90: rgb(152 152 152);
-    --color-subtext-100: rgb(116 116 116);
+    --color-subtext-60: var(--subtext-60);
+    --color-subtext-70: var(--subtext-70);
+    --color-subtext-80: var(--subtext-80);
+    --color-subtext-90: var(--subtext-90);
+    --color-subtext-100: var(--subtext-100);
 
     /* Interactive */
     --color-interactive-100: rgb(53 117 255);
@@ -38,37 +38,122 @@
 
     /* Danger */
     --color-danger-100: rgb(255 59 47);
-    /* --- Background Colors --- */
 
-    /* Background */
-    --color-bg-main: rgb(246 246 244);
-    --color-bg-border: rgb(239 239 233);
+    /* --- Background Colors --- */
+    --color-bg-main: var(--bg-main);
+    --color-bg-border: var(--bg-border);
 
     /* Card */
-    --color-card-bg: rgb(255 254 251);
-    --color-card-hover: rgb(247 245 241);
-    --color-card-border: rgb(226 224 213);
+    --color-card-bg: var(--card-bg);
+    --color-card-hover: var(--card-hover);
+    --color-card-border: var(--card-border);
 
     /* --- Brand Colors --- */
-    --color-brand-200: rgb(201 190 181);
-    --color-brand-150: rgb(225 215 206);
-    --color-brand-100: rgb(233 225 218);
-    --color-brand-50: rgb(242 239 236);
-    --color-brand-10: rgb(247 245 244);
+    --color-brand-200: var(--brand-200);
+    --color-brand-150: var(--brand-150);
+    --color-brand-100: var(--brand-100);
+    --color-brand-50: var(--brand-50);
+    --color-brand-10: var(--brand-10);
 
     /* --- Secondary --- */
-    --color-secondary-300: rgb(118 81 55);
-    --color-secondary-250: rgb(138 97 68);
-    --color-secondary-200: rgb(129 100 77);
-    --color-secondary-150: rgb(154 125 102);
-    --color-secondary-100: rgb(177 160 134);
-    --color-secondary-50: rgb(198 179 149);
-    --color-secondary-20: rgb(212 198 188);
-    --color-secondary-10: rgb(217 197 164);
-    --color-secondary-5: rgb(244 236 229)
+    --color-secondary-300: var(--secondary-300);
+    --color-secondary-250: var(--secondary-250);
+    --color-secondary-200: var(--secondary-200);
+    --color-secondary-150: var(--secondary-150);
+    --color-secondary-100: var(--secondary-100);
+    --color-secondary-50: var(--secondary-50);
+    --color-secondary-20: var(--secondary-20);
+    --color-secondary-10: var(--secondary-10);
+    --color-secondary-5: var(--secondary-5);
 }
 
 @layer base {
+    :root {
+        /* Neutrals Colors (Light) */
+        --text-60: #686563;
+        --text-70: #524d49;
+        --text-80: #37322e;
+        --text-90: #231d18;
+        --text-100: #231d18;
+
+        /* Sub Text (Light) */
+        --subtext-60: #e5e5e5;
+        --subtext-70: #d9d9d9;
+        --subtext-80: #c7c7c7;
+        --subtext-90: #989898;
+        --subtext-100: #747474;
+
+        /* Background (Light) */
+        --bg-main: #f6f6f4;
+        --bg-border: #efefe9;
+
+        /* Card (Light) */
+        --card-bg: #fffefb;
+        --card-hover: #f7f5f1;
+        --card-border: #e2e0d5;
+
+        /* Brand Colors (Light) */
+        --brand-200: #c9beb5;
+        --brand-150: #e1d7ce;
+        --brand-100: #e9e1da;
+        --brand-50: #f2efec;
+        --brand-10: #f7f5f4;
+
+        /* Secondary Colors (Light) */
+        --secondary-300: #765137;
+        --secondary-250: #8a6144;
+        --secondary-200: #81644d;
+        --secondary-150: #9a7d66;
+        --secondary-100: #b1a086;
+        --secondary-50: #c6b395;
+        --secondary-20: #d4c6bc;
+        --secondary-10: #d9c5a4;
+        --secondary-5: #f4ece5;
+    }
+
+    .dark {
+        /* Neutrals Colors (Dark Mode - Vintage Theme) */
+        --text-60: #A3A09A;
+        --text-70: #BDBAB3;
+        --text-80: #D4D2CD;
+        --text-90: #E5E3DF;
+        --text-100: #F5F4F0;
+
+        /* Sub Text (Dark Mode) */
+        --subtext-60: #2A2825;
+        --subtext-70: #383632;
+        --subtext-80: #4A4742;
+        --subtext-90: #88857F;
+        --subtext-100: #A19E98;
+
+        /* Background (Dark Mode) */
+        --bg-main: #141311;
+        --bg-border: #24221F;
+
+        /* Card (Dark Mode) */
+        --card-bg: #1D1C1A;
+        --card-hover: #262421;
+        --card-border: #33302C;
+
+        /* Brand Colors (Dark Mode) */
+        --brand-200: #6F6F6E;
+        --brand-150: #4C4A45;
+        --brand-100: #2F2E2C;
+        --brand-50: #23211E;
+        --brand-10: #181714;
+
+        /* Secondary Colors (Dark Mode) */
+        --secondary-300: #765137;
+        --secondary-250: #8a6144;
+        --secondary-200: #81644d;
+        --secondary-150: #9a7d66;
+        --secondary-100: #b1a086;
+        --secondary-50: #c6b395;
+        --secondary-20: #463b32;
+        --secondary-10: #362E27;
+        --secondary-5: #231E19;
+    }
+
     button,
     a,
     input[type="button"],

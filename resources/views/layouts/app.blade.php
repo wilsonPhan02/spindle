@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="{{ (auth()->user()?->profile?->theme === 'dark') ? 'dark' : '' }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -55,11 +55,30 @@
         window.addEventListener('pageshow', (e) => {
             if (e.persisted) checkStaleData();
         });
+
+        // Bootstrap & SPA navigation dark mode sync to prevent FOUC during wire:navigate
+        const applyThemeSync = () => {
+            try {
+                const stored = localStorage.getItem('theme');
+                const dbTheme = "{{ auth()->user()?->profile?->theme ?? '' }}";
+                const isDark = stored ? stored === 'dark' : (dbTheme === 'dark' || window.matchMedia('(prefers-color-scheme: dark)').matches);
+                if (isDark) {
+                    document.documentElement.classList.add('dark');
+                    if (!stored && dbTheme === 'dark') localStorage.setItem('theme', 'dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                }
+            } catch (e) {}
+        };
+
+        applyThemeSync();
+        document.addEventListener('livewire:navigating', applyThemeSync);
+        document.addEventListener('livewire:navigated', applyThemeSync);
     </script>
 </head>
 <body
     data-load-time="{{ microtime(true) }}"
-    class="bg-bg-main antialiased min-h-screen flex overflow-hidden"
+    class="bg-bg-main text-text-100 antialiased min-h-screen flex overflow-hidden transition-colors duration-200"
     x-data="{
         currentUsername: '{{ Auth::user()->profile?->username ?? explode('@', Auth::user()->email)[0] }}',
         currentAvatarUrl: '{{ Auth::user()->profile?->avatar_url ? Storage::url(Auth::user()->profile->avatar_url) : '' }}'

@@ -251,7 +251,7 @@ new #[Layout('layouts.app')] class extends Component {
                                     class="flex flex-col gap-2 bg-card-bg border border-card-border p-4 rounded-lg group cursor-pointer hover:bg-card-hover hover:border-secondary-100 transition-all duration-200"
                                 >
                                     <div class="flex items-center gap-2 min-w-0">
-                                        <svg class="w-8 h-8 text-[#8C7558] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <svg class="w-8 h-8 text-secondary-250 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 3.5h7.5L19 8v12.5a1 1 0 01-1 1H7a1 1 0 01-1-1V4.5a1 1 0 011-1z" />
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 3.5V8h5" />
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6M9 16.5h6" />
@@ -290,7 +290,7 @@ new #[Layout('layouts.app')] class extends Component {
                                         @if($character->image_path)
                                             <img src="{{ Storage::url($character->image_path) }}" class="w-full h-full object-cover">
                                         @else
-                                            <x-icons.default-avatar class="w-full h-full text-[#A08866]" />
+                                            <x-icons.default-avatar class="w-full h-full text-secondary-100" />
                                         @endif
                                     </div>
                                     <div class="min-w-0 flex-1 gap-1 py-1">

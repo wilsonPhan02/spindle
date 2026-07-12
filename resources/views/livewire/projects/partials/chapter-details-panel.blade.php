@@ -140,7 +140,7 @@
                         class="relative w-full aspect-[16/8] rounded-xl overflow-hidden bg-brand-50 border border-brand-150 shadow-inner group shrink-0 flex items-center justify-center">
 
                         <!-- Progress Overlay -->
-                        <div x-show="isUploading" x-transition class="absolute inset-0 bg-[#F5EFE9]/80 backdrop-blur-md z-40 flex flex-col items-center justify-center">
+                        <div x-show="isUploading" x-transition class="absolute inset-0 bg-secondary-5/80 backdrop-blur-md z-40 flex flex-col items-center justify-center">
                             <svg class="animate-spin h-6 w-6 text-secondary-200 mb-1.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
                             <div class="text-secondary-200 font-semibold text-xs">{{ __('Uploading...') }} <span x-text="progress + '%'"></span></div>
                             
@@ -339,7 +339,7 @@
                             </button>
 
                             {{-- Full Width Compact Add Tag Input Box (when adding, takes full line so tags drop below) --}}
-                            <div x-show="addingTag" x-cloak class="w-full p-1.5 rounded-lg bg-secondary-100/50 border border-secondary-50/50 shadow-2xs flex flex-col gap-0.5 mb-1.5">
+                            <div x-show="addingTag" x-cloak class="w-full p-1.5 rounded-lg bg-secondary-10/50 border border-secondary-50/50 shadow-2xs flex flex-col gap-0.5 mb-1.5">
                                 <div class="flex items-center justify-between gap-1">
                                     <input type="text" x-ref="tagInput" x-model="tagVal"
                                            @input="if(tagVal.length > 20) tagVal = tagVal.substring(0, 20)"
@@ -357,7 +357,7 @@
 
                             @if($chapterCard->tags && $chapterCard->tags->isNotEmpty())
                                 @foreach($chapterCard->tags as $tag)
-                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-brand-150 text-[11.5px] text-app-body-small text-secondary-200 font-semibold border border-brand-200 max-w-[140px] shadow-2xs group"
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-brand-10 text-[11.5px] text-app-body-small text-secondary-200 font-semibold border border-secondary-100 max-w-[140px] shadow-2xs group"
                                           title="{{ $tag->name }}">
                                         <span class="truncate">{{ $tag->name }}</span>
                                         <button type="button" wire:click="removeTag({{ $tag->id }})" class="text-secondary-150 hover:text-secondary-200 opacity-60 group-hover:opacity-100 transition-opacity ml-0.5 cursor-pointer" title="{{ __('Remove tag') }}">&times;</button>

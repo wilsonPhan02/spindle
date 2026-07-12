@@ -7,6 +7,7 @@ new #[Layout('layouts.app')] class extends Component {
     public $user;
     public $profile;
     public string $language = 'en';
+    public string $theme = 'light';
 
     /**
      * Daftar bahasa yang tersedia.
@@ -33,6 +34,18 @@ new #[Layout('layouts.app')] class extends Component {
         $this->user     = Auth::user()->fresh();
         $this->profile  = $this->user->profile;
         $this->language = $this->profile->language ?? 'en';
+        $this->theme    = $this->profile->theme ?? 'light';
+    }
+
+    public function updateTheme(string $newTheme): void
+    {
+        if (! in_array($newTheme, ['light', 'dark'], true)) return;
+
+        if ($this->profile) {
+            $this->profile->update(['theme' => $newTheme]);
+        }
+
+        $this->theme = $newTheme;
     }
 
     public function saveLanguage(string $lang)
@@ -55,9 +68,9 @@ new #[Layout('layouts.app')] class extends Component {
 
     {{-- Header --}}
     <header class="flex justify-between items-center mb-8">
-        <a href="{{ route('dashboard') }}" wire:navigate class="flex items-center gap-3 text-[18px] text-[#7A7A7A] hover:text-[#8C7558] transition-colors">
+        <a href="{{ route('dashboard') }}" wire:navigate class="flex items-center gap-3 text-[18px] text-subtext-100 hover:text-secondary-250 transition-colors">
             <x-icons.chevron rotate="180" size="w-3.5 h-3.5" color="currentColor"/>
-            <span class="text-[#2C2C2C] font-semibold">{{ __('Settings') }}</span>
+            <span class="text-text-100 font-semibold">{{ __('Settings') }}</span>
         </a>
     </header>
 
@@ -112,7 +125,26 @@ new #[Layout('layouts.app')] class extends Component {
             </x-settings-items>
 
             {{-- Dark Mode --}}
-            <x-settings-items variant="toggle" label="{{ __('Dark Mode') }}">
+            <x-settings-items
+                variant="toggle"
+                label="{{ __('Dark Mode') }}"
+                :isOn="$theme === 'dark'"
+                x-data="{
+                    isOn: false,
+                    init() {
+                        this.isOn = ($store.theme ? $store.theme.isDark : document.documentElement.classList.contains('dark'));
+                    }
+                }"
+                @click="
+                    () => {
+                        try {
+                            const nextState = $store.theme ? $store.theme.toggle() : !isOn;
+                            isOn = nextState;
+                            $wire.updateTheme(nextState ? 'dark' : 'light');
+                        } catch (e) {}
+                    }
+                "
+            >
                 <x-slot:icon>
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
