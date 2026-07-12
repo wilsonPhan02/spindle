@@ -1,7 +1,7 @@
 @props(['items'])
 
 <header class="flex justify-between items-center mb-8 lg:mb-10 w-full">
-    <div class="flex items-center gap-2 lg:gap-3 text-[16px] lg:text-[18px] text-text-70 flex-1 min-w-0 pr-4">
+    <div class="flex items-center gap-2 lg:gap-3 text-app-subtitle-1 lg:text-[18px] text-text-70 flex-1 min-w-0 pr-4">
         @foreach($items as $index => $item)
             @php
                 $isTruncated = isset($item['truncate']) && $item['truncate'];
