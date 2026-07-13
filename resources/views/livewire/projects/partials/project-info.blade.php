@@ -294,7 +294,7 @@
                             if ($titleLen >= 25) { $dtlTitleSize = 'text-[22px]'; } elseif ($titleLen >= 15) { $dtlTitleSize = 'text-[26px]'; }
                         @endphp
 
-                        <div x-data="{ editingTitle: false, hoverTitle: false, localTitle: @entangle('title') }" @mouseover="hoverTitle = true" @mouseleave="hoverTitle = false" x-on:livewire:navigated.window="localTitle = $wire.title" class="flex items-center gap-3 group">
+                        <div x-data="{ editingTitle: false, hoverTitle: false, localTitle: @entangle('title') }" @mouseover="hoverTitle = true" @mouseleave="hoverTitle = false" x-on:livewire:navigated.window="localTitle = $wire.title" class="flex items-center gap-3 group relative">
                             <h1
                                 x-show="!editingTitle"
                                 @dblclick="editingTitle = true; setTimeout(() => $refs.titleInput.focus(), 50)"
@@ -306,15 +306,18 @@
                                 <x-icons.rename class="w-5 h-5" />
                             </button>
 
-                            <input
-                                x-show="editingTitle"
-                                x-model="localTitle"
-                                x-ref="titleInput"
-                                @click.outside="if(editingTitle) { $wire.saveTitle(); editingTitle = false; }"
-                                @keydown.enter="$wire.saveTitle(); editingTitle = false"
-                                @keydown.escape="editingTitle = false; localTitle = '{{ addslashes($project->title) }}'"
-                                class="{{ $dtlTitleSize }} text-app-title-1 text-text-80 bg-transparent border-b-2 border-secondary-100 outline-none w-full focus:border-secondary-200 focus:ring-0 px-0 py-1"
-                            />
+                            <div class="relative w-full" x-show="editingTitle">
+                                <input
+                                    x-model="localTitle"
+                                    x-ref="titleInput"
+                                    maxlength="100"
+                                    @click.outside="if(editingTitle) { $wire.saveTitle(); editingTitle = false; }"
+                                    @keydown.enter="$wire.saveTitle(); editingTitle = false"
+                                    @keydown.escape="editingTitle = false; localTitle = '{{ addslashes($project->title) }}'"
+                                    class="{{ $dtlTitleSize }} text-app-title-1 text-text-80 bg-transparent border-b-2 border-secondary-100 outline-none w-full focus:border-secondary-200 focus:ring-0 px-0 py-1 pr-14"
+                                />
+                                <span class="absolute right-0 bottom-2 text-xs text-subtext-80 font-medium" x-text="(localTitle ? localTitle.length : 0) + '/100'"></span>
+                            </div>
                         </div>
                         <p class="text-app-body-large text-subtext-100 mt-2 truncate">{{ __('from ') }}<span class="text-text-80" title="{{ $project->section->title ?? __('Uncategorized') }}">{{ \Illuminate\Support\Str::limit($project->section->title ?? __('Uncategorized'), 30) }}</span></p>
                     </div>
