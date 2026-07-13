@@ -67,7 +67,11 @@ new #[Layout('layouts.app')] class extends Component {
     }
 
     public function saveTitle() {
-        $this->title = trim($this->title) ?: 'Untitled Project';
+        $this->title = trim($this->title);
+        if (strlen($this->title) > 100) {
+            $this->title = substr($this->title, 0, 100);
+        }
+        $this->title = $this->title ?: 'Untitled Project';
         $this->project->update(['title' => $this->title]);
         $this->dispatch('project-updated');
     }
