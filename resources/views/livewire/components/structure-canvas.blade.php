@@ -228,15 +228,11 @@ new class extends Component {
                         <div class="w-full flex justify-center sortable-item cursor-grab active:cursor-grabbing"
                              data-id="{{ $chapter->chapter_card_id }}"
                              wire:key="chapter-{{ $chapter->chapter_card_id }}">
-                             
-                            <div class="w-full pointer-events-none">
-                                <div class="pointer-events-auto w-full">
-                                    <x-chapter-card 
-                                        :chapter="$chapter" 
-                                        :sections="$this->currentTemplate->sections" 
-                                    />
-                                </div>
-                            </div>
+
+                            <x-chapter-card
+                                :chapter="$chapter"
+                                :sections="$this->currentTemplate->sections"
+                            />
                         </div>
                     @empty
                         <div class="col-span-full w-full min-h-40 flex items-center justify-center border-2 border-dashed border-brand-100 rounded-lg text-text-60 bg-transparent">
@@ -272,27 +268,4 @@ new class extends Component {
     </x-confirm-dialog>
 </div>
 
-<script>
-    document.addEventListener('alpine:init', () => {
-        Alpine.data('sortableList', ($wire) => ({
-            init() {
-                new Sortable(this.$refs.list, {
-                    animation: 200,
-                    ghostClass: 'opacity-50',
-                    dragClass: 'cursor-grabbing',
-                    chosenClass: 'cursor-grabbing',
-                    draggable: '.sortable-item',
-                    onEnd: (evt) => {
-                        if (evt.oldIndex === evt.newIndex) return;
 
-                        const items = Array.from(this.$refs.list.querySelectorAll('.sortable-item'));
-                        
-                        const newOrderIds = items.map(item => item.getAttribute('data-id'));
-                        
-                        $wire.updateChapterOrder(newOrderIds);
-                    }
-                });
-            }
-        }));
-    });
-</script>

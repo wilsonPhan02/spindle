@@ -3,6 +3,7 @@ import './whiteboard';
 import './text-editor';
 import './landing';
 import './theme';
+import './structure-canvas';
 
 // ---- Komponen carousel (From Writers To Writers) ----
 document.addEventListener('alpine:init', () => {

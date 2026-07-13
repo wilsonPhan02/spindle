@@ -585,6 +585,19 @@
 @keyframes windBlow { 0% { transform: translateX(-100%); opacity: 0; } 50% { opacity: 1; } 100% { transform: translateX(300%); opacity: 0; } } .animate-wind-blow { animation: windBlow linear infinite; }
 @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
 
+@keyframes progressFill {
+    0% { width: 0%; }
+    15% { width: 35%; }
+    40% { width: 68%; }
+    75% { width: 88%; }
+    100% { width: 98%; }
+}
+.animate-progress-fill {
+    animation: progressFill 2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    background-color: var(--color-secondary-250);
+    box-shadow: 0 0 16px 3px var(--color-secondary-150), 0 0 8px 2px var(--color-secondary-200);
+}
+
 /* --- Extracted from structure.blade.php --- */
 /* .bg-dot-pattern {
     background-color: var(--color-brand-10); 

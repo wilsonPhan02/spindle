@@ -70,6 +70,7 @@
         #{{ $editorId }} ol { list-style: decimal; padding-left: 1.5em; }
         #{{ $editorId }} hr { border: none; border-top: 1px solid var(--color-brand-200); margin: 1em 0; }
         #{{ $editorId }} blockquote { border-left: 3px solid var(--color-brand-200); padding-left: 1em; color: var(--color-text-70); }
+        #{{ $editorId }} .todo-item { margin-top: 0.25em; margin-bottom: 0.25em; line-height: 1.5; }
 
         .toolbar-scroll::-webkit-scrollbar { display: none; }
         .toolbar-scroll { -ms-overflow-style: none; scrollbar-width: none; cursor: default; }
@@ -164,14 +165,14 @@
                     x-transition:enter-end="opacity-100 scale-100"
                     @click.outside="activeDropdown = null"
                     x-bind:style="`position: fixed; top: ${pos.top}px; left: ${pos.left}px; z-index: 9999;`"
-                    class="w-40 bg-white border border-brand-200 rounded-lg py-1"
+                    class="w-40 bg-brand-10 border border-brand-200 rounded-lg py-1"
                     style="display: none;"
                 >
-                    <button type="button" @mousedown.prevent="saveSelection()" @click="setFormat('p', '{{ __('Normal Text') }}'); activeDropdown = null" class="format-option w-full text-left px-3 py-1.5 text-app-body-medium text-text-90 hover:bg-brand-50" x-bind:class="formatValue === 'p' ? 'bg-brand-150 font-semibold' : ''" title="{{ __('Normal Text') }}">{{ __('Normal Text') }}</button>
-                    <button type="button" @mousedown.prevent="saveSelection()" @click="setFormat('h1', '{{ __('Heading 1') }}'); activeDropdown = null" class="format-option w-full text-left px-3 py-1.5 text-app-subtitle-1 font-bold text-text-90 hover:bg-brand-50" x-bind:class="formatValue === 'h1' ? 'bg-brand-150' : ''" title="{{ __('Heading 1 (# + Space)') }}">{{ __('Heading 1') }}</button>
-                    <button type="button" @mousedown.prevent="saveSelection()" @click="setFormat('h2', '{{ __('Heading 2') }}'); activeDropdown = null" class="format-option w-full text-left px-3 py-1.5 text-app-subfeature font-bold text-text-90 hover:bg-brand-50" x-bind:class="formatValue === 'h2' ? 'bg-brand-150' : ''" title="{{ __('Heading 2 (## + Space)') }}">{{ __('Heading 2') }}</button>
-                    <button type="button" @mousedown.prevent="saveSelection()" @click="setFormat('h3', '{{ __('Heading 3') }}'); activeDropdown = null" class="format-option w-full text-left px-3 py-1.5 text-app-body-medium font-bold text-text-90 hover:bg-brand-50" x-bind:class="formatValue === 'h3' ? 'bg-brand-150' : ''" title="{{ __('Heading 3 (### + Space)') }}">{{ __('Heading 3') }}</button>
-                    <button type="button" @mousedown.prevent="saveSelection()" @click="setFormat('blockquote', '{{ __('Quote') }}'); activeDropdown = null" class="format-option w-full text-left px-3 py-1.5 text-app-body-medium italic text-text-70 hover:bg-brand-50" x-bind:class="formatValue === 'blockquote' ? 'bg-brand-150' : ''" title="{{ __('Quote (> + Space)') }}">{{ __('Quote') }}</button>
+                    <button type="button" @mousedown.prevent @click="setFormat('p', '{{ __('Normal Text') }}'); activeDropdown = null" class="format-option w-full text-left px-3 py-1.5 text-app-body-medium text-text-90 hover:bg-brand-50" x-bind:class="formatValue === 'p' ? 'bg-brand-150 font-semibold' : ''" title="{{ __('Normal Text') }}">{{ __('Normal Text') }}</button>
+                    <button type="button" @mousedown.prevent @click="setFormat('h1', '{{ __('Heading 1') }}'); activeDropdown = null" class="format-option w-full text-left px-3 py-1.5 text-app-subtitle-1 font-bold text-text-90 hover:bg-brand-50" x-bind:class="formatValue === 'h1' ? 'bg-brand-150' : ''" title="{{ __('Heading 1 (# + Space)') }}">{{ __('Heading 1') }}</button>
+                    <button type="button" @mousedown.prevent @click="setFormat('h2', '{{ __('Heading 2') }}'); activeDropdown = null" class="format-option w-full text-left px-3 py-1.5 text-app-subfeature font-bold text-text-90 hover:bg-brand-50" x-bind:class="formatValue === 'h2' ? 'bg-brand-150' : ''" title="{{ __('Heading 2 (## + Space)') }}">{{ __('Heading 2') }}</button>
+                    <button type="button" @mousedown.prevent @click="setFormat('h3', '{{ __('Heading 3') }}'); activeDropdown = null" class="format-option w-full text-left px-3 py-1.5 text-app-body-medium font-bold text-text-90 hover:bg-brand-50" x-bind:class="formatValue === 'h3' ? 'bg-brand-150' : ''" title="{{ __('Heading 3 (### + Space)') }}">{{ __('Heading 3') }}</button>
+                    <button type="button" @mousedown.prevent @click="setFormat('blockquote', '{{ __('Quote') }}'); activeDropdown = null" class="format-option w-full text-left px-3 py-1.5 text-app-body-medium italic text-text-70 hover:bg-brand-50" x-bind:class="formatValue === 'blockquote' ? 'bg-brand-150' : ''" title="{{ __('Quote (> + Space)') }}">{{ __('Quote') }}</button>
                 </div>
             </template>
         </div>

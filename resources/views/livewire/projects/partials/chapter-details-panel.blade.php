@@ -151,8 +151,6 @@
 
                         @if($chapterCard->cover_image_path)
                             <img src="{{ Storage::url($chapterCard->cover_image_path) }}" class="w-full h-full object-cover transition-transform duration-300" alt="Chapter Cover">
-                        @elseif($project->cover_image_path)
-                            <img src="{{ Storage::url($project->cover_image_path) }}" class="w-full h-full object-cover transition-transform duration-300" alt="Project Cover">
                         @else
                             <div class="flex flex-col items-center justify-center gap-1 p-4 text-center">
                                 <x-icons.no-structure class="w-8 h-8 text-secondary-150 opacity-60" />
@@ -164,11 +162,11 @@
                         <div x-show="hoverCover && !showCropper" x-transition class="absolute bottom-2.5 left-2.5 z-30 flex items-center gap-1.5">
                             <label class="flex items-center gap-1.5 px-2.5 py-1.5 bg-black/75 backdrop-blur-md border border-white/15 hover:bg-black/90 text-white text-app-caption text-[10px] font-semibold rounded-md shadow-lg cursor-pointer transition-all active:scale-95">
                                 <x-icons.upload class="w-3.5 h-3.5 text-white" />
-                                <span>{{ $chapterCard->cover_image_path || $project->cover_image_path ? __('Change Cover') : __('Upload Cover') }}</span>
+                                <span>{{ $chapterCard->cover_image_path ? __('Change Cover') : __('Upload Cover') }}</span>
                                 <input type="file" x-ref="coverInput" @change="onFileChange" accept="image/*" class="hidden">
                             </label>
 
-                            @if($chapterCard->cover_image_path || $project->cover_image_path)
+                            @if($chapterCard->cover_image_path)
                                 <button type="button" wire:click="detachCoverImage" class="flex items-center gap-1.5 px-2.5 py-1.5 bg-black/75 backdrop-blur-md border border-danger-100/40 hover:bg-danger-100/20 text-danger-100 text-app-caption text-[10px] font-semibold rounded-md shadow-lg cursor-pointer transition-all active:scale-95" title="{{ __('Detach Cover') }}">
                                     <x-icons.delete class="w-3.5 h-3.5 text-danger-100" />
                                     <span>{{ __('Remove') }}</span>
