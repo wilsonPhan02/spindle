@@ -111,8 +111,8 @@ new #[Layout('layouts.app')] class extends Component {
         $this->validate([
             'cover_image' => 'image|max:5120'
         ], [
-            'cover_image.max' => 'The selected image is too large. The maximum allowed file size is 5MB.',
-            'cover_image.image' => 'The selected file type is not supported. Please upload an image.',
+            'cover_image.max' => __('The selected image is too large. The maximum allowed file size is 5MB.'),
+            'cover_image.image' => __('The selected file type is not supported. Please upload an image.'),
         ]);
         
         $path = $this->replaceImage($this->cover_image, $this->project->cover_image_path, 'covers');
@@ -175,8 +175,8 @@ new #[Layout('layouts.app')] class extends Component {
         $this->validate([
             'icon_image' => 'nullable|file|mimes:jpeg,png,jpg,svg,webp|max:2048',
         ], [
-            'icon_image.max' => 'The selected image is too large. The maximum allowed file size is 2MB.',
-            'icon_image.mimes' => 'The selected file type is not supported. Please upload a JPG, PNG, SVG, or WEBP.',
+            'icon_image.max' => __('The selected image is too large. The maximum allowed file size is 2MB.'),
+            'icon_image.mimes' => __('The selected file type is not supported. Please upload a JPG, PNG, SVG, or WEBP.'),
         ]);
 
         if ($this->icon_image) {

@@ -242,7 +242,7 @@ new #[Layout('layouts.app')] class extends Component {
                         ->where('nick_name', $this->nickName)
                         ->where('character_id', '!=', $this->character->character_id)
                         ->exists();
-                    $this->nickNameError = $isDuplicate ? 'Nickname already taken.' : '';
+                    $this->nickNameError = $isDuplicate ? __('Nickname already taken.') : '';
                 }
             }
 
@@ -340,7 +340,7 @@ new #[Layout('layouts.app')] class extends Component {
                     checkDuplicate() {
                         const typed = this.nickNameDraft.trim().toLowerCase();
                         if (this.existingNicknames.includes(typed) && typed !== this.nickNameDisplay.toLowerCase()) {
-                            this.nickNameError = 'Nickname is already taken';
+                            this.nickNameError = '{{ __('Nickname already taken.') }}';
                         } else {
                             this.nickNameError = '';
                         }
@@ -406,7 +406,7 @@ new #[Layout('layouts.app')] class extends Component {
                     <span x-show="!editingNickName" class="text-app-desc-feature text-danger-100">{{ $nickNameError }}</span>
                 @endif
                 <div class="flex items-center gap-2 text-app-body-medium text-subtext-90">
-                    <span>Full Name :</span>
+                    <span>{{ __('Full Name') }} :</span>
                     <input type="text" wire:model="fullName"
                         x-init="$el.addEventListener('input', (e) => stripLeadingSpace(e, 'fullNameCount'), true)"
                         @focus="editingFullName = true; fullNameCount = $event.target.value.length"
@@ -435,9 +435,9 @@ new #[Layout('layouts.app')] class extends Component {
     <x-confirm-dialog
         eventName="open-delete-character-confirm"
         title="{{ __('Delete Character?') }}"
-        description='"{{ $nickName }}" and every relationship involving them will be permanently removed.'
-        confirmText="Confirm Delete"
-        cancelText="Cancel"
+        description='"{{ $nickName }}" {{ __('and every relationship involving them will be permanently removed.') }}'
+        confirmText="{{ __('Confirm Delete') }}"
+        cancelText="{{ __('Cancel') }}"
         submitAction="deleteCharacter"
     >
         <x-slot:icon>

@@ -32,13 +32,13 @@ new #[Layout('layouts.guest')] #[Title('Sign Up - Spindle')] class extends Compo
             'password_confirmation' => ['required', 'same:password'],
             'terms' => ['accepted'],
         ], [
-            'terms.accepted' => 'You must agree to the terms and conditions.',
-            'password_confirmation.same' => 'The password confirmation does not match.',
-            'password.min' => 'Password must be at least 8 characters and contain at least one uppercase character, one lowercase character, one number, and one special character.',
-            'password.letters' => 'Password must be at least 8 characters and contain at least one uppercase character, one lowercase character, one number, and one special character.',
-            'password.mixed' => 'Password must be at least 8 characters and contain at least one uppercase character, one lowercase character, one number, and one special character.',
-            'password.numbers' => 'Password must be at least 8 characters and contain at least one uppercase character, one lowercase character, one number, and one special character.',
-            'password.symbols' => 'Password must be at least 8 characters and contain at least one uppercase character, one lowercase character, one number, and one special character.',
+            'terms.accepted' => __('You must agree to the terms and conditions.'),
+            'password_confirmation.same' => __('The password confirmation does not match.'),
+            'password.min' => __('Password must be at least 8 characters and contain at least one uppercase character, one lowercase character, one number, and one special character.'),
+            'password.letters' => __('Password must be at least 8 characters and contain at least one uppercase character, one lowercase character, one number, and one special character.'),
+            'password.mixed' => __('Password must be at least 8 characters and contain at least one uppercase character, one lowercase character, one number, and one special character.'),
+            'password.numbers' => __('Password must be at least 8 characters and contain at least one uppercase character, one lowercase character, one number, and one special character.'),
+            'password.symbols' => __('Password must be at least 8 characters and contain at least one uppercase character, one lowercase character, one number, and one special character.'),
         ]);
 
         // 2. Simpan User (profile dibuat otomatis via User::booted())

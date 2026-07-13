@@ -750,7 +750,7 @@ new #[Layout('layouts.app')] class extends Component {
                             />
                         @else
                             <div class="flex-1 flex items-center justify-center text-text-60 text-app-body-medium">
-                                Select a note to start editing
+                                {{ __('Select a note to start editing') }}
                             </div>
                         @endif
 
@@ -783,7 +783,7 @@ new #[Layout('layouts.app')] class extends Component {
                         @click="closeMenu(); $wire.addSubTab(menuNoteId)"
                     >
                         <x-icons.add class="w-4 h-4 shrink-0 text-text-80" />
-                        Add Sub-Tab
+                        {{ __('Add Sub-Tab') }}
                     </button>
 
                     <button
@@ -823,9 +823,9 @@ new #[Layout('layouts.app')] class extends Component {
     <x-confirm-dialog
         eventName="open-delete-note-dialog"
         title="{{ __('Delete Note?') }}"
-        description="Are you sure you want to permanently delete this note? All sub-tabs will also be deleted."
-        confirmText="Yes, Delete"
-        cancelText="Cancel"
+        description="{{ __('Are you sure you want to permanently delete this note? All sub-tabs will also be deleted.') }}"
+        confirmText="{{ __('Yes, Delete') }}"
+        cancelText="{{ __('Cancel') }}"
         submitAction="deleteNote"
         btnColor="bg-danger-100 hover:bg-danger-100/90 text-white"
     >

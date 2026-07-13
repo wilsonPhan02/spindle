@@ -231,7 +231,7 @@ new class extends Component {
             const name = this.editGroupName.trim();
             if (name === '' || name === group.name) { this.editingGroupId = null; this.groupNameError = ''; return; }
             if (this.detailGroups.some(g => g.id !== group.id && g.name.trim().toLowerCase() === name.toLowerCase())) {
-                this.groupNameError = 'Group name already exists.';
+                this.groupNameError = '{{ __('Group name already exists.') }}';
                 return;
             }
             this.groupNameError = '';
@@ -249,7 +249,7 @@ new class extends Component {
             if (name === '' || name === field.name) { this.editingFieldId = null; this.fieldNameError = ''; return; }
             const group = this.detailGroups.find(g => g.fields.some(f => f.id === field.id));
             if (group && group.fields.some(f => f.id !== field.id && f.name.trim().toLowerCase() === name.toLowerCase())) {
-                this.fieldNameError = 'Field name already exists in this group.';
+                this.fieldNameError = '{{ __('Field name already exists in this group.') }}';
                 return;
             }
             this.fieldNameError = '';
@@ -266,7 +266,7 @@ new class extends Component {
             const group = this.detailGroups.find(g => g.id === groupId);
             if (!group) return;
             if (group.fields.some(f => f.name.trim().toLowerCase() === name.toLowerCase())) {
-                this.fieldNameError = 'Field name already exists in this group.';
+                this.fieldNameError = '{{ __('Field name already exists in this group.') }}';
                 return;
             }
             this.fieldNameError = '';
@@ -291,7 +291,7 @@ new class extends Component {
             const name = this.newGroupName.trim();
             if (name === '') return;
             if (this.detailGroups.some(g => g.name.trim().toLowerCase() === name.toLowerCase())) {
-                this.groupNameError = 'Group name already exists.';
+                this.groupNameError = '{{ __('Group name already exists.') }}';
                 return;
             }
             this.groupNameError = '';
@@ -441,7 +441,7 @@ new class extends Component {
 
         <div class="flex justify-end">
             <button @click="showNewGroupInput = true" type="button" class="cursor-pointer px-8 py-4 rounded-lg bg-secondary-100 text-bg-main text-app-feature hover:bg-secondary-150 transition-colors">
-                + Add Group
+                {{ __('+ Add Group') }}
             </button>
         </div>
 
@@ -462,7 +462,7 @@ new class extends Component {
 
                         <div class="flex flex-col w-full gap-5">
                             <h3 class="text-app-heading-1 text-text-80">{{ __('Delete Detail Group?') }}</h3>
-                            <p class="text-app-subfeature text-text-80 px-3">This group and every field & value inside it will be permanently removed for all characters.</p>
+                            <p class="text-app-subfeature text-text-80 px-3">{{ __('This group and every field & value inside it will be permanently removed for all characters.') }}</p>
                         </div>
 
                         <div class="flex gap-4 w-full justify-center">

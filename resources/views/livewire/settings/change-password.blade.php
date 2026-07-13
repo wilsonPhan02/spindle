@@ -25,16 +25,16 @@ new class extends Component {
             ],
             'new_password_confirmation' => ['required', 'same:new_password']
         ], [
-            'current_password.required' => 'Please enter your current password.',
-            'new_password.required' => 'Please enter a new password.',
-            'new_password.min' => 'Password must be at least 8 characters and contain at least one uppercase character, one lowercase character, one number, and one special character.',
-            'new_password_confirmation.required' => 'Please confirm your new password.',
-            'new_password_confirmation.same' => 'The password confirmation does not match.',
+            'current_password.required' => __('Please enter your current password.'),
+            'new_password.required' => __('Please enter a new password.'),
+            'new_password.min' => __('Password must be at least 8 characters and contain at least one uppercase character, one lowercase character, one number, and one special character.'),
+            'new_password_confirmation.required' => __('Please confirm your new password.'),
+            'new_password_confirmation.same' => __('The password confirmation does not match.'),
         ]);
 
         if (!Hash::check($this->current_password, Auth::user()->password)) {
             throw ValidationException::withMessages([
-                'current_password' => 'Invalid current password.',
+                'current_password' => __('Invalid current password.'),
             ]);
         }
 

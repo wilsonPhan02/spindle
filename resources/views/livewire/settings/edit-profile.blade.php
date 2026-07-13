@@ -47,8 +47,8 @@ new class extends Component {
             'gender' => 'nullable|in:male,female',
             'new_photo' => 'nullable|image|max:5120',
         ], [
-            'new_photo.max' => 'The selected image is too large. The maximum allowed file size is 5MB.',
-            'new_photo.image' => 'The selected file type is not supported. Please upload an image.',
+            'new_photo.max' => __('The selected image is too large. The maximum allowed file size is 5MB.'),
+            'new_photo.image' => __('The selected file type is not supported. Please upload an image.'),
         ]);
 
         $user = auth()->user();

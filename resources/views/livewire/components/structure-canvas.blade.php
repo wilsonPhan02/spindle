@@ -88,13 +88,13 @@ new class extends Component {
             'project_id' => $this->project->project_id,
             'structure_section_id' => $sectionId,
             'title' => $chapterTitle,
-            'status' => 'In Progress',
+            'status' => __('In Progress'),
             'order_index' => $newOrder
         ]);
 
         \App\Models\Manuscript::create([
             'chapter_card_id' => $chapter->chapter_card_id,
-            'title' => 'Draft 1',
+            'title' => __('Draft') . ' 1',
             'content' => '',
             'word_count' => 0
         ]);
@@ -257,9 +257,9 @@ new class extends Component {
     <x-confirm-dialog
         eventName="open-delete-dialog"
         title="{{ __('Delete Chapter') }}"
-        description="Are you sure you want to delete this chapter? This action will shift the order of subsequent chapters and cannot be undone."
-        confirmText="Yes, Delete"
-        cancelText="Cancel"
+        description="{{ __('Are you sure you want to delete this chapter? This action will shift the order of subsequent chapters and cannot be undone.') }}"
+        confirmText="{{ __('Yes, Delete') }}"
+        cancelText="{{ __('Cancel') }}"
         submitAction="deleteChapter"
     >
         <x-slot:icon>
