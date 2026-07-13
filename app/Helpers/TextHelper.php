@@ -40,6 +40,10 @@ class TextHelper
             return '';
         }
 
+        if (preg_match('/^Draft\s+(\d+)$/i', $name, $matches)) {
+            return __('Draft') . ' ' . $matches[1];
+        }
+
         foreach (self::getDefaultNames() as $default) {
             if ($name === $default) {
                 return __($default);
@@ -55,6 +59,11 @@ class TextHelper
     {
         if (!$name) {
             return $name;
+        }
+
+        $localizedDraft = __('Draft');
+        if (preg_match('/^' . preg_quote($localizedDraft, '/') . '\s+(\d+)$/i', $name, $matches)) {
+            return 'Draft ' . $matches[1];
         }
 
         foreach (self::getDefaultNames() as $default) {

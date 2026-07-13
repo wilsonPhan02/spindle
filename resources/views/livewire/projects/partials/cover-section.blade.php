@@ -69,7 +69,7 @@
                                 const file = $event.target.files[0];
                                 if (file) {
                                     if (file.size > 5 * 1024 * 1024) {
-                                        clientError = 'The selected image is too large. The maximum allowed file size is 5MB.';
+                                        clientError = '{{ __('The selected image is too large. The maximum allowed file size is 5MB.') }}';
                                         $event.target.value = '';
                                     } else {
                                         clientError = null;

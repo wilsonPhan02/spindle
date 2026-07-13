@@ -82,7 +82,7 @@ new #[Layout('layouts.app')] class extends Component {
             ->toArray();
 
         $nextNum = count($existingTitles) + 1;
-        while (in_array(strtolower("draft {$nextNum}"), $existingTitles)) {
+        while (in_array("draft {$nextNum}", $existingTitles)) {
             $nextNum++;
         }
 

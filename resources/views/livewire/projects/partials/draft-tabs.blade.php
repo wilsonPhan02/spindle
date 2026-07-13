@@ -41,7 +41,7 @@
                                 @dblclick.stop="startRenameDraft('{{ $draft->manuscript_id }}', $el.innerText.trim())"
                                 class="truncate max-w-[120px]"
                                 title="{{ __('Double-click to rename') }}"
-                            >{{ !empty(trim($draft->title ?? '')) ? $draft->title : __('Draft') }}</span>
+                            >{{ !empty(trim($draft->title ?? '')) ? \App\Helpers\TextHelper::localizeDefaultName($draft->title) : __('Draft') }}</span>
 
                             <input
                                 x-show="renamingDraftId === '{{ $draft->manuscript_id }}'"

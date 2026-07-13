@@ -96,7 +96,7 @@ new class extends Component {
         $newIndex = count($this->customSections) + 1;
         $this->customSections[] = [
             'id' => null, // null berarti ini section baru
-            'title' => 'Section ' . $newIndex, 
+            'title' => __('Section') . ' ' . $newIndex, 
             'goal' => ''
         ];
     }

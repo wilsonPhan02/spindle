@@ -224,7 +224,7 @@ new class extends Component {
             <div x-show="!confirmingDeleteRel && !confirmingDeleteType" class="flex flex-col gap-6">
 
                 <div class="flex flex-col gap-1 text-center">
-                    <h3 class="text-app-title-1 text-[28px] text-text-80" x-text="editingRelationId ? 'Edit Relationship' : 'Choose Relationship Type'"></h3>
+                    <h3 class="text-app-title-1 text-[28px] text-text-80" x-text="editingRelationId ? '{{ __('Edit Relationship') }}' : '{{ __('Choose Relationship Type') }}'"></h3>
                     <div x-show="charFromName && charToName" style="display:none;" 
                         class="flex flex-row items-center justify-center gap-3">
                         
@@ -363,7 +363,7 @@ new class extends Component {
 
                 <div class="flex flex-col w-full gap-5">
                     <h3 class="text-app-heading-1 text-text-80">{{ __('Delete Relationship Type?') }}</h3>
-                    <p class="text-app-subfeature text-text-80 px-3">"<span x-text="types.find(t => t.id === pendingDeleteTypeId)?.name"></span>" and every relationship using it will be permanently removed.</p>
+                    <p class="text-app-subfeature text-text-80 px-3">"<span x-text="types.find(t => t.id === pendingDeleteTypeId)?.name"></span>" {{ __('and every relationship using it will be permanently removed.') }}</p>
                 </div>
 
                 <div class="flex gap-4 w-full justify-center">

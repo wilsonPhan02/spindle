@@ -78,7 +78,7 @@
                                 if (!file) return;
                                 
                                 if (file.size > 5 * 1024 * 1024) {
-                                    this.clientError = 'The selected image is too large. The maximum allowed file size is 5MB.';
+                                    this.clientError = '{{ __('The selected image is too large. The maximum allowed file size is 5MB.') }}';
                                     if(this.$refs.coverInput) this.$refs.coverInput.value = '';
                                     return;
                                 }

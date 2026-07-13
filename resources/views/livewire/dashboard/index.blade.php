@@ -327,9 +327,9 @@ new class extends Component {
     <x-confirm-dialog
         eventName="open-archive-section-dialog"
         title="{{ __('Archive this Section?') }}"
-        description="Are you sure you want to archive this section? You can restore it from the Archive page."
-        confirmText="Yes, Archive"
-        cancelText="Cancel"
+        description="{{ __('Are you sure you want to archive this section? You can restore it from the Archive page.') }}"
+        confirmText="{{ __('Yes, Archive') }}"
+        cancelText="{{ __('Cancel') }}"
         submitAction="archiveSection"
         iconColor="text-warning-100"
         iconBg="bg-warning-100/10"
