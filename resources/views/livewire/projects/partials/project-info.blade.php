@@ -382,9 +382,10 @@
                                         placeholder="{{ __('Category...') }}" 
                                         class="w-28 text-app-body-small bg-transparent border-b border-secondary-100 outline-none px-1 py-0 text-text-70 focus:border-secondary-200"/>
                                 
-                                <button @mousedown.prevent="addingCat = false; $wire.addCategory()" 
+                                <button @mousedown.prevent="if(addCount > 0) { addingCat = false; $wire.addCategory(); } else { addingCat = false; $wire.set('newCategoryName', ''); }" 
                                         class="text-secondary-150 hover:text-secondary-200 transition-colors shrink-0">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                                    <svg x-show="addCount === 0" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                                    <svg x-show="addCount > 0" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
                                 </button>
 
                             <span class="absolute -bottom-3.5 right-1 text-[9px] text-subtext-90 font-medium" x-text="addCount + '/20'"></span>
