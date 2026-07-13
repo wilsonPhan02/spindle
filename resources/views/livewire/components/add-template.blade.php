@@ -514,7 +514,7 @@ new class extends Component {
                                 <div class="w-full mb-12 px-3">
                                     <hr class="mb-4 border-text-60 border-t-1">
                                     @if ($this->selectedTemplate->description)
-                                        <p class="text-web-body-small text-text-70 leading-relaxed whitespace-pre-wrap">{{ $this->selectedTemplate->description }}</p>
+                                        <p class="text-web-body-small text-text-70 leading-relaxed whitespace-pre-wrap">{{ __($this->selectedTemplate->description) }}</p>
                                     @else
                                         <p class="text-center text-web-body-small text-text-70 leading-relaxed whitespace-pre-wrap">{{ __('No description for this template') }}</p>
                                     @endif
@@ -530,7 +530,7 @@ new class extends Component {
                                             </h3>
                                             @if ($section->goal)
                                                 <div class="prose prose-stone prose-p:text-text-70 prose-li:text-text-70 prose-strong:text-text-80 max-w-none text-web-body-small leading-relaxed">
-                                                    {!! Str::markdown($section->goal) !!}
+                                                    {!! Str::markdown(__($section->goal)) !!}
                                                 </div>
                                             @else
                                                 <p class=" text-text-60 italic text-app-body-small">{{ __('No details for this section yet.') }}</p>
