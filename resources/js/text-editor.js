@@ -88,7 +88,7 @@ document.addEventListener('alpine:init', () => {
                 if (e.key === ' ' || e.key === 'Spacebar' || e.code === 'Space' || e.key === 'Unidentified') {
                     this.handleMarkdownShortcuts();
                 }
-                if (e.key !== 'Enter' && e.key !== 'Tab') {
+                if (e.key !== 'Tab') {
                     this.refreshToolbarState();
                 }
                 if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Backspace', 'Delete', 'Enter'].includes(e.key)) {
@@ -195,7 +195,120 @@ document.addEventListener('alpine:init', () => {
                 }
             }
 
+            if (cmd === 'insertUnorderedList' || cmd === 'insertOrderedList') {
+                this.toggleCustomList(cmd === 'insertUnorderedList' ? 'ul' : 'ol');
+                return;
+            }
+
             document.execCommand(cmd, false, val);
+            this.refreshToolbarState();
+            this.scheduleSave();
+        },
+
+        toggleCustomList(listType) {
+            const editorEl = document.getElementById(this.editorId);
+            if (!editorEl) return;
+            const sel = window.getSelection();
+            if (!sel || !sel.anchorNode) return;
+
+            let node = sel.anchorNode;
+            if (node.nodeType === 3) node = node.parentElement;
+
+            const existingLi = node.closest('li');
+            if (existingLi && editorEl.contains(existingLi)) {
+                const parentList = existingLi.parentNode;
+                if (parentList && parentList.tagName && parentList.tagName.toLowerCase() === listType) {
+                    const p = document.createElement('p');
+                    p.innerHTML = existingLi.innerHTML || '<br>';
+
+                    if (parentList.children.length === 1) {
+                        parentList.parentNode.replaceChild(p, parentList);
+                    } else if (parentList.firstElementChild === existingLi) {
+                        parentList.parentNode.insertBefore(p, parentList);
+                        parentList.removeChild(existingLi);
+                    } else if (parentList.lastElementChild === existingLi) {
+                        parentList.parentNode.insertBefore(p, parentList.nextSibling);
+                        parentList.removeChild(existingLi);
+                    } else {
+                        const newList = document.createElement(listType);
+                        while (existingLi.nextElementSibling) {
+                            newList.appendChild(existingLi.nextElementSibling);
+                        }
+                        parentList.parentNode.insertBefore(p, parentList.nextSibling);
+                        parentList.parentNode.insertBefore(newList, p.nextSibling);
+                        parentList.removeChild(existingLi);
+                    }
+
+                    const range = document.createRange();
+                    range.selectNodeContents(p);
+                    range.collapse(false);
+                    sel.removeAllRanges();
+                    sel.addRange(range);
+                    this.refreshToolbarState();
+                    this.scheduleSave();
+                    return;
+                } else if (parentList && ['ul', 'ol'].includes(parentList.tagName.toLowerCase())) {
+                    if (parentList.children.length === 1) {
+                        const newList = document.createElement(listType);
+                        newList.appendChild(existingLi);
+                        parentList.parentNode.replaceChild(newList, parentList);
+                    } else {
+                        const newList = document.createElement(listType);
+                        newList.appendChild(existingLi);
+                        parentList.parentNode.insertBefore(newList, parentList.nextSibling);
+                    }
+                    const range = document.createRange();
+                    range.selectNodeContents(existingLi);
+                    range.collapse(false);
+                    sel.removeAllRanges();
+                    sel.addRange(range);
+                    this.refreshToolbarState();
+                    this.scheduleSave();
+                    return;
+                }
+            }
+
+            let block = node.closest('.todo-item, p, h1, h2, h3, blockquote, div');
+            if (!block || block === editorEl || !editorEl.contains(block)) {
+                if (editorEl.contains(node) && node !== editorEl && node.parentNode === editorEl) {
+                    block = node;
+                } else {
+                    return;
+                }
+            }
+
+            let contentHtml = '<br>';
+            if (block.classList && block.classList.contains('todo-item')) {
+                const textSpan = block.querySelector('.todo-text');
+                contentHtml = textSpan ? textSpan.innerHTML : (block.textContent || '<br>');
+            } else {
+                contentHtml = block.innerHTML || (block.textContent || '<br>');
+            }
+            if (!contentHtml.trim() || contentHtml.trim() === '<br>') contentHtml = '<br>';
+
+            const li = document.createElement('li');
+            li.innerHTML = contentHtml;
+
+            const prev = block.previousElementSibling;
+            const next = block.nextElementSibling;
+
+            if (prev && prev.tagName && prev.tagName.toLowerCase() === listType) {
+                prev.appendChild(li);
+                block.parentNode.removeChild(block);
+            } else if (next && next.tagName && next.tagName.toLowerCase() === listType) {
+                next.insertBefore(li, next.firstElementChild);
+                block.parentNode.removeChild(block);
+            } else {
+                const newList = document.createElement(listType);
+                newList.appendChild(li);
+                block.parentNode.replaceChild(newList, block);
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(li);
+            range.collapse(false);
+            sel.removeAllRanges();
+            sel.addRange(range);
             this.refreshToolbarState();
             this.scheduleSave();
         },
@@ -214,6 +327,26 @@ document.addEventListener('alpine:init', () => {
                 block = node.closest('p, h1, h2, h3, blockquote, div');
                 if (block === editorEl) {
                     block = node.closest('p, h1, h2, h3, blockquote');
+                }
+            }
+
+            if (!block || block === editorEl) {
+                let targetNode = sel && sel.anchorNode ? sel.anchorNode : null;
+                if (targetNode && targetNode !== editorEl && editorEl && editorEl.contains(targetNode)) {
+                    while (targetNode.parentElement && targetNode.parentElement !== editorEl) {
+                        targetNode = targetNode.parentElement;
+                    }
+                    const newBlock = document.createElement(tag === 'p' ? 'p' : tag);
+                    targetNode.parentNode.insertBefore(newBlock, targetNode);
+                    newBlock.appendChild(targetNode);
+                    block = newBlock;
+                } else if (editorEl && editorEl.firstChild) {
+                    const newBlock = document.createElement(tag === 'p' ? 'p' : tag);
+                    while (editorEl.firstChild) {
+                        newBlock.appendChild(editorEl.firstChild);
+                    }
+                    editorEl.appendChild(newBlock);
+                    block = newBlock;
                 }
             }
 
@@ -263,8 +396,8 @@ document.addEventListener('alpine:init', () => {
                         newRange.setStart(newBlock.firstChild, 0);
                         newRange.collapse(true);
                     } else {
-                        newRange.selectNodeContents(newBlock);
-                        newRange.collapse(false);
+                        newRange.setStart(newBlock, 0);
+                        newRange.collapse(true);
                     }
                     if (sel) {
                         sel.removeAllRanges();
@@ -273,8 +406,8 @@ document.addEventListener('alpine:init', () => {
                 } catch (e) {
                     try {
                         const fallbackRange = document.createRange();
-                        fallbackRange.selectNodeContents(newBlock);
-                        fallbackRange.collapse(false);
+                        fallbackRange.setStart(newBlock, 0);
+                        fallbackRange.collapse(true);
                         if (sel) {
                             sel.removeAllRanges();
                             sel.addRange(fallbackRange);
@@ -310,6 +443,24 @@ document.addEventListener('alpine:init', () => {
                     if (node.nodeType === 3) node = node.parentElement;
                     const block = node ? node.closest('h1, h2, h3, blockquote, p, li, div') : null;
                     if (block && editorEl.contains(block)) {
+                        if (this.activeStates.bold && ['h1', 'h2', 'h3'].includes(block.tagName.toLowerCase())) {
+                            let el = sel.anchorNode;
+                            if (el && el.nodeType === 3) el = el.parentElement;
+                            let explicitBold = false;
+                            while (el && el !== block && el !== editorEl) {
+                                if (el.tagName && ['B', 'STRONG'].includes(el.tagName.toUpperCase())) {
+                                    explicitBold = true;
+                                    break;
+                                }
+                                if (el.style && (el.style.fontWeight === 'bold' || parseInt(el.style.fontWeight, 10) >= 600)) {
+                                    explicitBold = true;
+                                    break;
+                                }
+                                el = el.parentElement;
+                            }
+                            this.activeStates.bold = explicitBold;
+                        }
+
                         if (block.classList.contains('todo-item') || node.closest('.todo-item')) {
                             this.activeStates.todo = true;
                             this.activeStates.insertUnorderedList = false;
@@ -326,6 +477,9 @@ document.addEventListener('alpine:init', () => {
                         if (map[tag]) {
                             this.formatValue = tag;
                             this.formatLabel = map[tag];
+                        } else {
+                            this.formatValue = 'p';
+                            this.formatLabel = this.i18n ? this.i18n.normalText : 'Normal Text';
                         }
 
                         // PERBAIKAN: Override status Toolbar UI langsung dari ComputedStyle seperti di notes
@@ -362,6 +516,9 @@ document.addEventListener('alpine:init', () => {
                         const normHilite = this.normalizeColor(inlineHilite);
                         this.currentTextColor = this.textColors.find(c => this.normalizeColor(c) === normFore) || '#000000';
                         this.currentHighlightColor = this.highlightColors.find(c => c !== 'transparent' && this.normalizeColor(c) === normHilite) || 'transparent';
+                    } else {
+                        this.formatValue = 'p';
+                        this.formatLabel = this.i18n ? this.i18n.normalText : 'Normal Text';
                     }
                 }
             } catch (e) { /* ignore */ }
@@ -426,7 +583,7 @@ document.addEventListener('alpine:init', () => {
 
             const checkbox = document.createElement('input');
             checkbox.type = 'checkbox';
-            checkbox.className = 'todo-checkbox mt-1 cursor-pointer w-4 h-4 rounded border-secondary-100 text-secondary-200 accent-secondary-200 focus:ring-secondary-200';
+            checkbox.className = 'todo-checkbox mt-1 cursor-pointer w-4 h-4 rounded border-secondary-100 text-secondary-200 accent-secondary-200 focus:ring-secondary-200 shrink-0';
             checkbox.setAttribute('contenteditable', 'false');
             if (isChecked) {
                 checkbox.setAttribute('checked', 'checked');
@@ -444,7 +601,20 @@ document.addEventListener('alpine:init', () => {
 
             todoDiv.appendChild(checkbox);
             todoDiv.appendChild(span);
-            block.parentNode.replaceChild(todoDiv, block);
+            if (block.tagName && block.tagName.toLowerCase() === 'li' && block.parentNode && ['ul', 'ol'].includes(block.parentNode.tagName.toLowerCase())) {
+                const parentList = block.parentNode;
+                if (parentList.children.length === 1) {
+                    parentList.parentNode.replaceChild(todoDiv, parentList);
+                } else if (parentList.firstElementChild === block) {
+                    parentList.parentNode.insertBefore(todoDiv, parentList);
+                    parentList.removeChild(block);
+                } else {
+                    parentList.parentNode.insertBefore(todoDiv, parentList.nextSibling);
+                    parentList.removeChild(block);
+                }
+            } else {
+                block.parentNode.replaceChild(todoDiv, block);
+            }
 
             const textSpan = todoDiv.querySelector('.todo-text');
             const range = document.createRange();
@@ -477,7 +647,7 @@ document.addEventListener('alpine:init', () => {
 
                 if (block && editorEl.contains(block)) {
                     const hasTrailingSpace = /[\s\u00A0]$/.test(textBefore);
-                    const trimmed = textBefore.replace(/^[\s\u200B\uFEFF]+|[\s\u200B\uFEFF]+$/g, '');
+                    const trimmed = textBefore.replace(/^[\s\u00A0\u200B\uFEFF]+|[\s\u00A0\u200B\uFEFF]+$/g, '');
 
                     if (hasTrailingSpace && trimmed === '#') {
                         this.deleteShortcutPrefix(node, sel.anchorOffset);
@@ -707,6 +877,7 @@ document.addEventListener('alpine:init', () => {
                             sel.removeAllRanges();
                             sel.addRange(range);
                             this.scheduleSave();
+                            this.refreshToolbarState();
                             return;
                         }
                     }
@@ -769,19 +940,40 @@ document.addEventListener('alpine:init', () => {
                             sel.removeAllRanges();
                             sel.addRange(range);
                         } else {
+                            const textSpan = todoItem.querySelector('.todo-text');
+                            let afterHtml = '<br>';
+                            if (textSpan && sel && sel.rangeCount > 0) {
+                                try {
+                                    const rangeAfter = document.createRange();
+                                    rangeAfter.setStart(sel.anchorNode, sel.anchorOffset);
+                                    rangeAfter.setEndAfter(textSpan.lastChild || textSpan);
+                                    const extracted = rangeAfter.extractContents();
+                                    const tmp = document.createElement('div');
+                                    tmp.appendChild(extracted);
+                                    if (tmp.innerHTML && tmp.textContent.trim() !== '') {
+                                        afterHtml = tmp.innerHTML;
+                                    }
+                                    if (!textSpan.innerHTML || textSpan.textContent.trim() === '') {
+                                        textSpan.innerHTML = '<br>';
+                                    }
+                                } catch (err) {
+                                    afterHtml = '<br>';
+                                }
+                            }
+
                             const newTodo = document.createElement('div');
                             newTodo.className = 'todo-item flex items-start gap-2 my-1';
 
                             const checkbox = document.createElement('input');
                             checkbox.type = 'checkbox';
-                            checkbox.className = 'todo-checkbox mt-1 cursor-pointer w-4 h-4 rounded border-secondary-100 text-secondary-200 accent-secondary-200 focus:ring-secondary-200';
+                            checkbox.className = 'todo-checkbox mt-1 cursor-pointer w-4 h-4 rounded border-secondary-100 text-secondary-200 accent-secondary-200 focus:ring-secondary-200 shrink-0';
                             checkbox.setAttribute('contenteditable', 'false');
                             const onClickCode = 'this.nextElementSibling.style.textDecoration = this.checked ? \'line-through\' : \'none\'; this.nextElementSibling.style.opacity = this.checked ? \'0.5\' : \'1\';';
                             checkbox.setAttribute('onclick', onClickCode);
 
                             const span = document.createElement('span');
                             span.className = 'todo-text flex-1 outline-none';
-                            span.innerHTML = '<br>';
+                            span.innerHTML = afterHtml;
 
                             newTodo.appendChild(checkbox);
                             newTodo.appendChild(span);
@@ -791,14 +983,15 @@ document.addEventListener('alpine:init', () => {
                             } else {
                                 todoItem.parentNode.appendChild(newTodo);
                             }
-                            const textSpan = newTodo.querySelector('.todo-text');
+                            const newSpan = newTodo.querySelector('.todo-text');
                             const range = document.createRange();
-                            range.selectNodeContents(textSpan);
+                            range.selectNodeContents(newSpan);
                             range.collapse(true);
                             sel.removeAllRanges();
                             sel.addRange(range);
                         }
                         this.scheduleSave();
+                        this.refreshToolbarState();
                         return;
                     }
 
