@@ -414,7 +414,7 @@ new #[Layout('layouts.app')] class extends Component {
                                             'bg-brand-150' => !in_array($chapter->status, ['In Progress', 'Completed'])
                                         ])>
                                             <x-icons.chapter-status :status="$chapter->status" class="w-3.5 h-3.5 shrink-0" />
-                                            {{ $chapter->status ?? __('In Progress') }}
+                                            {{ __($chapter->status ?? 'In Progress') }}
                                         </span>
                                         
                                     </div>

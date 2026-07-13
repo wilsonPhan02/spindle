@@ -243,7 +243,7 @@
                         activeDropdown = activeDropdown === 'textColor' ? null : 'textColor';
                         if (activeDropdown === 'textColor') adjustOverlayPosition(pos, 172, 140, $event.currentTarget);
                     "
-                    class="toolbar-btn" title="Text Color"
+                    class="toolbar-btn" title="{{ __('Text Color') }}"
                 >
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M11 3L5.5 17h2.25l1.12-3h6.25l1.12 3h2.25L13 3h-2zm-1.38 9L12 5.67 14.38 12H9.62z"/></svg>
                     <span class="block h-[3px] w-3.5 rounded-sm -mt-0.5" x-bind:style="`background:${currentTextColor || 'var(--color-text-80)'}`"></span>
@@ -283,7 +283,7 @@
                         activeDropdown = activeDropdown === 'highlightColor' ? null : 'highlightColor';
                         if (activeDropdown === 'highlightColor') adjustOverlayPosition(pos, 184, 140, $event.currentTarget);
                     "
-                    class="toolbar-btn" title="Highlight (==text==)"
+                    class="toolbar-btn" title="{{ __('Highlight (==text==)') }}"
                 >
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M7 22l4-4H3l4 4zm9.06-1.19l-7.87-7.87 1.41-1.41 7.87 7.87-1.41 1.41zM17.5 6c-.32 0-.64.12-.88.37l-4.25 4.25-1.06-1.06-1.41 1.41 1.06 1.06-3.66 3.66 7.06 7.06 6.63-6.63c.48-.48.48-1.27 0-1.76L18.38 6.37A1.24 1.24 0 0017.5 6z"/></svg>
                     <span class="block h-[3px] w-3.5 rounded-sm -mt-0.5" x-bind:style="`background:${currentHighlightColor || 'transparent'}`"></span>

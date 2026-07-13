@@ -118,7 +118,7 @@ new #[Layout('layouts.app')] class extends Component {
         return [
             'id'        => $relationship->relationship_id,
             'otherId'   => $other?->character_id,
-            'otherName' => $other?->nick_name ?? 'Unknown',
+            'otherName' => $other?->nick_name ?? __('Unknown'),
             'typeId'    => $relationship->relationship_type_id,
             'typeName'  => $relationship->relationshipType->name,
             'textColor' => $relationship->relationshipType->text_color,
@@ -275,9 +275,9 @@ new #[Layout('layouts.app')] class extends Component {
 
 <div x-data="{ confirmingDelete: false }" class="p-6 lg:p-10 max-w-6xl mx-auto">
         <x-breadcrumb :items="[
-            ['label' => 'Dashboard', 'url' => route('dashboard')],
+            ['label' => __('Dashboard'), 'url' => route('dashboard')],
             ['label' => $project->title, 'url' => route('projects.show', $project), 'truncate' => true],
-            ['label' => 'Characters', 'url' => route('projects.characters', $project)],
+            ['label' => __('Characters'), 'url' => route('projects.characters', $project)],
             ['label' => $character->nick_name, 'truncate' => true]
         ]" />
 
@@ -435,7 +435,7 @@ new #[Layout('layouts.app')] class extends Component {
     <x-confirm-dialog
         eventName="open-delete-character-confirm"
         title="{{ __('Delete Character?') }}"
-        description='"{{ $nickName }}" {{ __('and every relationship involving them will be permanently removed.') }}'
+        description="&quot;{{ $nickName }}&quot; {{ __('and every relationship involving them will be permanently removed.') }}"
         confirmText="{{ __('Confirm Delete') }}"
         cancelText="{{ __('Cancel') }}"
         submitAction="deleteCharacter"

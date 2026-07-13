@@ -233,8 +233,8 @@ new #[Layout('layouts.app')] class extends Component {
         $this->validate([
             'coverUpload' => 'image|max:5120',
         ], [
-            'coverUpload.max' => 'The selected image is too large. The maximum allowed file size is 5MB.',
-            'coverUpload.image' => 'The selected file type is not supported. Please upload an image.',
+            'coverUpload.max' => __('The selected image is too large. The maximum allowed file size is 5MB.'),
+            'coverUpload.image' => __('The selected file type is not supported. Please upload an image.'),
         ]);
 
         if ($this->coverUpload) {

@@ -5,7 +5,7 @@ use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use App\Models\User;
 
-new #[Layout('layouts.guest')] #[Title('Complete Your Profile - Spindle')] class extends Component
+new #[Layout('layouts.guest')] class extends Component
 {
     public $username = '';
     public $occupation = '';
@@ -47,9 +47,10 @@ new #[Layout('layouts.guest')] #[Title('Complete Your Profile - Spindle')] class
 ?>
 
 <div class="relative flex flex-col items-center justify-center min-h-screen w-full">
+    <x-slot:title>{{ __('Complete Your Profile - Spindle') }}</x-slot>
     
     <div class="absolute inset-0 z-0 pointer-events-none">
-        <img src="{{ asset('images/auth-bg.svg') }}" class="absolute inset-0 w-full h-full object-cover" alt="Background"> 
+        <img src="{{ asset('images/auth-bg.svg') }}" class="absolute inset-0 w-full h-full object-cover" alt="{{ __('Background') }}"> 
     </div>
 
     <div class="relative z-10 flex flex-col items-center justify-center w-full px-4">

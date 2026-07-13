@@ -58,7 +58,7 @@ new #[Layout('layouts.guest')] class extends Component {
         if ($status === Password::PASSWORD_RESET) {
             session()->flash('status', __($status));
     
-            $message = 'Your masterpiece is secured. The password has been rewritten.';
+            $message = __('Your masterpiece is secured. The password has been rewritten.');
 
             if (auth()->check()) {
                 return redirect()->route('settings')->with('success', $message);

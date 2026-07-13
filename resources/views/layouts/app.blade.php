@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="{{ auth()->user()?->profile?->theme === 'dark' ? 'dark' : '' }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="{{ auth()->user()?->profile?->theme === 'dark' ? 'dark' : '' }}">
 <head>
     <meta charset="UTF-8">
     {{-- This MUST be the very first script — blocking, no defer/async — to prevent Flash of Incorrect Theme (FOIT) --}}

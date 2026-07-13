@@ -88,13 +88,13 @@ new class extends Component {
             'project_id' => $this->project->project_id,
             'structure_section_id' => $sectionId,
             'title' => $chapterTitle,
-            'status' => __('In Progress'),
+            'status' => 'In Progress',
             'order_index' => $newOrder
         ]);
 
         \App\Models\Manuscript::create([
             'chapter_card_id' => $chapter->chapter_card_id,
-            'title' => __('Draft') . ' 1',
+            'title' => 'Draft 1',
             'content' => '',
             'word_count' => 0
         ]);
