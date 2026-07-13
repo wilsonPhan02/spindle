@@ -415,6 +415,7 @@ new #[Layout('layouts.app')] class extends Component {
         title="{{ __('Delete Character?') }}"
         description='"{{ $nickName }}" and every relationship involving them will be permanently removed.'
         confirmText="Confirm Delete"
+        cancelText="Cancel"
         submitAction="deleteCharacter"
     >
         <x-slot:icon>

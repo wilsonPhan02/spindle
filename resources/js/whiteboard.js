@@ -5,8 +5,14 @@ document.addEventListener('alpine:init', () => {
         panning: false,
         panStartX: 0, panStartY: 0,
         panOriginX: 0, panOriginY: 0,
-        canvasW: 2400,
-        canvasH: 1800,
+        get canvasW() {
+            const multiplier = Math.floor(this.characters.length / 25);
+            return 2400 + (multiplier * 800);
+        },
+        get canvasH() {
+            const multiplier = Math.floor(this.characters.length / 25);
+            return 1800 + (multiplier * 600);
+        },
         projectId,
         characters,
         relationships,
@@ -65,6 +71,12 @@ document.addEventListener('alpine:init', () => {
                 const { typeId } = e.detail;
                 this.relationshipTypes = this.relationshipTypes.filter(rt => rt.id !== typeId);
                 this.relationships = this.relationships.filter(r => r.typeId !== typeId);
+            });
+
+            this.$watch('characters.length', () => {
+                this.$nextTick(() => {
+                    this.clampPan();
+                });
             });
 
             this.centerBoard();
@@ -314,12 +326,12 @@ document.addEventListener('alpine:init', () => {
             this.applyZoom(Math.min(2, +(this.zoom + 0.1).toFixed(2)));
         },
         zoomOut() {
-            this.applyZoom(Math.max(0.5, +(this.zoom - 0.1).toFixed(2)));
+            this.applyZoom(Math.max(0.1, +(this.zoom - 0.1).toFixed(2)));
         },
         onWheel(e) {
             if (this.isAnyPopupOpen()) return;
             const delta = e.deltaY > 0 ? -0.1 : 0.1;
-            this.applyZoom(Math.min(2, Math.max(0.5, +(this.zoom + delta).toFixed(2))));
+            this.applyZoom(Math.min(2, Math.max(0.1, +(this.zoom + delta).toFixed(2))));
         },
         startPan(e) {
             if (this.isAnyPopupOpen()) return;

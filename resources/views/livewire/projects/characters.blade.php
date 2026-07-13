@@ -87,12 +87,28 @@ new #[Layout('layouts.app')] class extends Component {
             fn () => $this->project->characters()->pluck('full_name')
         );
 
+        $charCount = count($this->characters);
+        $isExpanding = ($charCount > 0) && ($charCount % 25 === 0);
+
+        if ($isExpanding) {
+            $this->project->characters()->update([
+                'canvas_left' => \Illuminate\Support\Facades\DB::raw('canvas_left + 400'),
+                'canvas_top' => \Illuminate\Support\Facades\DB::raw('canvas_top + 300'),
+            ]);
+            $this->loadCharacters();
+            $this->dispatch('characters-shifted', shiftX: 400, shiftY: 300);
+        }
+
+        $multiplier = floor(count($this->characters) / 25);
+        $currentW = 2400 + ($multiplier * 800);
+        $currentH = 1800 + ($multiplier * 600);
+
         $character = $this->project->characters()->create([
             'full_name' => $charName,
             'nick_name' => $charName,
             'bio' => '',
-            'canvas_top' => 860 + rand(-60, 60),
-            'canvas_left' => 1160 + rand(-60, 60),
+            'canvas_top' => ($currentH / 2 - 60) + rand(-60, 60),
+            'canvas_left' => ($currentW / 2 - 60) + rand(-60, 60),
         ]);
 
         $mapped = $this->mapCharacter($character);
@@ -171,6 +187,7 @@ new #[Layout('layouts.app')] class extends Component {
             )"
             x-on:livewire:navigated.window="centerBoard()"
             x-on:character-created.window="characters.push($event.detail.character)"
+            x-on:characters-shifted.window="characters.forEach(c => { c.left += $event.detail.shiftX; c.top += $event.detail.shiftY; }); panX -= $event.detail.shiftX * zoom; panY -= $event.detail.shiftY * zoom; clampPan();"
             @wheel.prevent="if (characters.length > 0) onWheel($event)"
             @mousedown="if (characters.length > 0) startPan($event)"
             @mousemove="if (characters.length > 0) { onPan($event); onDragChar($event); onDragLabel($event); }"
@@ -181,15 +198,8 @@ new #[Layout('layouts.app')] class extends Component {
             class="bg-dot-pattern relative w-full h-full rounded-xl border border-brand-200 bg-brand-10 overflow-hidden"
             wire:ignore
         >
-            <div x-ref="canvas" class="absolute inset-0 origin-top-left" :style="`transform: translate(${panX}px, ${panY}px) scale(${zoom}); width: 2400px; height: 1800px;`">
+            <div x-ref="canvas" class="absolute inset-0 origin-top-left" :style="`transform: translate(${panX}px, ${panY}px) scale(${zoom}); width: ${canvasW}px; height: ${canvasH}px;`">
 
-                {{-- Garis relasi (di belakang karakter), tetap tampil selama sesi --}}
-                {{-- Digambar sebagai SVG <path> lewat x-html (bukan <template x-for>),
-                     karena Alpine tidak bisa meng-clone elemen SVG dengan namespace yang
-                     benar lewat template cloning. Melengkung otomatis kalau ada lebih dari
-                     1 relasi antara pasangan karakter yang sama, supaya tidak tumpang tindih.
-                     Posisi dihitung ulang tiap render lewat relationLine(), jadi ikut
-                     bergerak saat karakter di-drag. --}}
                 <svg
                     class="absolute inset-0 z-10 pointer-events-none"
                     :width="canvasW" :height="canvasH"
