@@ -196,22 +196,19 @@ new class extends Component {
                             </div>
                         </div>
 
-                        <div class="relative shrink-0">
-                            <button @click="menuOpen = !menuOpen" @click.away="menuOpen = false" class="p-1 hover:bg-brand-150 rounded-md transition-colors cursor-pointer">
-                                <svg class="w-6 h-6 text-text-80" fill="currentColor" viewBox="0 0 24 24"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
+                        <div class="flex items-center gap-1 shrink-0">
+                            <button wire:click="addProject('{{ $section->section_id }}')" class="p-2 text-text-80 hover:text-secondary-200 hover:bg-brand-150 rounded-md transition-colors cursor-pointer group relative">
+                                <x-icons.add class="w-5 h-5" />
+                                <span class="absolute -top-8 left-1/2 -translate-x-1/2 bg-text-100 text-brand-10 text-[11px] font-medium px-2 py-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">{{ __('Add Project') }}</span>
                             </button>
-
-                            <div x-show="menuOpen" style="display: none;" class="absolute right-0 mt-2 w-48 bg-white border border-brand-150 rounded-lg shadow-lg z-50 py-1 overflow-hidden">
-                                <button wire:click="addProject('{{ $section->section_id }}')" @click="menuOpen = false" class="w-full text-left px-4 py-2 text-app-body-medium text-text-80 hover:bg-brand-10 flex items-center gap-3 transition-colors">
-                                    <x-icons.add class="w-4 h-4 shrink-0 text-text-80" /> {{ __('Add Project') }}
-                                </button>
-                                <button @click="editing = true; menuOpen = false; setTimeout(() => $refs.nameInput.focus(), 50)" class="w-full text-left px-4 py-2 text-app-body-medium text-text-80 hover:bg-brand-10 flex items-center gap-3 transition-colors">
-                                    <x-icons.rename class="w-4 h-4 shrink-0 text-text-80" /> {{ __('Rename') }}
-                                </button>
-                                <button @click="$dispatch('open-archive-section-dialog', { id: '{{ $section->section_id }}' }); menuOpen = false" class="w-full text-left px-4 py-2 text-app-body-medium text-text-80 hover:bg-brand-10 flex items-center gap-3 transition-colors">
-                                    <x-icons.archive class="w-4 h-4 shrink-0 text-text-80" /> {{ __('Archive') }}
-                                </button>
-                            </div>
+                            <button @click="editing = true; setTimeout(() => $refs.nameInput.focus(), 50)" class="p-2 text-text-80 hover:text-secondary-200 hover:bg-brand-150 rounded-md transition-colors cursor-pointer group relative">
+                                <x-icons.rename class="w-5 h-5" />
+                                <span class="absolute -top-8 left-1/2 -translate-x-1/2 bg-text-100 text-brand-10 text-[11px] font-medium px-2 py-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">{{ __('Rename') }}</span>
+                            </button>
+                            <button @click="$dispatch('open-archive-section-dialog', { id: '{{ $section->section_id }}' })" class="p-2 text-text-80 hover:text-warning-100 hover:bg-warning-100/10 rounded-md transition-colors cursor-pointer group relative">
+                                <x-icons.archive class="w-5 h-5" />
+                                <span class="absolute -top-8 left-1/2 -translate-x-1/2 bg-text-100 text-brand-10 text-[11px] font-medium px-2 py-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">{{ __('Archive') }}</span>
+                            </button>
                         </div>
                     </div>
 
@@ -305,10 +302,7 @@ new class extends Component {
                             </a>
                         @endforeach
 
-                        <button wire:click="addProject('{{ $section->section_id }}')" class="w-44 shrink-0 aspect-[2/3] border-2 border-dashed border-brand-200 rounded-xl flex flex-col items-center justify-center text-subtext-80 hover:border-secondary-200 hover:text-secondary-200 hover:bg-secondary-5 transition-all group mb-3 select-none">
-                            <svg class="w-8 h-8 mb-2 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                            <span class="text-sm font-medium">{{ __('New Project') }}</span>
-                        </button>
+
 
                     </div>
 

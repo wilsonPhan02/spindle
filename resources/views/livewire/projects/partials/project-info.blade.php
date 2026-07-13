@@ -489,7 +489,7 @@
                 <div class="absolute bottom-4 text-app-desc-feature text-[11px] left-8 right-8 flex justify-between items-center">
                     <button
                         @click="$dispatch('open-archive-project-dialog')"
-                        class="flex items-center gap-1.5 px-2 py-1 -ml-2 rounded-md text-[11px] font-medium text-secondary-100 hover:text-danger-100 hover:bg-danger-100/10 transition-colors opacity-70 hover:opacity-100">
+                        class="flex items-center gap-1.5 px-2 py-1 -ml-2 rounded-md text-[11px] font-medium text-secondary-100 hover:text-warning-100 hover:bg-warning-100/10 transition-colors opacity-70 hover:opacity-100">
                         <x-icons.archive class="w-3.5 h-3.5" /> {{ __('Move To Archive') }}
                     </button>
                     <div
