@@ -75,10 +75,21 @@ new #[Layout('layouts.app')] class extends Component {
         $project = Project::where('user_id', Auth::id())->find($projectId);
         if ($project) {
             $project->update(['archived_at' => null]);
-            // Jika kita merestore project dari section yang terarsip, restore sectionnya juga
+            
+            // Jika kita merestore project dari section yang terarsip
             if ($project->section && $project->section->archived_at !== null) {
-                $project->section->update(['archived_at' => null]);
+                $section = $project->section;
+                
+                // Sebelum membuat section aktif kembali, pastikan project lain yang ada di dalamnya
+                // di-archive secara eksplisit agar tidak ikut ter-restore ke dashboard.
+                $section->projects()->where('project_id', '!=', $project->project_id)
+                                    ->whereNull('archived_at')
+                                    ->update(['archived_at' => $section->archived_at]);
+                                    
+                // Restore section agar project yang dipilih bisa tampil di dashboard
+                $section->update(['archived_at' => null]);
             }
+            
             $this->loadArchived();
             $this->dispatch('project-updated');
         }
@@ -100,7 +111,7 @@ new #[Layout('layouts.app')] class extends Component {
     <header class="flex justify-between items-center mb-8">
         <a href="{{ route('dashboard') }}" wire:navigate class="flex items-center gap-3 text-[18px] text-subtext-100 hover:text-secondary-200 transition-colors">
             <x-icons.chevron rotate="180" size="w-3.5 h-3.5" color="currentColor"/>
-            <span class="text-text-70 font-semibold">{{ __('Archive') }}</span>
+            <span class="text-text-70 text-app-subtitle-1 font-semibold">{{ __('Archive') }}</span>
         </a>
     </header>
 
@@ -117,7 +128,7 @@ new #[Layout('layouts.app')] class extends Component {
                 <div class="relative">
 
                     {{-- Section Header --}}
-                    <div class="flex justify-between items-center border-b border-brand-150 pb-2 mb-6" x-data="{ menuOpen: false }">
+                    <div class="relative z-50 flex justify-between items-center border-b border-brand-150 pb-2 mb-6" x-data="{ menuOpen: false }">
                         <div class="min-w-0 flex-1">
                             <h2 class="text-2xl font-merriweather text-text-100 truncate">
                                 {{ $section->title }}
@@ -158,27 +169,86 @@ new #[Layout('layouts.app')] class extends Component {
                     </div>
 
                     {{-- Projects Grid (mirip dashboard) --}}
-                    <div class="flex gap-6 overflow-x-auto pb-4 custom-scrollbar">
+                    <div class="flex gap-6 overflow-x-auto pb-4 custom-scrollbar"
+                         x-data="{ 
+                             isDown: false, 
+                             isDragging: false,
+                             canScroll: false,
+                             startX: 0, 
+                             scrollLeft: 0,
+                             checkScrollable() {
+                                 this.canScroll = this.$el.scrollWidth > this.$el.clientWidth;
+                                 return this.canScroll;
+                             },
+                             handleWheel(e) {
+                                 if (this.checkScrollable() && e.deltaY !== 0) {
+                                     const atLeft = this.$el.scrollLeft <= 0 && e.deltaY < 0;
+                                     const atRight = Math.ceil(this.$el.scrollLeft + this.$el.clientWidth) >= this.$el.scrollWidth && e.deltaY > 0;
+                                     
+                                     if (!atLeft && !atRight) {
+                                         e.preventDefault();
+                                         this.$el.scrollBy({ left: e.deltaY * 1.5, behavior: 'smooth' });
+                                     }
+                                 }
+                             },
+                             startDrag(e) {
+                                 if (!this.checkScrollable()) return;
+                                 this.isDown = true;
+                                 this.isDragging = false;
+                                 this.startX = e.pageX - this.$el.offsetLeft;
+                                 this.scrollLeft = this.$el.scrollLeft;
+                             },
+                             stopDrag() {
+                                 this.isDown = false;
+                                 setTimeout(() => this.isDragging = false, 200);
+                             },
+                             doDrag(e) {
+                                 if (!this.isDown) return;
+                                 const x = e.pageX - this.$el.offsetLeft;
+                                 const walk = (x - this.startX) * 1.5;
+                                 if (Math.abs(walk) > 5) {
+                                     this.isDragging = true;
+                                     e.preventDefault();
+                                 }
+                                 this.$el.scrollLeft = this.scrollLeft - walk;
+                             }
+                         }"
+                         :class="{ 
+                             'cursor-grab active:cursor-grabbing': canScroll, 
+                             '[&_a]:pointer-events-none [&_button]:pointer-events-none': isDragging 
+                         }"
+                         x-init="checkScrollable()"
+                         @mouseenter="checkScrollable()"
+                         @wheel="handleWheel($event)"
+                         @mousedown="startDrag($event)"
+                         @mouseleave="stopDrag()"
+                         @mouseup="stopDrag()"
+                         @mousemove="doDrag($event)"
+                         @click.capture="if(isDragging) { $event.preventDefault(); $event.stopPropagation(); }"
+                    >
 
                         @forelse($section->projects as $project)
                             <div class="w-44 shrink-0 group" x-data="{ menuOpen: false }">
-                                <div class="relative">
-                                    {{-- Book Cover --}}
-                                    <div class="w-full aspect-[2/3] bg-secondary-100 rounded-r-xl rounded-l-sm border-l-[6px] border-secondary-300 shadow-md relative mb-3 opacity-75 group-hover:opacity-95 transition-all duration-200">
-                                        @if($project->cover_image_path)
-                                            <img src="{{ Storage::url($project->cover_image_path) }}" class="absolute inset-y-0 left-0 right-0 w-full h-full object-cover rounded-r-xl rounded-l-sm" />
-                                        @endif
-                                        <div class="absolute inset-1 border border-secondary-10 opacity-40 rounded-r-lg pointer-events-none"></div>
-                                        <div class="absolute top-1.5 left-1.5 w-4 h-4 border-t border-l border-brand-200 opacity-60"></div>
-                                        <div class="absolute bottom-1.5 right-1.5 w-4 h-4 border-b border-r border-brand-200 opacity-60"></div>
-                                        <div class="absolute right-0 top-0 bottom-0 w-1.5 bg-white opacity-40 rounded-r-xl"></div>
-                                    </div>
+                                <div class="w-full aspect-[1/1.6] relative mb-3 opacity-75 group-hover:opacity-100 transition-opacity duration-200">
+                                    @if($project->cover_image_path)
+                                        <div class="absolute inset-y-0 left-0 right-3 w-[calc(100%-12px)] h-full z-20 rounded-l-sm rounded-r-md overflow-hidden shadow-md bg-gradient-to-br from-secondary-50 to-secondary-150 p-[8px] border-r border-black/10 transition-shadow duration-300 group-hover:shadow-xl">
+                                            <div class="w-full h-full overflow-hidden rounded-sm bg-brand-100">
+                                                <img src="{{ Storage::url($project->cover_image_path) }}" class="w-full h-full object-cover" />
+                                            </div>
+                                        </div>
+                                        <div class="absolute top-2 bottom-2 right-1.5 w-3 bg-gradient-to-r from-[#e9e1da] to-[#d9c5a4] border-y border-r border-[#c6b395] rounded-r-[2px] z-10 shadow-inner"></div>
+                                        <div class="absolute inset-y-0 right-0 w-6 bg-[#8a6144] rounded-r-md z-0 shadow-sm border-l border-black/20 transition-shadow duration-300 group-hover:shadow-lg"></div>
+                                    @else
+                                        <x-default-project class="absolute inset-y-0 left-0 right-3 w-[calc(100%-12px)] h-full text-secondary-100 rounded-l-sm rounded-r-md shadow-md z-20 border-r border-black/10 transition-shadow duration-300 group-hover:shadow-xl" />
+                                        <div class="absolute top-2 bottom-2 right-1.5 w-3 bg-gradient-to-r from-[#e9e1da] to-[#d9c5a4] border-y border-r border-[#c6b395] rounded-r-[2px] z-10 shadow-inner"></div>
+                                        <div class="absolute inset-y-0 right-0 w-6 bg-[#8a6144] rounded-r-md z-0 shadow-sm border-l border-black/20 transition-shadow duration-300 group-hover:shadow-lg"></div>
+                                    @endif
 
                                     {{-- Restore/Delete overlay --}}
-                                    <div class="absolute inset-x-0 bottom-3 flex flex-col gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 px-3">
+                                    <div class="absolute left-0 right-3 bottom-3 flex flex-col gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 px-3 z-30">
                                         <button
                                             wire:click="restoreProject('{{ $project->project_id }}')"
-                                            class="w-full flex items-center justify-center gap-1.5 py-1.5 bg-text-100/90 backdrop-blur-sm rounded-lg text-[12px] text-bg-main font-medium hover:bg-text-100 transition-colors shadow-lg cursor-pointer"
+                                            class="w-full flex items-center justify-center gap-1.5 py-1.5 bg-bg-main/85 backdrop-blur-md border border-brand-200/50 rounded-lg text-[12px] text-text-100 font-medium hover:bg-bg-main hover:text-secondary-200 hover:border-secondary-200 transition-all shadow-lg cursor-pointer"
                                         >
                                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
@@ -187,9 +257,9 @@ new #[Layout('layouts.app')] class extends Component {
                                         </button>
                                         <button
                                             @click="$dispatch('open-delete-project-dialog', { id: '{{ $project->project_id }}' })"
-                                            class="w-full flex items-center justify-center gap-1.5 py-1.5 bg-danger-100/90 backdrop-blur-sm rounded-lg text-[12px] text-white font-medium hover:bg-danger-100 transition-colors shadow-lg"
+                                            class="w-full flex items-center justify-center gap-1.5 py-1.5 bg-bg-main/85 backdrop-blur-md border border-brand-200/50 rounded-lg text-[12px] text-danger-100 font-medium hover:bg-danger-100 hover:text-white hover:border-danger-100 transition-all shadow-lg cursor-pointer"
                                         >
-                                            <x-icons.delete class="w-3 h-3 text-white" />
+                                            <x-icons.delete class="w-3 h-3" />
                                             {{ __('Delete') }}
                                         </button>
                                     </div>
@@ -201,11 +271,11 @@ new #[Layout('layouts.app')] class extends Component {
                                     @elseif($project->icon_type === 'image' && $project->icon)
                                         <img src="{{ asset('storage/' . $project->icon) }}" alt="" class="w-4 h-4 object-cover rounded shrink-0">
                                     @else
-                                        <x-icons.sidebar-book class="w-4 h-4 text-text-80 shrink-0" />
+                                        <x-icons.sidebar-book class="w-4 h-4 text-secondary-100 shrink-0 group-hover:text-secondary-200 transition-colors" />
                                     @endif
-                                    <h3 class="text-app-body-medium text-text-100 truncate">{{ $project->title }}</h3>
+                                    <h3 class="text-app-body-medium text-text-100 truncate group-hover:text-secondary-200 transition-colors">{{ $project->title }}</h3>
                                 </div>
-                                <p class="text-[11px] text-subtext-70">{{ $project->created_at->translatedFormat('d F Y') }}</p>
+                                <p class="text-[11px] font-medium text-subtext-90">{{ $project->created_at->translatedFormat('d F Y') }}</p>
                             </div>
                         @empty
                             <div class="flex items-center justify-center w-full py-8 text-subtext-90 text-app-body-medium italic">

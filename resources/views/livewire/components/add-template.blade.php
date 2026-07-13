@@ -121,14 +121,46 @@ new class extends Component {
     }
 
     public function saveCustomTemplate() {
-        $this->validate([
+        $rules = [
             'customTemplateName' => 'required|string|max:100',
             'customTemplateDescription' => 'nullable|string',
             'customImagePreview' => 'nullable|image|max:5120',
             'customSections' => 'required|array|min:1',
             'customSections.*.title' => 'required|string|max:40',
             'customSections.*.goal' => 'nullable|string',
-        ]);
+        ];
+
+        $messages = [
+            'customTemplateName.required' => __('The structure name is required.'),
+            'customTemplateName.max' => __('The structure name must not be greater than 100 characters.'),
+            'customImagePreview.image' => __('The cover image must be a valid image file.'),
+            'customImagePreview.max' => __('The cover image size must not exceed 5MB.'),
+            'customSections.required' => __('At least one narrative section is required.'),
+            'customSections.min' => __('At least one narrative section is required.'),
+            'customSections.*.title.required' => __('The section title is required.'),
+            'customSections.*.title.max' => __('The section title must not be greater than 40 characters.'),
+        ];
+
+        $attributes = [
+            'customTemplateName' => __('structure name'),
+            'customTemplateDescription' => __('description'),
+            'customImagePreview' => __('cover image'),
+            'customSections' => __('narrative sections'),
+        ];
+
+        foreach ($this->customSections as $index => $section) {
+            $num = $index + 1;
+            $attributes["customSections.{$index}.title"] = __("section :num title", ['num' => $num]);
+            $attributes["customSections.{$index}.goal"] = __("section :num description", ['num' => $num]);
+        }
+
+        try {
+            $this->validate($rules, $messages, $attributes);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            $this->setErrorBag($e->validator->errors());
+            $this->dispatch('scroll-to-first-error');
+            return;
+        }
 
         DB::transaction(function () {
             // Upload gambar baru jika ada
@@ -317,12 +349,17 @@ new class extends Component {
 }; ?>
 
 <div>
+    {{-- Top loading progress bar (appears at top of browser page matching global NProgress bar style) --}}
+    <div wire:loading class="fixed top-0 inset-x-0 z-[200] h-[2px] overflow-hidden pointer-events-none">
+        <div class="h-full animate-progress-fill"></div>
+    </div>
+
     @if($isOpen)
         <div class="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-sm transition-opacity">
             
             <div class="relative bg-bg-main w-full max-w-3xl h-[90vh] rounded-2xl shadow-2xl flex flex-col overflow-hidden mx-4 border border-bg-border">
                 
-                <button wire:click="closeModal" class="absolute top-6 right-6 w-10 h-10 rounded-full border border-brand-200 text-text-60 hover:bg-brand-50 hover:text-secondary-200 flex items-center justify-center transition-colors z-50 bg-bg-main">
+                <button wire:click="closeModal" wire:loading.attr="disabled" class="absolute top-6 right-6 w-10 h-10 rounded-full border border-brand-200 text-text-60 hover:bg-brand-50 hover:text-secondary-200 flex items-center justify-center transition-colors z-50 bg-bg-main disabled:opacity-50">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" d="M6 18L18 6M6 6l12 12"/></svg>
                 </button>
 
@@ -338,6 +375,7 @@ new class extends Component {
                         <div class="flex flex-col gap-8 items-center w-full">
                             @foreach($this->availableTemplates as $template)
                                 <div wire:click="viewDetail('{{ $template->template_id }}')" 
+                                     wire:loading.class="opacity-60 pointer-events-none"
                                      class="group relative w-full max-w-lg aspect-[16/9] bg-[#212121] rounded-xl overflow-hidden cursor-pointer border border-transparent hover:border-brand-200 transition-all p-8 md:p-12 shadow-sm">
                                     
                                     @if($template->image_preview && $template->is_custom)
@@ -367,14 +405,16 @@ new class extends Component {
                                         <div class="absolute top-3 right-3 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all transform translate-y-2 group-hover:translate-y-0 duration-300">
                                             
                                             <button @click.stop wire:click="editCustomTemplate('{{ $template->template_id }}')" 
-                                                    class="flex items-center gap-1 px-2 py-1 bg-bg-main/95 backdrop-blur-sm border border-brand-200 text-secondary-200 rounded-sm hover:bg-brand-200 transition-all shadow-md" 
+                                                    wire:loading.attr="disabled"
+                                                    class="flex items-center gap-1 px-2 py-1 bg-bg-main/95 backdrop-blur-sm border border-brand-200 text-secondary-200 rounded-sm hover:bg-brand-200 transition-all shadow-md disabled:opacity-50" 
                                                     title="Edit Structure">
                                                 <x-icons.rename class="w-3 h-3"/>
                                                 <span class="text-app-caption font-semibold">{{ __('Edit') }}</span>
                                             </button>
                                             
                                             <button @click.stop wire:click="attemptDeleteTemplate('{{ $template->template_id }}')" 
-                                                    class="flex items-center gap-2 px-2 py-1 bg-bg-main/95 backdrop-blur-sm border border-danger-100/50 text-danger-100 rounded-sm hover:bg-danger-100 hover:border-danger-100 hover:text-brand-50 transition-all shadow-md group/btn" 
+                                                    wire:loading.attr="disabled"
+                                                    class="flex items-center gap-2 px-2 py-1 bg-bg-main/95 backdrop-blur-sm border border-danger-100/50 text-danger-100 rounded-sm hover:bg-danger-100 hover:border-danger-100 hover:text-brand-50 transition-all shadow-md group/btn disabled:opacity-50" 
                                                     title="Delete Structure">
                                                 <x-icons.delete class="w-3 h-3" />
                                                 <span class="text-app-caption font-semibold">{{ __('Delete') }}</span>
@@ -388,7 +428,7 @@ new class extends Component {
                     </div>
 
                     <div class="shrink-0 p-6 flex justify-center bg-bg-main z-10 border-t border-bg-border/60">
-                        <button wire:click="goToStep4" class="flex items-center gap-2 px-6 py-2.5 bg-transparent border border-brand-200 text-secondary-200 rounded-md hover:bg-brand-50 hover:text-secondary-300 transition-colors text-web-button">
+                        <button wire:click="goToStep4" wire:loading.attr="disabled" class="flex items-center gap-2 px-6 py-2.5 bg-transparent border border-brand-200 text-secondary-200 rounded-md hover:bg-brand-50 hover:text-secondary-300 transition-colors text-web-button disabled:opacity-50">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                             {{ __('Create Template') }}
                         </button>
@@ -396,70 +436,112 @@ new class extends Component {
                 @endif
 
                 @if($step === 2 && $this->selectedTemplate)
-                    <div class="shrink-0 pt-6 px-6 relative z-10 bg-bg-main">
-                        <button wire:click="goBack" class="w-10 h-10 rounded-full border border-brand-200 text-text-60 hover:bg-brand-50 hover:text-text-100 flex items-center justify-center transition-colors bg-bg-main" title="Back to structures">
-                            <x-icons.back/>
-                        </button>
-                    </div>
+                    <div x-data="{ showStickyBtn: false }" class="flex flex-col flex-1 overflow-hidden">
 
-                    <div class="flex-1 overflow-y-auto custom-scrollbar px-10 md:px-14 pb-14 bg-bg-main">
-                        <div class="flex flex-col items-center max-w-4xl mx-auto w-full">
-                            
-                            <div class="text-center mb-10 w-full mt-4 max-w-xl mx-auto">
-                                <h1 class="block w-full text-app-title-1 text-text-100 mb-6 break-words" title="{{ $this->selectedTemplate->name }}">
-                                    {{ $this->selectedTemplate->name }}
-                                </h1>
-                                <button wire:click="useTemplate" class="px-5 py-2 border border-brand-200 text-secondary-200 rounded-md hover:bg-brand-50 hover:text-secondary-300 transition-colors text-web-button">
-                                    {{ __('Use Template') }}
+                        {{-- Header bar with back + conditional sticky Use Template button --}}
+                        <div class="shrink-0 pt-6 px-6 pb-4 relative z-10 bg-bg-main flex items-center justify-between">
+                            <button wire:click="goBack" wire:loading.attr="disabled" class="w-10 h-10 rounded-full border border-brand-200 text-text-60 hover:bg-brand-50 hover:text-text-100 flex items-center justify-center transition-colors bg-bg-main disabled:opacity-50" title="Back to structures">
+                                <x-icons.back/>
+                            </button>
+
+                            {{-- Sticky Use Template button — only visible when primary button is out of view --}}
+                            <div
+                                x-show="showStickyBtn"
+                                x-transition:enter="transition ease-out duration-200"
+                                x-transition:enter-start="opacity-0 scale-95"
+                                x-transition:enter-end="opacity-100 scale-100"
+                                x-transition:leave="transition ease-in duration-150"
+                                x-transition:leave-start="opacity-100 scale-100"
+                                x-transition:leave-end="opacity-0 scale-95"
+                                class="mr-14 sm:mr-16"
+                                style="display: none;"
+                            >
+                                <button wire:click="useTemplate" wire:loading.attr="disabled" class="h-10 min-w-[145px] px-5 border border-brand-200 text-secondary-200 rounded-md hover:bg-brand-50 hover:text-secondary-300 transition-colors text-web-button flex items-center justify-center gap-2 shadow-sm disabled:opacity-60 disabled:cursor-not-allowed">
+                                    <span wire:loading.remove wire:target="useTemplate">{{ __('Use Template') }}</span>
+                                    <span wire:loading.flex wire:target="useTemplate" class="items-center justify-center gap-2">
+                                        <svg class="animate-spin h-3.5 w-3.5 shrink-0 text-secondary-200" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                        <span>{{ __('Applying...') }}</span>
+                                    </span>
                                 </button>
                             </div>
+                        </div>
 
-                            <div class="relative overflow-hidden w-full max-w-xl h-[60vh] bg-[#212121] rounded-xl p-8 flex items-center justify-center mb-8">
-                                @if($this->selectedTemplate->image_preview)
-                                    @if($this->selectedTemplate->is_custom)
-                                        <img src="{{ Storage::url($this->selectedTemplate->image_preview) }}" alt="Preview" class="absolute inset-0 w-full h-full object-cover" />
-                                    @else
-                                        <img src="{{ asset('images/' . str_replace('.', '/', $this->selectedTemplate->image_preview) . '.svg') }}" class="w-full h-auto max-w-lg" alt="Template Preview" />
-                                    @endif
-                                @else
-                                    <div class="flex flex-col items-center justify-center h-48 text-brand-200">
-                                        <x-icons.no-structure class="w-12 h-12 opacity-50 mb-2"/>
-                                        <span class="text-app-desc-feature">{{ __('No Preview Available') }}</span>
+                        {{-- Scrollable content --}}
+                        <div class="flex-1 overflow-y-auto custom-scrollbar px-10 md:px-14 pb-14 bg-bg-main">
+                            <div class="flex flex-col items-center max-w-4xl mx-auto w-full">
+
+                                <div class="text-center mb-10 w-full mt-4 max-w-xl mx-auto">
+                                    <h1 class="block w-full text-app-title-1 text-text-100 mb-6 break-words" title="{{ $this->selectedTemplate->name }}">
+                                        {{ $this->selectedTemplate->name }}
+                                    </h1>
+
+                                    {{-- Primary Use Template button — observed by IntersectionObserver --}}
+                                    <div
+                                        x-ref="primaryUseBtn"
+                                        x-init="() => {
+                                            const observer = new IntersectionObserver(([entry]) => {
+                                                showStickyBtn = !entry.isIntersecting;
+                                            }, { threshold: 0.5 });
+                                            observer.observe($refs.primaryUseBtn);
+                                        }"
+                                    >
+                                        <button wire:click="useTemplate" wire:loading.attr="disabled" class="px-5 py-2 min-w-[160px] border border-brand-200 text-secondary-200 rounded-md hover:bg-brand-50 hover:text-secondary-300 transition-colors text-web-button flex items-center justify-center gap-2 mx-auto disabled:opacity-60 disabled:cursor-not-allowed">
+                                            <span wire:loading.remove wire:target="useTemplate">{{ __('Use Template') }}</span>
+                                            <span wire:loading.flex wire:target="useTemplate" class="items-center justify-center gap-2">
+                                                <svg class="animate-spin h-4 w-4 shrink-0 text-secondary-200" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                                <span>{{ __('Applying...') }}</span>
+                                            </span>
+                                        </button>
                                     </div>
-                                @endif
-                            </div>
-                            
-                            
-                            <div class="w-full mb-12 px-3">
-                                <hr class="mb-4 border-text-60 border-t-1">
-                                @if ($this->selectedTemplate->description)
-                                    <p class="text-web-body-small text-text-70 leading-relaxed whitespace-pre-wrap">{{ $this->selectedTemplate->description }}</p>
-                                @else
-                                    <p class="text-center text-web-body-small text-text-70 leading-relaxed whitespace-pre-wrap">{{ __('No description for this template') }}</p>
-                                @endif
-                                <hr class="mt-4 border-text-60 border-t-1">
-                            </div>
-                            
+                                </div>
 
-                            <div class="w-full flex flex-col gap-10 px-3">
-                                @forelse($this->selectedTemplate->sections as $section)
-                                    <div>
-                                        <h3 class="text-app-title-1 font-semibold text-text-90 mb-4">
-                                            {{ $section->title }}
-                                        </h3>
-                                        @if ($section->goal)
-                                            <div class="prose prose-stone prose-p:text-text-70 prose-li:text-text-70 prose-strong:text-text-80 max-w-none text-web-body-small leading-relaxed">
-                                                {!! Str::markdown($section->goal) !!}
-                                            </div>
+                                <div class="relative overflow-hidden w-full max-w-xl h-[60vh] bg-[#212121] rounded-xl p-8 flex items-center justify-center mb-8">
+                                    @if($this->selectedTemplate->image_preview)
+                                        @if($this->selectedTemplate->is_custom)
+                                            <img src="{{ Storage::url($this->selectedTemplate->image_preview) }}" alt="Preview" class="absolute inset-0 w-full h-full object-cover" />
                                         @else
-                                            <p class=" text-text-60 italic text-app-body-small">{{ __('No details for this section yet.') }}</p>
+                                            <img src="{{ asset('images/' . str_replace('.', '/', $this->selectedTemplate->image_preview) . '.svg') }}" class="w-full h-auto max-w-lg" alt="Template Preview" />
                                         @endif
-                                    </div>
-                                @empty
-                                    <p class="text-center text-text-60 italic text-app-body-small">{{ __('No detailed steps for this template yet.') }}</p>
-                                @endforelse
-                            </div>
+                                    @else
+                                        <div class="flex flex-col items-center justify-center h-48 text-brand-200">
+                                            <x-icons.no-structure class="w-12 h-12 opacity-50 mb-2"/>
+                                            <span class="text-app-desc-feature">{{ __('No Preview Available') }}</span>
+                                        </div>
+                                    @endif
+                                </div>
 
+
+                                <div class="w-full mb-12 px-3">
+                                    <hr class="mb-4 border-text-60 border-t-1">
+                                    @if ($this->selectedTemplate->description)
+                                        <p class="text-web-body-small text-text-70 leading-relaxed whitespace-pre-wrap">{{ $this->selectedTemplate->description }}</p>
+                                    @else
+                                        <p class="text-center text-web-body-small text-text-70 leading-relaxed whitespace-pre-wrap">{{ __('No description for this template') }}</p>
+                                    @endif
+                                    <hr class="mt-4 border-text-60 border-t-1">
+                                </div>
+
+
+                                <div class="w-full flex flex-col gap-10 px-3">
+                                    @forelse($this->selectedTemplate->sections as $section)
+                                        <div>
+                                            <h3 class="text-app-title-1 font-semibold text-text-90 mb-4">
+                                                {{ $section->title }}
+                                            </h3>
+                                            @if ($section->goal)
+                                                <div class="prose prose-stone prose-p:text-text-70 prose-li:text-text-70 prose-strong:text-text-80 max-w-none text-web-body-small leading-relaxed">
+                                                    {!! Str::markdown($section->goal) !!}
+                                                </div>
+                                            @else
+                                                <p class=" text-text-60 italic text-app-body-small">{{ __('No details for this section yet.') }}</p>
+                                            @endif
+                                        </div>
+                                    @empty
+                                        <p class="text-center text-text-60 italic text-app-body-small">{{ __('No detailed steps for this template yet.') }}</p>
+                                    @endforelse
+                                </div>
+
+                            </div>
                         </div>
                     </div>
                 @endif
@@ -480,12 +562,16 @@ new class extends Component {
                         </p>
 
                         <div class="flex gap-4">
-                            <button wire:click="$set('step', 2)" class="px-8 py-3 rounded-md border-2 border-brand-200 text-text-70 hover:bg-brand-50 transition-colors font-semibold text-web-button shadow-sm">
+                            <button wire:click="$set('step', 2)" wire:loading.attr="disabled" class="px-8 py-3 rounded-md border-2 border-brand-200 text-text-70 hover:bg-brand-50 transition-colors font-semibold text-web-button shadow-sm disabled:opacity-50">
                                 {{ __('Cancel') }}
                             </button>
                             
-                            <button wire:click="confirmTemplateChange" class="px-8 py-3 rounded-md bg-secondary-200 text-brand-10 hover:bg-secondary-300 hover:shadow-md transition-all font-semibold text-web-button shadow-sm transform active:scale-95">
-                                {{ __('Yes, Change Template') }}
+                            <button wire:click="confirmTemplateChange" wire:loading.attr="disabled" class="px-8 py-3 min-w-[230px] rounded-md bg-secondary-200 text-brand-10 hover:bg-secondary-300 hover:shadow-md transition-all font-semibold text-web-button shadow-sm transform active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+                                <span wire:loading.remove wire:target="confirmTemplateChange">{{ __('Yes, Change Template') }}</span>
+                                <span wire:loading.flex wire:target="confirmTemplateChange" class="items-center justify-center gap-2.5">
+                                    <svg class="animate-spin h-4 w-4 shrink-0 text-brand-10" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                    <span>{{ __('Applying...') }}</span>
+                                </span>
                             </button>
                         </div>
                     </div>
@@ -493,25 +579,44 @@ new class extends Component {
                 
                 @if($step === 4)
                     <div class="shrink-0 pt-6 px-6 relative z-10 bg-bg-main flex items-center border-b border-bg-border/60 pb-4">
-                        <button wire:click="goBack" class="w-10 h-10 rounded-full border border-brand-200 text-text-60 hover:bg-brand-50 hover:text-text-100 flex items-center justify-center transition-colors bg-bg-main" title="Back to structures">
+                        <button wire:click="goBack" wire:loading.attr="disabled" class="w-10 h-10 rounded-full border border-brand-200 text-text-60 hover:bg-brand-50 hover:text-text-100 flex items-center justify-center transition-colors bg-bg-main disabled:opacity-50" title="Back to structures">
                             <x-icons.back/>
                         </button>
                         <h2 class="text-app-title-1 text-text-90 ml-6">{{ __('Architect Your Structure') }}</h2>
                     </div>
 
-                    <div class="flex-1 overflow-y-auto custom-scrollbar px-10 md:px-14 py-8 bg-bg-main">
+                    <div
+                        x-ref="formScrollContainer"
+                        x-on:scroll-to-first-error.window="() => {
+                            try {
+                                $nextTick(() => {
+                                    const firstError = $el.querySelector('[data-validation-error=\'true\']');
+                                    if (firstError) {
+                                        const targetElement = firstError.closest('.form-field-group') || firstError.closest('div') || firstError;
+                                        targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                        const input = targetElement.querySelector('input, textarea, select');
+                                        if (input && typeof input.focus === 'function') {
+                                            setTimeout(() => input.focus({ preventScroll: true }), 350);
+                                        }
+                                    }
+                                });
+                            } catch (e) {}
+                        }"
+                        class="flex-1 overflow-y-auto custom-scrollbar px-10 md:px-14 py-8 bg-bg-main"
+                    >
                         <form wire:submit.prevent="saveCustomTemplate" class="max-w-3xl mx-auto flex flex-col gap-8 pb-10">
                             
                             <div class="flex flex-col gap-4">
-                                <div>
+                                <div class="form-field-group">
                                     <label class="block text-app-desc-feature font-bold text-text-70 uppercase tracking-wider mb-2">{{ __('Template Name') }} <span class="text-danger-100">*</span></label>
-                                    <input type="text" wire:model="customTemplateName" placeholder="{{ __('e.g. My Hero\'s Journey') }}" class="w-full bg-card-bg border border-card-border rounded-lg px-4 py-3 text-text-90 placeholder-text-60/40 focus:outline-none focus:border-secondary-200 focus:ring-1 focus:ring-secondary-200 transition-all text-app-body-medium">
-                                    @error('customTemplateName') <span class="text-danger-100 text-xs mt-1">{{ $message }}</span> @enderror
+                                    <input type="text" wire:model="customTemplateName" placeholder="{{ __('e.g. My Hero\'s Journey') }}" class="w-full bg-card-bg border @error('customTemplateName') border-danger-100 ring-1 ring-danger-100 @else border-card-border @enderror rounded-lg px-4 py-3 text-text-90 placeholder-text-60/40 focus:outline-none focus:border-secondary-200 focus:ring-1 focus:ring-secondary-200 transition-all text-app-body-medium">
+                                    @error('customTemplateName') <span data-validation-error="true" class="text-danger-100 text-xs mt-1 block">{{ $message }}</span> @enderror
                                 </div>
                                 
-                                <div>
+                                <div class="form-field-group">
                                     <label class="block text-app-desc-feature font-bold text-text-70 uppercase tracking-wider mb-2">{{ __('Description') }}</label>
-                                    <textarea wire:model="customTemplateDescription" rows="2" placeholder="{{ __('Briefly explain what this structure is for...') }}" class="w-full bg-card-bg border border-card-border rounded-lg px-4 py-3 text-text-90 placeholder-text-60/40 focus:outline-none focus:border-secondary-200 focus:ring-1 focus:ring-secondary-200 transition-all custom-scrollbar resize-none text-app-body-medium"></textarea>
+                                    <textarea wire:model="customTemplateDescription" rows="2" placeholder="{{ __('Briefly explain what this structure is for...') }}" class="w-full bg-card-bg border @error('customTemplateDescription') border-danger-100 ring-1 ring-danger-100 @else border-card-border @enderror rounded-lg px-4 py-3 text-text-90 placeholder-text-60/40 focus:outline-none focus:border-secondary-200 focus:ring-1 focus:ring-secondary-200 transition-all custom-scrollbar resize-none text-app-body-medium"></textarea>
+                                    @error('customTemplateDescription') <span data-validation-error="true" class="text-danger-100 text-xs mt-1 block">{{ $message }}</span> @enderror
                                 </div>
 
                                 <div x-data="{ 
@@ -594,7 +699,7 @@ new class extends Component {
                                                 );
                                             }, 'image/jpeg', 0.9);
                                         }
-                                    }">
+                                    }" class="form-field-group">
                                     <label class="block text-app-desc-feature font-bold text-text-70 uppercase tracking-wider mb-2">{{ __('Cover Image') }}</label>
                                     
                                     <div @mouseover="hoverCover = true" @mouseleave="hoverCover = false" class="relative w-full max-w-lg aspect-[16/9] mx-auto border border-brand-100 rounded-lg bg-card-bg transition-colors flex flex-col items-center justify-center overflow-hidden">
@@ -648,7 +753,7 @@ new class extends Component {
 
                                         {{-- Server-side Error --}}
                                         @error('customImagePreview') 
-                                            <div x-data="{ show: true }" x-show="show" class="absolute inset-x-4 top-4 bg-danger-100/95 text-bg-main text-[12px] font-medium px-3 py-2.5 rounded shadow-xl z-50 flex items-start gap-2">
+                                            <div data-validation-error="true" x-data="{ show: true }" x-show="show" class="absolute inset-x-4 top-4 bg-danger-100/95 text-bg-main text-[12px] font-medium px-3 py-2.5 rounded shadow-xl z-50 flex items-start gap-2">
                                                 <svg class="w-4 h-4 mt-0.5 shrink-0 text-bg-main" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
                                                 <span class="flex-1 leading-relaxed">{{ $message }}</span>
                                                 <button type="button" @click.stop="show = false" class="shrink-0 ml-2 p-0.5 hover:bg-black/20 rounded transition-colors" title="{{ __('Dismiss') }}"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
@@ -677,15 +782,15 @@ new class extends Component {
                                 </div>
 
                                 @foreach($customSections as $index => $section)
-                                    <div class="bg-card-bg border border-card-border rounded-xl p-5 shadow-sm relative group" wire:key="section-{{ $index }}">
+                                    <div class="form-field-group bg-card-bg border border-card-border rounded-xl p-5 shadow-sm relative group" wire:key="section-{{ $index }}">
                                         
                                         <div class="flex gap-4 items-start mb-4">
                                             <div class="w-8 h-8 rounded bg-brand-100 text-secondary-200 flex items-center justify-center font-bold text-app-body-small shrink-0 mt-1">
                                                 {{ $index + 1 }}
                                             </div>
                                             <div class="flex-1">
-                                                <input type="text" wire:model="customSections.{{ $index }}.title" placeholder="{{ __('e.g. Inciting Incident') }}" class="w-full bg-transparent border-b border-card-border focus:border-secondary-200 px-1 py-1.5 text-text-90 placeholder-text-60/40 focus:outline-none transition-all text-app-body-large">
-                                                @error('customSections.'.$index.'.title') <span class="text-danger-100 text-xs mt-1 block">{{ $message }}</span> @enderror
+                                                <input type="text" wire:model="customSections.{{ $index }}.title" placeholder="{{ __('e.g. Inciting Incident') }}" class="w-full bg-transparent border-b @error('customSections.'.$index.'.title') border-danger-100 @else border-card-border @enderror focus:border-secondary-200 px-1 py-1.5 text-text-90 placeholder-text-60/40 focus:outline-none transition-all text-app-body-large">
+                                                @error('customSections.'.$index.'.title') <span data-validation-error="true" class="text-danger-100 text-xs mt-1 block">{{ $message }}</span> @enderror
                                             </div>
                                             
                                             @if(count($customSections) > 1)
@@ -696,12 +801,13 @@ new class extends Component {
                                         </div>
 
                                         <div class="pl-12">
-                                            <textarea wire:model="customSections.{{ $index }}.goal" rows="2" placeholder="{{ __('Describe what needs to happen in this section...') }}" class="w-full bg-bg-main border border-card-border rounded-lg px-3 py-2 text-text-80 placeholder-text-60/40 focus:outline-none focus:border-secondary-200 transition-all custom-scrollbar resize-none text-app-body-small"></textarea>
+                                            <textarea wire:model="customSections.{{ $index }}.goal" rows="2" placeholder="{{ __('Describe what needs to happen in this section...') }}" class="w-full bg-bg-main border @error('customSections.'.$index.'.goal') border-danger-100 ring-1 ring-danger-100 @else border-card-border @enderror rounded-lg px-3 py-2 text-text-80 placeholder-text-60/40 focus:outline-none focus:border-secondary-200 transition-all custom-scrollbar resize-none text-app-body-small"></textarea>
+                                            @error('customSections.'.$index.'.goal') <span data-validation-error="true" class="text-danger-100 text-xs mt-1 block">{{ $message }}</span> @enderror
                                         </div>
                                     </div>
                                 @endforeach
                                 
-                                @error('customSections') <span class="text-danger-100 text-xs">{{ $message }}</span> @enderror
+                                @error('customSections') <span data-validation-error="true" class="text-danger-100 text-xs block mt-1">{{ $message }}</span> @enderror
 
                                 <button type="button" wire:click="addCustomSection" class="w-full py-4 border-2 border-dashed border-card-border rounded-xl text-text-60 hover:text-secondary-200 hover:border-brand-200 hover:bg-brand-50/50 transition-all flex items-center justify-center gap-2 group focus:outline-none text-web-button">
                                     <x-icons.add class="w-4 h-4" />
@@ -710,11 +816,14 @@ new class extends Component {
                             </div>
 
                             <div class="pt-3 mt-2 border-t border-bg-border/60 flex justify-end">
-                                <button type="submit" class="flex items-center gap-2 px-8 py-3 bg-secondary-200 text-brand-10 rounded-md hover:bg-secondary-300 transition-all text-web-button shadow-sm transform active:scale-95">
+                                <button type="submit" wire:loading.attr="disabled" class="flex items-center justify-center gap-2 min-w-[220px] px-8 py-3 bg-secondary-200 text-brand-10 rounded-md hover:bg-secondary-300 transition-all text-web-button shadow-sm transform active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed">
                                     <span wire:loading.remove wire:target="saveCustomTemplate">
                                         {{ $editingTemplateId ? __('Update Structure') : __('Build This Structure') }}
                                     </span>
-                                    <span wire:loading wire:target="saveCustomTemplate">{{ __('Saving...') }}</span>
+                                    <span wire:loading.flex wire:target="saveCustomTemplate" class="items-center justify-center gap-2.5">
+                                        <svg class="animate-spin h-4 w-4 shrink-0 text-brand-10" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                        <span>{{ __('Saving...') }}</span>
+                                    </span>
                                 </button>
                             </div>
                         </form>
