@@ -6,12 +6,20 @@ document.addEventListener('alpine:init', () => {
         panStartX: 0, panStartY: 0,
         panOriginX: 0, panOriginY: 0,
         get canvasW() {
-            const multiplier = Math.floor(this.characters.length / 25);
-            return 2400 + (multiplier * 800);
+            let baseW = 2400 + (Math.floor(this.characters.length / 25) * 800);
+            if (this.characters.length > 0) {
+                const maxLeft = Math.max(...this.characters.map(c => c.left));
+                baseW = Math.max(baseW, maxLeft + 400); // 400px padding
+            }
+            return baseW;
         },
         get canvasH() {
-            const multiplier = Math.floor(this.characters.length / 25);
-            return 1800 + (multiplier * 600);
+            let baseH = 1800 + (Math.floor(this.characters.length / 25) * 600);
+            if (this.characters.length > 0) {
+                const maxTop = Math.max(...this.characters.map(c => c.top));
+                baseH = Math.max(baseH, maxTop + 300); // 300px padding
+            }
+            return baseH;
         },
         projectId,
         characters,
@@ -293,8 +301,8 @@ document.addEventListener('alpine:init', () => {
             if (Math.abs(dx) > 3 || Math.abs(dy) > 3) this.dragMoved = true;
             const char = this.characters.find(c => c.id === this.draggingId);
             if (char) {
-                char.top = this.dragOrigTop + dy;
-                char.left = this.dragOrigLeft + dx;
+                char.top = Math.max(40, this.dragOrigTop + dy);
+                char.left = Math.max(40, this.dragOrigLeft + dx);
             }
         },
         stopDragChar() {
@@ -434,12 +442,12 @@ document.addEventListener('alpine:init', () => {
             this.applyZoom(Math.min(2, +(this.zoom + 0.1).toFixed(2)));
         },
         zoomOut() {
-            this.applyZoom(Math.max(0.1, +(this.zoom - 0.1).toFixed(2)));
+            this.applyZoom(Math.max(0.5, +(this.zoom - 0.1).toFixed(2)));
         },
         onWheel(e) {
             if (this.isAnyPopupOpen()) return;
             const delta = e.deltaY > 0 ? -0.1 : 0.1;
-            this.applyZoom(Math.min(2, Math.max(0.1, +(this.zoom + delta).toFixed(2))));
+            this.applyZoom(Math.min(2, Math.max(0.5, +(this.zoom + delta).toFixed(2))));
         },
         startPan(e) {
             if (this.isAnyPopupOpen()) return;

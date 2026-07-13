@@ -199,7 +199,7 @@ new #[Layout('layouts.app')] class extends Component {
                     
                     <template x-if="recommendations.characters.length > 0">
                         <div>
-                            <div class="px-4 py-1 bg-brand-50 text-[10px] font-bold text-subtext-100 uppercase tracking-wider">{{ __('Characters') }}</div>
+                            <div class="px-4 py-1 bg-brand-50 text-app-caption font-semibold text-subtext-100 uppercase">{{ __('Characters') }}</div>
                             <template x-for="rec in recommendations.characters" :key="rec.id">
                                 <button @click="localQuery = rec.name; $dispatch('search-query-updated', {query: rec.name, type: 'character'}); showDropdown = false" 
                                         class="w-full flex items-center gap-3 px-4 py-2 hover:bg-brand-150 transition-colors text-left">
@@ -208,7 +208,7 @@ new #[Layout('layouts.app')] class extends Component {
                                         <x-icons.default-avatar x-show="!rec.imagePath" class="w-full h-full" />
                                     </div>
                                     <div class="flex flex-col min-w-0">
-                                        <span class="text-app-body-medium font-medium text-text-80 truncate" x-text="rec.name"></span>
+                                        <span class="text-app-body-medium text-text-80 truncate" x-text="rec.name"></span>
                                     </div>
                                 </button>
                             </template>
@@ -217,12 +217,12 @@ new #[Layout('layouts.app')] class extends Component {
 
                     <template x-if="recommendations.tags.length > 0">
                         <div>
-                            <div class="px-4 py-1 bg-brand-50 text-[10px] font-bold text-subtext-100 uppercase tracking-wider">{{ __('Tags') }}</div>
+                            <div class="px-4 py-1 bg-brand-50 text-app-caption font-semibold text-subtext-100 uppercase">{{ __('Tags') }}</div>
                             <template x-for="tag in recommendations.tags" :key="tag">
                                 <button @click="localQuery = tag; $dispatch('search-query-updated', {query: tag, type: 'tag'}); showDropdown = false" 
                                         class="w-full flex items-center gap-3 px-4 py-2 hover:bg-brand-150 transition-colors text-left">
                                     <svg class="w-4 h-4 text-secondary-100 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" /></svg>
-                                    <span class="text-app-body-medium font-medium text-text-80 truncate" x-text="tag"></span>
+                                    <span class="text-app-body-medium text-text-80 truncate" x-text="tag"></span>
                                 </button>
                             </template>
                         </div>
@@ -230,12 +230,12 @@ new #[Layout('layouts.app')] class extends Component {
 
                     <template x-if="recommendations.relations.length > 0">
                         <div>
-                            <div class="px-4 py-1 bg-brand-50 text-[10px] font-bold text-subtext-100 uppercase tracking-wider">{{ __('Relations') }}</div>
+                            <div class="px-4 py-1 bg-brand-50 text-app-caption font-semibold text-subtext-100 uppercase">{{ __('Relations') }}</div>
                             <template x-for="rel in recommendations.relations" :key="rel">
                                 <button @click="localQuery = rel; $dispatch('search-query-updated', {query: rel, type: 'relation'}); showDropdown = false" 
                                         class="w-full flex items-center gap-3 px-4 py-2 hover:bg-brand-150 transition-colors text-left">
                                     <svg class="w-4 h-4 text-brand-200 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg>
-                                    <span class="text-app-body-medium font-medium text-text-80 truncate" x-text="rel"></span>
+                                    <span class="text-app-body-medium text-text-80 truncate" x-text="rel"></span>
                                 </button>
                             </template>
                         </div>
@@ -268,7 +268,6 @@ new #[Layout('layouts.app')] class extends Component {
             @mousemove="if (characters.length > 0) { onPan($event); onDragChar($event); onDragLabel($event); }"
             @mouseup="stopPan(); stopDragChar(); stopDragLabel()"
             @mouseleave="stopPan(); stopDragChar(); stopDragLabel()"
-            {{-- :style="`background-image: radial-gradient(circle, var(--color-brand-150) ${1.5 * zoom}px, transparent ${1.5 * zoom}px); background-size: ${22 * zoom}px ${22 * zoom}px; background-position: ${panX}px ${panY}px;`" --}}
             :class="characters.length === 0 ? 'cursor-default' : (isAnyPopupOpen() ? 'cursor-auto' : (panning ? 'cursor-grabbing' : 'cursor-grab'))"
             class="bg-dot-pattern relative w-full h-full rounded-xl border border-brand-200 bg-brand-10 overflow-hidden"
             wire:ignore
@@ -316,7 +315,7 @@ new #[Layout('layouts.app')] class extends Component {
                                     'opacity-40': addingRelation && relationSourceId === char.id,
                                     'animate-pulse': addingRelation && relationSourceId !== char.id && !hoverSelf,
                                     'ring-2 ring-secondary-200': addingRelation && relationSourceId !== char.id,
-                                    'ring-4 ring-brand-300 border-transparent': searchQuery && hasSearchMatch && isCharacterHighlighted(char)
+                                    'ring-3 ring-secondary-150 border-transparent': searchQuery && hasSearchMatch && isCharacterHighlighted(char)
                                 }"
                             >
                                 <img x-show="char.imagePath" :src="char.imagePath" draggable="false" @dragstart.prevent class="w-full h-full object-cover pointer-events-none select-none">
@@ -327,10 +326,6 @@ new #[Layout('layouts.app')] class extends Component {
                     </div>
                 </template>
 
-                {{-- Label nama relasi, dirender terpisah supaya tidak pernah tertutup garis,
-                     tapi z-index-nya di bawah semua karakter supaya karakter selalu tampil di atas label.
-                     Bisa di-drag tegak lurus terhadap garis A-B buat atur bentuk kurvanya sendiri
-                     (disimpan per-relasi lewat updateRelationshipCurve, lihat curveOffset). --}}
                 <template x-for="rel in relationships" :key="'label-' + rel.id">
                     <span
                         class="absolute z-[15] text-app-desc-feature font-semibold whitespace-nowrap px-2 py-1 rounded select-none [transition-property:opacity,filter] duration-300"
