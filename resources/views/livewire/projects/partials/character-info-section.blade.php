@@ -59,7 +59,7 @@
                     {{-- Cropper Modal Overlay --}}
                     <div x-show="showCropper" x-cloak class="absolute inset-0 z-50 bg-bg-main flex flex-col rounded-lg overflow-hidden border border-black/10">
                         <div class="flex-1 w-full relative">
-                            <img x-ref="cropperImg" :src="cropImageUrl" class="block max-w-full" alt="Crop Preview">
+                            <img x-ref="cropperImg" :src="cropImageUrl" class="max-w-full block" alt="{{ __('Crop Preview') }}">
                         </div>
                         <div class="absolute bottom-4 left-0 right-0 flex justify-center gap-2 z-50">
                             <button @click="cancelCrop()" type="button" class="px-4 py-1.5 bg-bg-main/90 backdrop-blur text-text-70 text-[11px] font-bold uppercase tracking-wider rounded-md border border-text-60 hover:bg-bg-main shadow-lg transition-colors">{{ __('Cancel') }}</button>
@@ -76,7 +76,7 @@
                                     const file = $event.target.files[0];
                                     if (file) {
                                         if (file.size > 5 * 1024 * 1024) {
-                                            clientError = 'The selected image is too large. The maximum allowed file size is 5MB.';
+                                            this.clientError = '{{ __('The selected image is too large. The maximum allowed file size is 5MB.') }}';
                                             $event.target.value = '';
                                         } else {
                                             clientError = null;

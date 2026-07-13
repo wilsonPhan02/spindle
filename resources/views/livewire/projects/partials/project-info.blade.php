@@ -192,7 +192,7 @@
                                         const file = $event.target.files[0];
                                         if (file) {
                                             if (file.size > 2 * 1024 * 1024) {
-                                                clientError = 'The selected image is too large. The maximum allowed file size is 2MB.';
+                                                clientError = '{{ __('The selected image is too large. The maximum allowed file size is 2MB.') }}';
                                                 $event.target.value = '';
                                             } else {
                                                 clientError = null;
@@ -277,7 +277,7 @@
                                 {{-- Inline Cropper UI for Icon --}}
                                 <div x-show="showCropper" style="display: none;" class="flex-1 flex flex-col gap-3">
                                     <div class="w-full aspect-square bg-brand-50 rounded border border-brand-200 flex items-center justify-center overflow-hidden">
-                                        <img x-ref="iconCropperImg" :src="cropImageUrl" class="block max-w-full" alt="Crop Preview">
+                                        <img x-ref="iconCropperImg" :src="cropImageUrl" class="block max-w-full" alt="{{ __('Crop Preview') }}">
                                     </div>
                                     <div class="flex justify-end gap-2">
                                         <button @click="cancelCrop()" type="button" class="px-3 py-1.5 text-app-desc-feature font-semibold text-text-70 hover:bg-brand-100 rounded transition-colors">{{ __('Cancel') }}</button>

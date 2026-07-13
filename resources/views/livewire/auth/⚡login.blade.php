@@ -5,7 +5,7 @@ use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Illuminate\Support\Facades\Auth;
 
-new #[Layout('layouts.guest')] #[Title('Sign In - Spindle')] class extends Component
+new #[Layout('layouts.guest')] class extends Component
 {
     public $email = '';
     public $password = '';
@@ -37,9 +37,10 @@ new #[Layout('layouts.guest')] #[Title('Sign In - Spindle')] class extends Compo
 ?>
 
 <div class="relative flex flex-col items-center justify-center min-h-screen w-full">
+    <x-slot:title>{{ __('Sign In - Spindle') }}</x-slot>
 
     <div class="absolute inset-0 z-0 pointer-events-none">
-        <img src="{{ asset('images/auth-bg.svg') }}" class="absolute inset-0 w-full h-full object-cover" alt="Background">
+        <img src="{{ asset('images/auth-bg.svg') }}" class="absolute inset-0 w-full h-full object-cover" alt="{{ __('Background') }}">
     </div>
 
     <div class="relative z-10 flex flex-col items-center justify-center w-full px-4">

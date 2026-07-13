@@ -100,8 +100,8 @@
                         <button @click="toggle()" 
                                 type="button"
                                 class="group relative flex h-9 w-9 items-center justify-center rounded-full border border-secondary-100/50 dark:border-secondary-200/50 bg-secondary-5 dark:bg-brand-50 text-secondary-200 shadow-sm transition-all duration-300 hover:scale-105 hover:border-secondary-200 hover:shadow focus:outline-none"
-                                :title="isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'"
-                                aria-label="Toggle Theme">
+                                :title="isDark ? '{{ __('Switch to Light Mode') }}' : '{{ __('Switch to Dark Mode') }}'"
+                                aria-label="{{ __('Toggle Theme') }}">
                             <!-- Sun icon (shows in Dark mode) -->
                             <svg x-show="isDark" x-cloak class="h-4 w-4 text-secondary-200 transition-transform duration-300 group-hover:rotate-45" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
@@ -200,7 +200,7 @@
                 <div class="absolute top-[85%] left-0 h-[3px] w-[60%] bg-gradient-to-r from-transparent via-brand-10/80 to-transparent animate-wind-blow" style="animation-duration: 4.2s; animation-delay: 3.2s; filter: blur(1px);"></div>
             </div>
 
-            <img src="{{ $img('hero-figure.png') }}" alt="The Weaver"
+            <img src="{{ $img('hero-figure.png') }}" alt="{{ __('The Weaver') }}"
                  class="animate-sway relative z-10 w-full max-w-none select-none drop-shadow-[0_14px_22px_rgba(43,31,23,0.35)]">
         </div>
 
@@ -273,7 +273,7 @@
                                 <div class="tilt-container relative w-full h-auto cursor-pointer" style="perspective: 1000px;">
                                     <div class="tilt-element relative w-full h-auto drop-shadow-[0_24px_40px_rgba(0,0,0,0.45)] transition-transform duration-[200ms] ease-out pointer-events-none"
                                          style="transform-style: preserve-3d; transform: rotateX(0deg) rotateY(0deg) scale(1);">
-                                         <img src="{{ $img($tangle['file']) }}" alt="The Great Tangle" loading="lazy" class="w-full h-auto block">
+                                         <img src="{{ $img($tangle['file']) }}" alt="{{ __('The Great Tangle') }}" loading="lazy" class="w-full h-auto block">
                                          
                                          <!-- Localized Text Overlay -->
                                          <div class="absolute bottom-[10.5%] inset-x-4 flex justify-center text-center">
@@ -302,7 +302,7 @@
                 
                 <!-- Spindle Tool/Card (Foreground with Float Animation) -->
                 <div class="absolute top-1/2 left-[24%] lg:left-[30%] xl:left-[26%] 2xl:left-[20%] z-10 w-[200px] lg:w-[260px] -translate-y-[100%] animate-float transition-all duration-300">
-                    <img src="{{ $img('group47.png') }}" alt="The Spindle" loading="lazy"
+                    <img src="{{ $img('group47.png') }}" alt="{{ __('The Spindle') }}" loading="lazy"
                          class="w-full rotate-[8deg] drop-shadow-[0_30px_40px_rgba(0,0,0,0.5)]">
                 </div>
             </div>
@@ -341,7 +341,7 @@
                         @for ($i = 0; $i < 4; $i++)
                             <div class="carousel-scale-item w-[70vw] sm:w-[400px] lg:w-[500px] shrink-0 px-2 transition-transform duration-75">
                                 <div class="overflow-hidden rounded-2xl border border-card-border bg-card-bg shadow-[0_20px_40px_rgba(43,31,23,0.25)]">
-                                    <img src="{{ $img('writers-center.png') }}" alt="Spindle dashboard preview" loading="lazy" class="w-full object-cover">
+                                    <img src="{{ $img('writers-center.png') }}" alt="{{ __('Spindle dashboard preview') }}" loading="lazy" class="w-full object-cover">
                                 </div>
                             </div>
                         @endfor
@@ -351,7 +351,7 @@
                         @for ($i = 0; $i < 4; $i++)
                             <div class="carousel-scale-item w-[70vw] sm:w-[400px] lg:w-[500px] shrink-0 px-2 transition-transform duration-75">
                                 <div class="overflow-hidden rounded-2xl border border-card-border bg-card-bg shadow-[0_20px_40px_rgba(43,31,23,0.25)]">
-                                    <img src="{{ $img('writers-center.png') }}" alt="Spindle dashboard preview" loading="lazy" class="w-full object-cover">
+                                    <img src="{{ $img('writers-center.png') }}" alt="{{ __('Spindle dashboard preview') }}" loading="lazy" class="w-full object-cover">
                                 </div>
                             </div>
                         @endfor
@@ -509,12 +509,12 @@
                 {!! __('Copyright © :year Spindle. Empowering storytellers to weave unforgettable narratives. Developed and maintained by the Spindle Team. All rights reserved.', ['year' => date('Y')]) !!}
             </p>
             <div class="mt-8 flex items-center gap-4">
-                <a href="#" aria-label="Instagram" class="flex h-11 w-11 items-center justify-center rounded-full border border-white/40 transition-colors hover:bg-white/10">
+                <a href="#" aria-label="{{ __('Instagram') }}" class="flex h-11 w-11 items-center justify-center rounded-full border border-white/40 transition-colors hover:bg-white/10">
                     <svg viewBox="0 0 24 24" fill="none" class="h-5 w-5" stroke="currentColor" stroke-width="1.8">
                         <rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/>
                     </svg>
                 </a>
-                <a href="#" aria-label="Email" class="flex h-11 w-11 items-center justify-center rounded-full border border-white/40 transition-colors hover:bg-white/10">
+                <a href="#" aria-label="{{ __('Email') }}" class="flex h-11 w-11 items-center justify-center rounded-full border border-white/40 transition-colors hover:bg-white/10">
                     <svg viewBox="0 0 24 24" fill="none" class="h-5 w-5" stroke="currentColor" stroke-width="1.8">
                         <rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/>
                     </svg>
@@ -524,7 +524,7 @@
     </footer>
 
     <!-- Back to Top Button -->
-    <a href="#hero" id="back-to-top" aria-label="Back to top"
+    <a href="#hero" id="back-to-top" aria-label="{{ __('Back to top') }}"
        class="fixed bottom-8 right-8 z-50 flex h-12 w-12 translate-y-[150%] items-center justify-center rounded-full bg-secondary-150 text-brand-10 opacity-0 shadow-[0_8px_16px_rgba(43,31,23,0.2)] transition-all duration-500 hover:bg-secondary-200 hover:-translate-y-1 hover:shadow-[0_12px_24px_rgba(43,31,23,0.3)]">
         <svg viewBox="0 0 24 24" fill="none" class="h-6 w-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M5 15l7-7 7 7"/>

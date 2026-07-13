@@ -150,7 +150,7 @@
                         </div>
 
                         @if($chapterCard->cover_image_path)
-                            <img src="{{ Storage::url($chapterCard->cover_image_path) }}" class="w-full h-full object-cover transition-transform duration-300" alt="Chapter Cover">
+                            <img src="{{ Storage::url($chapterCard->cover_image_path) }}" class="w-full h-full object-cover transition-transform duration-300" alt="{{ __('Chapter Cover') }}">
                         @else
                             <div class="flex flex-col items-center justify-center gap-1 p-4 text-center">
                                 <x-icons.no-structure class="w-8 h-8 text-secondary-150 opacity-60" />

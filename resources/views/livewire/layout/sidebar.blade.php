@@ -238,7 +238,7 @@ new class extends Component {
 
             <div class="flex flex-col truncate">
                 <span class="text-app-subheading-2 text-text-80 truncate" :title="currentUsername" x-text="currentUsername">
-                {{ Auth::user()->profile?->username ?? 'User' }}
+                {{ Auth::user()->profile?->username ?? __('User') }}
                 </span>
 
                 <span class="text-app-body-small text-subtext-90 truncate" title="{{ Auth::user()->email }}">

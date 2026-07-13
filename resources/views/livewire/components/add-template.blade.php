@@ -379,13 +379,13 @@ new class extends Component {
                                      class="group relative w-full max-w-lg aspect-[16/9] bg-[#212121] rounded-xl overflow-hidden cursor-pointer border border-transparent hover:border-brand-200 transition-all p-8 md:p-12 shadow-sm">
                                     
                                     @if($template->image_preview && $template->is_custom)
-                                        <img src="{{ Storage::url($template->image_preview) }}" alt="Preview" class="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:blur-[1px] transition-all duration-300 z-0" />
+                                        <img src="{{ Storage::url($template->image_preview) }}" alt="{{ __('Preview') }}" class="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:blur-[1px] transition-all duration-300 z-0" />
                                     @endif
 
                                     <div class="relative z-10 w-full max-w-2xl h-full flex items-center justify-center transition-all duration-300 group-hover:blur-[1px] group-hover:opacity-90 pointer-events-none">
                                         @if($template->image_preview)
                                             @if(!$template->is_custom)
-                                                <img src="{{ asset('images/' . str_replace('.', '/', $template->image_preview) . '.svg') }}" class="w-full max-w-lg h-auto" alt="Template Preview" />
+                                                <img src="{{ asset('images/' . str_replace('.', '/', $template->image_preview) . '.svg') }}" class="w-full max-w-lg h-auto" alt="{{ __('Template Preview') }}" />
                                             @endif
                                         @else
                                             <div class="flex flex-col items-center justify-center h-48 text-brand-200">
@@ -407,7 +407,7 @@ new class extends Component {
                                             <button @click.stop wire:click="editCustomTemplate('{{ $template->template_id }}')" 
                                                     wire:loading.attr="disabled"
                                                     class="flex items-center gap-1 px-2 py-1 bg-bg-main/95 backdrop-blur-sm border border-brand-200 text-secondary-200 rounded-sm hover:bg-brand-200 transition-all shadow-md disabled:opacity-50" 
-                                                    title="Edit Structure">
+                                                    title="{{ __('Edit Structure') }}">
                                                 <x-icons.rename class="w-3 h-3"/>
                                                 <span class="text-app-caption font-semibold">{{ __('Edit') }}</span>
                                             </button>
@@ -415,7 +415,7 @@ new class extends Component {
                                             <button @click.stop wire:click="attemptDeleteTemplate('{{ $template->template_id }}')" 
                                                     wire:loading.attr="disabled"
                                                     class="flex items-center gap-2 px-2 py-1 bg-bg-main/95 backdrop-blur-sm border border-danger-100/50 text-danger-100 rounded-sm hover:bg-danger-100 hover:border-danger-100 hover:text-brand-50 transition-all shadow-md group/btn disabled:opacity-50" 
-                                                    title="Delete Structure">
+                                                    title="{{ __('Delete Structure') }}">
                                                 <x-icons.delete class="w-3 h-3" />
                                                 <span class="text-app-caption font-semibold">{{ __('Delete') }}</span>
                                             </button>
@@ -440,7 +440,7 @@ new class extends Component {
 
                         {{-- Header bar with back + conditional sticky Use Template button --}}
                         <div class="shrink-0 pt-6 px-6 pb-4 relative z-10 bg-bg-main flex items-center justify-between">
-                            <button wire:click="goBack" wire:loading.attr="disabled" class="w-10 h-10 rounded-full border border-brand-200 text-text-60 hover:bg-brand-50 hover:text-text-100 flex items-center justify-center transition-colors bg-bg-main disabled:opacity-50" title="Back to structures">
+                            <button wire:click="goBack" wire:loading.attr="disabled" class="w-10 h-10 rounded-full border border-brand-200 text-text-60 hover:bg-brand-50 hover:text-text-100 flex items-center justify-center transition-colors bg-bg-main disabled:opacity-50" title="{{ __('Back to structures') }}">
                                 <x-icons.back/>
                             </button>
 
@@ -498,9 +498,9 @@ new class extends Component {
                                 <div class="relative overflow-hidden w-full max-w-xl h-[60vh] bg-[#212121] rounded-xl p-8 flex items-center justify-center mb-8">
                                     @if($this->selectedTemplate->image_preview)
                                         @if($this->selectedTemplate->is_custom)
-                                            <img src="{{ Storage::url($this->selectedTemplate->image_preview) }}" alt="Preview" class="absolute inset-0 w-full h-full object-cover" />
+                                            <img src="{{ Storage::url($this->selectedTemplate->image_preview) }}" alt="{{ __('Preview') }}" class="absolute inset-0 w-full h-full object-cover" />
                                         @else
-                                            <img src="{{ asset('images/' . str_replace('.', '/', $this->selectedTemplate->image_preview) . '.svg') }}" class="w-full h-auto max-w-lg" alt="Template Preview" />
+                                            <img src="{{ asset('images/' . str_replace('.', '/', $this->selectedTemplate->image_preview) . '.svg') }}" class="w-full h-auto max-w-lg" alt="{{ __('Template Preview') }}" />
                                         @endif
                                     @else
                                         <div class="flex flex-col items-center justify-center h-48 text-brand-200">
@@ -579,7 +579,7 @@ new class extends Component {
                 
                 @if($step === 4)
                     <div class="shrink-0 pt-6 px-6 relative z-10 bg-bg-main flex items-center border-b border-bg-border/60 pb-4">
-                        <button wire:click="goBack" wire:loading.attr="disabled" class="w-10 h-10 rounded-full border border-brand-200 text-text-60 hover:bg-brand-50 hover:text-text-100 flex items-center justify-center transition-colors bg-bg-main disabled:opacity-50" title="Back to structures">
+                        <button wire:click="goBack" wire:loading.attr="disabled" class="w-10 h-10 rounded-full border border-brand-200 text-text-60 hover:bg-brand-50 hover:text-text-100 flex items-center justify-center transition-colors bg-bg-main disabled:opacity-50" title="{{ __('Back to structures') }}">
                             <x-icons.back/>
                         </button>
                         <h2 class="text-app-title-1 text-text-90 ml-6">{{ __('Architect Your Structure') }}</h2>
@@ -643,7 +643,7 @@ new class extends Component {
                                             if (!file) return;
                                             
                                             if (file.size > 5 * 1024 * 1024) {
-                                                this.clientError = 'The selected image is too large. The maximum allowed file size is 5MB.';
+                                                this.clientError = '{{ __('The selected image is too large. The maximum allowed file size is 5MB.') }}';
                                                 this.$refs.coverInput.value = '';
                                                 return;
                                             }
@@ -848,9 +848,9 @@ new class extends Component {
 
     <x-confirm-dialog
         eventName="show-template-in-use-warning"
-        title="Structure is in Use"
-        description="This template cannot be deleted because it is currently being used by one or more of your projects. You must change the structure in those projects first."
-        confirmText="Understood"
+        title="{{ __('Structure is in Use') }}"
+        description="{{ __('This template cannot be deleted because it is currently being used by one or more of your projects. You must change the structure in those projects first.') }}"
+        confirmText="{{ __('Understood') }}"
         iconColor="text-warning-100"
         iconBg="bg-warning-100/20"
         btnColor="bg-secondary-150 text-subtext-60 hover:bg-secondary-200"

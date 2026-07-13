@@ -52,7 +52,7 @@
                 {{-- Inline Cropper UI for Cover --}}
                 <div x-show="showCropper" style="display: none;" class="absolute inset-0 z-40 bg-brand-50 rounded-l-md rounded-r-xl border border-brand-200 overflow-hidden flex flex-col">
                     <div class="flex-1 w-full relative">
-                        <img x-ref="cropperImg" :src="cropImageUrl" class="block max-w-full" alt="Crop Preview">
+                        <img x-ref="cropperImg" :src="cropImageUrl" class="max-w-full block" alt="{{ __('Crop Preview') }}">
                     </div>
                     <div class="absolute bottom-4 left-0 right-0 flex justify-center gap-2 z-50">
                         <button @click="cancelCrop()" type="button" class="px-4 py-1.5 bg-bg-main/90 backdrop-blur text-text-70 text-[11px] font-bold uppercase tracking-wider rounded-md border border-text-60 hover:bg-bg-main shadow-lg transition-colors">{{ __('Cancel') }}</button>

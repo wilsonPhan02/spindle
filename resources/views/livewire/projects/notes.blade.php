@@ -146,7 +146,7 @@ new #[Layout('layouts.app')] class extends Component {
         }
         
         $this->redoStack[] = $lastAction;
-        $this->dispatch('show-undo-toast', message: 'Action undone.');
+        $this->dispatch('show-undo-toast', message: __('Action undone.'));
     }
 
     public function redo(): void
@@ -211,7 +211,7 @@ new #[Layout('layouts.app')] class extends Component {
         }
         
         $this->undoStack[] = $lastAction;
-        $this->dispatch('show-undo-toast', message: 'Action redone.');
+        $this->dispatch('show-undo-toast', message: __('Action redone.'));
     }
 
     public function undoWithCurrentBody(?string $currentHtml = null, ?int $cursorOffset = null): void
@@ -240,7 +240,7 @@ new #[Layout('layouts.app')] class extends Component {
             'title'          => $this->nextDefaultTitle(null),
             'body'           => '',
         ]);
-        $this->pushUndo('add', ['note_id' => $note->note_id], 'Note created.');
+        $this->pushUndo('add', ['note_id' => $note->note_id], __('Note created.'));
         $this->selectNote($note->note_id, false);
     }
 
@@ -257,7 +257,7 @@ new #[Layout('layouts.app')] class extends Component {
             'title'          => $this->nextDefaultTitle($parentId),
             'body'           => '',
         ]);
-        $this->pushUndo('add', ['note_id' => $note->note_id], 'Sub tab created.');
+        $this->pushUndo('add', ['note_id' => $note->note_id], __('Sub tab created.'));
         $this->selectNote($note->note_id, false);
     }
 
@@ -287,7 +287,7 @@ new #[Layout('layouts.app')] class extends Component {
 
         if ($finalTitle === '' || $finalTitle === ' (Copy)') return;
         
-        $this->pushUndo('rename', ['note_id' => $noteId, 'old_title' => $note->title, 'new_title' => $finalTitle], 'Note renamed.');
+        $this->pushUndo('rename', ['note_id' => $noteId, 'old_title' => $note->title, 'new_title' => $finalTitle], __('Note renamed.'));
         
         $note->update(['title' => $finalTitle]);
     }
@@ -297,7 +297,7 @@ new #[Layout('layouts.app')] class extends Component {
         $source = Note::with('childrenRecursive')->find($noteId);
         if (!$source) return;
         $duplicate = $this->cloneNoteRecursive($source, $source->parent_note_id, $source->depth);
-        $this->pushUndo('add', ['note_id' => $duplicate->note_id], 'Note duplicated.');
+        $this->pushUndo('add', ['note_id' => $duplicate->note_id], __('Note duplicated.'));
         $this->selectNote($duplicate->note_id, false);
     }
 
@@ -326,7 +326,7 @@ new #[Layout('layouts.app')] class extends Component {
 
         $wasActive = ($this->activeNoteId === $noteId);
         
-        $this->pushUndo('remove', ['note_id' => $noteId], 'Note deleted.');
+        $this->pushUndo('remove', ['note_id' => $noteId], __('Note deleted.'));
         
         $note->delete();
 
@@ -371,7 +371,7 @@ new #[Layout('layouts.app')] class extends Component {
                 'timestamp' => time(),
             ];
             $this->redoStack = [];
-            $this->dispatch('show-undo-toast', message: 'Text edited.');
+            $this->dispatch('show-undo-toast', message: __('Text edited.'));
         }
         $this->editorBody = $html;
         $this->lastCursorOffset = $cursorOffset;
@@ -474,7 +474,7 @@ new #[Layout('layouts.app')] class extends Component {
                 'moved_id'      => $draggedId,
                 'old_positions' => $oldPositions,
                 'new_positions' => $newPositions,
-            ], 'Note moved.');
+            ], __('Note moved.'));
             $this->selectNote($draggedId);
         }
     }
@@ -677,9 +677,9 @@ new #[Layout('layouts.app')] class extends Component {
 
         {{-- Breadcrumb --}}
         <x-breadcrumb :items="[
-            ['label' => 'Dashboard', 'url' => route('dashboard')],
+            ['label' => __('Dashboard'), 'url' => route('dashboard')],
             ['label' => $project->title, 'url' => route('projects.show', $project), 'truncate' => true],
-            ['label' => 'Notes']
+            ['label' => __('Notes')]
         ]" />
 
         <h2 class="text-web-heading-2 text-text-100 mb-6">{{ __('Project Notes') }}</h2>

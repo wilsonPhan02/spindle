@@ -184,7 +184,7 @@
             {{-- Cropper Area --}}
             <div class="p-6 bg-brand-50 w-full h-[400px] flex items-center justify-center">
                 <div class="w-full h-full overflow-hidden rounded-md border border-brand-150">
-                    <img x-ref="cropperImg" :src="cropImageUrl" class="max-w-full block" alt="Picture">
+                    <img x-ref="cropperImg" :src="cropImageUrl" class="max-w-full block" alt="{{ __('Picture') }}">
                 </div>
             </div>
             
