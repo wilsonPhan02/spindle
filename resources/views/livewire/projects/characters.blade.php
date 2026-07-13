@@ -171,8 +171,83 @@ new #[Layout('layouts.app')] class extends Component {
             ['label' => __('Characters')]
         ]" />
 
-        <div class="flex justify-between items-center">
+        <div class="flex justify-between items-center gap-4">
             <h1 class="text-app-title-1 text-text-100">{{ __('Characters Sheet') }}</h1>
+            
+            <div class="relative w-64" 
+                 x-data="{ localQuery: '', showDropdown: false, recommendations: { characters: [], tags: [], relations: [] } }" 
+                 @search-recommendations.window="recommendations = $event.detail"
+                 @click.away="showDropdown = false"
+            >
+                <svg class="absolute left-3 top-2.5 w-4 h-4 text-subtext-100" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                <input 
+                    x-model="localQuery"
+                    @input="$dispatch('search-query-updated', {query: localQuery, type: 'all'}); showDropdown = true"
+                    @focus="$dispatch('search-query-updated', {query: localQuery, type: 'all'}); showDropdown = true"
+                    type="text" 
+                    placeholder="{{ __('Search character...') }}" 
+                    class="w-full pl-9 pr-8 py-2 bg-brand-10 border border-brand-150 rounded-full text-app-body-medium text-text-80 placeholder-subtext-100 focus:ring-1 focus:ring-secondary-150 outline-none transition-shadow"
+                >
+                <button x-show="localQuery !== ''" @click="localQuery = ''; $dispatch('search-query-updated', {query: '', type: 'all'}); showDropdown = false" class="absolute right-3 top-2.5 text-subtext-100 hover:text-text-80 transition-colors" x-cloak>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+
+                <div x-show="showDropdown && localQuery !== ''" 
+                     x-transition
+                     class="absolute top-full left-0 right-0 mt-2 bg-brand-10 border border-brand-200 rounded-lg shadow-lg overflow-hidden z-[100] max-h-96 overflow-y-auto" 
+                     x-cloak>
+                    
+                    <template x-if="recommendations.characters.length > 0">
+                        <div>
+                            <div class="px-4 py-1 bg-brand-50 text-[10px] font-bold text-subtext-100 uppercase tracking-wider">{{ __('Characters') }}</div>
+                            <template x-for="rec in recommendations.characters" :key="rec.id">
+                                <button @click="localQuery = rec.name; $dispatch('search-query-updated', {query: rec.name, type: 'character'}); showDropdown = false" 
+                                        class="w-full flex items-center gap-3 px-4 py-2 hover:bg-brand-150 transition-colors text-left">
+                                    <div class="w-6 h-6 shrink-0 rounded-full bg-brand-100 border border-brand-200 overflow-hidden flex items-center justify-center">
+                                        <img x-show="rec.imagePath" :src="rec.imagePath" class="w-full h-full object-cover">
+                                        <x-icons.default-avatar x-show="!rec.imagePath" class="w-full h-full" />
+                                    </div>
+                                    <div class="flex flex-col min-w-0">
+                                        <span class="text-app-body-medium font-medium text-text-80 truncate" x-text="rec.name"></span>
+                                    </div>
+                                </button>
+                            </template>
+                        </div>
+                    </template>
+
+                    <template x-if="recommendations.tags.length > 0">
+                        <div>
+                            <div class="px-4 py-1 bg-brand-50 text-[10px] font-bold text-subtext-100 uppercase tracking-wider">{{ __('Tags') }}</div>
+                            <template x-for="tag in recommendations.tags" :key="tag">
+                                <button @click="localQuery = tag; $dispatch('search-query-updated', {query: tag, type: 'tag'}); showDropdown = false" 
+                                        class="w-full flex items-center gap-3 px-4 py-2 hover:bg-brand-150 transition-colors text-left">
+                                    <svg class="w-4 h-4 text-secondary-100 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" /></svg>
+                                    <span class="text-app-body-medium font-medium text-text-80 truncate" x-text="tag"></span>
+                                </button>
+                            </template>
+                        </div>
+                    </template>
+
+                    <template x-if="recommendations.relations.length > 0">
+                        <div>
+                            <div class="px-4 py-1 bg-brand-50 text-[10px] font-bold text-subtext-100 uppercase tracking-wider">{{ __('Relations') }}</div>
+                            <template x-for="rel in recommendations.relations" :key="rel">
+                                <button @click="localQuery = rel; $dispatch('search-query-updated', {query: rel, type: 'relation'}); showDropdown = false" 
+                                        class="w-full flex items-center gap-3 px-4 py-2 hover:bg-brand-150 transition-colors text-left">
+                                    <svg class="w-4 h-4 text-brand-200 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg>
+                                    <span class="text-app-body-medium font-medium text-text-80 truncate" x-text="rel"></span>
+                                </button>
+                            </template>
+                        </div>
+                    </template>
+
+                    <template x-if="recommendations.characters.length === 0 && recommendations.tags.length === 0 && recommendations.relations.length === 0">
+                        <div class="px-4 py-4 text-center">
+                            <p class="text-app-body-medium text-text-60">{{ __('No results found') }}</p>
+                        </div>
+                    </template>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -217,8 +292,13 @@ new #[Layout('layouts.app')] class extends Component {
                         @mousedown.stop="startDragChar($event, char)"
                         @click="if (!dragMoved) { if (addingRelation && relationSourceId !== char.id) { selectTarget(char.id) } else if (!addingRelation) { openCharacterInfo(char) } }"
                         :data-character-id="char.id"
-                        class="absolute cursor-pointer flex flex-col items-center gap-2 pt-11 px-6 select-none"
-                        :class="draggingId === char.id ? 'cursor-grabbing z-40' : 'cursor-grab z-20'"
+                        class="absolute cursor-pointer flex flex-col items-center gap-2 pt-11 px-6 select-none transition duration-300"
+                        :class="{
+                            'cursor-grabbing z-40': draggingId === char.id,
+                            'cursor-grab z-20': draggingId !== char.id && (!searchQuery || !hasSearchMatch || isCharacterHighlighted(char)),
+                            'cursor-grab z-10': draggingId !== char.id && searchQuery && hasSearchMatch && !isCharacterHighlighted(char),
+                            'scale-105 drop-shadow-xl z-30': searchQuery && hasSearchMatch && isCharacterHighlighted(char)
+                        }"
                         :style="`top: ${char.top - 44}px; left: ${char.left - 24}px;`"
                     >
                         <div class="relative w-20 h-20">
@@ -231,11 +311,12 @@ new #[Layout('layouts.app')] class extends Component {
                             </button>
 
                             <div
-                                class="w-20 h-20 rounded-full bg-brand-100 border-2 border-brand-200 overflow-hidden flex items-center justify-center transition-opacity"
+                                class="w-20 h-20 rounded-full bg-brand-100 border-2 border-brand-200 overflow-hidden flex items-center justify-center transition-all duration-300"
                                 :class="{
                                     'opacity-40': addingRelation && relationSourceId === char.id,
                                     'animate-pulse': addingRelation && relationSourceId !== char.id && !hoverSelf,
-                                    'ring-2 ring-secondary-200': addingRelation && relationSourceId !== char.id
+                                    'ring-2 ring-secondary-200': addingRelation && relationSourceId !== char.id,
+                                    'ring-4 ring-brand-300 border-transparent': searchQuery && hasSearchMatch && isCharacterHighlighted(char)
                                 }"
                             >
                                 <img x-show="char.imagePath" :src="char.imagePath" draggable="false" @dragstart.prevent class="w-full h-full object-cover pointer-events-none select-none">
@@ -252,8 +333,12 @@ new #[Layout('layouts.app')] class extends Component {
                      (disimpan per-relasi lewat updateRelationshipCurve, lihat curveOffset). --}}
                 <template x-for="rel in relationships" :key="'label-' + rel.id">
                     <span
-                        class="absolute z-[15] text-app-desc-feature font-semibold whitespace-nowrap px-2 py-1 rounded select-none"
-                        :class="draggingLabelRelId === rel.id ? 'cursor-grabbing' : 'cursor-grab'"
+                        class="absolute z-[15] text-app-desc-feature font-semibold whitespace-nowrap px-2 py-1 rounded select-none [transition-property:opacity,filter] duration-300"
+                        :class="{
+                            'cursor-grabbing': draggingLabelRelId === rel.id,
+                            'cursor-grab': draggingLabelRelId !== rel.id,
+                            'opacity-30 grayscale': searchQuery && hasSearchMatch && !isRelationHighlighted(rel)
+                        }"
                         :style="`left: ${relationLine(rel).midX}px; top: ${relationLine(rel).midY}px; transform: translate(-50%, -50%) rotate(${relationLine(rel).labelAngle}rad); color: ${rel.textColor}; background-color: ${rel.bgColor};`"
                         @mousedown.stop="startDragLabel($event, rel)"
                         @click="if (!labelDragMoved) openEditRelation(rel)"
