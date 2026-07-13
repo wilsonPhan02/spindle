@@ -128,7 +128,7 @@ new #[Layout('layouts.app')] class extends Component {
                 <div class="relative">
 
                     {{-- Section Header --}}
-                    <div class="flex justify-between items-center border-b border-brand-150 pb-2 mb-6" x-data="{ menuOpen: false }">
+                    <div class="relative z-50 flex justify-between items-center border-b border-brand-150 pb-2 mb-6" x-data="{ menuOpen: false }">
                         <div class="min-w-0 flex-1">
                             <h2 class="text-2xl font-merriweather text-text-100 truncate">
                                 {{ $section->title }}
@@ -169,7 +169,63 @@ new #[Layout('layouts.app')] class extends Component {
                     </div>
 
                     {{-- Projects Grid (mirip dashboard) --}}
-                    <div class="flex gap-6 overflow-x-auto pb-4 custom-scrollbar">
+                    <div class="flex gap-6 overflow-x-auto pb-4 custom-scrollbar"
+                         x-data="{ 
+                             isDown: false, 
+                             isDragging: false,
+                             canScroll: false,
+                             startX: 0, 
+                             scrollLeft: 0,
+                             checkScrollable() {
+                                 this.canScroll = this.$el.scrollWidth > this.$el.clientWidth;
+                                 return this.canScroll;
+                             },
+                             handleWheel(e) {
+                                 if (this.checkScrollable() && e.deltaY !== 0) {
+                                     const atLeft = this.$el.scrollLeft <= 0 && e.deltaY < 0;
+                                     const atRight = Math.ceil(this.$el.scrollLeft + this.$el.clientWidth) >= this.$el.scrollWidth && e.deltaY > 0;
+                                     
+                                     if (!atLeft && !atRight) {
+                                         e.preventDefault();
+                                         this.$el.scrollBy({ left: e.deltaY * 1.5, behavior: 'smooth' });
+                                     }
+                                 }
+                             },
+                             startDrag(e) {
+                                 if (!this.checkScrollable()) return;
+                                 this.isDown = true;
+                                 this.isDragging = false;
+                                 this.startX = e.pageX - this.$el.offsetLeft;
+                                 this.scrollLeft = this.$el.scrollLeft;
+                             },
+                             stopDrag() {
+                                 this.isDown = false;
+                                 setTimeout(() => this.isDragging = false, 200);
+                             },
+                             doDrag(e) {
+                                 if (!this.isDown) return;
+                                 const x = e.pageX - this.$el.offsetLeft;
+                                 const walk = (x - this.startX) * 1.5;
+                                 if (Math.abs(walk) > 5) {
+                                     this.isDragging = true;
+                                     e.preventDefault();
+                                 }
+                                 this.$el.scrollLeft = this.scrollLeft - walk;
+                             }
+                         }"
+                         :class="{ 
+                             'cursor-grab active:cursor-grabbing': canScroll, 
+                             '[&_a]:pointer-events-none [&_button]:pointer-events-none': isDragging 
+                         }"
+                         x-init="checkScrollable()"
+                         @mouseenter="checkScrollable()"
+                         @wheel="handleWheel($event)"
+                         @mousedown="startDrag($event)"
+                         @mouseleave="stopDrag()"
+                         @mouseup="stopDrag()"
+                         @mousemove="doDrag($event)"
+                         @click.capture="if(isDragging) { $event.preventDefault(); $event.stopPropagation(); }"
+                    >
 
                         @forelse($section->projects as $project)
                             <div class="w-44 shrink-0 group" x-data="{ menuOpen: false }">
