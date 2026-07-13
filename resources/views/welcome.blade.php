@@ -301,7 +301,7 @@
                      class="pointer-events-none absolute top-1/2 left-[-15%] lg:left-[-8%] xl:left-[-12%] 2xl:left-[-18%] z-0 w-[100%] lg:w-[500px] max-w-none -translate-y-[40%] select-none transition-all duration-300">
                 
                 <!-- Spindle Tool/Card (Foreground with Float Animation) -->
-                <div class="absolute top-1/2 left-[24%] lg:left-[30%] xl:left-[26%] 2xl:left-[20%] z-10 w-[200px] lg:w-[260px] -translate-y-[85%] animate-float transition-all duration-300">
+                <div class="absolute top-1/2 left-[24%] lg:left-[30%] xl:left-[26%] 2xl:left-[20%] z-10 w-[200px] lg:w-[260px] -translate-y-[100%] animate-float transition-all duration-300">
                     <img src="{{ $img('group47.png') }}" alt="The Spindle" loading="lazy"
                          class="w-full rotate-[8deg] drop-shadow-[0_30px_40px_rgba(0,0,0,0.5)]">
                 </div>
