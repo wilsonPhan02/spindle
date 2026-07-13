@@ -5,14 +5,30 @@ document.addEventListener('alpine:init', () => {
         panning: false,
         panStartX: 0, panStartY: 0,
         panOriginX: 0, panOriginY: 0,
-        canvasW: 2400,
-        canvasH: 1800,
+        get canvasW() {
+            let baseW = 2400 + (Math.floor(this.characters.length / 25) * 800);
+            if (this.characters.length > 0) {
+                const maxLeft = Math.max(...this.characters.map(c => c.left));
+                baseW = Math.max(baseW, maxLeft + 400); // 400px padding
+            }
+            return baseW;
+        },
+        get canvasH() {
+            let baseH = 1800 + (Math.floor(this.characters.length / 25) * 600);
+            if (this.characters.length > 0) {
+                const maxTop = Math.max(...this.characters.map(c => c.top));
+                baseH = Math.max(baseH, maxTop + 300); // 300px padding
+            }
+            return baseH;
+        },
         projectId,
         characters,
         relationships,
         relationshipTypes,
         infoCharacter: null,
         showCharacterInfoPopup: false,
+        searchQuery: '',
+        searchType: 'all',
         addingRelation: false,
         relationSourceId: null,
         pendingTargetId: null,
@@ -27,6 +43,33 @@ document.addEventListener('alpine:init', () => {
         labelDragMoved: false,
 
         init() {
+            window.addEventListener('search-query-updated', (e) => {
+                const payload = e.detail;
+                if (typeof payload === 'string') {
+                    this.searchQuery = payload;
+                    this.searchType = 'all';
+                } else {
+                    this.searchQuery = payload.query;
+                    this.searchType = payload.type || 'all';
+                }
+                const matches = {
+                    characters: this.searchQuery && (this.searchType === 'all' || this.searchType === 'character') ? this.characters.filter(c => this.matchesCharacterSearch(c)).slice(0, 3) : [],
+                    tags: this.searchQuery && (this.searchType === 'all' || this.searchType === 'tag') ? Array.from(this.searchMatchedTags).slice(0, 3) : [],
+                    relations: this.searchQuery && (this.searchType === 'all' || this.searchType === 'relation') ? Array.from(new Set(this.relationships.filter(r => this.matchesRelationSearch(r)).map(r => r.name))).slice(0, 3) : []
+                };
+                window.dispatchEvent(new CustomEvent('search-recommendations', { detail: matches }));
+
+                if (this.searchQuery && this.searchMatchedCharacters.size > 0) {
+                    let totalX = 0, totalY = 0;
+                    const matchedIds = Array.from(this.searchMatchedCharacters);
+                    matchedIds.forEach(id => {
+                        const center = this.getCenter(id);
+                        totalX += center.x;
+                        totalY += center.y;
+                    });
+                    this.panTo(totalX / matchedIds.length, totalY / matchedIds.length);
+                }
+            });
             window.addEventListener('open-relation-type-popup', () => { this.relPopupOpen = true; });
             window.addEventListener('open-edit-relation-popup', () => { this.relPopupOpen = true; });
             window.addEventListener('relation-popup-closed', () => { this.relPopupOpen = false; });
@@ -67,6 +110,12 @@ document.addEventListener('alpine:init', () => {
                 this.relationships = this.relationships.filter(r => r.typeId !== typeId);
             });
 
+            this.$watch('characters.length', () => {
+                this.$nextTick(() => {
+                    this.clampPan();
+                });
+            });
+
             this.centerBoard();
         },
 
@@ -91,6 +140,78 @@ document.addEventListener('alpine:init', () => {
             return (rel.curveOffset !== null && rel.curveOffset !== undefined)
                 ? rel.curveOffset
                 : this.getGroupOffsetIndex(rel) * 26;
+        },
+        matchesCharacterSearch(char) {
+            if (!this.searchQuery) return false;
+            if (this.searchType !== 'all' && this.searchType !== 'character') return false;
+            const q = this.searchQuery.toLowerCase();
+            if (char.name.toLowerCase().includes(q)) return true;
+            return false;
+        },
+        matchesTagSearch(char) {
+            if (!this.searchQuery) return false;
+            if (this.searchType !== 'all' && this.searchType !== 'tag') return false;
+            const q = this.searchQuery.toLowerCase();
+            if (char.tags && char.tags.some(t => t.toLowerCase().includes(q))) return true;
+            return false;
+        },
+        matchesRelationSearch(rel) {
+            if (!this.searchQuery) return false;
+            if (this.searchType !== 'all' && this.searchType !== 'relation') return false;
+            const q = this.searchQuery.toLowerCase();
+            if (rel.name.toLowerCase().includes(q)) return true;
+            return false;
+        },
+        get searchMatchedCharacters() {
+            if (!this.searchQuery) return new Set();
+            return new Set(this.characters.filter(c => this.matchesCharacterSearch(c)).map(c => c.id));
+        },
+        get searchMatchedRelations() {
+            if (!this.searchQuery) return new Set();
+            return new Set(this.relationships.filter(r => this.matchesRelationSearch(r)).map(r => r.id));
+        },
+        get searchMatchedTags() {
+            if (!this.searchQuery) return new Set();
+            const q = this.searchQuery.toLowerCase();
+            const tags = new Set();
+            this.characters.forEach(c => {
+                if (c.tags) {
+                    c.tags.forEach(t => {
+                        if (t.toLowerCase().includes(q)) tags.add(t);
+                    });
+                }
+            });
+            return tags;
+        },
+        get hasSearchMatch() {
+            if (!this.searchQuery) return false;
+            return this.searchMatchedCharacters.size > 0 || this.searchMatchedTags.size > 0 || this.searchMatchedRelations.size > 0;
+        },
+        isCharacterHighlighted(char) {
+            if (!this.hasSearchMatch) return true;
+            if (this.searchMatchedCharacters.has(char.id)) return true;
+            if (this.matchesTagSearch(char)) return true;
+            
+            if (this.searchMatchedRelations.size > 0) {
+                const connectedToMatchedRel = this.relationships.some(r => 
+                    this.searchMatchedRelations.has(r.id) && (r.from === char.id || r.to === char.id)
+                );
+                if (connectedToMatchedRel) return true;
+            }
+            return false;
+        },
+        isRelationHighlighted(rel) {
+            if (!this.hasSearchMatch) return true;
+            if (this.searchMatchedRelations.has(rel.id)) return true;
+            
+            if (this.searchMatchedCharacters.size > 0 || this.searchMatchedTags.size > 0) {
+                const fromChar = this.characters.find(c => c.id === rel.from);
+                const toChar = this.characters.find(c => c.id === rel.to);
+                
+                if (fromChar && (this.searchMatchedCharacters.has(fromChar.id) || this.matchesTagSearch(fromChar))) return true;
+                if (toChar && (this.searchMatchedCharacters.has(toChar.id) || this.matchesTagSearch(toChar))) return true;
+            }
+            return false;
         },
         /**
          * Calculates the geometric properties of the relationship line connecting two characters.
@@ -145,10 +266,17 @@ document.addEventListener('alpine:init', () => {
         edgePathsMarkup() {
             return this.relationships.map(rel => {
                 const line = this.relationLine(rel);
-                const color = /^#[0-9a-fA-F]{3,8}$/.test(rel.textColor) ? rel.textColor : '#8C7558';
+                let color = /^#[0-9a-fA-F]{3,8}$/.test(rel.textColor) ? rel.textColor : '#8C7558';
+                let opacity = '1';
+
+                if (this.searchQuery && this.hasSearchMatch && !this.isRelationHighlighted(rel)) {
+                    color = '#E2E8F0';
+                    opacity = '0.3';
+                }
+
                 const d = `M ${line.x1} ${line.y1} Q ${line.controlX} ${line.controlY} ${line.x2} ${line.y2}`;
                 const hit = `<path d="${d}" stroke="transparent" stroke-width="14" fill="none" pointer-events="stroke" style="cursor:pointer" data-rel-id="${rel.id}"></path>`;
-                const visible = `<path d="${d}" stroke="${color}" stroke-width="2" fill="none" pointer-events="none"></path>`;
+                const visible = `<path d="${d}" stroke="${color}" stroke-width="2" fill="none" pointer-events="none" opacity="${opacity}"></path>`;
                 return hit + visible;
             }).join('');
         },
@@ -173,8 +301,8 @@ document.addEventListener('alpine:init', () => {
             if (Math.abs(dx) > 3 || Math.abs(dy) > 3) this.dragMoved = true;
             const char = this.characters.find(c => c.id === this.draggingId);
             if (char) {
-                char.top = this.dragOrigTop + dy;
-                char.left = this.dragOrigLeft + dx;
+                char.top = Math.max(40, this.dragOrigTop + dy);
+                char.left = Math.max(40, this.dragOrigLeft + dx);
             }
         },
         stopDragChar() {
@@ -338,8 +466,6 @@ document.addEventListener('alpine:init', () => {
         },
         stopPan() { this.panning = false; },
         centerBoard() {
-            // Pakai double requestAnimationFrame, supaya ukuran elemen (offsetWidth/Height)
-            // sudah benar-benar final setelah layout/navigasi selesai sebelum dihitung.
             requestAnimationFrame(() => {
                 requestAnimationFrame(() => {
                     this.panX = (this.$el.offsetWidth - this.canvasW * this.zoom) / 2;
@@ -347,6 +473,15 @@ document.addEventListener('alpine:init', () => {
                     this.clampPan();
                     this.$el.scrollIntoView({ behavior: 'auto', block: 'center' });
                 });
+            });
+        },
+        panTo(x, y) {
+            requestAnimationFrame(() => {
+                const containerW = this.$el.offsetWidth;
+                const containerH = this.$el.offsetHeight;
+                this.panX = containerW / 2 - x * this.zoom;
+                this.panY = containerH / 2 - y * this.zoom;
+                this.clampPan();
             });
         },
     }))

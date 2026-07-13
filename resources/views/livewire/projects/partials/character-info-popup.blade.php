@@ -1,11 +1,11 @@
 {{-- Popup info karakter: muncul saat klik karakter (di luar mode tambah relasi) --}}
 <div
+    x-data="{ showDeleteConfirm: false }"
     x-show="showCharacterInfoPopup"
     style="display: none;"
-    @do-delete-character-info.window="deleteCharacterConfirmed()"
     class="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 backdrop-blur-sm p-4 sm:p-6"
 >
-    <div @click.away="closeCharacterInfo()" class="bg-bg-main border border-brand-150 rounded-xl shadow-xl w-auto overflow-hidden relative max-h-[calc(100vh-2rem)] sm:max-h-[calc(100vh-2rem)] overflow-y-auto">
+    <div @click.away="if (!showDeleteConfirm) closeCharacterInfo()" class="bg-bg-main border border-brand-150 rounded-xl shadow-xl w-auto overflow-hidden relative max-h-[calc(100vh-2rem)] sm:max-h-[calc(100vh-2rem)] overflow-y-auto">
         <template x-if="infoCharacter">
             <div>
                 {{-- X close button --}}
@@ -81,7 +81,7 @@
                             ></p>
                         </div>
                         <div class="flex gap-2.5 mt-2">
-                            <button @click="$dispatch('open-delete-character-info-confirm')" class="p-3 rounded-lg cursor-pointer border border-danger-100 text-danger-100 hover:bg-danger-100/10 transition-colors"
+                            <button @click="showDeleteConfirm = true" class="p-3 rounded-lg cursor-pointer border border-danger-100 text-danger-100 hover:bg-danger-100/10 transition-colors"
                             title="{{ __('Delete Character') }}">
                                 <x-icons.delete class="w-5 h-5"/>
                             </button>
@@ -94,15 +94,53 @@
         </template>
     </div>
 
-    <x-confirm-dialog
-        eventName="open-delete-character-info-confirm"
-        title="{{ __('Delete Character?') }}"
-        description='&quot;<span x-text="infoCharacter.fullName"></span>&quot; {{ __("and every relationship involving them will be permanently removed.") }}'
-        confirmText="{{ __('Confirm Delete') }}"
-        dispatchAction="do-delete-character-info"
+    <div 
+        x-show="showDeleteConfirm" 
+        style="display: none;"
+        class="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-sm"
+        @click.stop="showDeleteConfirm = false"
+        x-transition:enter="transition ease-out duration-300"
+        x-transition:enter-start="opacity-0"
+        x-transition:enter-end="opacity-100"
+        x-transition:leave="transition ease-in duration-200"
+        x-transition:leave-start="opacity-100"
+        x-transition:leave-end="opacity-0"
     >
-        <x-slot:icon>
-            <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" /></svg>
-        </x-slot:icon>
-    </x-confirm-dialog>
+        <div
+            @click.stop
+            class="flex flex-col bg-card-bg border border-card-border rounded-2xl shadow-2xl w-full max-w-md px-12 py-8 text-center gap-8"
+            x-transition:enter="transition ease-out duration-300"
+            x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+            x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+            x-transition:leave="transition ease-in duration-200"
+            x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+            x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+        >
+            <div class="mx-auto flex items-center justify-center h-24 w-24 rounded-full bg-danger-100/10">
+                <div class="flex items-center justify-center text-danger-100">
+                    <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" /></svg>
+                </div>
+            </div>
+
+            <div class="flex flex-col w-full gap-5">
+                <h3 class="text-app-heading-1 text-text-80">{{ __('Delete Character?') }}</h3>
+                <p class="text-app-subfeature text-text-80 px-3">{!! '&quot;<span x-text="infoCharacter?.fullName"></span>&quot; ' . __("and every relationship involving them will be permanently removed.") !!}</p>
+            </div>
+
+            <div class="flex gap-4 w-full justify-center">
+                <button 
+                    @click="showDeleteConfirm = false" 
+                    class="flex-1 py-2 px-4 rounded-lg border border-card-border text-text-80 text-web-body-small font-semibold hover:bg-card-hover transition-colors"
+                >
+                    {{ __('Cancel') }}
+                </button>
+                <button 
+                    @click="deleteCharacterConfirmed(); showDeleteConfirm = false"
+                    class="flex-1 py-3 px-4 rounded-lg text-bg-main transition-colors text-web-body-small font-semibold bg-danger-100 hover:opacity-90 text-white"
+                >
+                    {{ __('Confirm Delete') }}
+                </button>
+            </div>
+        </div>
+    </div>
 </div>

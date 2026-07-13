@@ -232,7 +232,7 @@ new #[Layout('layouts.app')] class extends Component {
             }
 
             if ($property === 'nickName') {
-                $this->nickName = mb_substr(ltrim($this->nickName), 0, 20);
+                $this->nickName = mb_substr(ltrim($this->nickName), 0, 30);
 
                 if (trim($this->nickName) === '') {
                     $this->nickName = 'Unnamed Character';
@@ -315,6 +315,8 @@ new #[Layout('layouts.app')] class extends Component {
                     nickNameDisplay: @js($nickName),
                     nickNameCount: {{ mb_strlen($nickName) }},
                     fullNameCount: {{ mb_strlen($fullName) }},
+                    nickNameError: '',
+                    existingNicknames: @js(array_map(fn($c) => strtolower($c['name']), $otherCharacters)),
                     init() {
                         this.$wire.$watch('nickName', (value) => {
                             const displayValue = value === '' ? 'Unnamed Character' : value;
@@ -325,15 +327,30 @@ new #[Layout('layouts.app')] class extends Component {
                     startEditNickName() {
                         this.nickNameDraft = this.nickNameDisplay;
                         this.nickNameCount = this.nickNameDraft.length;
+                        this.nickNameError = '';
                         this.editingNickName = true;
                         this.$nextTick(() => this.$refs.nickNameInput.focus());
                     },
                     cancelNickNameEdit() {
                         this.nickNameDraft = this.nickNameDisplay;
                         this.nickNameCount = this.nickNameDisplay.length;
+                        this.nickNameError = '';
                         this.editingNickName = false;
                     },
+                    checkDuplicate() {
+                        const typed = this.nickNameDraft.trim().toLowerCase();
+                        if (this.existingNicknames.includes(typed) && typed !== this.nickNameDisplay.toLowerCase()) {
+                            this.nickNameError = 'Nickname is already taken';
+                        } else {
+                            this.nickNameError = '';
+                        }
+                    },
                     commitNickNameEdit() {
+                        this.checkDuplicate();
+                        if (this.nickNameError) {
+                            this.cancelNickNameEdit();
+                            return;
+                        }
                         const typed = this.nickNameDraft.trim();
                         this.$wire.set('nickName', typed, true);
 
@@ -347,6 +364,10 @@ new #[Layout('layouts.app')] class extends Component {
                         if (e.target.value.startsWith(' ')) {
                             e.target.value = e.target.value.replace(/^\s+/, '');
                         }
+                        if (countProp === 'nickNameCount') {
+                            this.nickNameDraft = e.target.value;
+                            this.checkDuplicate();
+                        }
                         this[countProp] = e.target.value.length;
                     },
                 }"
@@ -359,7 +380,7 @@ new #[Layout('layouts.app')] class extends Component {
                         class="text-app-title-1 text-text-100 truncate cursor-text"
                     ></h1>
 
-                    <div x-show="editingNickName" x-cloak class="flex items-center gap-2 flex-1 min-w-0 border-b {{ $nickNameError ? 'border-danger-100' : 'border-subtext-70' }}">
+                    <div x-show="editingNickName" x-cloak class="flex items-center gap-2 flex-1 min-w-0 border-b transition-colors" :class="nickNameError ? 'border-danger-100' : 'border-subtext-70'">
                         <input
                             type="text"
                             x-ref="nickNameInput"
@@ -368,7 +389,7 @@ new #[Layout('layouts.app')] class extends Component {
                             @blur="commitNickNameEdit()"
                             @keydown.enter="$event.target.blur()"
                             @keydown.escape="$event.target.blur()"
-                            maxlength="20"
+                            maxlength="30"
                             placeholder="{{ __('Nickname') }}"
                             class="text-app-title-1 text-text-100 bg-transparent outline-none w-full truncate"
                         >
@@ -377,11 +398,12 @@ new #[Layout('layouts.app')] class extends Component {
                         </button>
                     </div>
                 </div>
-                <span x-show="editingNickName" x-cloak class="text-app-desc-feature text-subtext-80">
-                    <span x-text="nickNameCount"></span>/20
-                </span>
+                <div x-show="editingNickName" x-cloak class="flex items-center justify-between text-app-desc-feature">
+                    <span x-show="nickNameError" class="text-danger-100" x-text="nickNameError"></span>
+                    <span class="text-subtext-80 ml-auto"><span x-text="nickNameCount"></span>/30</span>
+                </div>
                 @if($nickNameError)
-                    <span class="text-app-desc-feature text-danger-100">{{ $nickNameError }}</span>
+                    <span x-show="!editingNickName" class="text-app-desc-feature text-danger-100">{{ $nickNameError }}</span>
                 @endif
                 <div class="flex items-center gap-2 text-app-body-medium text-subtext-90">
                     <span>Full Name :</span>
@@ -415,6 +437,7 @@ new #[Layout('layouts.app')] class extends Component {
         title="{{ __('Delete Character?') }}"
         description='"{{ $nickName }}" and every relationship involving them will be permanently removed.'
         confirmText="Confirm Delete"
+        cancelText="Cancel"
         submitAction="deleteCharacter"
     >
         <x-slot:icon>
