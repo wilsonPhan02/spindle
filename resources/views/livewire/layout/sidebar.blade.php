@@ -15,6 +15,12 @@ new class extends Component {
         $this->loadProjects();
     }
 
+    #[On('profile-updated')]
+    public function refreshProfile()
+    {
+        auth()->user()?->unsetRelation('profile');
+    }
+
     #[On('project-pinned-updated')]
     #[On('project-updated')]
     public function loadProjects()
@@ -217,6 +223,26 @@ new class extends Component {
     }
 }; ?>
 <aside
+    x-data="{
+        currentPath: window.location.pathname,
+        init() {
+            document.addEventListener('livewire:navigated', () => {
+                this.currentPath = window.location.pathname;
+            });
+            window.addEventListener('popstate', () => {
+                this.currentPath = window.location.pathname;
+            });
+        },
+        isActiveProject(projectId) {
+            return this.currentPath === '/projects/' + projectId || this.currentPath.startsWith('/projects/' + projectId + '/');
+        },
+        isActiveRoute(path) {
+            return this.currentPath === path || (path !== '/' && this.currentPath.startsWith(path + '/'));
+        }
+    }"
+    x-on:livewire:navigated.document="currentPath = window.location.pathname"
+    x-on:livewire:navigated.window="currentPath = window.location.pathname"
+    x-on:popstate.window="currentPath = window.location.pathname"
     @mouseleave="$store.layout.isHovered = false"
     class="fixed inset-y-0 left-0 z-50 w-72 bg-brand-100 border-r border-brand-150 transition-transform duration-300 ease-in-out flex flex-col shadow-sm"
     :class="($store.layout.isPinned || $store.layout.isHovered) ? 'translate-x-0' : '-translate-x-full'"
@@ -237,7 +263,15 @@ new class extends Component {
             </div>
 
             <div class="flex flex-col truncate">
-                <span class="text-app-subheading-2 text-text-80 truncate" :title="currentUsername" x-text="currentUsername">
+                <span
+                    class="text-app-subheading-2 text-text-80 truncate"
+                    :title="currentUsername"
+                    x-text="currentUsername"
+                    @profile-updated.window="() => {
+                        const newName = $event.detail?.newName ?? $event.detail?.[0]?.newName;
+                        if (newName) currentUsername = newName;
+                    }"
+                >
                 {{ Auth::user()->profile?->username ?? __('User') }}
                 </span>
 
@@ -307,7 +341,7 @@ new class extends Component {
                                     @elseif($item['type'] === 'section')
                                         <x-icons.list class="w-4 h-4 text-secondary-250 shrink-0" />
                                     @endif
-                                    <span class="text-[13px] font-medium text-text-80 truncate group-hover:text-text-100">{!! $this->highlight($item['title'], $searchQuery, 'font-bold text-text-100') !!}</span>
+                                    <span class="text-app-body-small text-[13px] font-medium text-text-80 truncate group-hover:text-text-100">{!! $this->highlight($item['title'], $searchQuery, 'font-bold text-text-100') !!}</span>
                                 </div>
                                 <span class="text-[10px] text-text-70 truncate ml-2 max-w-[130px] text-right">
                                     @if($item['type'] === 'category')
@@ -321,7 +355,7 @@ new class extends Component {
                         @endforeach
 
                         @if($this->searchResultsData['total'] > 5)
-                            <button @click="expandedSearch = !expandedSearch" class="w-full text-center text-[11px] font-semibold text-secondary-250 hover:text-secondary-300 py-2 mt-2 transition-colors">
+                            <button @click="expandedSearch = !expandedSearch" class="w-full text-center text-app-body-small text-[11px] font-semibold text-secondary-250 hover:text-secondary-300 py-2 mt-2 transition-colors">
                                 <span x-text="expandedSearch ? '{{ __('Show less') }}' : '{{ __('Show more') }} ({{ $this->searchResultsData['total'] - 5 }})'"></span>
                             </button>
                         @endif
@@ -341,7 +375,7 @@ new class extends Component {
                 @if(count($pinnedProjects) > 0)
                     <div class="space-y-1 pb-2">
                         @foreach($pinnedProjects->take(3) as $pProject)
-                            <div x-data="{ rowHovered: false }" @mouseenter="rowHovered = true" @mouseleave="rowHovered = false" wire:key="marked-{{ $pProject->project_id }}" class="group flex items-center justify-between px-2 py-1.5 -mx-2 rounded-lg hover:bg-brand-150 transition-colors">
+                            <div x-data="{ rowHovered: false }" @mouseenter="rowHovered = true" @mouseleave="rowHovered = false" wire:key="marked-{{ $pProject->project_id }}" class="group flex items-center justify-between px-2 py-1.5 -mx-2 rounded-lg transition-colors" :class="isActiveProject('{{ $pProject->project_id }}') ? 'bg-brand-150 text-text-100 font-semibold' : 'hover:bg-brand-150'">
                                 <a href="{{ route('projects.show', $pProject->project_id) }}" wire:navigate class="flex items-center gap-2 flex-1 min-w-0">
                                     @if($pProject->icon_type === 'emoji')
                                         <span class="text-[16px] leading-none shrink-0">{{ $pProject->icon }}</span>
@@ -350,7 +384,7 @@ new class extends Component {
                                     @else
                                         <x-icons.sidebar-book class="w-4 h-4 text-text-70 shrink-0" />
                                     @endif
-                                    <span class="text-[13px] font-medium text-text-80 truncate transition-colors" :class="rowHovered ? 'text-text-100' : ''">{{ $pProject->title }}</span>
+                                    <span class="text-app-body-small text-[13px] font-medium text-text-80 truncate transition-colors" :class="(rowHovered || isActiveProject('{{ $pProject->project_id }}')) ? 'text-text-100 font-semibold' : ''">{{ $pProject->title }}</span>
                                 </a>
                                 <button wire:click="unpin('{{ $pProject->project_id }}')" class="transition-all p-1 shrink-0 text-secondary-100 hover:text-secondary-250 opacity-0 group-hover:opacity-100" :class="rowHovered ? 'opacity-100' : 'opacity-0'" title="{{ __('Unmark Project') }}">
                                     <x-icons.bookmark-slash class="w-4 h-4" />
@@ -361,7 +395,7 @@ new class extends Component {
                         @if(count($pinnedProjects) > 3)
                             <div x-show="viewAll" x-collapse x-cloak class="space-y-1 mt-1">
                                 @foreach($pinnedProjects->skip(3) as $pProject)
-                                    <div x-data="{ rowHovered: false }" @mouseenter="rowHovered = true" @mouseleave="rowHovered = false" wire:key="marked-more-{{ $pProject->project_id }}" class="group flex items-center justify-between px-2 py-1.5 -mx-2 rounded-lg hover:bg-brand-150 transition-colors">
+                                    <div x-data="{ rowHovered: false }" @mouseenter="rowHovered = true" @mouseleave="rowHovered = false" wire:key="marked-more-{{ $pProject->project_id }}" class="group flex items-center justify-between px-2 py-1.5 -mx-2 rounded-lg transition-colors" :class="isActiveProject('{{ $pProject->project_id }}') ? 'bg-brand-150 text-text-100 font-semibold' : 'hover:bg-brand-150'">
                                         <a href="{{ route('projects.show', $pProject->project_id) }}" wire:navigate class="flex items-center gap-2 flex-1 min-w-0">
                                             @if($pProject->icon_type === 'emoji')
                                                 <span class="text-[16px] leading-none shrink-0">{{ $pProject->icon }}</span>
@@ -370,7 +404,7 @@ new class extends Component {
                                             @else
                                                 <x-icons.sidebar-book class="w-4 h-4 text-text-70 shrink-0" />
                                             @endif
-                                            <span class="text-[13px] font-medium text-text-80 truncate transition-colors" :class="rowHovered ? 'text-text-100' : ''">{{ $pProject->title }}</span>
+                                            <span class="text-app-body-small text-[13px] font-medium text-text-80 truncate transition-colors" :class="(rowHovered || isActiveProject('{{ $pProject->project_id }}')) ? 'text-text-100 font-semibold' : ''">{{ $pProject->title }}</span>
                                         </a>
                                         <button wire:click="unpin('{{ $pProject->project_id }}')" class="transition-all p-1 shrink-0 text-secondary-100 hover:text-secondary-250 opacity-0 group-hover:opacity-100" :class="rowHovered ? 'opacity-100' : 'opacity-0'" title="{{ __('Unmark Project') }}">
                                             <x-icons.bookmark-slash class="w-4 h-4" />
@@ -400,7 +434,7 @@ new class extends Component {
                 @if(count($recentProjects) > 0)
                     <div class="space-y-1 pb-2">
                         @foreach($recentProjects->take(3) as $rProject)
-                            <a href="{{ route('projects.show', $rProject->project_id) }}" wire:navigate class="flex items-center gap-2 px-2 py-1.5 -mx-2 rounded-lg hover:bg-brand-150 transition-colors group">
+                            <a x-data="{ rowHovered: false }" wire:key="recent-{{ $rProject->project_id }}" href="{{ route('projects.show', $rProject->project_id) }}" wire:navigate class="flex items-center gap-2 px-2 py-1.5 -mx-2 rounded-lg transition-colors group" :class="isActiveProject('{{ $rProject->project_id }}') ? 'bg-brand-150 text-text-100 font-semibold' : 'hover:bg-brand-150'">
                                 @if($rProject->icon_type === 'emoji')
                                     <span class="text-[16px] leading-none shrink-0">{{ $rProject->icon }}</span>
                                 @elseif($rProject->icon_type === 'image' && $rProject->icon)
@@ -408,14 +442,14 @@ new class extends Component {
                                 @else
                                     <x-icons.sidebar-book class="w-4 h-4 text-text-70 shrink-0" />
                                 @endif
-                                <span class="text-[13px] font-medium text-text-80 truncate group-hover:text-text-100 transition-colors">{{ $rProject->title }}</span>
+                                <span class="text-app-body-small text-[13px] font-medium text-text-80 truncate group-hover:text-text-100 transition-colors" :class="isActiveProject('{{ $rProject->project_id }}') ? 'text-text-100 font-semibold' : ''">{{ $rProject->title }}</span>
                             </a>
                         @endforeach
                         
                         @if(count($recentProjects) > 3)
                             <div x-show="viewAll" x-collapse x-cloak class="space-y-1 mt-1">
                                 @foreach($recentProjects->skip(3) as $rProject)
-                                    <a href="{{ route('projects.show', $rProject->project_id) }}" wire:navigate class="flex items-center gap-2 px-2 py-1.5 -mx-2 rounded-lg hover:bg-brand-150 transition-colors group">
+                                    <a x-data="{ rowHovered: false }" wire:key="recent-more-{{ $rProject->project_id }}" href="{{ route('projects.show', $rProject->project_id) }}" wire:navigate class="flex items-center gap-2 px-2 py-1.5 -mx-2 rounded-lg transition-colors group" :class="isActiveProject('{{ $rProject->project_id }}') ? 'bg-brand-150 text-text-100 font-semibold' : 'hover:bg-brand-150'">
                                         @if($rProject->icon_type === 'emoji')
                                             <span class="text-[16px] leading-none shrink-0">{{ $rProject->icon }}</span>
                                         @elseif($rProject->icon_type === 'image' && $rProject->icon)
@@ -423,11 +457,11 @@ new class extends Component {
                                         @else
                                             <x-icons.sidebar-book class="w-4 h-4 text-text-70 shrink-0" />
                                         @endif
-                                        <span class="text-[13px] font-medium text-text-80 truncate group-hover:text-text-100 transition-colors">{{ $rProject->title }}</span>
+                                        <span class="text-app-body-small text-[13px] font-medium text-text-80 truncate group-hover:text-text-100 transition-colors" :class="isActiveProject('{{ $rProject->project_id }}') ? 'text-text-100 font-semibold' : ''">{{ $rProject->title }}</span>
                                     </a>
                                 @endforeach
                             </div>
-                            <button @click="viewAll = !viewAll" class="w-full text-center text-[11px] font-semibold text-secondary-250 hover:text-secondary-300 py-1.5 transition-colors">
+                            <button @click="viewAll = !viewAll" class="w-full text-center text-app-body-small text-[11px] font-semibold text-secondary-250 hover:text-secondary-300 py-1.5 transition-colors">
                                 <span x-text="viewAll ? '{{ __('Show less') }}' : '{{ __('View all') }} ({{ count($recentProjects) }})'"></span>
                             </button>
                         @endif
@@ -446,12 +480,12 @@ new class extends Component {
         <div class="pt-6 shrink-0">
             <div class="text-app-feature text-text-70 mb-2">{{ __('Others') }}</div>
             <div class="space-y-1">
-                <a href="{{ route('archive') }}" wire:navigate class="flex items-center px-3 py-2 -mx-3 rounded-lg text-app-body-medium text-text-80 hover:bg-brand-150 hover:text-text-100 transition-colors group {{ request()->routeIs('archive') ? 'bg-brand-150 text-text-100' : '' }}">
+                <a x-data wire:key="nav-archive" href="{{ route('archive') }}" wire:navigate class="flex items-center px-3 py-2 -mx-3 rounded-lg text-app-feature text-text-80 transition-colors group" :class="isActiveRoute('{{ route('archive', [], false) }}') ? 'bg-brand-150 text-text-100 font-semibold' : 'hover:bg-brand-150 hover:text-text-100'">
                     <x-icons.archive class="w-5 h-5 mr-3 text-text-80 group-hover:text-text-100 transition-colors" />
                     {{ __('Archive') }}
                 </a>
 
-                <a href="{{ route('settings') }}" wire:navigate class="flex items-center px-3 py-2 -mx-3 rounded-lg text-app-body-medium text-text-80 hover:bg-brand-150 hover:text-text-100 transition-colors group {{ request()->routeIs('settings') ? 'bg-brand-150 text-text-100' : '' }}">
+                <a x-data wire:key="nav-settings" href="{{ route('settings') }}" wire:navigate class="flex items-center px-3 py-2 -mx-3 rounded-lg text-app-feature text-text-80 transition-colors group" :class="isActiveRoute('{{ route('settings', [], false) }}') ? 'bg-brand-150 text-text-100 font-semibold' : 'hover:bg-brand-150 hover:text-text-100'">
                     <x-icons.setting class="w-5 h-5 mr-3 text-text-80 group-hover:text-text-100 transition-colors" />
                     {{ __('Settings') }}
                 </a>
