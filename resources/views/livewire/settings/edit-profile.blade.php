@@ -72,12 +72,11 @@ new class extends Component {
         }
 
         $profile->update($updateData);
-        // $this->dispatch('profile-updated');
-        // $this->dispatch('close-modal');
+
+        $this->dispatch('show-toast', message: __('Profile updated successfully.'));
 
         $newAvatarUrl = $profile->avatar_url ? Storage::url($profile->avatar_url) : null;
 
-        // Dispatch dengan parameter bernama 'avatarUrl'
         $this->dispatch('profile-updated', 
             avatarUrl: $newAvatarUrl,
             newName: trim($this->username)

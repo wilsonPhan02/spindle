@@ -542,137 +542,9 @@ new #[Layout('layouts.app')] class extends Component {
             $dispatch('request-redo');
         }
     "
-    x-data="{
-        // ========================
-        // TAB STATE
-        // ========================
-        openMenuId: null,
-        menuNoteId: null,
-        menuNoteTitle: '',
-        menuNoteIsLeaf: false,
-        menuPos: { top: 0, left: 0 },
-        renamingId: null,
-        renameValue: '',
-        collapsed: {},
-
-
-        toggleCollapse(id) {
-            this.collapsed[id] = !this.collapsed[id];
-        },
-        isCollapsed(id) {
-            return !!this.collapsed[id];
-        },
-
-        openMenu(id, title, isLeaf, triggerEl) {
-            this.openMenuId = id;
-            this.menuNoteId = id;
-            this.menuNoteTitle = title;
-            this.menuNoteIsLeaf = isLeaf;
-            const rect = triggerEl.getBoundingClientRect();
-            
-            let top = rect.bottom;
-            let left = rect.right - 176;
-            
-            // Adjust if menu would get cut off at the bottom
-            if (top + 170 > window.innerHeight) {
-                top = rect.top - 165; 
-            }
-            
-            this.menuPos = {
-                top: top,
-                left: left
-            };
-        },
-        closeMenu() {
-            this.openMenuId = null;
-        },
-
-        startRename(id, currentTitle) {
-            this.renamingId = id;
-            this.renameValue = currentTitle;
-            this.openMenuId = null;
-            this.$nextTick(() => {
-                const el = document.getElementById('rename_' + id);
-                if (el) { el.focus(); el.select(); }
-            });
-        },
-        commitRename(id) {
-            if (this.renameValue.trim() !== '') {
-                $wire.renameNote(id, this.renameValue);
-            }
-            this.renamingId = null;
-        },
-
-        // ========================
-        // DRAG & DROP (TABS)
-        // ========================
-        draggedId: null,
-        dragOverId: null,
-        dragPos: null,
-
-        onDragStart(id, event) {
-            this.draggedId = id;
-            event.dataTransfer.effectAllowed = 'move';
-        },
-        onDragOver(id, isLeaf, event) {
-            if (this.draggedId === id) return;
-            event.preventDefault();
-            event.dataTransfer.dropEffect = 'move';
-            this.dragOverId = id;
-            const rect = event.currentTarget.getBoundingClientRect();
-            const y = event.clientY - rect.top;
-            if (isLeaf) {
-                this.dragPos = y < rect.height * 0.5 ? 'before' : 'after';
-            } else {
-                this.dragPos = y < rect.height * 0.25 ? 'before' : (y > rect.height * 0.75 ? 'after' : 'inside');
-            }
-        },
-        onDrop(targetId, position, event) {
-            event.preventDefault();
-            if (!this.draggedId || this.draggedId === targetId) {
-                this.draggedId = null; this.dragOverId = null; return;
-            }
-            $wire.moveNote(this.draggedId, targetId, position);
-            this.draggedId = null;
-            this.dragOverId = null;
-            this.dragPos = null;
-        },
-        onDragEnd() {
-            this.draggedId = null;
-            this.dragOverId = null;
-            this.dragPos = null;
-        }
-    }"
+    x-data="notesManager"
     class="h-full"
 >
-    <style>
-        [x-cloak] { display: none !important; }
-
-        .custom-scrollbar::-webkit-scrollbar { width: 5px; height: 5px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background-color: var(--color-secondary-100); border-radius: 10px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background-color: var(--color-secondary-150); }
-
-        .tab-item { transition: background-color 0.12s; }
-        .tab-item:hover { background-color: var(--color-brand-150); }
-        .tab-item.active { background-color: var(--color-brand-200); }
-
-        .context-menu-item:hover { background-color: var(--color-brand-100); }
-
-        .drag-over-before { box-shadow: inset 0 2px 0 0 var(--color-secondary-200); }
-        .drag-over-after  { box-shadow: inset 0 -2px 0 0 var(--color-secondary-200); }
-        .drag-over-inside { background-color: var(--color-brand-150) !important; border-radius: 4px; }
-        .dragging-opacity { opacity: 0.4; }
-
-        .subtab-line { position: absolute; left: 0; top: 0; bottom: 0; width: 1px; background-color: var(--color-brand-200); }
-        .collapse-caret { transition: transform 0.15s ease; }
-        .collapse-caret.is-collapsed { transform: rotate(-90deg); }
-
-        .drag-handle { cursor: grab; opacity: 0; transition: opacity 0.12s; }
-        .tab-item:hover .drag-handle { opacity: 1; }
-        .drag-handle:active { cursor: grabbing; }
-    </style>
-
     <div class="p-4 lg:p-6 max-w-7xl mx-auto">
 
         {{-- Breadcrumb --}}
@@ -682,7 +554,7 @@ new #[Layout('layouts.app')] class extends Component {
             ['label' => __('Notes')]
         ]" />
 
-        <h2 class="text-web-heading-2 text-text-100 mb-6">{{ __('Project Notes') }}</h2>
+        <h2 class="text-web-heading-2 text-text-100 mb-6">{{ __('Notes') }}</h2>
 
         {{-- Main Container --}}
         <div class="border border-brand-150 rounded-xl shadow-sm overflow-hidden flex flex-col h-[calc(100vh-200px)]">
@@ -707,35 +579,7 @@ new #[Layout('layouts.app')] class extends Component {
                 <div class="flex flex-1 min-h-0">
 
                     {{-- LEFT PANEL --}}
-                    <div id="tab-panel" class="w-[220px] shrink-0 border-r border-brand-150 flex flex-col bg-brand-50 relative">
-
-                        <div class="flex items-center justify-between px-4 py-3 border-b border-brand-150">
-                            <span class="text-app-caption font-semibold text-text-60 uppercase tracking-widest">{{ __('Document Tabs') }}</span>
-                            <button wire:click="addNote" class="w-5 h-5 flex items-center justify-center text-secondary-200 hover:text-secondary-100 transition-colors" title="{{ __('Add new note') }}">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                            </button>
-                        </div>
-
-                        {{-- Tab list --}}
-                        <div class="flex-1 overflow-y-auto py-2 custom-scrollbar">
-                            @foreach($rootNotes as $note)
-                                @include('livewire.projects.partials.note-tab-item', [
-                                    'note'         => $note,
-                                    'activeNoteId' => $activeNoteId,
-                                    'depth'        => 0,
-                                ])
-                            @endforeach
-
-                            <div
-                                class="h-10"
-                                x-bind:class="dragOverId === '__root__' ? 'drag-over-after' : ''"
-                                @dragover.stop.prevent="if (draggedId) { dragOverId = '__root__'; dragPos = 'after'; }"
-                                @dragleave.stop="if (dragOverId === '__root__') dragOverId = null"
-                                @drop.stop.prevent="if (draggedId) { $wire.moveNote(draggedId, null, 'after'); draggedId = null; dragOverId = null; }"
-                            ></div>
-                        </div>
-
-                    </div>
+                    @include('livewire.projects.partials.note-sidebar')
 
                     {{-- RIGHT PANEL: Editor --}}
                     <div class="flex-1 flex flex-col min-w-0">
@@ -761,61 +605,7 @@ new #[Layout('layouts.app')] class extends Component {
             {{-- ============================================================
                  GLOBAL CONTEXT MENU UNTUK TABS
             ============================================================ --}}
-            <template x-teleport="body">
-                <div
-                    data-menu-dropdown
-                    x-show="openMenuId !== null"
-                    x-cloak
-                    x-transition:enter="transition ease-out duration-100"
-                    x-transition:enter-start="opacity-0 scale-95"
-                    x-transition:enter-end="opacity-100 scale-100"
-                    x-transition:leave="transition ease-in duration-75"
-                    x-transition:leave-start="opacity-100 scale-100"
-                    x-transition:leave-end="opacity-0 scale-95"
-                    @click.outside="closeMenu()"
-                    x-bind:style="`position: fixed; top: ${menuPos.top}px; left: ${menuPos.left}px; z-index: 9999;`"
-                    class="w-48 bg-card-bg border border-brand-150 rounded-lg shadow-lg py-1 overflow-hidden z-50"
-                    style="display: none;"
-                >
-                    <button
-                        x-show="!menuNoteIsLeaf"
-                        class="w-full text-left px-4 py-2 text-app-body-medium text-text-80 hover:bg-brand-10 flex items-center gap-3 transition-colors"
-                        @click="closeMenu(); $wire.addSubTab(menuNoteId)"
-                    >
-                        <x-icons.add class="w-4 h-4 shrink-0 text-text-80" />
-                        {{ __('Add Sub-Tab') }}
-                    </button>
-
-                    <button
-                        class="w-full text-left px-4 py-2 text-app-body-medium text-text-80 hover:bg-brand-10 flex items-center gap-3 transition-colors"
-                        @click="closeMenu(); startRename(menuNoteId, menuNoteTitle)"
-                    >
-                        <x-icons.rename class="w-4 h-4 shrink-0 text-text-80" />
-                        {{ __('Rename') }}
-                    </button>
-
-                    <button
-                        class="w-full text-left px-4 py-2 text-app-body-medium text-text-80 hover:bg-brand-10 flex items-center gap-3 transition-colors"
-                        @click="closeMenu(); $wire.duplicateNote(menuNoteId)"
-                    >
-                        <x-icons.duplicate class="w-4 h-4 shrink-0 text-text-80" />
-                        {{ __('Duplicate') }}
-                    </button>
-
-                    <div class="h-px bg-brand-150 my-1"></div>
-
-                    <button
-                        class="w-full text-left px-4 py-2 text-app-body-medium text-danger-100 hover:bg-danger-100/5 flex items-center gap-3 transition-colors"
-                        @click="
-                            closeMenu();
-                            $dispatch('open-delete-note-dialog', { id: menuNoteId });
-                        "
-                    >
-                        <x-icons.delete class="w-4 h-4 shrink-0 text-danger-100" />
-                        {{ __('Delete') }}
-                    </button>
-                </div>
-            </template>
+            @include('livewire.projects.partials.note-context-menu')
 
         </div>
     </div>

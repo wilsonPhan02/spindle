@@ -26,44 +26,20 @@
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
-    <style>
-        @keyframes mountainRise {
-            0% { transform: translateY(150px); opacity: 0; }
-            100% { transform: translateY(0); opacity: 1; }
-        }
-        .animate-mountain-rise-1 {
-            animation: mountainRise 1.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-            opacity: 0;
-        }
-        .animate-mountain-rise-2 {
-            animation: mountainRise 1.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-            animation-delay: 0.15s;
-            opacity: 0;
-        }
-        .animate-mountain-rise-3 {
-            animation: mountainRise 1.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-            animation-delay: 0.3s;
-            opacity: 0;
-        }
-        @keyframes book-wave {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-8px); } /* Very subtle wave */
-        }
-        .animate-book-wave {
-            animation: book-wave 4s ease-in-out infinite;
-        }
-    </style>
 </head>
 
 
 @php $img = fn ($f) => asset('images/landing/' . $f); @endphp
+@php $vid = fn ($f) => asset('videos/landing/' . $f); @endphp
 
 <body class="bg-brand-50 dark:bg-bg-main text-text-80 dark:text-text-100 font-montserrat antialiased overflow-x-hidden">
+    <x-desktop-only />
+
 
     
     <nav id="main-nav" class="fixed top-5 inset-x-0 z-50 transition-transform duration-700">
         <div class="mx-auto max-w-[1280px] px-6 lg:px-10">
-            <div class="flex w-full items-center justify-between rounded-full bg-white dark:bg-card-bg dark:border dark:border-brand-150 py-2 pl-10 pr-2.5 shadow-lg transition-colors duration-300">
+            <div class="flex w-full items-center justify-between rounded-full bg-bg-main py-2 pl-10 pr-2.5 shadow-lg transition-colors duration-300">
                 <a href="#hero" class="flex items-center">
                     <x-logo class="h-[26px] w-auto select-none text-text-80 dark:text-text-100 transition-colors" />
                 </a>
@@ -74,40 +50,19 @@
                     <li><a href="#tools"   class="nav-link hover:text-secondary-200 transition-colors">{{ __('Features') }}</a></li>
                 </ul>
                 <div class="flex items-center gap-3 sm:gap-4">
-                    <!-- Bulletproof Spindle Theme Toggle -->
-                    <div x-data="{
-                             isDark: document.documentElement.classList.contains('dark'),
-                             toggle() {
-                                 this.isDark = !this.isDark;
-                                 if (this.isDark) {
-                                     document.documentElement.classList.add('dark');
-                                     localStorage.setItem('theme', 'dark');
-                                 } else {
-                                     document.documentElement.classList.remove('dark');
-                                     localStorage.setItem('theme', 'light');
-                                 }
-                                 if (window.Alpine && Alpine.store('theme')) {
-                                     Alpine.store('theme').isDark = this.isDark;
-                                 }
-                                 window.dispatchEvent(new CustomEvent('theme-changed', { detail: { isDark: this.isDark } }));
-                             }
-                         }"
-                         x-init="
-                             isDark = document.documentElement.classList.contains('dark');
-                             window.addEventListener('theme-changed', e => isDark = e.detail.isDark);
-                         "
-                         class="flex items-center">
-                        <button @click="toggle()" 
+                    <!-- Spindle Theme Toggle -->
+                    <div x-data class="flex items-center">
+                        <button @click="$store.theme.toggle()" 
                                 type="button"
                                 class="group relative flex h-9 w-9 items-center justify-center rounded-full border border-secondary-100/50 dark:border-secondary-200/50 bg-secondary-5 dark:bg-brand-50 text-secondary-200 shadow-sm transition-all duration-300 hover:scale-105 hover:border-secondary-200 hover:shadow focus:outline-none"
-                                :title="isDark ? '{{ __('Switch to Light Mode') }}' : '{{ __('Switch to Dark Mode') }}'"
+                                :title="$store.theme.isDark ? '{{ __('Switch to Light Mode') }}' : '{{ __('Switch to Dark Mode') }}'"
                                 aria-label="{{ __('Toggle Theme') }}">
                             <!-- Sun icon (shows in Dark mode) -->
-                            <svg x-show="isDark" x-cloak class="h-4 w-4 text-secondary-200 transition-transform duration-300 group-hover:rotate-45" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                            <svg x-show="$store.theme.isDark" x-cloak class="h-4 w-4 text-secondary-200 transition-transform duration-300 group-hover:rotate-45" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
                             </svg>
                             <!-- Moon icon (shows in Light mode) -->
-                            <svg x-show="!isDark" class="h-4 w-4 text-secondary-200 transition-transform duration-300 group-hover:-rotate-12" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                            <svg x-show="!$store.theme.isDark" class="h-4 w-4 text-secondary-200 transition-transform duration-300 group-hover:-rotate-12" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
                             </svg>
                         </button>
@@ -155,7 +110,7 @@
                         </div>
                     </div>
                     <a href="{{ route('dashboard') }}"
-                       class="inline-flex items-center rounded-full bg-secondary-150 px-9 py-3.5 text-web-body-small font-merriweather text-brand-10
+                       class="inline-flex items-center rounded-full bg-secondary-150 px-9 py-3.5 text-web-body-small font-merriweather text-[#FFFFFF]
                               transition-all duration-300 hover:bg-secondary-200 hover:-translate-y-0.5 hover:shadow-md">
                         {{ __('Enter the Realm') }}
                     </a>
@@ -224,7 +179,7 @@
                     {!! __('Weave every character, plot, and world into a story worth telling, spinning countless narrative threads into one cohesive universe.') !!}
                 </p>
                 <a href="{{ route('dashboard') }}"
-                   class="mt-8 inline-flex items-center rounded-[7px] bg-secondary-150 px-10 py-3.5 font-merriweather text-[16px] text-brand-10
+                   class="mt-8 inline-flex items-center rounded-[7px] bg-secondary-150 px-10 py-3.5 font-merriweather text-[16px] text-[#FFFFFF]
                           shadow-md transition-all duration-700 hover:bg-secondary-200 hover:-translate-y-1 hover:shadow-lg">
                     {{ __('Enter the Realm') }}
                 </a>
@@ -244,8 +199,8 @@
             </div>
             @include('partials.starfield')
             <div class="relative z-10 mx-auto flex min-h-screen max-w-[1240px] flex-col justify-center px-6 lg:px-[52px] py-40">
-                <h2 class="reveal text-web-title leading-tight text-[#F3ECE3] max-w-[600px]">{!! __('The Creative Realms') !!}</h2>
-                <p class="reveal reveal-d1 mt-6 max-w-[520px] font-montserrat text-[18px] leading-[28px] text-[#E3DBD0]">
+                <h2 class="reveal text-web-title text-[#F3ECE3] max-w-[640px]">{!! __('The Creative Realms') !!}</h2>
+                <p class="reveal reveal-d1 mt-6 max-w-[480px] font-web-body-large text-[#E3DBD0]">
                     {{ __('In a Universe known as') }} <span class="font-merriweather italic text-[#CAB79B]">{{ __('“The Creative Realms”') }}</span><br>
                     {{ __('Lived the Writer of Worlds. They possess the power to create life from the void.') }}
                 </p>
@@ -256,8 +211,8 @@
         <section class="relative min-h-screen flex flex-col justify-center overflow-hidden bg-[#2a1f17] py-20">
             @include('partials.starfield')
             <div class="relative z-10 mx-auto w-full max-w-[1240px] px-6 lg:px-[52px] text-center mt-6 lg:mt-8">
-                <p class="reveal font-montserrat text-[18px] text-[#E3DBD0]">{{ __('However, every Writer faces the same monster') }}</p>
-                <h2 class="reveal reveal-d1 mt-2 font-merriweather text-[44px] font-bold italic text-[#F3ECE3] mx-auto max-w-[700px]">{{ __('“The Great Tangle”') }}</h2>
+                <p class="reveal text-web-body-large text-[#E3DBD0]">{{ __('However, every Writer faces the same monster') }}</p>
+                <h2 class="reveal reveal-d1 mt-2 text-web-heading-1 italic text-[#F3ECE3] mx-auto max-w-[700px]">{{ __('“The Great Tangle”') }}</h2>
 
                 <div class="mt-14 flex flex-wrap items-center justify-center gap-6" style="perspective: 1500px;">
                     @php
@@ -302,32 +257,44 @@
                 
                 <!-- Spindle Tool/Card (Foreground with Float Animation) -->
                 <div class="absolute top-1/2 left-[24%] lg:left-[30%] xl:left-[26%] 2xl:left-[20%] z-10 w-[200px] lg:w-[260px] -translate-y-[100%] animate-float transition-all duration-300">
-                    <img src="{{ $img('group47.png') }}" alt="{{ __('The Spindle') }}" loading="lazy"
+                    <img src="{{ $img('spindle-card.png') }}" alt="{{ __('The Spindle') }}" loading="lazy"
                          class="w-full rotate-[8deg] drop-shadow-[0_30px_40px_rgba(0,0,0,0.5)]">
                 </div>
             </div>
 
             <div class="reveal reveal-right order-1 lg:order-2 -mt-12 lg:-mt-24">
-                <p class="font-montserrat text-[18px] font-semibold text-[#CAB79B]">{{ __('WHO WE ARE?') }}</p>
+                <p class="text-web-subheading-1 text-[#CAB79B]">{{ __('WHO WE ARE?') }}</p>
                 <h2 class="mt-1 text-web-title text-[#F3ECE3] max-w-[600px]">{!! __('But Spindle Come as Solution') !!}</h2>
-                <p class="mt-6 max-w-[500px] font-montserrat text-[18px] leading-[28px] text-[#E3DBD0] opacity-90">
-                    {{ __('We are going to help you create your story. Weave stories, characters, and notes easily by using Spindle. Convert your abstract yarn into a magic yarn!') }}
+                <p class="mt-6 max-w-[500px] text-web-body-large text-[#E3DBD0] opacity-90">
+                    {{ __('Born from the desire to untangle complex narratives, Spindle is the loom for your creative threads. We are here to help you weave scattered ideas into a cohesive, breathing universe.') }}
                 </p>
             </div>
         </div>
+
+        <!-- Gradient Transition to Next Section -->
+        <div class="pointer-events-none absolute inset-x-0 bottom-0 z-0 h-82 bg-gradient-to-b from-transparent to-brand-50 dark:to-bg-main"></div>
     </section>
 </div>
 
     
     <section id="writers" class="relative min-h-screen flex flex-col justify-center overflow-hidden bg-brand-50 dark:bg-bg-main py-20 scroll-mt-24">
-        <div class="mx-auto max-w-[1240px] px-6 lg:px-[52px] text-center -mt-4">
-            <p class="reveal font-montserrat text-[18px] font-semibold text-secondary-200">{{ __('OUR MISSION') }}</p>
-            <h2 class="mt-1 text-web-title text-text-80 dark:text-text-100 mx-auto max-w-[700px]">
-                {{ __('From Writers To') }} <span class="font-merriweather italic text-secondary-200">{{ __('Writers') }}</span>
+        <div class="mx-auto max-w-[1180px] px-6 lg:px-[52px] text-center -mt-4">
+            <p class="reveal text-web-subheading-1 text-secondary-200">{{ __('OUR MISSION') }}</p>
+            <h2 class="mt-1 text-web-title text-text-80 dark:text-text-100 mx-auto max-w-[480px]">
+                {{ __('Weaving Worlds ') }} <span class="font-merriweather italic text-secondary-200">{{ __('Together') }}</span>
             </h2>
-            <p class="mx-auto mt-4 max-w-[560px] font-montserrat text-[18px] leading-[28px] text-text-70 dark:text-text-90">
+            <p class="mx-auto mt-4 max-w-[560px] text-web-body-large text-text-70 dark:text-text-90">
                 {{ __('We are going to help you create your story. Weave stories, characters, and notes easily by using Spindle. Convert your abstract yarn into a magic yarn!') }}
             </p>
+
+            @php
+                $features = [
+                    ['file' => 'feature-chapter.png'],
+                    ['file' => 'feature-characters.png'],
+                    ['file' => 'feature-dashboard.png'],
+                    ['file' => 'feature-notes.png']
+                ];
+            @endphp
 
             <!-- Infinite Marquee Carousel -->
             <div class="relative mt-6 overflow-x-clip overflow-y-visible w-full max-w-full pb-16 pt-4">
@@ -338,23 +305,22 @@
                 <div class="flex w-max animate-[marquee_50s_linear_infinite]" id="scale-carousel-track">
                     <!-- Group 1 -->
                     <div class="flex w-max">
-                        @for ($i = 0; $i < 4; $i++)
-                            <div class="carousel-scale-item w-[70vw] sm:w-[400px] lg:w-[500px] shrink-0 px-2 transition-transform duration-75">
+                        @foreach ( $features as $feature )
+                            <div class="carousel-scale-item w-[70vw] sm:w-[400px] lg:w-[800px] shrink-0 px-2 transition-transform duration-75">
                                 <div class="overflow-hidden rounded-2xl border border-card-border bg-card-bg shadow-[0_20px_40px_rgba(43,31,23,0.25)]">
-                                    <img src="{{ $img('writers-center.png') }}" alt="{{ __('Spindle dashboard preview') }}" loading="lazy" class="w-full object-cover">
+                                    <img src="{{ $img($feature['file']) }}" alt="{{ __('Spindle features preview') }}" loading="lazy" class="w-full object-cover">
                                 </div>
                             </div>
-                        @endfor
+                        @endforeach
                     </div>
                     <!-- Group 2 (Exact duplicate for seamless loop) -->
                     <div class="flex w-max">
-                        @for ($i = 0; $i < 4; $i++)
+                        @foreach ( $features as $feature )
                             <div class="carousel-scale-item w-[70vw] sm:w-[400px] lg:w-[500px] shrink-0 px-2 transition-transform duration-75">
                                 <div class="overflow-hidden rounded-2xl border border-card-border bg-card-bg shadow-[0_20px_40px_rgba(43,31,23,0.25)]">
-                                    <img src="{{ $img('writers-center.png') }}" alt="{{ __('Spindle dashboard preview') }}" loading="lazy" class="w-full object-cover">
-                                </div>
+                                    <img src="{{ $img($feature['file']) }}" alt="{{ __('Spindle features preview') }}" loading="lazy" class="w-full object-cover">
                             </div>
-                        @endfor
+                        @endforeach
                     </div>
                 </div>
             </div>
@@ -362,24 +328,26 @@
     </section>
 
     
-    <section id="tools" class="relative min-h-screen flex flex-col justify-center overflow-hidden bg-brand-50 dark:bg-bg-main pt-24 pb-8 scroll-mt-32">
+    <section id="tools" class="relative min-h-screen flex flex-col justify-center overflow-hidden bg-brand-50 dark:bg-bg-main pt-24 pb-8 scroll-mt-16">
         <div class="mx-auto max-w-[1240px] px-6 lg:px-[52px] -mt-16">
-            <p class="reveal font-montserrat text-[18px] font-semibold text-secondary-200">{{ __('WHY CHOOSE US') }}</p>
-            <h2 class="reveal reveal-d1 mt-1 max-w-[599px] text-web-title text-text-80 dark:text-text-100">{{ __('We Provide A Tools For Writing') }}</h2>
+            <p class="reveal text-web-subheading-1 text-secondary-200">{{ __('WHY CHOOSE US') }}</p>
+            <h2 class="reveal reveal-d1 mt-1 max-w-[540px] text-web-title text-text-80 dark:text-text-100">
+                {{ __('Tools Crafted For') }}<span class="font-merriweather italic text-secondary-200">{{ __(' The Weaver') }}</span>
+            </h2>
 
-            @php $base = asset('images/landing') . '/'; @endphp
+            @php $base = asset('videos/landing') . '/'; @endphp
             <div x-data="{ 
                     sel: 0, 
                     base: '{{ $base }}', 
                     timer: null,
                     items: [
-                        { t: '{{ __('Create a New Project') }}', d: '{{ __('Sections act as unified directories to organize and store every series of your creative works.') }}', img: 'writers-center.png' },
-                        { t: '{{ __('Choose a Structure') }}', d: '{{ __('Select the perfect narrative framework to seamlessly organize your timeline, plots, and acts.') }}', img: 'writers-center.png' },
-                        { t: '{{ __('Create Character Relationship') }}', d: '{{ __('Map out complex character relationships to ensure consistency across your storytelling universe.') }}', img: 'writers-center.png' },
-                        { t: '{{ __('Add Your Notes') }}', d: '{{ __('Consolidate your lore, world-building notes, and untamed ideas into a single, accessible repository.') }}', img: 'writers-center.png' },
+                        { t: '{{ __('Create a New Project') }}', d: '{{ __('Sections act as unified directories to organize and store every series of your creative works.') }}', vid: 'guide-create-a-new-project.mp4' },
+                        { t: '{{ __('Choose a Structure') }}', d: '{{ __('Select the perfect narrative framework to seamlessly organize your timeline, plots, and acts.') }}', vid: 'guide-choose-a-structure.mp4' },
+                        { t: '{{ __('Create Character Relationship') }}', d: '{{ __('Map out complex character relationships to ensure consistency across your storytelling universe.') }}', vid: 'guide-create-character-relationship.mp4' },
+                        { t: '{{ __('Add Your Notes') }}', d: '{{ __('Consolidate your lore, world-building notes, and untamed ideas into a single, accessible repository.') }}', vid: 'guide-add-your-notes.mp4' },
                     ],
                     startTimer() {
-                        this.timer = setInterval(() => { this.sel = (this.sel + 1) % this.items.length; }, 3500);
+                        this.timer = setInterval(() => { this.sel = (this.sel + 1) % this.items.length; }, 5500);
                     },
                     stopTimer() {
                         clearInterval(this.timer);
@@ -391,12 +359,12 @@
                  class="mt-8 grid grid-cols-1 items-center gap-10 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)] lg:gap-14">
                 
                 <div class="reveal reveal-left order-2 lg:order-1 w-full lg:w-11/12 lg:ml-auto">
-                      <div class="relative aspect-[566/419] w-full" style="perspective: 1500px; transform-style: preserve-3d;">
+                      <div class="relative aspect-[780/624] w-full" style="perspective: 1500px; transform-style: preserve-3d;">
                           <template x-for="(it, i) in items" :key="i">
                               <div class="absolute inset-0 overflow-hidden rounded-sm border border-secondary-200/30 bg-brand-100 shadow-[0_15px_30px_rgba(43,31,23,0.15)] transition-all duration-[1200ms] ease-[cubic-bezier(0.4,0,0.2,1)]"
                                    :style="sel === i ? 'transform: translate3d(0px, 0px, 50px) rotate(0deg) scale(1); opacity: 1;' : 
                                            `transform: translate3d(${ (i - sel) * 16 }px, ${ Math.abs(i - sel) * 12 }px, ${ -Math.abs(i - sel) * 60 }px) rotate(${ (i - sel) * 4 }deg) scale(${ 1 - Math.abs(i - sel)*0.02 }); opacity: ${ 1 - Math.abs(i - sel)*0.25 };`">
-                                  <img :src="base + it.img" class="h-full w-full object-cover object-top pointer-events-none" alt="">
+                                  <video :src="base + it.vid" class="h-full w-full object-cover object-top pointer-events-none" alt="" loop autoplay>
                               </div>
                           </template>
                       </div>
@@ -407,12 +375,22 @@
                           <button type="button" x-on:click="sel = i" x-on:mouseenter="sel = i"
                                   class="block w-full rounded-[6px] border-2 px-7 text-left transition-all duration-[800ms] ease-[cubic-bezier(0.4,0,0.2,1)]"
                                   :class="sel === i ? 'border-secondary-200 bg-brand-150 dark:bg-card-bg pt-5 pb-5' : 'border-brand-200 dark:border-brand-150 py-4 hover:border-secondary-150 hover:bg-brand-10 dark:hover:bg-brand-50'">
-                              <span class="font-merriweather text-[20px] italic transition-colors duration-[800ms]"
-                                    :class="sel === i ? 'text-secondary-200 dark:text-secondary-50' : 'text-text-70 dark:text-text-80'" x-text="it.t"></span>
+                              <div class="flex items-center gap-3">
+                                  <div class="flex w-10 shrink-0 items-center justify-center transition-colors duration-[800ms]"
+                                       :class="sel === i ? 'text-secondary-200 dark:text-secondary-50' : 'text-secondary-100 dark:text-text-80'"
+                                       style="--icon-color: currentColor; --icon-color-secondary: currentColor; --icon-opacity: 1;">
+                                      <template x-if="i === 0"><x-icons.sidebar-book class="h-6 w-auto" /></template>
+                                      <template x-if="i === 1"><x-icons.no-structure class="h-6 w-auto" /></template>
+                                      <template x-if="i === 2"><x-icons.no-character class="h-6 w-auto" /></template>
+                                      <template x-if="i === 3"><x-icons.no-notes class="h-6 w-auto" /></template>
+                                  </div>
+                                  <span class="font-merriweather text-[20px] italic transition-colors duration-[800ms]"
+                                        :class="sel === i ? 'text-secondary-200 dark:text-secondary-50' : 'text-text-70 dark:text-text-80'" x-text="it.t"></span>
+                              </div>
                               <div class="grid transition-all duration-[800ms] ease-[cubic-bezier(0.4,0,0.2,1)]"
                                    :class="sel === i ? 'grid-rows-[1fr] opacity-100 mt-2' : 'grid-rows-[0fr] opacity-0 mt-0'">
                                   <div class="overflow-hidden">
-                                      <p class="font-montserrat text-[14px] leading-[24px] text-text-80 dark:text-text-90 h-[72px]" x-text="it.d"></p>
+                                      <p class="text-web-body-small text-text-80 dark:text-text-90 h-[72px]" x-text="it.d"></p>
                                   </div>
                               </div>
                           </button>
@@ -424,17 +402,6 @@
 
     <section class="relative min-h-screen flex flex-col justify-center overflow-hidden bg-brand-50 dark:bg-bg-main py-20">
         <!-- Wind Rings Background -->
-        <style>
-            .custom-scrollbar::-webkit-scrollbar-thumb:hover { background-color: #8C7558; }
-            @keyframes wind-ring {
-                0% { transform: scale(0.3) rotate(0deg); opacity: 0; border-width: 8px; }
-                20% { opacity: 0.35; }
-                100% { transform: scale(3.5) rotate(180deg); opacity: 0; border-width: 2px; }
-            }
-            .animate-wind-ring {
-                animation: wind-ring 6s cubic-bezier(0.21, 0.53, 0.3, 1) infinite;
-            }
-        </style>
         <div class="absolute inset-0 z-0 flex items-center justify-center pointer-events-none">
             <div class="absolute w-[250px] h-[250px] md:w-[350px] md:h-[350px] border border-secondary-200 animate-wind-ring" style="border-radius: 40% 60% 60% 40% / 50% 40% 60% 50%;"></div>
             <div class="absolute w-[250px] h-[250px] md:w-[350px] md:h-[350px] border border-brand-200 animate-wind-ring" style="border-radius: 60% 40% 30% 70% / 60% 50% 50% 40%; animation-delay: -2s;"></div>
@@ -442,7 +409,7 @@
         </div>
 
         <div class="relative z-10 mx-auto max-w-[1240px] px-6 lg:px-[52px] text-center">
-            <p class="reveal mx-auto max-w-[800px] font-merriweather text-[28px] md:text-[36px] lg:text-[42px] italic leading-[1.5] text-text-80 dark:text-text-100">
+            <p class="reveal mx-auto max-w-[720px] text-web-heading-2 md:text-[36px] lg:text-[42px] italic leading-[1.5] text-text-80 dark:text-text-100">
                 {{ __('You Are The') }} <span class="text-secondary-200">{{ __('“Weavers”') }}</span>...<br class="hidden md:block">
                 {{ __('The Ones Who Will Turn A Yarn Into A Story.') }}
             </p>
@@ -451,11 +418,11 @@
 
     <section class="relative overflow-hidden bg-brand-50 dark:bg-bg-main pt-16 pb-0">
         <div class="reveal reveal-d1 relative mx-auto max-w-[1240px] px-6 lg:px-[52px]">
-            <div class="relative overflow-hidden rounded-[28px] px-6 pt-20 mb-16 text-center shadow-lg" style="background-color: #E9E1DA;">
-                <h2 class="text-web-title text-[#231D18] mx-auto max-w-[700px]">
-                    {{ __('Are You Ready To') }} <span class="font-merriweather italic text-[#81644D]">{{ __('Spin A Yarn?') }}</span>
+            <div class="relative overflow-hidden rounded-[28px] px-6 pt-20 mb-16 text-center shadow-lg bg-brand-100 dark:bg-brand-150">
+                <h2 class="text-web-title text-text-80 mx-auto max-w-[580px]">
+                    {{ __('Are You Ready To') }} <span class="font-merriweather italic text-secondary-200">{{ __('Spin A Yarn?') }}</span>
                 </h2>
-                <p class="mx-auto mt-4 max-w-[580px] font-montserrat text-[18px] leading-[28px] text-[#37322E]">
+                <p class="mx-auto mt-4 max-w-[580px] font-montserrat text-[18px] leading-[28px] text-subtext-100">
                     {{ __('Weave every character, plot, and world into a story worth telling, spinning countless narrative threads into one cohesive universe.') }}
                 </p>
                 <a href="{{ route('dashboard') }}"

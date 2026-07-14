@@ -20,6 +20,8 @@
         </script>
     </head>
     <body class="font-sans antialiased text-text-80 bg-brand-50 overflow-x-hidden transition-colors duration-200">
+        <x-desktop-only />
+
         {{ $slot }}
     </body>
 </html>

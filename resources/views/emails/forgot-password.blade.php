@@ -1,7 +1,7 @@
 <div style="background-color: #f8fafc; padding: 40px 20px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
     <div style="max-width: 570px; margin: 0 auto;">
         
-        {{-- Card Utama --}}
+        {{-- Main Card --}}
         <div style="background-color: #ffffff; padding: 45px; border-radius: 2px; text-align: left; border: 1px solid #e8e5ef; box-shadow: 0 2px 0 rgba(0, 0, 150, 0.025), 2px 4px 0 rgba(0, 0, 150, 0.015);">
             
             {{-- Header --}}

@@ -71,12 +71,12 @@
         :class="{ 'cursor-pointer hover:border-secondary-200': @json($editable) }"
         @if($editable) @click="$refs.photo.click()" @endif
     >
-        {{-- Tampilan FOTO --}}
+        {{-- PHOTO Display --}}
         <template x-if="photoPreview || ('{{ $imageUrl }}' && !isRemoved)">
             <img :src="photoPreview || '{{ $imageUrl }}'" class="absolute inset-0 w-full h-full object-cover object-center z-10">
         </template>
 
-        {{-- Tampilan PLACEHOLDER --}}
+        {{-- PLACEHOLDER Display --}}
         <template x-if="!photoPreview && (!'{{ $imageUrl }}' || isRemoved)">
             <div class="absolute inset-0 flex items-center justify-center bg-brand-100 z-0">
                 <x-icons.default-avatar
@@ -101,7 +101,7 @@
                 </svg>
                 <span class="text-web-body-small font-medium uppercase tracking-wider">{{ __('Edit Photo') }}</span>
 
-                {{-- Tombol Detach --}}
+                {{-- Detach Button --}}
                 <template x-if="photoPreview || ('{{ $imageUrl }}' && !isRemoved)">
                     <button 
                         type="button"

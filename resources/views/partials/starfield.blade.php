@@ -25,7 +25,7 @@
 @endphp
 <div class="pointer-events-none absolute inset-0 z-0 overflow-hidden">
     @foreach ($stars as $s)
-        <span class="animate-twinkle absolute rounded-full bg-brand-10 shadow-[0_0_8px_rgba(255,255,255,0.8)]"
+        <span class="animate-twinkle absolute rounded-full bg-[#FFFFFF] shadow-[0_0_8px_rgba(255,255,255,0.8)]"
               style="top: {{ $s[0] }}%; left: {{ $s[1] }}%; height: {{ $s[2] }}px; width: {{ $s[2] }}px; animation-delay: {{ $s[3] }}s;"></span>
     @endforeach
 </div>
