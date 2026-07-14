@@ -21,3 +21,8 @@ yarn-error.log
 /.nova
 /.vscode
 /.zed
+
+# Temporary files
+temp_log.txt
+picker_source.txt
+restore.cjs

@@ -1,8 +1,657 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:wght@400;700&family=Montserrat:wght@400;500;600;700;800&display=swap');
+@plugin "@tailwindcss/typography";
 @import 'tailwindcss';
 
 @source '../views';
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 
 @theme {
+    /* --- Font Families --- */
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-merriweather: 'Merriweather', serif;
+    --font-montserrat: 'Montserrat', sans-serif;
+    --font-inter: 'Inter', sans-serif;
+
+    /* Neutrals Colors */
+    --color-text-60: var(--text-60);
+    --color-text-70: var(--text-70);
+    --color-text-80: var(--text-80);
+    --color-text-90: var(--text-90);
+    --color-text-100: var(--text-100);
+
+    /* Sub Text */
+    --color-subtext-60: var(--subtext-60);
+    --color-subtext-70: var(--subtext-70);
+    --color-subtext-80: var(--subtext-80);
+    --color-subtext-90: var(--subtext-90);
+    --color-subtext-100: var(--subtext-100);
+
+    /* Interactive */
+    --color-interactive-100: rgb(53 117 255);
+    --color-interactive-opacity: rgb(101 150 255);
+
+    /* Success */
+    --color-success-100: rgb(0 192 89);
+
+    /* Warning */
+    --color-warning-100: rgb(255 190 0);
+
+    /* Danger */
+    --color-danger-100: var(--danger-100);
+
+    /* --- Background Colors --- */
+    --color-bg-main: var(--bg-main);
+    --color-bg-border: var(--bg-border);
+
+    /* Card */
+    --color-card-bg: var(--card-bg);
+    --color-card-hover: var(--card-hover);
+    --color-card-border: var(--card-border);
+
+    /* --- Brand Colors --- */
+    --color-brand-200: var(--brand-200);
+    --color-brand-150: var(--brand-150);
+    --color-brand-100: var(--brand-100);
+    --color-brand-50: var(--brand-50);
+    --color-brand-10: var(--brand-10);
+
+    /* --- Secondary --- */
+    --color-secondary-300: var(--secondary-300);
+    --color-secondary-250: var(--secondary-250);
+    --color-secondary-200: var(--secondary-200);
+    --color-secondary-150: var(--secondary-150);
+    --color-secondary-100: var(--secondary-100);
+    --color-secondary-50: var(--secondary-50);
+    --color-secondary-20: var(--secondary-20);
+    --color-secondary-10: var(--secondary-10);
+    --color-secondary-5: var(--secondary-5);
 }
+
+@layer base {
+    :root {
+        /* Neutrals Colors (Light) */
+        --text-60: #686563;
+        --text-70: #524d49;
+        --text-80: #37322e;
+        --text-90: #231d18;
+        --text-100: #231d18;
+
+        /* Sub Text (Light) */
+        --subtext-60: #e5e5e5;
+        --subtext-70: #d9d9d9;
+        --subtext-80: #c7c7c7;
+        --subtext-90: #989898;
+        --subtext-100: #747474;
+
+        /* Background (Light) */
+        --bg-main: #f6f6f4;
+        --bg-border: #efefe9;
+
+        /* Card (Light) */
+        --card-bg: #fffefb;
+        --card-hover: #f7f5f1;
+        --card-border: #e2e0d5;
+
+        /* Brand Colors (Light) */
+        --brand-200: #c9beb5;
+        --brand-150: #e1d7ce;
+        --brand-100: #e9e1da;
+        --brand-50: #f2efec;
+        --brand-10: #f7f5f4;
+
+        /* Secondary Colors (Light) */
+        --secondary-300: #765137;
+        --secondary-250: #8a6144;
+        --secondary-200: #81644d;
+        --secondary-150: #9a7d66;
+        --secondary-100: #b1a086;
+        --secondary-50: #c6b395;
+        --secondary-20: #d4c6bc;
+        --secondary-10: #d9c5a4;
+        --secondary-5: #f4ece5;
+
+        /* Scrollbar (Light) */
+        --scrollbar-thumb: #D5C6A9;
+        --scrollbar-thumb-hover: #B69F78;
+
+        /* Danger (Light) */
+        --danger-100: rgb(255 59 47);
+    }
+
+    .dark {
+        /* Neutrals Colors (Dark Mode - Cohesive Warm Editorial Night Theme) */
+        --text-60: #8F887F;
+        --text-70: #AEA59A;
+        --text-80: #CBC1B5;
+        --text-90: #E3DBD0;
+        --text-100: #F3ECE3;
+
+        /* Sub Text (Dark Mode) */
+        --subtext-60: #1E1C19;
+        --subtext-70: #2C2A26;
+        --subtext-80: #44403A;
+        --subtext-90: #7E776E;
+        --subtext-100: #9E968C;
+
+        /* Background (Dark Mode) */
+        --bg-main: #131210;
+        --bg-border: #23211D;
+
+        /* Card (Dark Mode) */
+        --card-bg: #1A1916;
+        --card-hover: #23211D;
+        --card-border: #2E2B26;
+
+        /* Brand Colors (Dark Mode) */
+        --brand-200: #3D3831;
+        --brand-150: #2E2A25;
+        --brand-100: #161513;
+        --brand-50: #191815;
+        --brand-10: #1C1A17;
+
+        /* Secondary Colors (Dark Mode) */
+        --secondary-300: #73583D;
+        --secondary-250: #7F6346;
+        --secondary-200: #8A6D50;
+        --secondary-150: #9E8263;
+        --secondary-100: #B5A184;
+        --secondary-50: #CAB79B;
+        --secondary-20: #3A3228;
+        --secondary-10: #2B251D;
+        --secondary-5: #1E1A14;
+
+        /* Scrollbar (Dark Mode) */
+        --scrollbar-thumb: #3A3630;
+        --scrollbar-thumb-hover: #544E45;
+
+        /* Danger (Dark Mode - Warm Crimson Red) */
+        --danger-100: #C83E31;
+    }
+
+    button,
+    a,
+    input[type="button"],
+    input[type="submit"],
+    input[type="reset"],
+    select,
+    label,
+    [role="button"] {
+        cursor: pointer !important;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    input[type="number"],
+    input[type="search"],
+    input[type="tel"],
+    input[type="url"],
+    textarea,
+    [contenteditable="true"] {
+        cursor: text !important;
+    }
+}
+
+/* --- Text Styles Library (Composite Properties) --- */
+@layer components {
+
+    /* ==============================
+       WEB STYLES
+       ============================== */
+
+    .text-web-title {
+        font-family: var(--font-merriweather);
+        font-weight: 400; /* Regular */
+        font-size: 4rem; /* 64px */
+        line-height: 5rem; /* 80px */
+        letter-spacing: 0;
+    }
+
+    .text-web-heading-1 {
+        font-family: var(--font-merriweather);
+        font-weight: 700; /* Bold */
+        font-size: 2.25rem; /* 36px */
+        line-height: 3.25rem; /* 52px */
+        letter-spacing: 0;
+    }
+
+    .text-web-heading-2 {
+        font-family: var(--font-merriweather);
+        font-weight: 400; /* Regular */
+        font-size: 1.75rem; /* 28px */
+        line-height: 2.375rem; /* 38px */
+        letter-spacing: 0;
+    }
+
+    .text-web-subheading-1 {
+        font-family: var(--font-montserrat);
+        font-weight: 600; /* SemiBold */
+        font-size: 1.25rem; /* 20px */
+        line-height: 1.75rem; /* 28px */
+        letter-spacing: 0;
+    }
+
+    .text-web-body-large {
+        font-family: var(--font-montserrat);
+        font-weight: 600; /* SemiBold */
+        font-size: 1.125rem; /* 18px */
+        line-height: 1.75rem; /* 28px */
+        letter-spacing: 0;
+    }
+
+    .text-web-body-small {
+        font-family: var(--font-montserrat);
+        font-weight: 400; /* Regular */
+        font-size: 1rem; /* 16px */
+        line-height: 1.5rem; /* 24px */
+        letter-spacing: 0;
+    }
+
+    .text-web-button {
+        font-family: var(--font-montserrat);
+        font-weight: 600; /* SemiBold */
+        font-size: 1rem; /* 16px */
+        line-height: 1.25rem; /* 20px */
+        letter-spacing: 0;
+    }
+
+    /* ==============================
+       WEB APP STYLES
+       ============================== */
+
+    .text-app-title-1 {
+        font-family: var(--font-merriweather);
+        font-weight: 400; /* Regular */
+        font-size: 2.25rem; /* 36px */
+        line-height: 2.875rem; /* 46px */
+        letter-spacing: 0;
+    }
+
+    .text-app-title-2 {
+        font-family: var(--font-montserrat);
+        font-weight: 700; /* Bold */
+        font-size: 2.25rem; /* 36px */
+        line-height: 2.625rem; /* 42px */
+        letter-spacing: 0;
+    }
+
+    .text-app-heading-1 {
+        font-family: var(--font-montserrat);
+        font-weight: 600; /* SemiBold */
+        font-size: 1.5rem; /* 24px */
+        line-height: 2rem; /* 32px */
+        letter-spacing: 0;
+    }
+
+    .text-app-heading-2 {
+        font-family: var(--font-montserrat);
+        font-weight: 600; /* SemiBold */
+        font-size: 1.25rem; /* 20px */
+        line-height: 1.5rem; /* 24px */
+        letter-spacing: 0;
+    }
+
+    .text-app-subheading-1 {
+        font-family: var(--font-inter);
+        font-weight: 600; /* SemiBold */
+        font-size: 1.25rem; /* 20px */
+        line-height: 1.5rem; /* 24px */
+        letter-spacing: 0;
+    }
+
+    .text-app-subheading-2 {
+        font-family: var(--font-inter);
+        font-weight: 600; /* SemiBold */
+        font-size: 1rem; /* 16px */
+        line-height: 1.375rem; /* 22px */
+        letter-spacing: 0;
+    }
+
+    .text-app-body-large {
+        font-family: var(--font-inter);
+        font-weight: 500; /* Medium */
+        font-size: 1rem; /* 16px */
+        line-height: 1.375rem; /* 22px */
+        letter-spacing: 0;
+    }
+
+    .text-app-body-medium {
+        font-family: var(--font-inter);
+        font-weight: 500; /* Medium */
+        font-size: 0.875rem; /* 14px */
+        line-height: 1.25rem; /* 20px */
+        letter-spacing: 0;
+    }
+
+    .text-app-body-small {
+        font-family: var(--font-inter);
+        font-weight: 500; /* Medium */
+        font-size: 0.75rem; /* 12px */
+        line-height: 1rem; /* 16px */
+        letter-spacing: 0;
+    }
+
+    .text-app-subtitle-1 {
+        font-family: var(--font-montserrat);
+        font-weight: 500; /* Medium */
+        font-size: 1.125rem; /* 18px */
+        line-height: 1.5rem; /* 24px */
+        letter-spacing: 0;
+    }
+
+    .text-app-feature {
+        font-family: var(--font-montserrat);
+        font-weight: 600; /* SemiBold */
+        font-size: 0.875rem; /* 14px */
+        line-height: 1.125rem; /* 18px */
+        letter-spacing: 0;
+    }
+
+    .text-app-subfeature {
+        font-family: var(--font-montserrat);
+        font-weight: 500; /* Medium */
+        font-size: 1rem; /* 16px */
+        line-height: 1.375rem; /* 22px */
+        letter-spacing: 0;
+    }
+
+    .text-app-desc-feature {
+        font-family: var(--font-montserrat);
+        font-weight: 500; /* Medium */
+        font-size: 0.75rem; /* 12px */
+        line-height: 1rem; /* 16px */
+        letter-spacing: 0;
+    }
+
+    .text-app-caption {
+        font-family: var(--font-montserrat);
+        font-weight: 500; /* Medium */
+        font-size: 0.67rem; /* 12px */
+        line-height: 1rem; /* 16px */
+        letter-spacing: 0;
+    }
+
+    /* ==============================
+       FLATPICKR CUSTOM
+       ============================== */
+    .flatpickr-calendar.static {
+        @apply !bg-brand-10 !border !border-secondary-50 !rounded-xl !shadow-lg;
+        @apply !right-0 !left-auto !mt-1;
+
+        transform: scale(0.9) !important;
+        transform-origin: top right !important;
+        font-family: var(--font-montserrat) !important;
+    }
+
+    .flatpickr-current-month {
+        @apply !flex !items-center !h-8 !p-0;
+    }
+
+    .flatpickr-monthDropdown-months {
+        @apply !text-[17px] !font-medium !text-secondary-200 !bg-brand-10 !rounded-md !px-1;
+        @apply hover:!bg-brand-100 !transition-colors !cursor-pointer;
+        height: 24px !important;
+    }
+
+    span.flatpickr-weekday {
+        @apply !text-secondary-250 !font-medium;
+    }
+
+    .flatpickr-day {
+        @apply !rounded-lg !transition-colors;
+    }
+
+    .flatpickr-day:hover,
+    .flatpickr-day.prevMonthDay:hover,
+    .flatpickr-day.nextMonthDay:hover,
+    .flatpickr-day.today:hover,
+    .flatpickr-day:focus {
+        @apply !bg-brand-100 !text-secondary-200 !border-transparent;
+    }
+
+    .flatpickr-day.today {
+        @apply !border-secondary-100 !text-secondary-250;
+    }
+
+    .flatpickr-day.selected {
+        /* Tadi kurang 'text-' di sini */
+        @apply !bg-secondary-200 !border-secondary-200 !text-brand-10;
+    }
+
+    .flatpickr-prev-month svg,
+    .flatpickr-next-month svg {
+        @apply !fill-secondary-200 !transition-colors;
+    }
+
+    .flatpickr-prev-month:hover svg,
+    .flatpickr-next-month:hover svg {
+        @apply !fill-secondary-250;
+    }
+}
+
+
+/* ==============================
+   LANDING PAGE — SUBTLE ANIMATIONS
+   ============================== */
+@layer utilities {
+
+    /* Scroll reveal: elemen mulai turun + transparan, naik halus saat masuk viewport */
+    .reveal {
+        opacity: 0;
+        transform: translateY(28px);
+        transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1),
+                    transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+        will-change: opacity, transform;
+    }
+    .reveal.in-view {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    /* Varian arah & delay bertingkat */
+    .reveal-left  { transform: translateX(-32px); }
+    .reveal-right { transform: translateX(32px); }
+    .reveal-left.in-view, .reveal-right.in-view { transform: translateX(0); }
+    .reveal-d1 { transition-delay: 0.12s; }
+    .reveal-d2 { transition-delay: 0.24s; }
+    .reveal-d3 { transition-delay: 0.36s; }
+
+    /* Float lembut naik-turun (untuk ilustrasi) */
+    @keyframes float-soft {
+        0%, 100% { transform: translateY(0); }
+        50%      { transform: translateY(-14px); }
+    }
+    .animate-float      { animation: float-soft 6s ease-in-out infinite; }
+    .animate-float-slow { animation: float-soft 9s ease-in-out infinite; }
+
+    /* Putaran sangat lambat untuk spiral galaksi */
+    @keyframes spin-slow { to { transform: rotate(360deg); } }
+    .animate-spin-slow { animation: spin-slow 90s linear infinite; }
+
+    /* Kelap-kelip bintang */
+    @keyframes twinkle {
+        0%, 100% { opacity: 0.2; }
+        50%      { opacity: 1; }
+    }
+    .animate-twinkle { animation: twinkle 3.5s ease-in-out infinite; }
+
+    /* Awan menyapu perlahan di langit hero */
+    @keyframes cloud-drift   { from { transform: translateX(-6%); } to { transform: translateX(7%); } }
+    @keyframes cloud-drift-2 { from { transform: translateX(8%); }  to { transform: translateX(-9%); } }
+    .animate-cloud   { animation: cloud-drift   22s ease-in-out infinite alternate; }
+    .animate-cloud-2 { animation: cloud-drift-2 30s ease-in-out infinite alternate; }
+
+    /* Ayunan lembut (syal / figur hero) — organik seperti tertiup angin */
+    @keyframes sway {
+        0%, 100% { transform: rotate(-0.5deg); }
+        30%      { transform: rotate(0.6deg); }
+        55%      { transform: rotate(-0.2deg); }
+        75%      { transform: rotate(0.4deg); }
+    }
+    .animate-sway { animation: sway 9s ease-in-out infinite; transform-origin: 55% bottom; }
+
+    /* Kabut tipis menyapu di atas gunung */
+    @keyframes mist {
+        0%   { transform: translateX(-5%); opacity: 0.35; }
+        50%  { opacity: 0.7; }
+        100% { transform: translateX(7%); opacity: 0.35; }
+    }
+    .animate-mist { animation: mist 28s ease-in-out infinite alternate; }
+
+    /* Partikel benang/debu naik perlahan dari figur */
+    @keyframes mote-rise {
+        0%   { transform: translateY(0) translateX(0) scale(1); opacity: 0; }
+        12%  { opacity: 0.85; }
+        88%  { opacity: 0.6; }
+        100% { transform: translateY(-140px) translateX(18px) scale(0.6); opacity: 0; }
+    }
+    .animate-mote { animation: mote-rise linear infinite; }
+
+    /* Untaian benang berkibar (dipakai bersama SMIL pada path) */
+    @keyframes thread-flutter {
+        0%, 100% { transform: translateY(0) skewX(0deg); }
+        50%      { transform: translateY(-3px) skewX(3deg); }
+    }
+    .animate-thread { animation: thread-flutter 4.5s ease-in-out infinite; transform-origin: left center; }
+
+    /* Navbar: transparan di atas hero, jadi solid setelah scroll */
+    #site-nav {
+        transition: background-color 0.4s ease, box-shadow 0.4s ease, backdrop-filter 0.4s ease;
+    }
+    #site-nav.nav-scrolled {
+        background-color: rgba(246, 246, 244, 0.85);
+        backdrop-filter: blur(10px);
+        box-shadow: 0 1px 0 rgba(129, 100, 77, 0.12);
+    }
+
+    /* Garis bawah underline tumbuh saat hover nav */
+    .nav-link { position: relative; }
+    .nav-link::after {
+        content: "";
+        position: absolute;
+        left: 0; bottom: -4px;
+        width: 100%; height: 1.5px;
+        background: currentColor;
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform 0.35s ease;
+    }
+    .nav-link:hover::after { transform: scaleX(1); }
+
+    /* Hormati preferensi reduce-motion */
+    @media (prefers-reduced-motion: reduce) {
+        .reveal { opacity: 1 !important; transform: none !important; transition: none !important; }
+        .animate-float, .animate-float-slow, .animate-spin-slow, .animate-twinkle { animation: none !important; }
+    }
+
+    /* Global Scrollbar Style */
+    * {
+        scrollbar-width: thin;
+        scrollbar-color: var(--scrollbar-thumb) transparent;
+    }
+    ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+        background-color: var(--scrollbar-thumb);
+        border-radius: 10px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+        background-color: var(--scrollbar-thumb-hover);
+    }
+
+
+}
+
+/* ==============================
+   LIVEWIRE NAVIGATION PROGRESS BAR
+   ============================== */
+#nprogress .bar {
+    background: var(--color-secondary-250) !important;
+    height: 2px !important;
+}
+#nprogress .peg {
+    box-shadow: 0 0 16px 3px var(--color-secondary-150), 0 0 8px 2px var(--color-secondary-200) !important;
+    opacity: 1 !important;
+}
+#nprogress .spinner-icon {
+    border-top-color: var(--color-secondary-250) !important;
+    border-left-color: var(--color-secondary-250) !important;
+}
+
+@keyframes windBlow { 0% { transform: translateX(-100%); opacity: 0; } 50% { opacity: 1; } 100% { transform: translateX(300%); opacity: 0; } } .animate-wind-blow { animation: windBlow linear infinite; }
+@keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+
+@keyframes progressFill {
+    0% { width: 0%; }
+    15% { width: 35%; }
+    40% { width: 68%; }
+    75% { width: 88%; }
+    100% { width: 98%; }
+}
+.animate-progress-fill {
+    animation: progressFill 2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    background-color: var(--color-secondary-250);
+    box-shadow: 0 0 16px 3px var(--color-secondary-150), 0 0 8px 2px var(--color-secondary-200);
+}
+
+/* --- Extracted from structure.blade.php --- */
+/* .bg-dot-pattern {
+    background-color: var(--color-brand-10); 
+    background-image: radial-gradient(
+        circle, 
+        color-mix(in srgb, var(--color-brand-150) 50%, transparent) 1.5px, 
+        transparent 1.5px
+    );
+    background-size: 22px 22px;
+}
+.dark .bg-dot-pattern {
+    background-color: var(--color-brand-10);
+    background-image: radial-gradient(
+        circle, 
+        color-mix(in srgb, var(--color-brand-200) 40%, transparent) 1.5px, 
+        transparent 1.5px
+    );
+} */
+
+.bg-dot-pattern {
+    /* Ambil nilai dari HTML, jika tidak ada pakai nilai default di sebelah kanan */
+    --z: var(--zoom, 1);
+    --px: var(--pan-x, 0px);
+    --py: var(--pan-y, 0px);
+
+    background-color: var(--color-brand-10); 
+    background-image: radial-gradient(
+        circle, 
+        color-mix(in srgb, var(--color-brand-150) 50%, transparent) calc(1.5px * var(--z)), 
+        transparent calc(1.5px * var(--z))
+    );
+    background-size: calc(22px * var(--z)) calc(22px * var(--z));
+    background-position: var(--px) var(--py);
+}
+
+/* Otomatis handle warna untuk Dark Mode */
+.dark .bg-dot-pattern {
+    background-image: radial-gradient(
+        circle, 
+        color-mix(in srgb, var(--color-brand-200) 40%, transparent) calc(1.5px * var(--z)), 
+        transparent calc(1.5px * var(--z))
+    );
+}
+
+/* --- Extracted from dashboard/index.blade.php --- */
+.welcome-marquee {
+    animation: welcome-slide var(--duration) linear infinite;
+}
+@keyframes welcome-slide {
+    0% { transform: translateX(0); }
+    85%, 100% { transform: translateX(var(--distance)); }
+}
+.mask-image-fade {
+    -webkit-mask-image: linear-gradient(to right, transparent, black 24px, black calc(100% - 24px), transparent);
+    mask-image: linear-gradient(to right, transparent, black 24px, black calc(100% - 24px), transparent);
+}
+
