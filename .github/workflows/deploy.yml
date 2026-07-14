@@ -1,0 +1,48 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches:
+      - main # Robot akan bekerja otomatis SETIAP ada push ke branch main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Eksekusi Perintah di Server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            # 1. Pindah ke folder website
+            cd /var/www/spindle
+            
+            # 2. Nyalakan mode perbaikan (agar pengunjung melihat halaman maintenance sementara)
+            php artisan down || true
+            
+            # 3. Tarik kode terbaru dari GitHub
+            git pull origin main
+            
+            # 4. Install paket PHP dan eksekusi Database
+            composer install --optimize-autoloader --no-dev
+            php artisan migrate --force
+            
+            # 5. Install paket Node.js dan kemas file CSS/JS (SANGAT PENTING!)
+            npm install
+            npm run build
+            
+            # 6. Bersihkan dan perbarui Cache Laravel
+            php artisan optimize:clear
+            php artisan config:cache
+            php artisan route:cache
+            php artisan view:cache
+            
+            # 7. Perbaiki ulang hak akses file agar server tidak Error 500
+            sudo chown -R ubuntu:www-data /var/www/spindle
+            sudo chmod -R 775 /var/www/spindle/storage
+            sudo chmod -R 775 /var/www/spindle/bootstrap/cache
+            
+            # 8. Matikan mode perbaikan (website kembali live)
+            php artisan up

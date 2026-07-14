@@ -253,13 +253,13 @@
                         x-show="activeDropdown === 'textColor'" x-cloak x-transition
                         @click.outside="activeDropdown = null"
                         x-bind:style="`position: fixed; top: ${pos.top}px; left: ${pos.left}px; z-index: 9999;`"
-                        class="p-2.5 bg-white border border-brand-200 rounded-lg shadow-lg flex flex-col"
+                        class="p-2.5 bg-brand-10 border border-brand-200 rounded-lg shadow-lg flex flex-col"
                         style="display: none; width: 172px;"
                     >
                         <span class="text-app-caption font-semibold text-secondary-150 uppercase tracking-wider mb-2 block">{{ __('Text Color') }}</span>
                         <div class="grid grid-cols-6 gap-2">
                             <template x-for="c in textColors" :key="c">
-                                <button type="button" @mousedown.prevent="saveSelection()" @click="exec('foreColor', c); currentTextColor = c;" class="w-5 h-5 rounded-full transition-all duration-150 relative flex items-center justify-center shrink-0" x-bind:class="(currentTextColor || '#000000') === c ? 'border border-secondary-200 bg-white p-[3px]' : 'border border-brand-200 hover:scale-110 hover:border-secondary-150'" x-bind:style="(currentTextColor || '#000000') === c ? '' : `background:${c}`" :title="c === '#000000' ? '{{ __('Default / Black') }}' : c">
+                                <button type="button" @mousedown.prevent="saveSelection()" @click="exec('foreColor', c); currentTextColor = c;" class="w-5 h-5 rounded-full transition-all duration-150 relative flex items-center justify-center shrink-0" x-bind:class="(currentTextColor || '#000000') === c ? 'border border-secondary-200 bg-brand-10 p-[1px]' : 'border border-brand-200 hover:scale-110 hover:border-secondary-150'" x-bind:style="(currentTextColor || '#000000') === c ? '' : `background:${c}`" :title="c === '#000000' ? '{{ __('Default / Black') }}' : c">
                                     <template x-if="(currentTextColor || '#000000') === c">
                                         <span class="w-full h-full rounded-full block" x-bind:style="`background:${c}`"></span>
                                     </template>
@@ -293,13 +293,13 @@
                         x-show="activeDropdown === 'highlightColor'" x-cloak x-transition
                         @click.outside="activeDropdown = null"
                         x-bind:style="`position: fixed; top: ${pos.top}px; left: ${pos.left}px; z-index: 9999;`"
-                        class="p-2.5 bg-white border border-brand-200 rounded-lg shadow-lg flex flex-col"
+                        class="p-2.5 bg-brand-10 border border-brand-200 rounded-lg shadow-lg flex flex-col"
                         style="display: none; width: 184px;"
                     >
                         <span class="text-app-caption font-semibold text-secondary-150 uppercase tracking-wider mb-2 block">{{ __('Highlight Color') }}</span>
                         <div class="grid grid-cols-7 gap-1.5">
                             <template x-for="c in highlightColors" :key="c">
-                                <button type="button" @mousedown.prevent="saveSelection()" @click="exec('hiliteColor', c === 'transparent' ? 'transparent' : c); currentHighlightColor = c;" class="w-5 h-5 rounded-full transition-all duration-150 relative flex items-center justify-center shrink-0" x-bind:class="(currentHighlightColor || 'transparent') === c ? 'border border-secondary-200 bg-white p-[3px]' : 'border border-brand-200 hover:scale-110 hover:border-secondary-150'" x-bind:style="(currentHighlightColor || 'transparent') === c || c === 'transparent' ? '' : `background:${c}`" :title="c === 'transparent' ? '{{ __('No Highlight') }}' : c">
+                                <button type="button" @mousedown.prevent="saveSelection()" @click="exec('hiliteColor', c === 'transparent' ? 'transparent' : c); currentHighlightColor = c;" class="w-5 h-5 rounded-full transition-all duration-150 relative flex items-center justify-center shrink-0" x-bind:class="(currentHighlightColor || 'transparent') === c ? 'border border-secondary-200 bg-brand-10 p-[1px]' : 'border border-brand-200 hover:scale-110 hover:border-secondary-150'" x-bind:style="(currentHighlightColor || 'transparent') === c || c === 'transparent' ? '' : `background:${c}`" :title="c === 'transparent' ? '{{ __('No Highlight') }}' : c">
                                     <template x-if="c === 'transparent'">
                                         <svg class="w-full h-full text-danger-100" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                                     </template>
