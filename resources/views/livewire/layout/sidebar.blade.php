@@ -434,31 +434,37 @@ new class extends Component {
                 @if(count($recentProjects) > 0)
                     <div class="space-y-1 pb-2">
                         @foreach($recentProjects->take(3) as $rProject)
-                            <a x-data="{ rowHovered: false }" wire:key="recent-{{ $rProject->project_id }}" href="{{ route('projects.show', $rProject->project_id) }}" wire:navigate class="flex items-center gap-2 px-2 py-1.5 -mx-2 rounded-lg transition-colors group" :class="isActiveProject('{{ $rProject->project_id }}') ? 'bg-brand-150 text-text-100 font-semibold' : 'hover:bg-brand-150'">
-                                @if($rProject->icon_type === 'emoji')
-                                    <span class="text-[16px] leading-none shrink-0">{{ $rProject->icon }}</span>
-                                @elseif($rProject->icon_type === 'image' && $rProject->icon)
-                                    <img src="{{ asset('storage/' . $rProject->icon) }}" alt="" class="w-4 h-4 object-cover rounded shrink-0">
-                                @else
-                                    <x-icons.sidebar-book class="w-4 h-4 text-text-70 shrink-0" />
-                                @endif
-                                <span class="text-app-body-small text-[13px] font-medium text-text-80 truncate group-hover:text-text-100 transition-colors" :class="isActiveProject('{{ $rProject->project_id }}') ? 'text-text-100 font-semibold' : ''">{{ $rProject->title }}</span>
-                            </a>
+                            <div x-data="{ rowHovered: false }" wire:key="recent-{{ $rProject->project_id }}" class="group flex items-center justify-between px-2 py-1.5 -mx-2 rounded-lg transition-colors" :class="isActiveProject('{{ $rProject->project_id }}') ? 'bg-brand-150' : 'hover:bg-brand-150'">
+                                <a href="{{ route('projects.show', $rProject->project_id) }}" wire:navigate class="flex items-center gap-2 flex-1 min-w-0">
+                                    @if($rProject->icon_type === 'emoji')
+                                        <span class="text-[16px] leading-none shrink-0">{{ $rProject->icon }}</span>
+                                    @elseif($rProject->icon_type === 'image' && $rProject->icon)
+                                        <img src="{{ asset('storage/' . $rProject->icon) }}" alt="" class="w-4 h-4 object-cover rounded shrink-0">
+                                    @else
+                                        <x-icons.sidebar-book class="w-4 h-4 text-text-70 shrink-0" />
+                                    @endif
+                                    <span class="text-app-body-small text-[13px] font-medium text-text-80 truncate group-hover:text-text-100 transition-colors" :class="isActiveProject('{{ $rProject->project_id }}') ? 'text-text-100 font-semibold' : ''">{{ $rProject->title }}</span>
+                                </a>
+                                <div class="p-1 shrink-0 w-6"></div>
+                            </div>
                         @endforeach
                         
                         @if(count($recentProjects) > 3)
                             <div x-show="viewAll" x-collapse x-cloak class="space-y-1 mt-1">
                                 @foreach($recentProjects->skip(3) as $rProject)
-                                    <a x-data="{ rowHovered: false }" wire:key="recent-more-{{ $rProject->project_id }}" href="{{ route('projects.show', $rProject->project_id) }}" wire:navigate class="flex items-center gap-2 px-2 py-1.5 -mx-2 rounded-lg transition-colors group" :class="isActiveProject('{{ $rProject->project_id }}') ? 'bg-brand-150 text-text-100 font-semibold' : 'hover:bg-brand-150'">
-                                        @if($rProject->icon_type === 'emoji')
-                                            <span class="text-[16px] leading-none shrink-0">{{ $rProject->icon }}</span>
-                                        @elseif($rProject->icon_type === 'image' && $rProject->icon)
-                                            <img src="{{ asset('storage/' . $rProject->icon) }}" alt="" class="w-4 h-4 object-cover rounded shrink-0">
-                                        @else
-                                            <x-icons.sidebar-book class="w-4 h-4 text-text-70 shrink-0" />
-                                        @endif
-                                        <span class="text-app-body-small text-[13px] font-medium text-text-80 truncate group-hover:text-text-100 transition-colors" :class="isActiveProject('{{ $rProject->project_id }}') ? 'text-text-100 font-semibold' : ''">{{ $rProject->title }}</span>
-                                    </a>
+                                    <div x-data="{ rowHovered: false }" wire:key="recent-more-{{ $rProject->project_id }}" class="group flex items-center justify-between px-2 py-1.5 -mx-2 rounded-lg transition-colors" :class="isActiveProject('{{ $rProject->project_id }}') ? 'bg-brand-150' : 'hover:bg-brand-150'">
+                                        <a href="{{ route('projects.show', $rProject->project_id) }}" wire:navigate class="flex items-center gap-2 flex-1 min-w-0">
+                                            @if($rProject->icon_type === 'emoji')
+                                                <span class="text-[16px] leading-none shrink-0">{{ $rProject->icon }}</span>
+                                            @elseif($rProject->icon_type === 'image' && $rProject->icon)
+                                                <img src="{{ asset('storage/' . $rProject->icon) }}" alt="" class="w-4 h-4 object-cover rounded shrink-0">
+                                            @else
+                                                <x-icons.sidebar-book class="w-4 h-4 text-text-70 shrink-0" />
+                                            @endif
+                                            <span class="text-app-body-small text-[13px] font-medium text-text-80 truncate group-hover:text-text-100 transition-colors" :class="isActiveProject('{{ $rProject->project_id }}') ? 'text-text-100 font-semibold' : ''">{{ $rProject->title }}</span>
+                                        </a>
+                                        <div class="p-1 shrink-0 w-6"></div>
+                                    </div>
                                 @endforeach
                             </div>
                             <button @click="viewAll = !viewAll" class="w-full text-center text-app-body-small text-[11px] font-semibold text-secondary-250 hover:text-secondary-300 py-1.5 transition-colors">
