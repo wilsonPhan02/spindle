@@ -302,7 +302,7 @@
                 
                 <!-- Spindle Tool/Card (Foreground with Float Animation) -->
                 <div class="absolute top-1/2 left-[24%] lg:left-[30%] xl:left-[26%] 2xl:left-[20%] z-10 w-[200px] lg:w-[260px] -translate-y-[100%] animate-float transition-all duration-300">
-                    <img src="{{ $img('group47.png') }}" alt="{{ __('The Spindle') }}" loading="lazy"
+                    <img src="{{ $img('spindle-card.png') }}" alt="{{ __('The Spindle') }}" loading="lazy"
                          class="w-full rotate-[8deg] drop-shadow-[0_30px_40px_rgba(0,0,0,0.5)]">
                 </div>
             </div>
@@ -329,6 +329,15 @@
                 {{ __('We are going to help you create your story. Weave stories, characters, and notes easily by using Spindle. Convert your abstract yarn into a magic yarn!') }}
             </p>
 
+            @php
+                $features = [
+                    ['file' => 'feature-chapter.png'],
+                    ['file' => 'feature-characters.png'],
+                    ['file' => 'feature-dashboard.png'],
+                    ['file' => 'feature-notes.png']
+                ];
+            @endphp
+
             <!-- Infinite Marquee Carousel -->
             <div class="relative mt-6 overflow-x-clip overflow-y-visible w-full max-w-full pb-16 pt-4">
                 <!-- Shadow overlays for smooth fading edges -->
@@ -338,23 +347,22 @@
                 <div class="flex w-max animate-[marquee_50s_linear_infinite]" id="scale-carousel-track">
                     <!-- Group 1 -->
                     <div class="flex w-max">
-                        @for ($i = 0; $i < 4; $i++)
+                        @foreach ( $features as $feature )
                             <div class="carousel-scale-item w-[70vw] sm:w-[400px] lg:w-[500px] shrink-0 px-2 transition-transform duration-75">
                                 <div class="overflow-hidden rounded-2xl border border-card-border bg-card-bg shadow-[0_20px_40px_rgba(43,31,23,0.25)]">
-                                    <img src="{{ $img('writers-center.png') }}" alt="{{ __('Spindle dashboard preview') }}" loading="lazy" class="w-full object-cover">
+                                    <img src="{{ $img($feature['file']) }}" alt="{{ __('Spindle features preview') }}" loading="lazy" class="w-full object-cover">
                                 </div>
                             </div>
-                        @endfor
+                        @endforeach
                     </div>
                     <!-- Group 2 (Exact duplicate for seamless loop) -->
                     <div class="flex w-max">
-                        @for ($i = 0; $i < 4; $i++)
+                        @foreach ( $features as $feature )
                             <div class="carousel-scale-item w-[70vw] sm:w-[400px] lg:w-[500px] shrink-0 px-2 transition-transform duration-75">
                                 <div class="overflow-hidden rounded-2xl border border-card-border bg-card-bg shadow-[0_20px_40px_rgba(43,31,23,0.25)]">
-                                    <img src="{{ $img('writers-center.png') }}" alt="{{ __('Spindle dashboard preview') }}" loading="lazy" class="w-full object-cover">
-                                </div>
+                                    <img src="{{ $img($feature['file']) }}" alt="{{ __('Spindle features preview') }}" loading="lazy" class="w-full object-cover">
                             </div>
-                        @endfor
+                        @endforeach
                     </div>
                 </div>
             </div>
