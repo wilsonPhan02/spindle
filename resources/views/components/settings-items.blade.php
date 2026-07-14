@@ -189,8 +189,8 @@
                 :class="isOn ? 'bg-secondary-300 border-secondary-300' : 'bg-brand-100 group-hover:bg-brand-150'"
             >
                 <div
-                    class="w-5 h-5 bg-white rounded-full shadow absolute top-0.5 left-0.5 transition-transform duration-300"
-                    :class="isOn ? 'translate-x-5' : 'translate-x-0'"
+                    class="w-5 h-5 bg-white rounded-full shadow absolute top-0 bottom-0 my-auto left-0.5 transition-transform duration-300"
+                    :class="isOn ? 'translate-x-[1.125rem]' : 'translate-x-0'"
                 ></div>
             </div>
         @else
