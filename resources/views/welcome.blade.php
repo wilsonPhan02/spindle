@@ -57,6 +57,7 @@
 
 
 @php $img = fn ($f) => asset('images/landing/' . $f); @endphp
+@php $vid = fn ($f) => asset('videos/landing/' . $f); @endphp
 
 <body class="bg-brand-50 dark:bg-bg-main text-text-80 dark:text-text-100 font-montserrat antialiased overflow-x-hidden">
 
@@ -375,19 +376,19 @@
             <p class="reveal font-montserrat text-[18px] font-semibold text-secondary-200">{{ __('WHY CHOOSE US') }}</p>
             <h2 class="reveal reveal-d1 mt-1 max-w-[599px] text-web-title text-text-80 dark:text-text-100">{{ __('We Provide A Tools For Writing') }}</h2>
 
-            @php $base = asset('images/landing') . '/'; @endphp
+            @php $base = asset('videos/landing') . '/'; @endphp
             <div x-data="{ 
                     sel: 0, 
                     base: '{{ $base }}', 
                     timer: null,
                     items: [
-                        { t: '{{ __('Create a New Project') }}', d: '{{ __('Sections act as unified directories to organize and store every series of your creative works.') }}', img: 'writers-center.png' },
-                        { t: '{{ __('Choose a Structure') }}', d: '{{ __('Select the perfect narrative framework to seamlessly organize your timeline, plots, and acts.') }}', img: 'writers-center.png' },
-                        { t: '{{ __('Create Character Relationship') }}', d: '{{ __('Map out complex character relationships to ensure consistency across your storytelling universe.') }}', img: 'writers-center.png' },
-                        { t: '{{ __('Add Your Notes') }}', d: '{{ __('Consolidate your lore, world-building notes, and untamed ideas into a single, accessible repository.') }}', img: 'writers-center.png' },
+                        { t: '{{ __('Create a New Project') }}', d: '{{ __('Sections act as unified directories to organize and store every series of your creative works.') }}', vid: 'guide-create-a-new-project.mp4' },
+                        { t: '{{ __('Choose a Structure') }}', d: '{{ __('Select the perfect narrative framework to seamlessly organize your timeline, plots, and acts.') }}', vid: 'guide-choose-a-structure.mp4' },
+                        { t: '{{ __('Create Character Relationship') }}', d: '{{ __('Map out complex character relationships to ensure consistency across your storytelling universe.') }}', vid: 'guide-create-character-relationship.mp4' },
+                        { t: '{{ __('Add Your Notes') }}', d: '{{ __('Consolidate your lore, world-building notes, and untamed ideas into a single, accessible repository.') }}', vid: 'guide-add-your-notes.mp4' },
                     ],
                     startTimer() {
-                        this.timer = setInterval(() => { this.sel = (this.sel + 1) % this.items.length; }, 3500);
+                        this.timer = setInterval(() => { this.sel = (this.sel + 1) % this.items.length; }, 5000);
                     },
                     stopTimer() {
                         clearInterval(this.timer);
@@ -404,7 +405,7 @@
                               <div class="absolute inset-0 overflow-hidden rounded-sm border border-secondary-200/30 bg-brand-100 shadow-[0_15px_30px_rgba(43,31,23,0.15)] transition-all duration-[1200ms] ease-[cubic-bezier(0.4,0,0.2,1)]"
                                    :style="sel === i ? 'transform: translate3d(0px, 0px, 50px) rotate(0deg) scale(1); opacity: 1;' : 
                                            `transform: translate3d(${ (i - sel) * 16 }px, ${ Math.abs(i - sel) * 12 }px, ${ -Math.abs(i - sel) * 60 }px) rotate(${ (i - sel) * 4 }deg) scale(${ 1 - Math.abs(i - sel)*0.02 }); opacity: ${ 1 - Math.abs(i - sel)*0.25 };`">
-                                  <img :src="base + it.img" class="h-full w-full object-cover object-top pointer-events-none" alt="">
+                                  <video :src="base + it.vid" class="h-full w-full object-cover object-top pointer-events-none" alt="" autoplay>
                               </div>
                           </template>
                       </div>
