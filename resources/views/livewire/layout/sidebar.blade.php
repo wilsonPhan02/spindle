@@ -225,6 +225,14 @@ new class extends Component {
 <aside
     x-data="{
         currentPath: window.location.pathname,
+        init() {
+            document.addEventListener('livewire:navigated', () => {
+                this.currentPath = window.location.pathname;
+            });
+            window.addEventListener('popstate', () => {
+                this.currentPath = window.location.pathname;
+            });
+        },
         isActiveProject(projectId) {
             return this.currentPath === '/projects/' + projectId || this.currentPath.startsWith('/projects/' + projectId + '/');
         },
@@ -232,6 +240,7 @@ new class extends Component {
             return this.currentPath === path || (path !== '/' && this.currentPath.startsWith(path + '/'));
         }
     }"
+    x-on:livewire:navigated.document="currentPath = window.location.pathname"
     x-on:livewire:navigated.window="currentPath = window.location.pathname"
     x-on:popstate.window="currentPath = window.location.pathname"
     @mouseleave="$store.layout.isHovered = false"
@@ -425,7 +434,7 @@ new class extends Component {
                 @if(count($recentProjects) > 0)
                     <div class="space-y-1 pb-2">
                         @foreach($recentProjects->take(3) as $rProject)
-                            <a href="{{ route('projects.show', $rProject->project_id) }}" wire:navigate class="flex items-center gap-2 px-2 py-1.5 -mx-2 rounded-lg transition-colors group" :class="isActiveProject('{{ $rProject->project_id }}') ? 'bg-brand-150 text-text-100 font-semibold' : 'hover:bg-brand-150'">
+                            <a x-data="{ rowHovered: false }" wire:key="recent-{{ $rProject->project_id }}" href="{{ route('projects.show', $rProject->project_id) }}" wire:navigate class="flex items-center gap-2 px-2 py-1.5 -mx-2 rounded-lg transition-colors group" :class="isActiveProject('{{ $rProject->project_id }}') ? 'bg-brand-150 text-text-100 font-semibold' : 'hover:bg-brand-150'">
                                 @if($rProject->icon_type === 'emoji')
                                     <span class="text-[16px] leading-none shrink-0">{{ $rProject->icon }}</span>
                                 @elseif($rProject->icon_type === 'image' && $rProject->icon)
@@ -440,7 +449,7 @@ new class extends Component {
                         @if(count($recentProjects) > 3)
                             <div x-show="viewAll" x-collapse x-cloak class="space-y-1 mt-1">
                                 @foreach($recentProjects->skip(3) as $rProject)
-                                    <a href="{{ route('projects.show', $rProject->project_id) }}" wire:navigate class="flex items-center gap-2 px-2 py-1.5 -mx-2 rounded-lg transition-colors group" :class="isActiveProject('{{ $rProject->project_id }}') ? 'bg-brand-150 text-text-100 font-semibold' : 'hover:bg-brand-150'">
+                                    <a x-data="{ rowHovered: false }" wire:key="recent-more-{{ $rProject->project_id }}" href="{{ route('projects.show', $rProject->project_id) }}" wire:navigate class="flex items-center gap-2 px-2 py-1.5 -mx-2 rounded-lg transition-colors group" :class="isActiveProject('{{ $rProject->project_id }}') ? 'bg-brand-150 text-text-100 font-semibold' : 'hover:bg-brand-150'">
                                         @if($rProject->icon_type === 'emoji')
                                             <span class="text-[16px] leading-none shrink-0">{{ $rProject->icon }}</span>
                                         @elseif($rProject->icon_type === 'image' && $rProject->icon)
@@ -471,12 +480,12 @@ new class extends Component {
         <div class="pt-6 shrink-0">
             <div class="text-app-feature text-text-70 mb-2">{{ __('Others') }}</div>
             <div class="space-y-1">
-                <a href="{{ route('archive') }}" wire:navigate class="flex items-center px-3 py-2 -mx-3 rounded-lg text-app-feature text-text-80 transition-colors group" :class="isActiveRoute('{{ route('archive', [], false) }}') ? 'bg-brand-150 text-text-100 font-semibold' : 'hover:bg-brand-150 hover:text-text-100'">
+                <a x-data wire:key="nav-archive" href="{{ route('archive') }}" wire:navigate class="flex items-center px-3 py-2 -mx-3 rounded-lg text-app-feature text-text-80 transition-colors group" :class="isActiveRoute('{{ route('archive', [], false) }}') ? 'bg-brand-150 text-text-100 font-semibold' : 'hover:bg-brand-150 hover:text-text-100'">
                     <x-icons.archive class="w-5 h-5 mr-3 text-text-80 group-hover:text-text-100 transition-colors" />
                     {{ __('Archive') }}
                 </a>
 
-                <a href="{{ route('settings') }}" wire:navigate class="flex items-center px-3 py-2 -mx-3 rounded-lg text-app-feature text-text-80 transition-colors group" :class="isActiveRoute('{{ route('settings', [], false) }}') ? 'bg-brand-150 text-text-100 font-semibold' : 'hover:bg-brand-150 hover:text-text-100'">
+                <a x-data wire:key="nav-settings" href="{{ route('settings') }}" wire:navigate class="flex items-center px-3 py-2 -mx-3 rounded-lg text-app-feature text-text-80 transition-colors group" :class="isActiveRoute('{{ route('settings', [], false) }}') ? 'bg-brand-150 text-text-100 font-semibold' : 'hover:bg-brand-150 hover:text-text-100'">
                     <x-icons.setting class="w-5 h-5 mr-3 text-text-80 group-hover:text-text-100 transition-colors" />
                     {{ __('Settings') }}
                 </a>
