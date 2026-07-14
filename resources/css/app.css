@@ -67,6 +67,8 @@
     --color-secondary-5: var(--secondary-5);
 }
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @layer base {
     :root {
         /* Neutrals Colors (Light) */
@@ -202,8 +204,8 @@
     .text-web-title {
         font-family: var(--font-merriweather);
         font-weight: 400; /* Regular */
-        font-size: 4rem; /* 64px */
-        line-height: 5rem; /* 80px */
+        font-size: 3.5rem; /* 64px */
+        line-height: 4rem; /* 80px */
         letter-spacing: 0;
     }
 
@@ -233,7 +235,7 @@
 
     .text-web-body-large {
         font-family: var(--font-montserrat);
-        font-weight: 600; /* SemiBold */
+        font-weight: 400; /* SemiBold */
         font-size: 1.125rem; /* 18px */
         line-height: 1.75rem; /* 28px */
         letter-spacing: 0;

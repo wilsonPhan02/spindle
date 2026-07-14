@@ -172,7 +172,7 @@ new #[Layout('layouts.app')] class extends Component {
         ]" />
 
         <div class="flex justify-between items-center gap-4">
-            <h1 class="text-app-title-1 text-text-100">{{ __('Characters Sheet') }}</h1>
+            <h1 class="text-app-title-1 text-text-100">{{ __('Characters') }}</h1>
             
             <div class="relative w-64" 
                  x-data="{ localQuery: '', showDropdown: false, recommendations: { characters: [], tags: [], relations: [] } }" 
