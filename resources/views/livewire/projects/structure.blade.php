@@ -32,7 +32,7 @@ new #[Layout('layouts.app')] class extends Component {
         ]" />
 
         <div class="flex justify-between items-end mb-6">
-            <h1 class="text-app-title-1 text-text-80">{{ __('Chapter Structure') }}</h1>
+            <h1 class="text-app-title-1 text-text-80">{{ __('Structure') }}</h1>
             
             <button wire:click="addTemplate" class="flex items-center px-3 py-2 gap-2 text-web-button text-text-60 hover:bg-brand-100 transition-colors rounded-sm max-w-[240px]"
             title="{{ $project->template ? $project->template->name : __('Add Template') }}"

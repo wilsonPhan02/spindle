@@ -682,7 +682,7 @@ new #[Layout('layouts.app')] class extends Component {
             ['label' => __('Notes')]
         ]" />
 
-        <h2 class="text-web-heading-2 text-text-100 mb-6">{{ __('Project Notes') }}</h2>
+        <h2 class="text-web-heading-2 text-text-100 mb-6">{{ __('Notes') }}</h2>
 
         {{-- Main Container --}}
         <div class="border border-brand-150 rounded-xl shadow-sm overflow-hidden flex flex-col h-[calc(100vh-200px)]">
