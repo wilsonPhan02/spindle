@@ -49,7 +49,7 @@ new #[Layout('layouts.guest')] class extends Component
             <x-logo class="h-10 w-auto text-text-80" />
         </div>
 
-        <div class="w-full max-w-md p-6 bg-card-bg border border-transparent rounded-xl shadow-md">
+        <div class="w-full max-w-md p-6 bg-card-bg border border-card-border rounded-xl shadow-lg">
 
             <h1 class="mb-5 text-2xl font-merriweather text-center text-text-80">{{ __('Sign In') }}</h1>
 
@@ -120,8 +120,8 @@ new #[Layout('layouts.guest')] class extends Component
                 <div class="flex-grow border-t border-subtext-70"></div>
             </div>
 
-            <button type="button"
-                class="flex items-center justify-center w-full py-2.5 mb-4 text-app-feature text-text-80 transition-colors bg-bg-main border border-card-border rounded-md hover:bg-card-hover">
+            <a href="{{ route('auth.google') }}"
+                class="flex items-center justify-center w-full py-2.5 mb-4 text-app-feature text-text-80 transition-colors bg-card-bg border border-subtext-70 shadow-sm rounded-md hover:bg-subtext-50">
                 <svg class="w-5 h-5 mr-2" viewBox="0 0 24 24">
                     <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
                     <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
@@ -129,11 +129,11 @@ new #[Layout('layouts.guest')] class extends Component
                     <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
                 </svg>
                 {{ __('Sign in with Google') }}
-            </button>
+            </a>
 
             <p class="text-app-body-medium text-center text-text-80">
                 {{ __('Don\'t have an account?') }}
-                <a href="{{ route('register') }}" wire:navigate class="text-interactive-100 hover:underline">{{ __('Sign up') }}</a>
+                <a href="{{ route('register') }}" @click.prevent="if(sessionStorage.getItem('from_register')){ sessionStorage.removeItem('from_register'); history.back(); } else { sessionStorage.setItem('from_login', '1'); Livewire.navigate('{{ route('register') }}'); }" class="text-interactive-100 hover:underline">{{ __('Sign up') }}</a>
             </p>
 
         </div>
