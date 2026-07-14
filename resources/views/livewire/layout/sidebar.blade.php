@@ -15,6 +15,12 @@ new class extends Component {
         $this->loadProjects();
     }
 
+    #[On('profile-updated')]
+    public function refreshProfile()
+    {
+        auth()->user()?->unsetRelation('profile');
+    }
+
     #[On('project-pinned-updated')]
     #[On('project-updated')]
     public function loadProjects()
@@ -237,7 +243,15 @@ new class extends Component {
             </div>
 
             <div class="flex flex-col truncate">
-                <span class="text-app-subheading-2 text-text-80 truncate" :title="currentUsername" x-text="currentUsername">
+                <span
+                    class="text-app-subheading-2 text-text-80 truncate"
+                    :title="currentUsername"
+                    x-text="currentUsername"
+                    @profile-updated.window="() => {
+                        const newName = $event.detail?.newName ?? $event.detail?.[0]?.newName;
+                        if (newName) currentUsername = newName;
+                    }"
+                >
                 {{ Auth::user()->profile?->username ?? __('User') }}
                 </span>
 
