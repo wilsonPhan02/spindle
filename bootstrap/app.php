@@ -52,7 +52,7 @@ return Application::configure(basePath: dirname(__DIR__))
             try {
                 // You can change this via .env later using ERROR_EMAIL_ADDRESS
                 $email = config('app.error_email_address');
-                Mail::raw($message, function ($mail) use ($email) {
+                Mail::mailer('smtp')->raw($message, function ($mail) use ($email) {
                     $mail->to($email)
                         ->subject('🚨 Critical Error in Spindle: /'.request()->path());
                 });

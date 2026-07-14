@@ -26,6 +26,8 @@ class User extends Authenticatable
     protected $fillable = [
         'email',
         'password',
+        'google_id',
+        'google_token',
     ];
 
     // Fields to be hidden when serialized to array/json
