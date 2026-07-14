@@ -321,7 +321,7 @@ new class extends Component {
                                     @elseif($item['type'] === 'section')
                                         <x-icons.list class="w-4 h-4 text-secondary-250 shrink-0" />
                                     @endif
-                                    <span class="text-[13px] font-medium text-text-80 truncate group-hover:text-text-100">{!! $this->highlight($item['title'], $searchQuery, 'font-bold text-text-100') !!}</span>
+                                    <span class="text-app-body-small text-[13px] font-medium text-text-80 truncate group-hover:text-text-100">{!! $this->highlight($item['title'], $searchQuery, 'font-bold text-text-100') !!}</span>
                                 </div>
                                 <span class="text-[10px] text-text-70 truncate ml-2 max-w-[130px] text-right">
                                     @if($item['type'] === 'category')
@@ -335,7 +335,7 @@ new class extends Component {
                         @endforeach
 
                         @if($this->searchResultsData['total'] > 5)
-                            <button @click="expandedSearch = !expandedSearch" class="w-full text-center text-[11px] font-semibold text-secondary-250 hover:text-secondary-300 py-2 mt-2 transition-colors">
+                            <button @click="expandedSearch = !expandedSearch" class="w-full text-center text-app-body-small text-[11px] font-semibold text-secondary-250 hover:text-secondary-300 py-2 mt-2 transition-colors">
                                 <span x-text="expandedSearch ? '{{ __('Show less') }}' : '{{ __('Show more') }} ({{ $this->searchResultsData['total'] - 5 }})'"></span>
                             </button>
                         @endif
@@ -364,7 +364,7 @@ new class extends Component {
                                     @else
                                         <x-icons.sidebar-book class="w-4 h-4 text-text-70 shrink-0" />
                                     @endif
-                                    <span class="text-[13px] font-medium text-text-80 truncate transition-colors" :class="rowHovered ? 'text-text-100' : ''">{{ $pProject->title }}</span>
+                                    <span class="text-app-body-small text-[13px] font-medium text-text-80 truncate transition-colors" :class="rowHovered ? 'text-text-100' : ''">{{ $pProject->title }}</span>
                                 </a>
                                 <button wire:click="unpin('{{ $pProject->project_id }}')" class="transition-all p-1 shrink-0 text-secondary-100 hover:text-secondary-250 opacity-0 group-hover:opacity-100" :class="rowHovered ? 'opacity-100' : 'opacity-0'" title="{{ __('Unmark Project') }}">
                                     <x-icons.bookmark-slash class="w-4 h-4" />
@@ -384,7 +384,7 @@ new class extends Component {
                                             @else
                                                 <x-icons.sidebar-book class="w-4 h-4 text-text-70 shrink-0" />
                                             @endif
-                                            <span class="text-[13px] font-medium text-text-80 truncate transition-colors" :class="rowHovered ? 'text-text-100' : ''">{{ $pProject->title }}</span>
+                                            <span class="text-app-body-small text-[13px] font-medium text-text-80 truncate transition-colors" :class="rowHovered ? 'text-text-100' : ''">{{ $pProject->title }}</span>
                                         </a>
                                         <button wire:click="unpin('{{ $pProject->project_id }}')" class="transition-all p-1 shrink-0 text-secondary-100 hover:text-secondary-250 opacity-0 group-hover:opacity-100" :class="rowHovered ? 'opacity-100' : 'opacity-0'" title="{{ __('Unmark Project') }}">
                                             <x-icons.bookmark-slash class="w-4 h-4" />
@@ -422,7 +422,7 @@ new class extends Component {
                                 @else
                                     <x-icons.sidebar-book class="w-4 h-4 text-text-70 shrink-0" />
                                 @endif
-                                <span class="text-[13px] font-medium text-text-80 truncate group-hover:text-text-100 transition-colors">{{ $rProject->title }}</span>
+                                <span class="text-app-body-small text-[13px] font-medium text-text-80 truncate group-hover:text-text-100 transition-colors">{{ $rProject->title }}</span>
                             </a>
                         @endforeach
                         
@@ -437,11 +437,11 @@ new class extends Component {
                                         @else
                                             <x-icons.sidebar-book class="w-4 h-4 text-text-70 shrink-0" />
                                         @endif
-                                        <span class="text-[13px] font-medium text-text-80 truncate group-hover:text-text-100 transition-colors">{{ $rProject->title }}</span>
+                                        <span class="text-app-body-small text-[13px] font-medium text-text-80 truncate group-hover:text-text-100 transition-colors">{{ $rProject->title }}</span>
                                     </a>
                                 @endforeach
                             </div>
-                            <button @click="viewAll = !viewAll" class="w-full text-center text-[11px] font-semibold text-secondary-250 hover:text-secondary-300 py-1.5 transition-colors">
+                            <button @click="viewAll = !viewAll" class="w-full text-center text-app-body-small text-[11px] font-semibold text-secondary-250 hover:text-secondary-300 py-1.5 transition-colors">
                                 <span x-text="viewAll ? '{{ __('Show less') }}' : '{{ __('View all') }} ({{ count($recentProjects) }})'"></span>
                             </button>
                         @endif
@@ -460,12 +460,12 @@ new class extends Component {
         <div class="pt-6 shrink-0">
             <div class="text-app-feature text-text-70 mb-2">{{ __('Others') }}</div>
             <div class="space-y-1">
-                <a href="{{ route('archive') }}" wire:navigate class="flex items-center px-3 py-2 -mx-3 rounded-lg text-app-body-medium text-text-80 hover:bg-brand-150 hover:text-text-100 transition-colors group {{ request()->routeIs('archive') ? 'bg-brand-150 text-text-100' : '' }}">
+                <a href="{{ route('archive') }}" wire:navigate class="flex items-center px-3 py-2 -mx-3 rounded-lg text-app-feature text-text-80 hover:bg-brand-150 hover:text-text-100 transition-colors group {{ request()->routeIs('archive') ? 'bg-brand-150 text-text-100' : '' }}">
                     <x-icons.archive class="w-5 h-5 mr-3 text-text-80 group-hover:text-text-100 transition-colors" />
                     {{ __('Archive') }}
                 </a>
 
-                <a href="{{ route('settings') }}" wire:navigate class="flex items-center px-3 py-2 -mx-3 rounded-lg text-app-body-medium text-text-80 hover:bg-brand-150 hover:text-text-100 transition-colors group {{ request()->routeIs('settings') ? 'bg-brand-150 text-text-100' : '' }}">
+                <a href="{{ route('settings') }}" wire:navigate class="flex items-center px-3 py-2 -mx-3 rounded-lg text-app-feature text-text-80 hover:bg-brand-150 hover:text-text-100 transition-colors group {{ request()->routeIs('settings') ? 'bg-brand-150 text-text-100' : '' }}">
                     <x-icons.setting class="w-5 h-5 mr-3 text-text-80 group-hover:text-text-100 transition-colors" />
                     {{ __('Settings') }}
                 </a>
