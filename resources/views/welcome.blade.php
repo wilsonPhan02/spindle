@@ -530,6 +530,7 @@
             <path d="M5 15l7-7 7 7"/>
         </svg>
     </a>
+    
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 </body>
 </html>
