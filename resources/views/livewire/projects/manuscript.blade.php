@@ -401,69 +401,6 @@ new #[Layout('layouts.app')] class extends Component {
     }"
     class="h-full"
 >
-    <style>
-        [x-cloak] { display: none !important; }
-
-        /* Hanging Tab Design */
-        .draft-tabs-container {
-            display: flex;
-            align-items: flex-start;
-            gap: 0px;
-            padding: 0;
-            background: transparent;
-            border-top: none;
-            width: 100%;
-            max-width: 100%;
-            overflow-x: auto;
-            overflow-y: hidden;
-            position: relative;
-            scrollbar-width: thin;
-        }
-
-        .draft-tab {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            padding: 8px 16px;
-            background: var(--color-brand-10);
-            border: 1px solid var(--color-brand-200);
-            border-top: none;
-            border-radius: 0 0 8px 8px;
-            cursor: pointer;
-            transition: all 0.15s ease;
-            user-select: none;
-            white-space: nowrap;
-            position: relative;
-            margin-left: -1px;
-            flex-shrink: 0;
-        }
-        .draft-tab:first-child {
-            margin-left: 0;
-            border-left: 1px solid var(--color-brand-200);
-        }
-        .draft-tab:hover {
-            background: var(--color-brand-150);
-        }
-        .draft-tab.active {
-            background: var(--color-brand-50);
-            border-top: none !important;
-            color: var(--color-text-80);
-            font-weight: 600;
-            box-shadow: none !important;
-            z-index: 20;
-        }
-        .draft-tab .draft-close {
-            opacity: 0; width: 16px; height: 16px; display: flex; align-items: center; justify-content: center;
-            border-radius: 3px; color: var(--color-subtext-90); transition: all 0.1s;
-        }
-        .draft-tab:hover .draft-close, .draft-tab.active .draft-close { opacity: 1; }
-        .draft-tab .draft-close:hover { background: var(--color-brand-150); color: var(--color-danger-100); }
-        .draft-tab .draft-drag { opacity: 0; cursor: grab; color: var(--color-secondary-200); transition: opacity 0.1s; }
-        .draft-tab:hover .draft-drag { opacity: 1; }
-        .draft-tab .draft-drag:active { cursor: grabbing; }
-        .draft-drag-over { border-left: 2px solid var(--color-secondary-200) !important; }
-    </style>
-
     <div class="p-4 lg:p-6 max-w-7xl mx-auto">
 
         {{-- Breadcrumb --}}

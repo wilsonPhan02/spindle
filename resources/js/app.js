@@ -4,8 +4,10 @@ import './text-editor';
 import './landing';
 import './theme';
 import './structure-canvas';
+import './layouts';
+import './notes';
 
-// ---- Komponen carousel (From Writers To Writers) ----
+// ---- Carousel Component (From Writers To Writers) ----
 document.addEventListener('alpine:init', () => {
     window.Alpine.plugin(collapse);
     Alpine.data('carousel', () => ({
@@ -27,7 +29,7 @@ document.addEventListener('alpine:init', () => {
     }));
 })
 
-// ---- Scroll-reveal halus untuk landing page ----
+// ---- Smooth scroll-reveal for landing page ----
 function initReveal() {
     const els = document.querySelectorAll('.reveal');
     if (!els.length) return;
@@ -57,7 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initNavbar();
 });
 
-// Navbar berubah solid setelah scroll sedikit melewati hero.
+// Navbar becomes solid after scrolling slightly past the hero.
 function initNavbar() {
     const nav = document.getElementById('site-nav');
     if (!nav) return;

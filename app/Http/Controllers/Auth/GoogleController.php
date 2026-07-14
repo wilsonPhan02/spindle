@@ -25,8 +25,8 @@ class GoogleController extends Controller
     public function callback()
     {
         try {
-            // Kita tambahkan setHttpClient(['verify' => false]) untuk menghindari 
-            // "cURL error 60: SSL certificate problem" yang sering terjadi di localhost Windows.
+            // We add setHttpClient(['verify' => false]) to avoid
+            // "cURL error 60: SSL certificate problem" which often occurs on Windows localhost.
             $googleUser = Socialite::driver('google')
                 ->setHttpClient(new \GuzzleHttp\Client(['verify' => false]))
                 ->user();
@@ -57,10 +57,10 @@ class GoogleController extends Controller
 
             Auth::login($user, true);
             
-            // Memastikan kita mendapatkan data profile terbaru
+            // Ensure we get the latest profile data
             $user->refresh();
 
-            // Jika username-nya masih kosong, paksa ke halaman onboarding
+            // If the username is still empty, force redirect to onboarding page
             if (!$user->profile || empty($user->profile->username)) {
                 return redirect('/onboarding');
             }
@@ -68,7 +68,7 @@ class GoogleController extends Controller
             return redirect()->route('dashboard');
 
         } catch (\Exception $e) {
-            // Mencatat error aslinya ke laravel.log agar kita tahu masalah sebenarnya
+            // Log the actual error to laravel.log so we know the real issue
             \Illuminate\Support\Facades\Log::error('Google Auth Error: ' . $e->getMessage());
             
             return redirect()->route('login')->withErrors([

@@ -53,12 +53,12 @@ class ChapterCard extends Model
         return $this->hasMany(Manuscript::class, 'chapter_card_id', 'chapter_card_id');
     }
 
-    public function tags()
+    public function tags(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
         return $this->belongsToMany(Tag::class, 'chapter_tag', 'chapter_card_id', 'tag_id');
     }
 
-    public function characters()
+    public function characters(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
         return $this->belongsToMany(Character::class, 'chapter_character', 'chapter_card_id', 'character_id');
     }

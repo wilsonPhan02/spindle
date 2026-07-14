@@ -26,33 +26,6 @@
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
-    <style>
-        @keyframes mountainRise {
-            0% { transform: translateY(150px); opacity: 0; }
-            100% { transform: translateY(0); opacity: 1; }
-        }
-        .animate-mountain-rise-1 {
-            animation: mountainRise 1.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-            opacity: 0;
-        }
-        .animate-mountain-rise-2 {
-            animation: mountainRise 1.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-            animation-delay: 0.15s;
-            opacity: 0;
-        }
-        .animate-mountain-rise-3 {
-            animation: mountainRise 1.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-            animation-delay: 0.3s;
-            opacity: 0;
-        }
-        @keyframes book-wave {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-8px); } /* Very subtle wave */
-        }
-        .animate-book-wave {
-            animation: book-wave 4s ease-in-out infinite;
-        }
-    </style>
 </head>
 
 
@@ -74,40 +47,19 @@
                     <li><a href="#tools"   class="nav-link hover:text-secondary-200 transition-colors">{{ __('Features') }}</a></li>
                 </ul>
                 <div class="flex items-center gap-3 sm:gap-4">
-                    <!-- Bulletproof Spindle Theme Toggle -->
-                    <div x-data="{
-                             isDark: document.documentElement.classList.contains('dark'),
-                             toggle() {
-                                 this.isDark = !this.isDark;
-                                 if (this.isDark) {
-                                     document.documentElement.classList.add('dark');
-                                     localStorage.setItem('theme', 'dark');
-                                 } else {
-                                     document.documentElement.classList.remove('dark');
-                                     localStorage.setItem('theme', 'light');
-                                 }
-                                 if (window.Alpine && Alpine.store('theme')) {
-                                     Alpine.store('theme').isDark = this.isDark;
-                                 }
-                                 window.dispatchEvent(new CustomEvent('theme-changed', { detail: { isDark: this.isDark } }));
-                             }
-                         }"
-                         x-init="
-                             isDark = document.documentElement.classList.contains('dark');
-                             window.addEventListener('theme-changed', e => isDark = e.detail.isDark);
-                         "
-                         class="flex items-center">
-                        <button @click="toggle()" 
+                    <!-- Spindle Theme Toggle -->
+                    <div x-data class="flex items-center">
+                        <button @click="$store.theme.toggle()" 
                                 type="button"
                                 class="group relative flex h-9 w-9 items-center justify-center rounded-full border border-secondary-100/50 dark:border-secondary-200/50 bg-secondary-5 dark:bg-brand-50 text-secondary-200 shadow-sm transition-all duration-300 hover:scale-105 hover:border-secondary-200 hover:shadow focus:outline-none"
-                                :title="isDark ? '{{ __('Switch to Light Mode') }}' : '{{ __('Switch to Dark Mode') }}'"
+                                :title="$store.theme.isDark ? '{{ __('Switch to Light Mode') }}' : '{{ __('Switch to Dark Mode') }}'"
                                 aria-label="{{ __('Toggle Theme') }}">
                             <!-- Sun icon (shows in Dark mode) -->
-                            <svg x-show="isDark" x-cloak class="h-4 w-4 text-secondary-200 transition-transform duration-300 group-hover:rotate-45" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                            <svg x-show="$store.theme.isDark" x-cloak class="h-4 w-4 text-secondary-200 transition-transform duration-300 group-hover:rotate-45" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
                             </svg>
                             <!-- Moon icon (shows in Light mode) -->
-                            <svg x-show="!isDark" class="h-4 w-4 text-secondary-200 transition-transform duration-300 group-hover:-rotate-12" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                            <svg x-show="!$store.theme.isDark" class="h-4 w-4 text-secondary-200 transition-transform duration-300 group-hover:-rotate-12" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
                             </svg>
                         </button>
@@ -424,17 +376,6 @@
 
     <section class="relative min-h-screen flex flex-col justify-center overflow-hidden bg-brand-50 dark:bg-bg-main py-20">
         <!-- Wind Rings Background -->
-        <style>
-            .custom-scrollbar::-webkit-scrollbar-thumb:hover { background-color: #8C7558; }
-            @keyframes wind-ring {
-                0% { transform: scale(0.3) rotate(0deg); opacity: 0; border-width: 8px; }
-                20% { opacity: 0.35; }
-                100% { transform: scale(3.5) rotate(180deg); opacity: 0; border-width: 2px; }
-            }
-            .animate-wind-ring {
-                animation: wind-ring 6s cubic-bezier(0.21, 0.53, 0.3, 1) infinite;
-            }
-        </style>
         <div class="absolute inset-0 z-0 flex items-center justify-center pointer-events-none">
             <div class="absolute w-[250px] h-[250px] md:w-[350px] md:h-[350px] border border-secondary-200 animate-wind-ring" style="border-radius: 40% 60% 60% 40% / 50% 40% 60% 50%;"></div>
             <div class="absolute w-[250px] h-[250px] md:w-[350px] md:h-[350px] border border-brand-200 animate-wind-ring" style="border-radius: 60% 40% 30% 70% / 60% 50% 50% 40%; animation-delay: -2s;"></div>

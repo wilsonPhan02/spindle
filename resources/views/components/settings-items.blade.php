@@ -9,14 +9,14 @@
 ])
 
 @if($variant === 'info')
-    {{-- Untuk Data Profile --}}
+    {{-- For Profile Data --}}
     <div class="min-w-0" title="{{ $value ?? __('None') }}">
         <div class="text-web-body-small text-[14px] text-text-80 mb-1/2 truncate">{{ $label }}</div>
         <div class="text-web-body-small text-[14px] text-subtext-90 truncate">{{ $value ?? __('None') }}</div>
     </div>
 
 @elseif($variant === 'dropdown')
-    {{-- Language Selector Dropdown dengan search --}}
+    {{-- Language Selector Dropdown with search --}}
     @php
         $activeOption = collect($options)->firstWhere('code', $current) ?? ($options[0] ?? null);
         $wireAction   = $attributes->get('wire:change', 'saveLanguage');
@@ -52,11 +52,11 @@
                 {{ $label }}
             </div>
 
-            {{-- Pill bahasa aktif --}}
+            {{-- Active language pill --}}
             <div class="flex items-center gap-2">
                 @if($activeOption)
                     <div class="flex items-center gap-2 px-2.5 py-1 rounded-full bg-brand-10 border border-brand-150 group-hover:bg-brand-50 transition-colors">
-                        {{-- Bendera lingkaran --}}
+                        {{-- Circle flag --}}
                         <div class="w-5 h-5 rounded-full overflow-hidden border border-brand-150 shrink-0">
                             <img
                                 src="https://flagcdn.com/w40/{{ $activeOption['cc'] }}.png"
@@ -123,7 +123,7 @@
                         class="w-full flex items-center gap-3 px-3 py-2 hover:bg-brand-50 transition-colors text-left group"
                         :class="option.code === {{ Illuminate\Support\Js::from($current) }} ? 'bg-brand-50' : ''"
                     >
-                        {{-- Bendera bulat --}}
+                        {{-- Circle flag --}}
                         <div class="w-7 h-7 rounded-full border border-brand-150 overflow-hidden shrink-0">
                             <img
                                 :src="`https://flagcdn.com/w40/${option.cc}.png`"
@@ -156,7 +156,7 @@
     </div>
 
 @else
-    {{-- Tampilan 2 & 3: Untuk Tombol Menu & Toggle --}}
+    {{-- Views 2 & 3: For Menu & Toggle Buttons --}}
     @php
         $textColor = $danger ? 'text-red-500' : 'text-text-80';
         $iconColor = $danger ? 'text-red-500' : 'text-subtext-90';
