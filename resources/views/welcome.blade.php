@@ -32,6 +32,8 @@
 @php $img = fn ($f) => asset('images/landing/' . $f); @endphp
 
 <body class="bg-brand-50 dark:bg-bg-main text-text-80 dark:text-text-100 font-montserrat antialiased overflow-x-hidden">
+    <x-desktop-only />
+
 
     
     <nav id="main-nav" class="fixed top-5 inset-x-0 z-50 transition-transform duration-700">

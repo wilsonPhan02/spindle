@@ -47,6 +47,8 @@
         currentAvatarUrl = $event.detail.avatarUrl;
     "
 >
+    <x-desktop-only />
+
     @persist('sidebar')
         <livewire:layout.sidebar />
     @endpersist
