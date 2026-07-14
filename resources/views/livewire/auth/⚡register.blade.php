@@ -113,11 +113,14 @@ new #[Layout('layouts.guest')] class extends Component
                 </div>
 
                 <!-- Bagian Checkbox yang sudah disederhanakan dan diposisikan ulang -->
-                <div class="flex items-center pt-1">
+                <div class="flex items-center pt-1 w-full overflow-hidden">
                     <input type="checkbox" wire:model="terms" id="terms" 
                         class="w-4 h-4 flex-shrink-0 mt-0.5 bg-bg-main border border-card-border rounded text-secondary-200 focus:ring-secondary-200 focus:ring-offset-card-bg">
-                    <label for="terms" class="ml-2 text-app-body-medium text-text-80 cursor-pointer">
-                        {!! __('I have read and agree to the <a href="#" class="text-interactive-100 hover:underline">terms and conditions</a>') !!}
+                    <label for="terms" class="ml-2 flex items-center gap-1 whitespace-nowrap text-[13px] sm:text-[14px] text-text-80 cursor-pointer overflow-hidden flex-1">
+                        <span class="truncate">{{ __('I have read and agree to the') }}</span>
+                        <button type="button" @click.prevent="$dispatch('open-terms-dialog')" class="text-interactive-100 hover:underline focus:outline-none flex-shrink-0">
+                            {{ __('terms and conditions') }}
+                        </button>
                     </label>
                 </div>
                 @error('terms') <span class="text-app-body-small text-danger-100 block">{{ $message }}</span> @enderror
@@ -148,7 +151,7 @@ new #[Layout('layouts.guest')] class extends Component
 
             <p class="text-app-body-medium text-center text-text-80">
                 {{ __('Already have an account?') }} 
-                <a href="{{ route('login') }}" wire:navigate class="text-interactive-100 hover:underline">{{ __('Sign in') }}</a>
+                <a href="{{ route('login') }}" @click.prevent="if(sessionStorage.getItem('from_login')){ sessionStorage.removeItem('from_login'); history.back(); } else { sessionStorage.setItem('from_register', '1'); Livewire.navigate('{{ route('login') }}'); }" class="text-interactive-100 hover:underline">{{ __('Sign in') }}</a>
             </p>
         </div>
     </div>
@@ -164,4 +167,6 @@ new #[Layout('layouts.guest')] class extends Component
         </div>
     </div>
     @endif
+    
+    <livewire:settings.terms-dialog />
 </div>

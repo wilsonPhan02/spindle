@@ -133,7 +133,7 @@ new #[Layout('layouts.guest')] class extends Component
 
             <p class="text-app-body-medium text-center text-text-80">
                 {{ __('Don\'t have an account?') }}
-                <a href="{{ route('register') }}" wire:navigate class="text-interactive-100 hover:underline">{{ __('Sign up') }}</a>
+                <a href="{{ route('register') }}" @click.prevent="if(sessionStorage.getItem('from_register')){ sessionStorage.removeItem('from_register'); history.back(); } else { sessionStorage.setItem('from_login', '1'); Livewire.navigate('{{ route('register') }}'); }" class="text-interactive-100 hover:underline">{{ __('Sign up') }}</a>
             </p>
 
         </div>
