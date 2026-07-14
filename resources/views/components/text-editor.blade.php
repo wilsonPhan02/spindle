@@ -46,51 +46,6 @@
 >
     <style>
         [x-cloak] { display: none !important; }
-        .custom-scrollbar::-webkit-scrollbar { width: 5px; height: 5px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background-color: var(--color-secondary-100); border-radius: 10px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background-color: var(--color-secondary-150); }
-
-        #{{ $editorId }}:focus { outline: none; }
-        #{{ $editorId }} p { margin-bottom: 1em; }
-        #{{ $editorId }} h1 { font-size: 2em; font-weight: 700 !important; margin-bottom: 0.5em; }
-        #{{ $editorId }} h2 { font-size: 1.5em; font-weight: 600 !important; margin-bottom: 0.5em; }
-        #{{ $editorId }} h3 { font-size: 1.17em; font-weight: 600 !important; margin-bottom: 0.5em; }
-        #{{ $editorId }} h1, #{{ $editorId }} h1 * { font-weight: 700 !important; font-size: 2em !important; line-height: 1.3 !important; color: var(--color-text-90) !important; }
-        #{{ $editorId }} h2, #{{ $editorId }} h2 * { font-weight: 600 !important; font-size: 1.5em !important; line-height: 1.35 !important; color: var(--color-text-90) !important; }
-        #{{ $editorId }} h3, #{{ $editorId }} h3 * { font-weight: 600 !important; font-size: 1.17em !important; line-height: 1.4 !important; color: var(--color-text-90) !important; }
-        
-        #{{ $editorId }} ul { list-style-type: disc; padding-left: 1.5em; }
-        #{{ $editorId }} ul ul { list-style-type: circle; }
-        #{{ $editorId }} ul ul ul { list-style-type: square; }
-        #{{ $editorId }} ul ul ul ul { list-style-type: disc; }
-        #{{ $editorId }} ul ul ul ul ul { list-style-type: circle; }
-        #{{ $editorId }} ul ul ul ul ul ul { list-style-type: square; }
-
-        #{{ $editorId }} ol { list-style: decimal; padding-left: 1.5em; }
-        #{{ $editorId }} hr { border: none; border-top: 1px solid var(--color-brand-200); margin: 1em 0; }
-        #{{ $editorId }} blockquote { border-left: 3px solid var(--color-brand-200); padding-left: 1em; color: var(--color-text-70); }
-        #{{ $editorId }} .todo-item { margin-top: 0.25em; margin-bottom: 0.25em; line-height: 1.5; }
-
-        .toolbar-scroll::-webkit-scrollbar { display: none; }
-        .toolbar-scroll { -ms-overflow-style: none; scrollbar-width: none; cursor: default; }
-        
-        /* Persis seperti di notes.blade.php */
-        .toolbar-btn {
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            width: 28px; height: 28px; border-radius: 5px;
-            cursor: pointer; color: var(--color-text-70); flex-shrink: 0;
-            transition: background-color 0.1s, color 0.1s;
-            border: 1px solid transparent;
-        }
-        .toolbar-btn:hover { background-color: var(--color-brand-150); }
-        .toolbar-btn.is-active {
-            background-color: var(--color-secondary-20);
-            color: var(--color-secondary-200);
-            border-color: var(--color-secondary-100);
-        }
-        .toolbar-divider { width: 1px; height: 18px; background-color: var(--color-brand-200); flex-shrink: 0; margin: 0 2px; }
-        .format-option.bg-brand-150 { background-color: var(--color-brand-150); }
     </style>
 
     {{-- Toolbar Wrapper with Gradient Mask for Overflow --}}
@@ -369,7 +324,7 @@
         <div
             id="{{ $editorId }}"
             contenteditable="true"
-            class="w-full h-full flex-1 p-8 lg:p-10 text-app-body-large text-text-90 leading-[1.65] overflow-y-auto custom-scrollbar bg-brand-50"
+            class="text-editor-content w-full h-full flex-1 p-8 lg:p-10 text-app-body-large text-text-90 leading-[1.65] overflow-y-auto custom-scrollbar bg-brand-50"
         ></div>
 
         {{-- Floating Block Drag Handle --}}
