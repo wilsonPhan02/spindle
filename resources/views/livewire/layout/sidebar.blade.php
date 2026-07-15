@@ -334,7 +334,7 @@ new class extends Component {
                                         @if(($item['icon_type'] ?? null) === 'emoji')
                                             <span class="text-[16px] leading-none shrink-0">{{ $item['icon'] }}</span>
                                         @elseif(($item['icon_type'] ?? null) === 'image' && !empty($item['icon']))
-                                            <img src="{{ asset('storage/' . $item['icon']) }}" alt="" class="w-4 h-4 object-cover rounded shrink-0">
+                                            <img src="{{ Storage::url($item['icon']) }}" alt="" class="w-4 h-4 object-cover rounded shrink-0">
                                         @else
                                             <x-icons.sidebar-book class="w-4 h-4 text-secondary-150 shrink-0" />
                                         @endif
@@ -380,7 +380,7 @@ new class extends Component {
                                     @if($pProject->icon_type === 'emoji')
                                         <span class="text-[16px] leading-none shrink-0">{{ $pProject->icon }}</span>
                                     @elseif($pProject->icon_type === 'image' && $pProject->icon)
-                                        <img src="{{ asset('storage/' . $pProject->icon) }}" alt="" class="w-4 h-4 object-cover rounded shrink-0">
+                                        <img src="{{ Storage::url($pProject->icon) }}" alt="" class="w-4 h-4 object-cover rounded shrink-0">
                                     @else
                                         <x-icons.sidebar-book class="w-4 h-4 text-text-70 shrink-0" />
                                     @endif
@@ -400,7 +400,7 @@ new class extends Component {
                                             @if($pProject->icon_type === 'emoji')
                                                 <span class="text-[16px] leading-none shrink-0">{{ $pProject->icon }}</span>
                                             @elseif($pProject->icon_type === 'image' && $pProject->icon)
-                                                <img src="{{ asset('storage/' . $pProject->icon) }}" alt="" class="w-4 h-4 object-cover rounded shrink-0">
+                                                <img src="{{ Storage::url($pProject->icon) }}" alt="" class="w-4 h-4 object-cover rounded shrink-0">
                                             @else
                                                 <x-icons.sidebar-book class="w-4 h-4 text-text-70 shrink-0" />
                                             @endif
@@ -439,7 +439,7 @@ new class extends Component {
                                     @if($rProject->icon_type === 'emoji')
                                         <span class="text-[16px] leading-none shrink-0">{{ $rProject->icon }}</span>
                                     @elseif($rProject->icon_type === 'image' && $rProject->icon)
-                                        <img src="{{ asset('storage/' . $rProject->icon) }}" alt="" class="w-4 h-4 object-cover rounded shrink-0">
+                                        <img src="{{ Storage::url($rProject->icon) }}" alt="" class="w-4 h-4 object-cover rounded shrink-0">
                                     @else
                                         <x-icons.sidebar-book class="w-4 h-4 text-text-70 shrink-0" />
                                     @endif
@@ -457,7 +457,7 @@ new class extends Component {
                                             @if($rProject->icon_type === 'emoji')
                                                 <span class="text-[16px] leading-none shrink-0">{{ $rProject->icon }}</span>
                                             @elseif($rProject->icon_type === 'image' && $rProject->icon)
-                                                <img src="{{ asset('storage/' . $rProject->icon) }}" alt="" class="w-4 h-4 object-cover rounded shrink-0">
+                                                <img src="{{ Storage::url($rProject->icon) }}" alt="" class="w-4 h-4 object-cover rounded shrink-0">
                                             @else
                                                 <x-icons.sidebar-book class="w-4 h-4 text-text-70 shrink-0" />
                                             @endif

@@ -381,9 +381,9 @@ new #[Layout('layouts.app')] class extends Component {
     public function saveUploadedFile()
     {
         if ($this->uploadFile) {
-            $path = $this->uploadFile->store('notes_attachments', 'public');
+            $path = $this->uploadFile->store('notes_attachments', config('filesystems.default'));
             $this->uploadFile = null;
-            return asset('storage/' . $path);
+            return Storage::url($path);
         }
         return null;
     }

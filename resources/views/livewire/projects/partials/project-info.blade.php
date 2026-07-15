@@ -82,7 +82,7 @@
                                 @if($project->icon_type === 'emoji')
                                     <span class="text-[32px] leading-none">{{ $project->icon }}</span>
                                 @elseif($project->icon_type === 'image' && $project->icon)
-                                    <img src="{{ asset('storage/' . $project->icon) }}"
+                                    <img src="{{ Storage::url($project->icon) }}"
                                         alt="{{ __('Project Icon') }}"
                                         class="w-8 h-8 object-cover rounded">
                                 @else

@@ -269,7 +269,7 @@ new #[Layout('layouts.app')] class extends Component {
                                     @if($project->icon_type === 'emoji')
                                         <span class="text-[16px] leading-none shrink-0">{{ $project->icon }}</span>
                                     @elseif($project->icon_type === 'image' && $project->icon)
-                                        <img src="{{ asset('storage/' . $project->icon) }}" alt="" class="w-4 h-4 object-cover rounded shrink-0">
+                                        <img src="{{ Storage::url($project->icon) }}" alt="" class="w-4 h-4 object-cover rounded shrink-0">
                                     @else
                                         <x-icons.sidebar-book class="w-4 h-4 text-secondary-100 shrink-0 group-hover:text-secondary-200 transition-colors" />
                                     @endif
