@@ -6,10 +6,10 @@ use Illuminate\Support\Facades\Auth;
 new class extends Component {
     public function deleteAccount(){
         $user = Auth::user();
+        Auth::logout();
         if ($user) {
             $user->delete();
         }
-        Auth::logout();
         session()->invalidate();
         session()->regenerateToken();
 
