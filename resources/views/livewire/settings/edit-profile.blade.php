@@ -41,7 +41,7 @@ new class extends Component {
 
     public function updateProfile(){
         $this->validate([
-            'username' => 'required|string|max:60',
+            'username' => ['required', 'string', 'max:60', 'unique:profiles,username,' . auth()->user()->profile->profile_id . ',profile_id'],
             'occupation' => 'nullable|string|max:60',
             'birth_date' => 'nullable|date',
             'gender' => 'nullable|in:male,female',

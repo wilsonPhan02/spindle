@@ -166,7 +166,7 @@ new class extends Component {
     @endphp
 
     @if($isProfileIncomplete)
-        <div x-data="{ show: !localStorage.getItem('hide_profile_banner_v1') }" 
+        <div x-data="{ show: !localStorage.getItem('hide_profile_banner_v1_{{ auth()->id() }}') }" 
              x-show="show" 
              x-transition.opacity.duration.300ms
              class="mb-8 flex flex-col sm:flex-row items-center justify-between p-5 bg-card-bg border border-brand-150 rounded-xl shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] relative overflow-hidden group">
@@ -186,7 +186,7 @@ new class extends Component {
                     {{ __('Let\'s Go!') }}
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
                 </a>
-                <button @click="show = false; localStorage.setItem('hide_profile_banner_v1', 'true')" class="p-2 text-subtext-90 hover:text-text-100 hover:bg-brand-100/50 rounded-md transition-colors" title="{{ __('Dismiss') }}">
+                <button @click="show = false; localStorage.setItem('hide_profile_banner_v1_{{ auth()->id() }}', 'true')" class="p-2 text-subtext-90 hover:text-text-100 hover:bg-brand-100/50 rounded-md transition-colors" title="{{ __('Dismiss') }}">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
             </div>
