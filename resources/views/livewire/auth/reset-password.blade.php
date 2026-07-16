@@ -8,7 +8,7 @@ use Livewire\Attributes\Rule;
 use Livewire\Attributes\Layout;
 use App\Models\User;
 
-new #[Layout('layouts.guest')] class extends Component {
+new #[Layout('layouts.guest-light')] class extends Component {
     public $token;
 
     #[Rule('required|email|exists:users,email')]
