@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
 
-new #[Layout('layouts.guest-light')] class extends Component
+new #[Layout('layouts.guest')] class extends Component
 {
     public $email = '';
     public $password = '';

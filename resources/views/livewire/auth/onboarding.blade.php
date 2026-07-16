@@ -4,7 +4,7 @@ use Livewire\Component;
 use Livewire\Attributes\Layout;
 use App\Models\User;
 
-new #[Layout('layouts.guest-light')] class extends Component
+new #[Layout('layouts.guest')] class extends Component
 {
     public $username = '';
     public $isSuccess = false;
