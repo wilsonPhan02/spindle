@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\OtpVerificationMail;
 
-new #[Layout('layouts.guest-light')] class extends Component
+new #[Layout('layouts.guest')] class extends Component
 {
     public $otp = ['', '', '', ''];
     public $resendCooldown = 0;
