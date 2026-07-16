@@ -13,11 +13,17 @@ new class extends Component {
         session()->invalidate();
         session()->regenerateToken();
 
-        return redirect()->route('register');
+        $this->dispatch('clear-auth-session-and-register');
     }
 }; ?>
 
-<div>
+<div x-data="{
+    clearAuth() {
+        sessionStorage.removeItem('auth_email');
+        sessionStorage.removeItem('auth_password');
+        window.location.href = '{{ route('register') }}';
+    }
+}" @clear-auth-session-and-register.window="clearAuth()">
     <x-confirm-dialog
         EventName="open-delete-dialog"
         :title="__('Delete Account')"
