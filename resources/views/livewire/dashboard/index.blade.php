@@ -169,7 +169,7 @@ new class extends Component {
     @else
         <div class="space-y-12 mb-8">
             @foreach($sections as $section)
-                <div id="section-{{ $section->section_id }}" x-data="{ editing: false, newName: '{{ $section->title }}', menuOpen: false }" class="relative scroll-mt-8">
+                <div id="section-{{ $section->section_id }}" x-data="{ editing: false, newName: {{ json_encode($section->title) }}, menuOpen: false }" class="relative scroll-mt-8">
 
                     <div class="flex justify-between items-center border-b border-brand-150 pb-2 mb-6">
                         <div class="w-full">
@@ -188,7 +188,7 @@ new class extends Component {
                                     x-ref="nameInput"
                                     maxlength="50"
                                     @keydown.enter="$wire.renameSection('{{ $section->section_id }}', newName); editing = false"
-                                    @keydown.escape="editing = false; newName = '{{ $section->title }}'"
+                                    @keydown.escape="editing = false; newName = {{ json_encode($section->title) }}"
                                     @click.away="$wire.renameSection('{{ $section->section_id }}', newName); editing = false"
                                     class="text-2xl font-merriweather text-text-100 bg-transparent border-b border-secondary-200 outline-none w-full focus:ring-0 px-0 py-0"
                                 >
