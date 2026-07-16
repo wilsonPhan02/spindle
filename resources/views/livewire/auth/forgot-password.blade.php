@@ -57,7 +57,7 @@ new class extends Component {
 
                 <div class="text-left space-y-2">
                     <x-form-input 
-                        label="{{ __('Email') }}" 
+                        label="{{ __('Drop your email here') }}" 
                         placeholder="{{ __('Enter your email') }}" 
                         model="email" 
                     />

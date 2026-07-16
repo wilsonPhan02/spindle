@@ -64,6 +64,11 @@ new class extends Component {
         <div class="flex flex-col gap-6">
             <h2 class="text-app-heading-1 text-text-100">{{ __('Change Password') }}</h2>
 
+            <div class="text-center -mt-4 mb-2">
+                <span class="text-app-body-small text-text-80 italic">{{ __('Email:') }}</span><br>
+                <span class="text-app-body-medium text-text-100 italic">{{ auth()->user()->email }}</span>
+            </div>
+
             <form wire:submit="updatePassword" class="flex flex-col gap-6">
                 <x-form-input 
                     label="{{ __('Current Password') }}" 
