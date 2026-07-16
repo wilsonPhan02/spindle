@@ -182,7 +182,7 @@
     "Enter your new password": "输入新密码",
     "Enter your occupation": "输入您的职业",
     "Enter your password": "输入密码",
-    "Enter your username": "输入您的用户名",
+    "Enter your username": "请输入您的用户名",
     "Eye Color": "眼色",
     "FEATURES": "功能",
     "Features": "功能",
@@ -581,5 +581,11 @@
     "Spindle is a complex writing environment optimized for larger screens. To weave your story and access all features, please open this application on a desktop or laptop device.": "Spindle 是一个针对大屏幕优化的复杂写作环境。要编织您的故事并访问所有功能，请在台式机或笔记本电脑设备上打开此应用程序。",
     "To-Do List ([] + Space)": "待办事项列表 ([] + 空格键)",
     "Profile updated successfully.": "个人资料更新成功。",
-    "Terakhir diperbarui:": "最后更新："
+    "Terakhir diperbarui:": "最后更新：",
+    "Welcome, Creator!": "欢迎，创作者！",
+    "Before you weave your first tale, let's set up your profile.": "在您编织第一个故事之前，让我们先设置您的个人资料。",
+    "Almost there...": "马上就好...",
+    "Hold up, Weaver!": "等一下，编织者！",
+    "Your profile is missing some vital threads. Let's complete it to weave your story seamlessly.": "您的个人资料还缺少一些重要的线索。让我们完善它，以便无缝编织您的故事。",
+    "Let's Go!": "走吧！"
 }

@@ -214,7 +214,7 @@
                 <p class="reveal text-web-body-large text-[#E3DBD0]">{{ __('However, every Writer faces the same monster') }}</p>
                 <h2 class="reveal reveal-d1 mt-2 text-web-heading-1 italic text-[#F3ECE3] mx-auto max-w-[700px]">{{ __('“The Great Tangle”') }}</h2>
 
-                <div class="mt-14 flex flex-wrap items-center justify-center gap-6" style="perspective: 1500px;">
+                <div class="mt-14 flex flex-wrap items-center justify-center gap-4 lg:gap-6" style="perspective: 1500px;">
                     @php
                         $tangles = [
                             ['file' => 'tangle-1.png', 'tilt' => 'rotate-[-5deg]', 'text' => 'Timelines twist into<br>deadly plot-holes...'],
@@ -223,7 +223,7 @@
                         ];
                     @endphp
                     @foreach($tangles as $tangle)
-                        <div class="reveal reveal-d{{ $loop->iteration }} {{ $tangle['tilt'] }} w-[300px] max-w-[80%] transition-all duration-500 hover:z-20">
+                        <div class="reveal reveal-d{{ $loop->iteration }} {{ $tangle['tilt'] }} w-[280px] xl:w-[300px] max-w-[80%] transition-all duration-500 hover:z-20">
                             <div class="animate-float hover:[animation-play-state:paused]" style="animation-delay: {{ $loop->index * 1.1 }}s; transform-style: preserve-3d;">
                                 <div class="tilt-container relative w-full h-auto cursor-pointer" style="perspective: 1000px;">
                                     <div class="tilt-element relative w-full h-auto drop-shadow-[0_24px_40px_rgba(0,0,0,0.45)] transition-transform duration-[200ms] ease-out pointer-events-none"
@@ -327,7 +327,7 @@
     </section>
 
     
-    <section id="tools" class="relative min-h-screen flex flex-col justify-center overflow-hidden bg-brand-50 dark:bg-bg-main pt-24 pb-8 scroll-mt-16">
+    <section id="tools" class="relative min-h-screen flex flex-col justify-center overflow-hidden bg-brand-50 dark:bg-bg-main pt-24 pb-8 scroll-mt-24">
         <div class="mx-auto max-w-[1240px] px-6 lg:px-[52px] -mt-16">
             <p class="reveal text-web-subheading-1 text-secondary-200">{{ __('WHY CHOOSE US') }}</p>
             <h2 class="reveal reveal-d1 mt-1 max-w-[540px] text-web-title text-text-80 dark:text-text-100">
@@ -357,7 +357,7 @@
                  @mouseleave="startTimer()"
                  class="mt-8 flex flex-col lg:flex-row items-center justify-between gap-10 lg:gap-12">
                 
-                <div class="reveal reveal-left order-2 lg:order-1 w-full lg:w-[530px] shrink-0">
+                <div class="reveal reveal-left order-2 lg:order-1 w-full lg:flex-1 xl:flex-none xl:w-[530px]">
                       <div class="relative aspect-[780/624] w-full" style="perspective: 1500px; transform-style: preserve-3d;">
                           <template x-for="(it, i) in items" :key="i">
                               <div class="absolute inset-0 overflow-hidden rounded-sm border border-secondary-200/30 bg-brand-100 shadow-[0_15px_30px_rgba(43,31,23,0.15)] transition-all duration-[1200ms] ease-[cubic-bezier(0.4,0,0.2,1)]"
@@ -369,7 +369,7 @@
                       </div>
                   </div>
 
-                  <div class="reveal reveal-right order-1 space-y-2 lg:order-2 w-full lg:w-[440px] shrink-0">
+                  <div class="reveal reveal-right order-1 space-y-2 lg:order-2 w-full lg:w-[400px] xl:w-[440px] shrink-0">
                       <template x-for="(it, i) in items" :key="i">
                           <button type="button" x-on:click="sel = i" x-on:mouseenter="sel = i"
                                   class="block w-full rounded-[6px] border-2 px-5 text-left transition-all duration-[800ms] ease-[cubic-bezier(0.4,0,0.2,1)]"
