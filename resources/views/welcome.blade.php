@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="scroll-smooth">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="scroll-smooth snap-y snap-mandatory">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -120,7 +120,7 @@
     </nav>
 
     
-    <header id="hero" class="relative min-h-screen overflow-hidden">
+    <header id="hero" class="relative min-h-screen overflow-hidden snap-start">
         
         <div class="absolute inset-0 z-0 bg-gradient-to-b from-[#cdb99e] via-[#e4d7c3] to-[#efe6d7]"></div>
 
@@ -172,8 +172,7 @@
         <div class="relative z-20 mx-auto max-w-[1240px] px-6 lg:px-[52px] pt-[150px]">
             <div class="max-w-[700px]">
                 <h1 class="reveal text-web-title text-[#37322e]">
-                    {{ __('Are You Ready To') }}<br>
-                    <span class="font-merriweather italic text-secondary-200">{{ __('Spin A Yarn?') }}</span>
+                    {{ __('Are You Ready To') }}<br><span class="font-merriweather italic text-secondary-200">{{ __('Spin A Yarn?') }}</span>
                 </h1>
                 <p class="reveal reveal-d1 mt-6 max-w-[480px] font-montserrat text-[18px] leading-[28px] text-[#524d49] min-h-[84px]">
                     {!! __('Weave every character, plot, and world into a story worth telling, spinning countless narrative threads into one cohesive universe.') !!}
@@ -190,7 +189,7 @@
     
     <div id="dark-universe" class="relative">
         
-        <section class="relative bg-[#2a1f17]">
+        <section class="relative bg-[#2a1f17] snap-start">
             
             <div class="pointer-events-none absolute inset-0 z-0">
                 <div class="absolute right-[0%] top-[55%] h-[750px] w-[1100px] max-w-none -translate-y-1/2">
@@ -208,7 +207,7 @@
         </section>
 
         
-        <section class="relative min-h-screen flex flex-col justify-center overflow-hidden bg-[#2a1f17] py-20">
+        <section class="relative min-h-screen flex flex-col justify-center overflow-hidden bg-[#2a1f17] py-20 snap-start">
             @include('partials.starfield')
             <div class="relative z-10 mx-auto w-full max-w-[1240px] px-6 lg:px-[52px] text-center mt-6 lg:mt-8">
                 <p class="reveal text-web-body-large text-[#E3DBD0]">{{ __('However, every Writer faces the same monster') }}</p>
@@ -244,7 +243,7 @@
             </div>
         </section>
     
-    <section id="about" class="relative min-h-screen flex flex-col justify-center overflow-hidden bg-[#2a1f17] py-20 scroll-mt-24">
+    <section id="about" class="relative min-h-screen flex flex-col justify-center overflow-hidden bg-[#2a1f17] py-20 scroll-mt-24 snap-start">
         @include('partials.starfield')
         <div class="relative z-10 mx-auto grid max-w-[1240px] grid-cols-1 items-center gap-12 px-6 lg:px-[52px] lg:grid-cols-2 mt-12 lg:mt-24">
             
@@ -276,11 +275,11 @@
 </div>
 
     
-    <section id="writers" class="relative min-h-screen flex flex-col justify-center overflow-hidden bg-brand-50 dark:bg-bg-main py-20 scroll-mt-24">
+    <section id="writers" class="relative min-h-screen flex flex-col justify-center overflow-hidden bg-brand-50 dark:bg-bg-main py-20 scroll-mt-24 snap-start">
         <div class="mx-auto max-w-[1180px] px-6 lg:px-[52px] text-center -mt-4">
             <p class="reveal text-web-subheading-1 text-secondary-200">{{ __('OUR MISSION') }}</p>
-            <h2 class="mt-1 text-web-title text-text-80 dark:text-text-100 mx-auto max-w-[480px]">
-                {{ __('Weaving Worlds ') }} <span class="font-merriweather italic text-secondary-200">{{ __('Together') }}</span>
+            <h2 class="mt-1 text-web-title text-text-80 dark:text-text-100 mx-auto">
+                {{ trim(__('Weaving Worlds ')) }}<br><span class="font-merriweather italic text-secondary-200">{{ __('Together') }}</span>
             </h2>
             <p class="mx-auto mt-4 max-w-[560px] text-web-body-large text-text-70 dark:text-text-90 min-h-[84px]">
                 {{ __('We are going to help you create your story. Weave stories, characters, and notes easily by using Spindle. Convert your abstract yarn into a magic yarn!') }}
@@ -327,11 +326,11 @@
     </section>
 
     
-    <section id="tools" class="relative min-h-screen flex flex-col justify-center overflow-hidden bg-brand-50 dark:bg-bg-main pt-24 pb-8 scroll-mt-24">
+    <section id="tools" class="relative min-h-screen flex flex-col justify-center overflow-hidden bg-brand-50 dark:bg-bg-main pt-24 pb-8 scroll-mt-24 snap-start">
         <div class="mx-auto max-w-[1240px] px-6 lg:px-[52px] -mt-16">
             <p class="reveal text-web-subheading-1 text-secondary-200">{{ __('WHY CHOOSE US') }}</p>
-            <h2 class="reveal reveal-d1 mt-1 max-w-[540px] text-web-title text-text-80 dark:text-text-100">
-                {{ __('Tools Crafted For') }}<br class="hidden lg:block"><span class="font-merriweather italic text-secondary-200">{{ __(' The Weaver') }}</span>
+            <h2 class="reveal reveal-d1 mt-1 text-web-title text-text-80 dark:text-text-100">
+                {{ __('Tools Crafted For') }}<br class="hidden lg:block"><span class="font-merriweather italic text-secondary-200">{{ trim(__(' The Weaver')) }}</span>
             </h2>
 
             @php $base = asset('videos/landing') . '/'; @endphp
@@ -357,7 +356,7 @@
                  @mouseleave="startTimer()"
                  class="mt-8 flex flex-col lg:flex-row items-center justify-between gap-10 lg:gap-12">
                 
-                <div class="reveal reveal-left order-2 lg:order-1 w-full lg:flex-1 xl:flex-none xl:w-[530px]">
+                <div class="reveal reveal-left order-2 lg:order-1 w-full lg:w-[420px] xl:w-[530px] shrink-0">
                       <div class="relative aspect-[780/624] w-full" style="perspective: 1500px; transform-style: preserve-3d;">
                           <template x-for="(it, i) in items" :key="i">
                               <div class="absolute inset-0 overflow-hidden rounded-sm border border-secondary-200/30 bg-brand-100 shadow-[0_15px_30px_rgba(43,31,23,0.15)] transition-all duration-[1200ms] ease-[cubic-bezier(0.4,0,0.2,1)]"
@@ -369,7 +368,7 @@
                       </div>
                   </div>
 
-                  <div class="reveal reveal-right order-1 space-y-2 lg:order-2 w-full lg:w-[400px] xl:w-[440px] shrink-0">
+                  <div class="reveal reveal-right order-1 space-y-2 lg:order-2 w-full lg:w-[420px] xl:w-[440px] shrink-0">
                       <template x-for="(it, i) in items" :key="i">
                           <button type="button" x-on:click="sel = i" x-on:mouseenter="sel = i"
                                   class="block w-full rounded-[6px] border-2 px-5 text-left transition-all duration-[800ms] ease-[cubic-bezier(0.4,0,0.2,1)]"
@@ -399,7 +398,7 @@
         </div>
     </section>
 
-    <section class="relative min-h-screen flex flex-col justify-center overflow-hidden bg-brand-50 dark:bg-bg-main py-20">
+    <section class="relative min-h-screen flex flex-col justify-center overflow-hidden bg-brand-50 dark:bg-bg-main py-20 snap-start">
         <!-- Wind Rings Background -->
         <div class="absolute inset-0 z-0 flex items-center justify-center pointer-events-none">
             <div class="absolute w-[250px] h-[250px] md:w-[350px] md:h-[350px] border border-secondary-200 animate-wind-ring" style="border-radius: 40% 60% 60% 40% / 50% 40% 60% 50%;"></div>
@@ -415,11 +414,11 @@
         </div>
     </section>
 
-    <section class="relative overflow-hidden bg-brand-50 dark:bg-bg-main pt-16 pb-0">
+    <section class="relative overflow-hidden bg-brand-50 dark:bg-bg-main pt-16 pb-0 snap-start">
         <div class="reveal reveal-d1 relative mx-auto max-w-[1240px] px-6 lg:px-[52px]">
             <div class="relative overflow-hidden rounded-[28px] px-6 pt-20 mb-16 text-center shadow-lg bg-brand-100 dark:bg-brand-150">
                 <h2 class="text-web-title text-text-80 mx-auto max-w-[580px]">
-                    {{ __('Are You Ready To') }} <span class="font-merriweather italic text-secondary-200">{{ __('Spin A Yarn?') }}</span>
+                    {{ __('Are You Ready To') }}<br><span class="font-merriweather italic text-secondary-200">{{ __('Spin A Yarn?') }}</span>
                 </h2>
                 <p class="mx-auto mt-4 max-w-[580px] font-montserrat text-[18px] leading-[28px] text-subtext-100 min-h-[84px]">
                     {{ __('Weave every character, plot, and world into a story worth telling, spinning countless narrative threads into one cohesive universe.') }}
@@ -460,7 +459,7 @@
     </section>
 
     
-    <footer class="bg-black py-16 text-white">
+    <footer class="bg-black py-16 text-white snap-start">
         <div class="mx-auto flex max-w-[1240px] flex-col items-center px-6 text-center">
             <a href="#hero" class="flex items-center">
                 <x-logo class="h-9 w-auto select-none text-white" />
