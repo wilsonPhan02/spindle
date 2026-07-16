@@ -570,5 +570,11 @@
     "Verify Your Email": "Verify Your Email",
     "Here is your One-Time Password (OTP) to verify your Spindle account.": "Here is your One-Time Password (OTP) to verify your Spindle account.",
     "This code is valid for 10 minutes. Please do not share it with anyone.": "This code is valid for 10 minutes. Please do not share it with anyone.",
-    "If you did not request this verification, please ignore this email.": "If you did not request this verification, please ignore this email."
+    "If you did not request this verification, please ignore this email.": "If you did not request this verification, please ignore this email.",
+    "Please enter your preferred name.": "Please enter your preferred name.",
+    "This name is already taken. Please choose another.": "This name is already taken. Please choose another.",
+    "Profile Setup - Spindle": "Profile Setup - Spindle",
+    "Profile Setup": "Profile Setup",
+    "What should we call you?": "What should we call you?",
+    "Enter your preferred name": "Enter your preferred name"
 }

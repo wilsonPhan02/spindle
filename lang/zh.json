@@ -570,5 +570,11 @@
     "Verify Your Email": "验证您的电子邮件",
     "Here is your One-Time Password (OTP) to verify your Spindle account.": "这是用于验证您的 Spindle 帐户的一次性密码 (OTP)。",
     "This code is valid for 10 minutes. Please do not share it with anyone.": "此代码在 10 分钟内有效。请勿与任何人分享。",
-    "If you did not request this verification, please ignore this email.": "如果您未请求此验证，请忽略此电子邮件。"
+    "If you did not request this verification, please ignore this email.": "如果您未请求此验证，请忽略此电子邮件。",
+    "Please enter your preferred name.": "请输入您的首选名称。",
+    "This name is already taken. Please choose another.": "该名称已被占用。请选择另一个。",
+    "Profile Setup - Spindle": "配置文件设置 - Spindle",
+    "Profile Setup": "配置文件设置",
+    "What should we call you?": "我们该怎么称呼您？",
+    "Enter your preferred name": "输入您的首选名称"
 }

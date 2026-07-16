@@ -570,5 +570,11 @@
     "Verify Your Email": "メールアドレスの確認",
     "Here is your One-Time Password (OTP) to verify your Spindle account.": "Spindleアカウントを認証するためのOne-Time Password (OTP)です。",
     "This code is valid for 10 minutes. Please do not share it with anyone.": "このコードは10分間有効です。誰とも共有しないでください。",
-    "If you did not request this verification, please ignore this email.": "この認証をリクエストしていない場合は、このメールを無視してください。"
+    "If you did not request this verification, please ignore this email.": "この認証をリクエストしていない場合は、このメールを無視してください。",
+    "Please enter your preferred name.": "希望する名前を入力してください。",
+    "This name is already taken. Please choose another.": "この名前はすでに使用されています。別の名前を選択してください。",
+    "Profile Setup - Spindle": "プロフィール設定 - Spindle",
+    "Profile Setup": "プロフィール設定",
+    "What should we call you?": "何とお呼びすればよろしいですか？",
+    "Enter your preferred name": "希望する名前を入力"
 }

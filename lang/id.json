@@ -570,5 +570,11 @@
     "Verify Your Email": "Verifikasi Email Anda",
     "Here is your One-Time Password (OTP) to verify your Spindle account.": "Berikut adalah One-Time Password (OTP) Anda untuk memverifikasi akun Spindle.",
     "This code is valid for 10 minutes. Please do not share it with anyone.": "Kode ini berlaku selama 10 menit. Jangan bagikan kepada siapa pun.",
-    "If you did not request this verification, please ignore this email.": "Jika Anda tidak meminta verifikasi ini, abaikan saja email ini."
+    "If you did not request this verification, please ignore this email.": "Jika Anda tidak meminta verifikasi ini, abaikan saja email ini.",
+    "Please enter your preferred name.": "Harap masukkan nama panggilan Anda.",
+    "This name is already taken. Please choose another.": "Nama ini sudah digunakan. Silakan pilih yang lain.",
+    "Profile Setup - Spindle": "Pengaturan Profil - Spindle",
+    "Profile Setup": "Pengaturan Profil",
+    "What should we call you?": "Kami harus memanggil Anda apa?",
+    "Enter your preferred name": "Masukkan nama panggilan Anda"
 }
