@@ -183,6 +183,9 @@ new class extends Component {
                 ghostClass: 'opacity-50',
                 handle: '.drag-handle',
                 draggable: '.sortable-group',
+                delay: 150,
+                delayOnTouchOnly: true,
+                fallbackTolerance: 3,
                 onEnd: (evt) => {
                     if (evt.oldIndex === evt.newIndex) return;
                     const orderedIds = Array.from(this.$refs.groupList.querySelectorAll('.sortable-group')).map(el => el.getAttribute('data-id'));

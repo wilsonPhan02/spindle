@@ -182,7 +182,7 @@
     "Enter your new password": "新しいパスワードを入力",
     "Enter your occupation": "職業を入力",
     "Enter your password": "パスワードを入力",
-    "Enter your username": "ユーザー名を入力",
+    "Enter your username": "ユーザー名を入力してください",
     "Eye Color": "目の色",
     "FEATURES": "機能",
     "Features": "機能",
@@ -575,11 +575,17 @@
     "This name is already taken. Please choose another.": "この名前はすでに使用されています。別の名前を選択してください。",
     "Profile Setup - Spindle": "プロフィール設定 - Spindle",
     "Profile Setup": "プロフィール設定",
-    "What should we call you?": "何とお呼びすればよろしいですか？",
+    "What should we call you?": "何とお呼びしましょうか？",
     "Enter your preferred name": "希望する名前を入力",
     "Desktop Required": "デスクトップが必要です",
     "Spindle is a complex writing environment optimized for larger screens. To weave your story and access all features, please open this application on a desktop or laptop device.": "Spindleは、大きな画面に最適化された複雑な執筆環境です。ストーリーを紡ぎ、すべての機能にアクセスするには、デスクトップまたはラップトップデバイスでこのアプリケーションを開いてください。",
     "To-Do List ([] + Space)": "To-Doリスト ([] + スペース)",
     "Profile updated successfully.": "プロフィールが正常に更新されました。",
-    "Terakhir diperbarui:": "最終更新:"
+    "Terakhir diperbarui:": "最終更新:",
+    "Welcome, Creator!": "ようこそ、クリエイター！",
+    "Before you weave your first tale, let's set up your profile.": "最初の物語を紡ぐ前に、プロフィールを設定しましょう。",
+    "Almost there...": "あともう少し...",
+    "Hold up, Weaver!": "ちょっと待って、ウィーバー！",
+    "Your profile is missing some vital threads. Let's complete it to weave your story seamlessly.": "プロフィールに重要な糸が欠けています。物語をシームレスに紡ぐために完成させましょう。",
+    "Let's Go!": "行こう！"
 }

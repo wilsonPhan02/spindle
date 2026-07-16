@@ -40,6 +40,11 @@ document.addEventListener('alpine:init', () => {
                 chosenClass: 'cursor-grabbing',
                 draggable: '.sortable-item',
 
+                // Touch support configuration
+                delay: 150, // Time in ms before drag starts
+                delayOnTouchOnly: true, // Only delay on touch devices
+                fallbackTolerance: 3, // Amount of pixels mouse can move before cancelling drag
+
                 // Prevent the native <a> link drag from interfering.
                 // SortableJS cancels native drag internally, but being
                 // explicit here ensures cross-browser consistency.
