@@ -17,9 +17,9 @@
                                 <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;">
                                     <tr>
                                         <td style="font-family: Arial, Helvetica, sans-serif; font-size: 16px; vertical-align: top;">
-                                            <h2 style="color: #0f172a; font-family: Arial, Helvetica, sans-serif; font-weight: 600; line-height: 1.2; margin: 0; margin-bottom: 24px; font-size: 24px; text-align: center;">Verify Your Email</h2>
+                                            <h2 style="color: #0f172a; font-family: Arial, Helvetica, sans-serif; font-weight: 600; line-height: 1.2; margin: 0; margin-bottom: 24px; font-size: 24px; text-align: center;">{{ __('Verify Your Email') }}</h2>
                                             <p style="font-family: Arial, Helvetica, sans-serif; font-size: 16px; font-weight: normal; margin: 0; margin-bottom: 16px; color: #475569; text-align: center;">
-                                                Here is your One-Time Password (OTP) to verify your Spindle account. 
+                                                {{ __('Here is your One-Time Password (OTP) to verify your Spindle account.') }} 
                                             </p>
                                             
                                             <div style="background-color: #f1f5f9; padding: 16px; border-radius: 8px; margin-bottom: 24px; text-align: center;">
@@ -27,11 +27,11 @@
                                             </div>
 
                                             <p style="font-family: Arial, Helvetica, sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 24px; color: #64748b; text-align: center;">
-                                                This code is valid for 10 minutes. Please do not share it with anyone.
+                                                {{ __('This code is valid for 10 minutes. Please do not share it with anyone.') }}
                                             </p>
 
                                             <p style="font-family: Arial, Helvetica, sans-serif; font-size: 16px; font-weight: normal; margin: 0; margin-bottom: 0px; color: #475569;">
-                                                Regards,<br>
+                                                {{ __('Regards,') }}<br>
                                                 <strong>Spindle</strong>
                                             </p>
                                         </td>
@@ -45,7 +45,7 @@
                         <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;">
                             <tr>
                                 <td class="content-block" style="font-family: Arial, Helvetica, sans-serif; vertical-align: top; padding-bottom: 10px; padding-top: 10px; color: #94a3b8; font-size: 12px; text-align: center;">
-                                    If you did not request this verification, please ignore this email.
+                                    {{ __('If you did not request this verification, please ignore this email.') }}
                                 </td>
                             </tr>
                         </table>
