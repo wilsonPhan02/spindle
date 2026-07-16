@@ -36,7 +36,7 @@ Route::middleware('guest')->group(function () {
 });
 
 // AREA AUTH: Hanya bisa diakses oleh orang yang SUDAH LOGIN
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', \App\Http\Middleware\EnsureOnboardingIsComplete::class])->group(function () {
     Volt::route('/email-verification', 'auth.email-verification')->name('email.verification');
 
     Route::middleware('email.verified')->group(function () {

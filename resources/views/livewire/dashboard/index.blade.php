@@ -160,6 +160,39 @@ new class extends Component {
         </div>
     </div>
 
+    @php
+        $profile = Auth::user()->profile;
+        $isProfileIncomplete = !$profile || !$profile->occupation || !$profile->gender || !$profile->birthdate || !$profile->avatar_url;
+    @endphp
+
+    @if($isProfileIncomplete)
+        <div x-data="{ show: !localStorage.getItem('hide_profile_banner_v1_{{ auth()->id() }}') }" 
+             x-show="show" 
+             x-transition.opacity.duration.300ms
+             class="mb-8 flex flex-col sm:flex-row items-center justify-between p-5 bg-card-bg border border-brand-150 rounded-xl shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] relative overflow-hidden group">
+            
+            <!-- decorative background elements -->
+            <div class="absolute -right-10 -top-10 w-40 h-40 bg-secondary-100/10 rounded-full blur-3xl pointer-events-none transition-all duration-700 group-hover:bg-secondary-100/20"></div>
+            
+            <div class="flex items-center gap-4 z-10 w-full sm:w-auto mb-4 sm:mb-0">
+                <div>
+                    <h3 class="text-[16px] font-merriweather text-text-100 font-semibold mb-0.5">{{ __('Complete Your Profile') }}</h3>
+                    <p class="text-[13px] font-inter text-text-80">{{ __('Personalize your creative space and let your true writer persona shine.') }}</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-3 z-10 shrink-0 self-end sm:self-center">
+                <a href="{{ route('settings', ['edit_profile' => 1]) }}" wire:navigate class="text-brand-10 text-[13px] font-inter px-5 py-2.5 bg-secondary-200 rounded-lg hover:bg-secondary-250 transition-colors shadow-sm font-medium flex items-center gap-2">
+                    {{ __('Let\'s Go!') }}
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                </a>
+                <button @click="show = false; localStorage.setItem('hide_profile_banner_v1_{{ auth()->id() }}', 'true')" class="p-2 text-subtext-90 hover:text-text-100 hover:bg-brand-100/50 rounded-md transition-colors" title="{{ __('Dismiss') }}">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+        </div>
+    @endif
+
     @if(count($sections) === 0)
         <div class="flex flex-col items-center justify-center mt-12">
             <x-empty-dashboard class="w-48 h-48 mb-6 opacity-80" />

@@ -3,10 +3,16 @@
 use Livewire\Component;
 use Livewire\Attributes\Layout;
 use App\Models\User;
+use Livewire\WithFileUploads;
+use App\Traits\HandlesFileUpload;
+use Illuminate\Support\Facades\Storage;
 
 new #[Layout('layouts.guest')] class extends Component
 {
+    use WithFileUploads, HandlesFileUpload;
+
     public $username = '';
+    public $new_photo;
     public $isSuccess = false;
 
     public function mount() {
@@ -23,15 +29,25 @@ new #[Layout('layouts.guest')] class extends Component
     {
         $this->validate([
             'username' => ['required', 'string', 'max:255', 'unique:profiles,username,' . auth()->user()->profile->profile_id . ',profile_id'],
+            'new_photo' => ['nullable', 'image', 'max:5120'],
         ], [
             'username.required' => __('Please enter your preferred name.'),
             'username.unique' => __('This name is already taken. Please choose another.'),
+            'new_photo.max' => __('The selected image is too large. The maximum allowed file size is 5MB.'),
+            'new_photo.image' => __('The selected file type is not supported. Please upload an image.'),
         ]);
 
         $profile = auth()->user()->profile;
-        $profile->update([
+        $updateData = [
             'username' => $this->username,
-        ]);
+        ];
+
+        if ($this->new_photo) {
+            $path = $this->replaceImage($this->new_photo, $profile->avatar_url, 'avatars');
+            $updateData['avatar_url'] = $path; 
+        }
+
+        $profile->update($updateData);
 
         $this->isSuccess = true;
         $this->js("setTimeout(() => window.location.href = '/dashboard', 1200)");
@@ -57,14 +73,9 @@ new #[Layout('layouts.guest')] class extends Component
             <h1 class="mb-6 text-2xl font-merriweather text-center text-text-80">{{ __('Profile Setup') }}</h1>
 
             {{-- Avatar --}}
-            <div class="flex justify-center mb-6">
-                <div class="w-32 h-32 rounded-full bg-brand-100 flex items-center justify-center overflow-hidden">
-                    <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full">
-                        <circle cx="40" cy="40" r="40" fill="#f0e8e0"/>
-                        <circle cx="40" cy="30" r="13" fill="#8B5E3C"/>
-                        <ellipse cx="40" cy="64" rx="20" ry="14" fill="#8B5E3C"/>
-                    </svg>
-                </div>
+            <div class="flex flex-col items-center justify-center mb-8 gap-2">
+                <x-avatar :editable="true" model="new_photo" size="w-32 h-32"
+                    :imageUrl="optional(auth()->user()->profile)->avatar_url ? Storage::url(auth()->user()->profile->avatar_url) : null" />
             </div>
 
             <form wire:submit="save" novalidate class="space-y-4">

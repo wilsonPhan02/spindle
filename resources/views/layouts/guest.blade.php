@@ -8,6 +8,11 @@
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:wght@400;700&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
         
         @vite(['resources/css/app.css', 'resources/js/app.js'])
+        
+        <!-- Cropper.js -->
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css" rel="stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
+
         {{-- Force light mode: auth pages always use the warm light design --}}
         <script>
             document.documentElement.classList.remove('dark');
