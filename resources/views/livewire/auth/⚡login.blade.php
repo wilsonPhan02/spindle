@@ -5,7 +5,7 @@ use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Illuminate\Support\Facades\Auth;
 
-new #[Layout('layouts.guest')] class extends Component
+new #[Layout('layouts.guest-light')] class extends Component
 {
     public $email = '';
     public $password = '';

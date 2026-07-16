@@ -51,7 +51,7 @@ class GoogleController extends Controller
                     'google_id' => $googleUser->getId(),
                     'google_token' => $googleUser->token,
                 ]);
-                
+                $user->update(['email_verified_at' => now()]);
                 $isNewUser = true;
             }
 

@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
 
-new #[Layout('layouts.guest')] class extends Component
+new #[Layout('layouts.guest-light')] class extends Component
 {
     public $email = '';
     public $password = '';
@@ -49,9 +49,8 @@ new #[Layout('layouts.guest')] class extends Component
 
         // 3. Login & Redirect
         Auth::login($user);
-        
         $this->isSuccess = true;
-        $this->js("setTimeout(() => window.location.href = '/onboarding', 1200)");
+        $this->js("setTimeout(() => window.location.href = '/email-verification', 1200)");
     }
 };
 ?>
