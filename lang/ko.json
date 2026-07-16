@@ -576,5 +576,10 @@
     "Profile Setup - Spindle": "프로필 설정 - Spindle",
     "Profile Setup": "프로필 설정",
     "What should we call you?": "뭐라고 부르면 좋을까요?",
-    "Enter your preferred name": "원하시는 이름 입력"
+    "Enter your preferred name": "원하시는 이름 입력",
+    "Desktop Required": "데스크톱 필요",
+    "Spindle is a complex writing environment optimized for larger screens. To weave your story and access all features, please open this application on a desktop or laptop device.": "Spindle은 큰 화면에 최적화된 복잡한 글쓰기 환경입니다. 스토리를 엮고 모든 기능에 액세스하려면 데스크톱 또는 랩톱 기기에서 이 애플리케이션을 여세요.",
+    "To-Do List ([] + Space)": "할 일 목록 ([] + 스페이스바)",
+    "Profile updated successfully.": "프로필이 성공적으로 업데이트되었습니다.",
+    "Terakhir diperbarui:": "마지막 업데이트:"
 }

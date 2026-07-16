@@ -576,5 +576,10 @@
     "Profile Setup - Spindle": "配置文件设置 - Spindle",
     "Profile Setup": "配置文件设置",
     "What should we call you?": "我们该怎么称呼您？",
-    "Enter your preferred name": "输入您的首选名称"
+    "Enter your preferred name": "输入您的首选名称",
+    "Desktop Required": "需要桌面端",
+    "Spindle is a complex writing environment optimized for larger screens. To weave your story and access all features, please open this application on a desktop or laptop device.": "Spindle 是一个针对大屏幕优化的复杂写作环境。要编织您的故事并访问所有功能，请在台式机或笔记本电脑设备上打开此应用程序。",
+    "To-Do List ([] + Space)": "待办事项列表 ([] + 空格键)",
+    "Profile updated successfully.": "个人资料更新成功。",
+    "Terakhir diperbarui:": "最后更新："
 }
