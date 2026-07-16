@@ -36,34 +36,37 @@ Route::middleware('guest')->group(function () {
 });
 
 // AREA AUTH: Hanya bisa diakses oleh orang yang SUDAH LOGIN
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', \App\Http\Middleware\EnsureOnboardingIsComplete::class])->group(function () {
+    Volt::route('/email-verification', 'auth.email-verification')->name('email.verification');
 
-    // Rute Dashboard setelah sukses register/login
-    Volt::route('/dashboard', 'dashboard.index')->name('dashboard');
-    // Rute Onboarding setelah register
-    Volt::route('/onboarding', 'auth.onboarding')->name('onboarding');
-    // Rute untuk ke Settings Page
-    Volt::route('/settings', 'settings.index')->name('settings');
-    $missingProject = function (Request $request) {
-        return redirect()->route('dashboard');
-    };
+    Route::middleware('email.verified')->group(function () {
+        // Rute Dashboard setelah sukses register/login
+        Volt::route('/dashboard', 'dashboard.index')->name('dashboard');
+        // Rute Onboarding setelah register
+        Volt::route('/onboarding', 'auth.onboarding')->name('onboarding');
+        // Rute untuk ke Settings Page
+        Volt::route('/settings', 'settings.index')->name('settings');
+        $missingProject = function (Request $request) {
+            return redirect()->route('dashboard');
+        };
 
-    Route::middleware('project.access')->group(function () use ($missingProject) {
-        // Rute untuk ke detail project
-        Volt::route('/projects/{project}', 'projects.show')->name('projects.show')->missing($missingProject);
-        // Rute untuk halaman characters project
-        Volt::route('/projects/{project}/characters', 'projects.characters')->name('projects.characters')->missing($missingProject);
-        // Rute untuk halaman characters detail project
-        Volt::route('/projects/{project}/characters/{character}', 'projects.character-detail')->name('projects.character.show')->missing($missingProject);
-        // Rute untuk ke structure project
-        Volt::route('/projects/{project}/structure', 'projects.structure')->name('projects.structure')->missing($missingProject);
-        // Rute untuk halaman notes project
-        Volt::route('/projects/{project}/notes', 'projects.notes')->name('projects.notes')->missing($missingProject);
-        // Rute untuk halaman manuscript chapter
-        Volt::route('/projects/{project}/structure/{chapterCard}/manuscript', 'projects.manuscript')->name('projects.manuscript');
+        Route::middleware('project.access')->group(function () use ($missingProject) {
+            // Rute untuk ke detail project
+            Volt::route('/projects/{project}', 'projects.show')->name('projects.show')->missing($missingProject);
+            // Rute untuk halaman characters project
+            Volt::route('/projects/{project}/characters', 'projects.characters')->name('projects.characters')->missing($missingProject);
+            // Rute untuk halaman characters detail project
+            Volt::route('/projects/{project}/characters/{character}', 'projects.character-detail')->name('projects.character.show')->missing($missingProject);
+            // Rute untuk ke structure project
+            Volt::route('/projects/{project}/structure', 'projects.structure')->name('projects.structure')->missing($missingProject);
+            // Rute untuk halaman notes project
+            Volt::route('/projects/{project}/notes', 'projects.notes')->name('projects.notes')->missing($missingProject);
+            // Rute untuk halaman manuscript chapter
+            Volt::route('/projects/{project}/structure/{chapterCard}/manuscript', 'projects.manuscript')->name('projects.manuscript');
+        });
+        // Rute untuk halaman archive
+        Volt::route('/archive', 'archive.index')->name('archive');
     });
-    // Rute untuk halaman archive
-    Volt::route('/archive', 'archive.index')->name('archive');
 
 });
 

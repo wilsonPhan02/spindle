@@ -64,7 +64,19 @@ new #[Layout('layouts.app')] class extends Component {
 
 }; ?>
 
-<div class="p-10 max-w-7xl mx-auto">
+<div class="p-10 max-w-7xl mx-auto" x-data="{
+    init() {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('edit_profile') === '1') {
+            setTimeout(() => {
+                $dispatch('open-edit-profile');
+                // Clean up URL without reloading
+                const newUrl = window.location.pathname;
+                window.history.replaceState({}, document.title, newUrl);
+            }, 300);
+        }
+    }
+}">
 
     {{-- Header --}}
     <header class="flex justify-between items-center mb-8">

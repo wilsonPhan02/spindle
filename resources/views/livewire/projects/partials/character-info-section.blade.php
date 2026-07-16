@@ -319,7 +319,7 @@
                                 </template>
                                 <div x-show="types.length === 0" class="px-3 py-2 text-app-desc-feature text-subtext-70 italic">{{ __('No types yet') }}</div>
                                 <div class="border-t border-brand-150">
-                                    <div @click="typeOpen = false; window.dispatchEvent(new CustomEvent('open-relation-type-popup', { detail: { relationId: null, charFromName: '{{ $character->nick_name }}', charToName: selectedChar ? selectedChar.name : null, usedTypeIds: selectedChar ? (relatedTypesByChar[selectedChar.id] || []) : [] } }))"
+                                    <div @click="typeOpen = false; window.dispatchEvent(new CustomEvent('open-relation-type-popup', { detail: { relationId: null, charFromName: {{ json_encode($character->nick_name) }}, charToName: selectedChar ? selectedChar.name : null, usedTypeIds: selectedChar ? (relatedTypesByChar[selectedChar.id] || []) : [] } }))"
                                         class="px-3 py-2 flex items-center gap-2 text-app-desc-feature font-semibold text-secondary-200 hover:bg-brand-100 cursor-pointer">
                                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
                                         {{ __('Add New Relation') }}
@@ -359,7 +359,7 @@
                         @endphp
                         <div class="grid grid-cols-[1fr_auto_1fr_auto] items-center gap-x-2 text-text-80 text-app-body-small w-full">
                             <div class="bg-brand-100 px-3 py-1.5 rounded-md truncate cursor-pointer hover:bg-brand-150 transition-colors"
-                                @click="window.dispatchEvent(new CustomEvent('open-edit-relation-popup', { detail: { relationId: '{{ $relationship['id'] }}', typeId: '{{ $relationship['typeId'] }}', charFromName: '{{ $character->nick_name }}', charToName: '{{ $relationship['otherName'] }}', usedTypeIds: @js($usedTypeIdsForOther) } }))">
+                                @click="window.dispatchEvent(new CustomEvent('open-edit-relation-popup', { detail: { relationId: '{{ $relationship['id'] }}', typeId: '{{ $relationship['typeId'] }}', charFromName: {{ json_encode($character->nick_name) }}, charToName: {{ json_encode($relationship['otherName']) }}, usedTypeIds: @js($usedTypeIdsForOther) } }))">
                                 {{ $relationship['otherName'] }}
                             </div>
 
@@ -367,7 +367,7 @@
 
                             <div class="px-3 py-1.5 rounded-md text-center truncate cursor-pointer hover:opacity-80 transition-opacity"
                                 style="background-color: {{ $relationship['bgColor'] }}; color: {{ $relationship['textColor'] }};"
-                                @click="window.dispatchEvent(new CustomEvent('open-edit-relation-popup', { detail: { relationId: '{{ $relationship['id'] }}', typeId: '{{ $relationship['typeId'] }}', charFromName: '{{ $character->nick_name }}', charToName: '{{ $relationship['otherName'] }}', usedTypeIds: @js($usedTypeIdsForOther) } }))">
+                                @click="window.dispatchEvent(new CustomEvent('open-edit-relation-popup', { detail: { relationId: '{{ $relationship['id'] }}', typeId: '{{ $relationship['typeId'] }}', charFromName: {{ json_encode($character->nick_name) }}, charToName: {{ json_encode($relationship['otherName']) }}, usedTypeIds: @js($usedTypeIdsForOther) } }))">
                                 {{ $relationship['typeName'] }}
                             </div>
 

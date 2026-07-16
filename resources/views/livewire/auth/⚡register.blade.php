@@ -49,9 +49,8 @@ new #[Layout('layouts.guest')] class extends Component
 
         // 3. Login & Redirect
         Auth::login($user);
-        
         $this->isSuccess = true;
-        $this->js("setTimeout(() => window.location.href = '/onboarding', 1200)");
+        $this->js("setTimeout(() => window.location.href = '/email-verification', 1200)");
     }
 };
 ?>
