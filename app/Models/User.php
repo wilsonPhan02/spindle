@@ -28,6 +28,9 @@ class User extends Authenticatable
         'password',
         'google_id',
         'google_token',
+        'email_otp',
+        'email_otp_expires_at',
+        'email_verified_at',
     ];
 
     // Fields to be hidden when serialized to array/json
@@ -47,7 +50,37 @@ class User extends Authenticatable
     {
         return [
             'password' => 'hashed', // Automatically hash password on save
+            'email_otp_expires_at' => 'datetime',
+            'email_verified_at' => 'datetime',
         ];
+    }
+
+    public function generateOtp()
+    {
+        $code = str_pad((string)random_int(0, 9999), 4, '0', STR_PAD_LEFT);
+        $this->update([
+            'email_otp' => $code,
+            'email_otp_expires_at' => now()->addMinutes(10),
+        ]);
+        return $code;
+    }
+
+    public function verifyOtp($code)
+    {
+        if ($this->email_otp === $code && $this->email_otp_expires_at && now()->lessThanOrEqualTo($this->email_otp_expires_at)) {
+            $this->update([
+                'email_verified_at' => now(),
+                'email_otp' => null,
+                'email_otp_expires_at' => null,
+            ]);
+            return true;
+        }
+        return false;
+    }
+
+    public function hasVerifiedEmail()
+    {
+        return !is_null($this->email_verified_at);
     }
 
     public function sendPasswordResetNotification($token)
