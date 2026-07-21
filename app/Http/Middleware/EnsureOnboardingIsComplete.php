@@ -17,17 +17,17 @@ class EnsureOnboardingIsComplete
     {
         if (auth()->check()) {
             $profile = auth()->user()->profile;
-            if (!$profile || !$profile->username) {
+            if (! $profile || ! $profile->username) {
                 // If they are not already on the onboarding page, redirect them
-                if (!$request->routeIs('onboarding') && 
-                    !$request->routeIs('logout') && 
-                    !$request->routeIs('email.verification') &&
-                    !$request->routeIs('verification.*')) {
+                if (! $request->routeIs('onboarding') &&
+                    ! $request->routeIs('logout') &&
+                    ! $request->routeIs('email.verification') &&
+                    ! $request->routeIs('verification.*')) {
                     return redirect()->route('onboarding');
                 }
             }
         }
-        
+
         return $next($request);
     }
 }

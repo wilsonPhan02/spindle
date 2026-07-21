@@ -30,40 +30,41 @@ class TextHelper
             'Friend',
             'Enemy',
             'Neighbor',
-            'Lover'
+            'Lover',
         ];
     }
 
     public static function localizeDefaultName(?string $name): string
     {
-        if (!$name) {
+        if (! $name) {
             return '';
         }
 
         if (preg_match('/^Draft\s+(\d+)$/i', $name, $matches)) {
-            return __('Draft') . ' ' . $matches[1];
+            return __('Draft').' '.$matches[1];
         }
 
         foreach (self::getDefaultNames() as $default) {
             if ($name === $default) {
                 return __($default);
             }
-            if (preg_match('/^(' . preg_quote($default, '/') . ')\s*\((\d+)\)$/', $name, $matches)) {
-                return __($default) . ' (' . $matches[2] . ')';
+            if (preg_match('/^('.preg_quote($default, '/').')\s*\((\d+)\)$/', $name, $matches)) {
+                return __($default).' ('.$matches[2].')';
             }
         }
+
         return $name;
     }
 
     public static function normalizeDefaultName(?string $name): ?string
     {
-        if (!$name) {
+        if (! $name) {
             return $name;
         }
 
         $localizedDraft = __('Draft');
-        if (preg_match('/^' . preg_quote($localizedDraft, '/') . '\s+(\d+)$/i', $name, $matches)) {
-            return 'Draft ' . $matches[1];
+        if (preg_match('/^'.preg_quote($localizedDraft, '/').'\s+(\d+)$/i', $name, $matches)) {
+            return 'Draft '.$matches[1];
         }
 
         foreach (self::getDefaultNames() as $default) {
@@ -71,10 +72,11 @@ class TextHelper
             if ($name === $localized) {
                 return $default;
             }
-            if (preg_match('/^(' . preg_quote($localized, '/') . ')\s*\((\d+)\)$/', $name, $matches)) {
-                return $default . ' (' . $matches[2] . ')';
+            if (preg_match('/^('.preg_quote($localized, '/').')\s*\((\d+)\)$/', $name, $matches)) {
+                return $default.' ('.$matches[2].')';
             }
         }
+
         return $name;
     }
 
@@ -112,15 +114,15 @@ class TextHelper
      * Generate a unique name for a new item, following file-explorer convention:
      *   "Untitled Project", "Untitled Project (1)", "Untitled Project (2)", …
      *
-     * @param  string   $base      The base default name, e.g. "Untitled Project".
-     * @param  callable $existing  A callable that returns an iterable of existing
-     *                             title strings to check against. Receives no args.
-     * @return string
+     * @param  string  $base  The base default name, e.g. "Untitled Project".
+     * @param  callable  $existing  A callable that returns an iterable of existing
+     *                              title strings to check against. Receives no args.
      */
     public static function uniqueName(string $base, callable $existing): string
     {
         $titles = collect($existing())->map(function ($t) {
             $normalized = self::normalizeDefaultName((string) $t);
+
             return strtolower($normalized);
         });
 

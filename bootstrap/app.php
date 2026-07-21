@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Middleware\CheckProjectAccess;
+use App\Http\Middleware\EnsureEmailIsVerified;
+use App\Http\Middleware\SetLocale;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Application;
@@ -21,12 +23,12 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->web(append: [
-            \App\Http\Middleware\SetLocale::class,
+            SetLocale::class,
         ]);
 
         $middleware->alias([
             'project.access' => CheckProjectAccess::class,
-            'email.verified' => \App\Http\Middleware\EnsureEmailIsVerified::class,
+            'email.verified' => EnsureEmailIsVerified::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

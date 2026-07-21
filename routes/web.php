@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Auth\GoogleController;
+use App\Http\Middleware\EnsureOnboardingIsComplete;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -21,6 +23,7 @@ Route::get('/lang/{locale}', function ($locale) {
             Auth::user()->profile->update(['language' => $locale]);
         }
     }
+
     return redirect()->back();
 })->name('lang.switch');
 
@@ -31,12 +34,12 @@ Route::middleware('guest')->group(function () {
     Volt::route('/login', 'auth.login')->name('login');
 
     // Google Auth Routes
-    Route::get('/auth/google', [\App\Http\Controllers\Auth\GoogleController::class, 'redirect'])->name('auth.google');
-    Route::get('/auth/google/callback', [\App\Http\Controllers\Auth\GoogleController::class, 'callback'])->name('auth.google.callback');
+    Route::get('/auth/google', [GoogleController::class, 'redirect'])->name('auth.google');
+    Route::get('/auth/google/callback', [GoogleController::class, 'callback'])->name('auth.google.callback');
 });
 
 // AREA AUTH: Hanya bisa diakses oleh orang yang SUDAH LOGIN
-Route::middleware(['auth', \App\Http\Middleware\EnsureOnboardingIsComplete::class])->group(function () {
+Route::middleware(['auth', EnsureOnboardingIsComplete::class])->group(function () {
     Volt::route('/email-verification', 'auth.email-verification')->name('email.verification');
 
     Route::middleware('email.verified')->group(function () {

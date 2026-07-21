@@ -15,6 +15,7 @@ trait HandlesFileUpload
     protected function uploadImage(UploadedFile $file, string $directory, ?string $disk = null)
     {
         $disk = $disk ?? config('filesystems.default');
+
         return $file->store($directory, $disk);
     }
 
@@ -24,7 +25,7 @@ trait HandlesFileUpload
     protected function deleteImage(?string $path, ?string $disk = null): bool
     {
         $disk = $disk ?? config('filesystems.default');
-        
+
         if ($path && Storage::disk($disk)->exists($path)) {
             return Storage::disk($disk)->delete($path);
         }
@@ -40,7 +41,7 @@ trait HandlesFileUpload
     protected function replaceImage(UploadedFile $file, ?string $oldPath, string $directory, ?string $disk = null)
     {
         $disk = $disk ?? config('filesystems.default');
-        
+
         $this->deleteImage($oldPath, $disk);
 
         return $this->uploadImage($file, $directory, $disk);
