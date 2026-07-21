@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Laravel\Socialite\Facades\Socialite;
 
 class GoogleController extends Controller
@@ -28,13 +30,13 @@ class GoogleController extends Controller
             // We add setHttpClient(['verify' => false]) to avoid
             // "cURL error 60: SSL certificate problem" which often occurs on Windows localhost.
             $googleUser = Socialite::driver('google')
-                ->setHttpClient(new \GuzzleHttp\Client(['verify' => false]))
+                ->setHttpClient(new Client(['verify' => false]))
                 ->user();
 
             // Find an existing user by email or google_id
             $user = User::where('email', $googleUser->getEmail())
-                        ->orWhere('google_id', $googleUser->getId())
-                        ->first();
+                ->orWhere('google_id', $googleUser->getId())
+                ->first();
 
             $isNewUser = false;
 
@@ -56,12 +58,12 @@ class GoogleController extends Controller
             }
 
             Auth::login($user, true);
-            
+
             // Ensure we get the latest profile data
             $user->refresh();
 
             // If the username is still empty, force redirect to onboarding page
-            if (!$user->profile || empty($user->profile->username)) {
+            if (! $user->profile || empty($user->profile->username)) {
                 return redirect('/onboarding');
             }
 
@@ -69,8 +71,8 @@ class GoogleController extends Controller
 
         } catch (\Exception $e) {
             // Log the actual error to laravel.log so we know the real issue
-            \Illuminate\Support\Facades\Log::error('Google Auth Error: ' . $e->getMessage());
-            
+            Log::error('Google Auth Error: '.$e->getMessage());
+
             return redirect()->route('login')->withErrors([
                 'email' => __('Authentication failed. Please try again.'),
             ]);

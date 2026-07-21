@@ -57,11 +57,12 @@ class User extends Authenticatable
 
     public function generateOtp()
     {
-        $code = str_pad((string)random_int(0, 9999), 4, '0', STR_PAD_LEFT);
+        $code = str_pad((string) random_int(0, 9999), 4, '0', STR_PAD_LEFT);
         $this->update([
             'email_otp' => $code,
             'email_otp_expires_at' => now()->addMinutes(10),
         ]);
+
         return $code;
     }
 
@@ -73,14 +74,16 @@ class User extends Authenticatable
                 'email_otp' => null,
                 'email_otp_expires_at' => null,
             ]);
+
             return true;
         }
+
         return false;
     }
 
     public function hasVerifiedEmail()
     {
-        return !is_null($this->email_verified_at);
+        return ! is_null($this->email_verified_at);
     }
 
     public function sendPasswordResetNotification($token)

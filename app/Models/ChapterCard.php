@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
+use App\Helpers\TextHelper;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Casts\Attribute;
-use App\Helpers\TextHelper;
 
 class ChapterCard extends Model
 {
@@ -53,12 +54,12 @@ class ChapterCard extends Model
         return $this->hasMany(Manuscript::class, 'chapter_card_id', 'chapter_card_id');
     }
 
-    public function tags(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    public function tags(): BelongsToMany
     {
         return $this->belongsToMany(Tag::class, 'chapter_tag', 'chapter_card_id', 'tag_id');
     }
 
-    public function characters(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    public function characters(): BelongsToMany
     {
         return $this->belongsToMany(Character::class, 'chapter_character', 'chapter_card_id', 'character_id');
     }
