@@ -174,7 +174,16 @@ new #[Layout('layouts.app')] class extends Component {
             </x-settings-items>
 
             {{-- Change Password --}}
-            <x-settings-items variant="menu" label="{{ __('Change Password') }}" @click="$dispatch('open-change-password')">
+            @php
+                $isGoogleAccount = !empty($user->google_id) || empty($user->password);
+            @endphp
+            <x-settings-items
+                variant="menu"
+                label="{{ __('Change Password') }}"
+                :disabled="$isGoogleAccount"
+                title="{{ $isGoogleAccount ? __('Not available for accounts signed in with Google') : '' }}"
+                @click="if (!{{ $isGoogleAccount ? 'true' : 'false' }}) $dispatch('open-change-password')"
+            >
                 <x-slot:icon>
                     <svg class="w-5 h-5 text-subtext-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
