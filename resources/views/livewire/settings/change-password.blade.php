@@ -13,6 +13,12 @@ new class extends Component {
 
     public function updatePassword()
     {
+        if (!empty(Auth::user()->google_id) || empty(Auth::user()->password)) {
+            throw ValidationException::withMessages([
+                'current_password' => __('You cannot change your password because you signed in with Google.'),
+            ]);
+        }
+
         $this->validate([
             'current_password' => ['required', 'string'],
             'new_password' => [
@@ -52,7 +58,7 @@ new class extends Component {
     x-data="{ show: false }" 
     x-show="show"
     @keydown.escape.window="show = false"
-    @open-change-password.window="show = true"
+    @open-change-password.window="if (!{{ (!empty(auth()->user()->google_id) || empty(auth()->user()->password)) ? 'true' : 'false' }}) show = true"
     @close-modal.window="show = false"
     style="display: none;"
     class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm"
