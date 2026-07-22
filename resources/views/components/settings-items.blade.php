@@ -6,6 +6,7 @@
     'options' => [],     // Untuk variant 'dropdown': array of ['code', 'name', 'cc']
     'current' => null,   // Untuk variant 'dropdown': kode bahasa yang aktif
     'isOn'    => false,
+    'disabled' => false,
 ])
 
 @if($variant === 'info')
@@ -158,14 +159,18 @@
 @else
     {{-- Views 2 & 3: For Menu & Toggle Buttons --}}
     @php
-        $textColor = $danger ? 'text-red-500' : 'text-text-80';
-        $iconColor = $danger ? 'text-red-500' : 'text-subtext-90';
-        $baseClass = 'w-full flex items-center justify-between py-3 px-4 -mx-4 transition-colors rounded-xl group hover:bg-brand-50 focus:outline-none';
-        $chevron   = $danger ? 'text-red-400 group-hover:text-red-600' : 'text-subtext-90 group-hover:text-text-100';
+        $isDisabled = $disabled || $attributes->has('disabled');
+        $textColor = $danger ? 'text-red-500' : ($isDisabled ? 'text-subtext-70' : 'text-text-80');
+        $iconColor = $danger ? 'text-red-500' : ($isDisabled ? 'text-subtext-70' : 'text-subtext-90');
+        $baseClass = $isDisabled
+            ? 'w-full flex items-center justify-between py-3 px-4 -mx-4 transition-colors rounded-xl group opacity-50 cursor-not-allowed focus:outline-none'
+            : 'w-full flex items-center justify-between py-3 px-4 -mx-4 transition-colors rounded-xl group hover:bg-brand-50 focus:outline-none';
+        $chevron   = $danger ? 'text-red-400 group-hover:text-red-600' : ($isDisabled ? 'text-subtext-70' : 'text-subtext-90 group-hover:text-text-100');
     @endphp
 
     <button
         type="button"
+        @disabled($isDisabled)
         @if($variant === 'toggle' && !$attributes->has('x-data'))
             x-data="{ isOn: {{ $isOn ? 'true' : 'false' }} }"
         @endif
